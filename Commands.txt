@@ -1,0 +1,105 @@
+Commands
+	<> means required parameter
+	[] means optional parameter
+	/ means pick one of these parameters
+	| means these two parameters are aliases
+	
+	/report assign <Index/last> <Player>
+		- Assigns a player to a report, basically makes the assigned player claim the specified report.
+		
+	/report claim <Index/last>
+		- Claims a report, states you would like to be in charge of dealing with this report.
+		
+	/report complete/finish <Index/last> <Report Summary>
+		-  Marks the report at Index as completed and stores a summary of the outcome of the report.
+		
+	/report delete/remove <Index/last>
+		- Deletes a specific report.
+		
+	/report delete/remove all
+		- Deletes all reports.
+		
+	/report delete/remove completed|finished
+		- Deletes all completed reports.
+		
+	/report delete/remove incomplete|unfinished
+		- Deletes all incomplete reports.
+	
+	/report delete/remove <Player Name> [reported/sender]
+		- Deletes all reports where the given player is either reported or the submitter of the report.
+		
+	/report downgrade <Index/last>
+		- Moves the specified report down to the next lowest priority.
+		
+	/report list [indexes]
+		- Lists the number of incomplete and completed reports, or their indexes.
+		
+	/report list priority [indexes]
+		- Lists the number of reports at all priority levels, or their indexes.
+		
+	/report list claimed [indexes]
+		- Lists the number of reports you have claimed, or their indexes.
+		
+	/report list claimed priority [indexes]
+		- Lists the number of reports you have claimed by their priority, or their indexes.
+		
+	/report move <Index/last> <Priority>
+		- Moves the specified report to a new priority.  Priority can be None, Low, Normal or High.
+		
+	/report <Player/!/*> <details>
+		- Reports a player with the details of the offense.  ! and * if the player name is not known.
+		
+	/report request <Player Name>
+		- Prints a list of indexes where the specified player was reported.
+	
+	/report request most
+		- Displays the player or players with the most reports against them.
+		
+	/report unassign <Index/last>
+		- Opposite of assigning a report.  Removes the player currently claiming the specified report.
+		
+	/report unclaim <Index/last>
+		-  Opposite of claiming a report, states you would like to step down from being in charge of dealing with this report.
+		
+	/report upgrade <Index/last>
+		- Moves the specified report up to the next highest priority.
+		
+	/report view <Index/last> [name]
+		- Views a report. Optional parameter name will display the player's real names.
+		
+	/report view all [name]
+		- Views all reports.
+		
+	/report view completed|finished [name]
+		- Views all completed reports.
+		
+	/report view incomplete|unfinished [name]
+		- Views all incomplete reports.
+		
+	/report view priority [name]
+		- Views all reports sorted by priority.
+		
+	/report view priority <Priority> [name]
+		- Views all reports that have the given priority.
+		
+	/report view claimed [name]
+		- Views all reports claimed by you.
+		
+	/report view claimed priority [name]
+		- Views all reports claimed by you, sorted by their priority.
+		
+	/report view claimed priority <Priority> [name]
+		- Views all reports claimed by you, that have the given priority.
+		
+	/report help [page]
+		- Shows help for the report command.
+	
+	
+	/respond <Index/last> [reported/sender]
+		- Teleports to the location of the report if reported/sender is not specified it teleports to the reported player's location.
+	/respond help
+		- Shows help for the respond command.
+	
+	Aliases:
+		report - rep, rreport
+		respond - resp, rrespond

@@ -1,0 +1,311 @@
+locale:
+  # Information about this file
+  info:
+    # The language name in English
+    language: "English"
+    # The version of this file should be integers (1,2,3...)
+    version: "9"
+    # Preferably your screen name used on BukkitDev/Bukkit forums
+    author: "KabOOm 356"
+  # Your translations go here
+  # %n creates a new line.  The strings should remain in the same format as the English counterpart.
+  # Do not translate the commands, but DO translate the variable parameters.
+  # ex. /report help stays the same where as /report respond <Index> [reported/sender] becomes /report respond <TRANSLATED> [reported/sender]
+  phrases:
+    
+    # Version 9
+    
+    allowedToReportPlayerAgain: "You are now allowed to report %r again!"
+    
+    reachedReportingLimitAgaintPlayer: "You have reached the reporting limit against %r!"
+    
+    remainingTimeToReportPlayer: "You must wait %h hours, %m minutes and %s seconds before reporting %r again!"
+    
+    viewPriority: "Report Priority:"
+    
+    noReports: "There are no reports!"
+    numberOfReportsAgainst: "There are %n report(s) against player(s): %p!"
+    
+    requestMostHelpDetails: "Displays the player or players with the most reports against them."
+    
+    deletePlayerReported: "All reports where %p was reported have been deleted!"
+    deletePlayerSender: "All reports that %p submitted have been deleted!"
+    
+    # Only translate '<Player Name>'.
+    deleteHelpPlayer: "/report delete/remove <Player Name> [reported/sender]"
+    deleteHelpPlayerDetails: "Deletes all reports where the given player is either reported or the submitter of the report."
+    
+    # Version 8
+    claimHelp: "/report claim <Index/last>"
+    claimHelpDetails: "Claims a report, states you would like to be in charge of dealing with this report."
+    
+    reportClaimSuccess: "You have successfully claimed report %i!"
+    
+    priorityLevelNotInBounds: "The priority level given is not in bounds!"
+    displayModLevel: "Your mod clearance level: %m"
+    
+    reportAlreadyClaimed: "The report at index %i is already claimed by %c, whose priority clearance is equal to or above yours!"
+    contactToAlter: "Please contact them to alter the report!"
+    
+    reportRequiresClearance: "The report at index %i requires a clearance of %m or higher!"
+    
+    unclaimHelp: "/report unclaim <Index/last>"
+    unclaimHelpDetails: "Opposite of claiming a report, states you would like to step down from being in charge of dealing with this report."
+    
+    reportIsNotClaimed: "The report at index %i is not claimed yet!"
+    reportUnclaimSuccess: "You have successfully unclaimed the report at index %i!"
+    
+    # Removed due to collision.
+    # Use viewPriority in Version 9.
+    #viewPriorityHeader: "Report Priority:"
+    viewClaimHeader: "Claimed status:"
+    viewStatusClaimed: "Claimed"
+    viewStatusUnclaimed: "Unclaimed"
+    
+    viewClaimedBy: "Claimed by:"
+    viewClaimedOn: "Claimed on:"
+    
+    viewCompletionStatus: "Completion status:"
+    
+    moveHelp: "/report move <Index/last> <Priority>"
+    moveHelpDetails: "Moves the specified report to a new priority.  Priority can be None, Low, Normal or High."
+    
+    moveReportSuccess: "The report at index %i was successfully moved to priority %p!"
+    
+    upgradeHelp: "/report upgrade <Index/last>"
+    upgradeHelpDetails: "Moves the specified report up to the next highest priority."
+    
+    reportIsAtHighestPriority: "The report at index %i is already at the highest priority!"
+    
+    downgradeHelp: "/report downgrade <Index/last>"
+    downgradeHelpDetails: "Moves the specified report down to the next lowest priority."
+    
+    reportIsAtLowestPriority: "The report at index %i is already at the lowest priority!"
+    
+    listPriorityCount: "There are %n report(s) with priority %p!"
+    listPriorityIndexes: "Reports with priority %p are at indexes: %i"
+    listNoReportsWithPriority: "There are no reports with priority %p!"
+    
+    pageNumberOutOfRange: "The page number is outside the range!"
+    numberOfHelpPages: "There are only %p help pages!"
+    reportHelpHeader: "Available /report Commands page %p of %c:"
+    respondHelpHeader: "Available /respond Commands page %p of %c:"
+    nextReportHelpPage: "Type /report help %p to view the next help page!"
+    nextRespondHelpPage: "Type /respond help %p to view the next help page!"
+    
+    assignedPlayerMustBeOnline: "The player to assign must be online!"
+    cannotAssignHigherPriority: "You cannot assign reports to players with the same or higher priority than you!"
+    playerPriority: "Player %p has a priority of %m"
+    
+    assignPriorityNotHighEnough: "The player %p does not have a high enough priority to be assigned to report %i!"
+    
+    assignHelp: "/report assign <Index/last> <Player>"
+    assignHelpDetails: "Assigns a player to a report, basically makes the assigned player claim the specified report."
+    
+    assignSuccessful: "Player %p was successfully assigned to report %i!"
+    assignedToReport: "%p has assigned you to report %i!"
+    
+    useClaimToAssignSelf: "Use /report claim to assign yourself to a report."
+    
+    unassignHelp: "/report unassign <Index/last>"
+    unassignHelpDetails: "Opposite of assigning a report.  Removes the player currently claiming the specified report."
+    
+    reportUnassignSuccess: "You have successfully unassigned %p from the report at index %i!"
+    unassignedFromReport: "You have been unassigned from report %i by %s!"
+    
+    displayOtherModLevel: "%p mod clearance level: %m"
+    
+    listClaimed: "You currently have %n claimed report(s)!"
+    listClaimedPriorityCount: "You have %n report(s) claimed with priority %p!"
+    listClaimedIndexes: "You have claimed reports at indexes: %i"
+    listClaimedPriorityIndexes: "Your report(s) claimed with priority %p are at indexes %i!"
+    listNoClaimedPriorityIndexes: "You do not have any claimed reports with priority %p!"
+    
+    listHelpPriorityDetails: "Lists the number of reports at all priority levels, or their indexes."
+    listHelpClaimedDetails: "Lists the number of reports you have claimed, or their indexes."
+    listHelpClaimedPriorityDetails: "Lists the number of reports you have claimed by their priority, or their indexes."
+    
+    viewYourClaimedReportsHeader: "Your Claimed Reports"
+    viewPriorityHeader: "%p Priority Reports"
+    viewHelpAllDetails: "Views all reports."
+    viewHelpCompletedDetails: "Views all completed reports."
+    viewHelpIncompleteDetails: "Views all incomplete reports."
+    viewHelpPriorityDetails: "Views all reports sorted by priority."
+    viewHelpGivenPriority: "/report view priority <Priority> [name]"
+    viewHelpGivenPriorityDetails: "Views all reports that have the given priority."
+    viewHelpClaimedDetails: "Views all reports claimed by you."
+    viewHelpClaimedPriorityDetails: "Views all reports claimed by you, sorted by their priority."
+    viewHelpClaimedGivenPriority: "/report view claimed priority <Priority> [name]"
+    viewHelpClaimedPriorityDetails: "Views all reports claimed by you, that have the given priority."
+    
+    deleteHelpAllDetails: "Deletes all reports."
+    deleteHelpCompletedDetails: "Deletes all completed reports."
+    deleteHelpIncompleteDetails: "Deletes all incomplete reports."
+    
+    # These line changed from previous versions.
+    # Please change them to reflect the following
+    # From version 6
+    # Only translate Index.
+    viewHelp: "/report view <Index/last> [name]"
+    viewHelpDetails: "Views a report. Optional parameter name will display the player's real names."
+    deleteHelp: "/report delete/remove <Index/last>"
+    deleteHelpDetails: "Deletes a specific report."
+    
+    # Version 7
+    # %i is where the indexes will be inserted
+    yourReportsCompleted: "Your reports have been completed at indexes: %i"
+    
+    # Version 6
+    
+    deleteComplete: "All completed reports deleted successfully!"
+    deleteIncomplete: "All incomplete reports deleted successfully!"
+    
+    reachedReportingLimit: "You have reached the reporting limit!"
+    remainingTimeForReport: "You must wait %h hours, %m minutes and %s seconds before reporting again!"
+    
+    allowedToReportAgain: "You are now allowed to report again!"
+    
+    # These line changed from previous versions.
+    # Please change them to reflect the following
+    # From version 1
+    listHelpDetails: "Lists the number of incomplete and completed reports, or their indexes."
+    
+    # From version 4
+    respondHelp: "/respond <Index/last> [reported/sender]"
+    
+    # DEPRECATED
+    # This line is no longer used
+    # You may remove it from version 5 if you want
+    listIndexesHelpDetails: "List the indexes of all completed reports and incomplete reports."
+    viewHelpAllDetails: "View a quick summary of all reports, or only completed or unfinished reports."
+    
+    # Version 5
+    
+    respondTeleportLocation: "You are at location (World, X, Y, Z): %world, %x, %y, %z"
+    
+    listReportNoCompleteIndexes: "There are no completed reports!"
+    listReportCompleteIndexes: "Complete reports are at indexes: %i"
+    
+    listReportNoIncompleteIndexes: "There are no incomplete reports!"
+    listReportIncompleteIndexes: "Incomplete reports are at indexes: %i"
+
+    # Version 4
+    
+    noReportsToView: "There are no reports to view!"
+    noLastReport: "You have not viewed a report yet, or the report was deleted!"
+    viewAllBeginHeader: "All Reports"
+    viewAllCompleteHeader: "Completed Reports"
+    viewAllUnfinishedHeader: "Unfinished Reports"
+    viewNoSummary: "No summary given"
+    completeNoSummary: "You must write a summary to complete a report!"
+    
+    # %i is where the report index will be inserted
+    # %s is where the report sender's name will be inserted
+    # %r is where the reported player's name will be inserted
+    viewAllReportHeader: "Report %i: %s reported %r"
+    
+    # %d is where the report details will be inserted
+    viewAllReportDetails: "Details: %d"
+    
+    reportHelpAliases: "/report command aliases - /rep, /rreport"
+    respondHelpAliases: "/respond command aliases - /resp, /rrespond"
+    
+    # This is now used in place of playerNotOnline from version 1
+    # You may leave playerNotOnline in or remove it
+    playerDoesNotExist: "That player does not exist!"
+    
+    # This lines changed from version 1.
+    # Please change it to reflect the following
+    completeHelp: "/report complete/finish <Index/last> [Report Summary]"
+    
+    # Version 3
+    
+    error: "An error has occurred!"
+    
+    # Version 2
+    
+    # %i is where the indexes will be inserted
+    listReportsAvailable: "You have access to the following reports: %i"
+    listNoReportsAvailable: "You do not have access to any reports!"
+    viewReportNotAvailable: "You do not have access to that report!"
+    
+    # Version 1
+    
+    # DEPRECATED
+    # This has been replaced by playerDoesNotExist in version 4
+    # You may remove this if you want
+    playerNotOnline: "That player is not online or does not exist!"
+    
+    broadcastYourReportCompleted: "Your report at index: %i has been completed"
+    # The message that will be sent when the /report list command is used.
+    # %r is the number of reports not completed.
+    # %c is the number of reports completed.
+    reportList: "There are %r reports submitted%nThere are %c completed reports"
+    # The message that will be broadcast when a report is submitted.
+    # %i is the index number of the report.
+    broadcastSubmitted: "A report has just been submitted at index: %i"
+    # The message that will be sent when a report is completed.
+    # %i is the index number of the report.
+    broadcastCompleted: "Report %i has just been completed"
+    # Don't translate /report help
+    tryReportHelp: "Try using /report help"
+    # Don't translate /respond help
+    tryRespondHelp: "Try using /respond help"
+    failedPermissions: "You do not have the required permissions to perform this command!"
+    playerComplete: "Report completion submitted. Thank you."
+    playerReport: "Report submitted. Thank you."
+    # Translate player and details
+    reportHelp: "/report <player/!/*> <details>"
+    
+    # DEPRECATED
+    # This has been replaced by reportHelpHeader in version 8
+    # You may remove this if you want
+    availableReport: "Available /report Commands:"
+    
+    # DEPRECATED
+    # This has been replaced by respondHelpHeader in version 8
+    # You may remove this if you want
+    availableRespond: "Available /respond Commands:"
+    
+    requestHelp: "/report request <Player Name>"
+    # Don't translate reported/sender
+    respondHelpDetails: "Teleports to the location of the report defaults to the reported player's location, if reported/sender is not specified."
+    reportHelpDetails: "Reports a player with the details of the offense.  ! and * if the player name is not known."
+    requestHelpDetails: "Prints a list of indexes where the specified player was reported."
+    completeHelpDetails: "Marks the report at Index as completed and stores a summary of the outcome of the report."
+    
+    indexInt: "Report index must be an integer!"
+    indexRange: "Report index outside of range!"
+    bothPlayerLocNF: "Both sender and reported players location's could not be found!"
+    reportedPlayerLocNF: "Reported players location could not be found!"
+    senderLocNF: "Sender's location could not be found!"
+    telSender: "Teleporting to the report sender's location"
+    telReported: "Teleporting to the reported player's location"
+    # %p is the player name requested
+    reqNF: "%p was not found in any reports."
+    # %p is the player name requested
+    # %i are the indexes
+    reqFI: "%p was found in the following reports: %i"
+    deleteAll: "All reports have been removed!"
+    # %i is the index number of the report.
+    deleteReport: "Report index %i deleted successfully."
+    SQLTablesReformat: "SQL tables reformatted successfully."
+    # %i is the index number of the report.
+    viewBegin: "Begin Report %i"
+    viewSender: "Report submitted by:"
+    viewReported: "Player Reported:"
+    viewDetails: "Report Details:"
+    viewDate: "Report submission date:"
+    viewSummaryTitle: "Report Summary"
+    
+    # DEPRECATED
+    # This has been replaced by viewCompletionStatus in version 8
+    # You may remove this if you want
+    viewStatus: "Report status:"
+    
+    viewCompletedBy: "Report completed by:"
+    viewCompletedOn: "Report completed on:"
+    viewFinished: "Completed"
+    viewUnfinished: "Uncompleted"
+    viewCompletedSummary: "Report summary:"
+    

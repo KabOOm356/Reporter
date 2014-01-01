@@ -1,0 +1,11 @@
+name: Reporter
+author: KabOOm 356
+website: http://dev.bukkit.org/server-mods/reporter/
+main: net.KabOOm356.Reporter.Reporter
+version: 3.1
+softdepend: [PermissionsEx]
+commands:
+  report:
+    aliases: [rreport, rep]
+  respond:
+    aliases: [rrespond, resp]

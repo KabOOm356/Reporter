@@ -1,0 +1,207 @@
+# Reporter Configuration File
+# Config Version: 11
+
+# General plugin settings
+general:
+
+  # General messaging settings
+  messaging:
+    
+    # Messages that will be displayed if a player's
+    # report was completed while they were offline
+    completedMessageOnLogin:
+      
+      # Should players receive the completion messages when they login
+      # Default: true
+      completedMessageOnLogin: true
+      
+      # Should there be a delay from when they
+      # login to when they receive the message
+      # Default: true
+      useDelay: true
+      
+      # The delay, in seconds, after login the player should receive the messages
+      # Default: 5
+      delay: 5
+  
+    # Listing reports when a player logs in settings
+    listOnLogin:
+      
+      # Should mods and admins be told the number of reports when they login
+      # Default: true
+      listOnLogin: true
+      
+      # If the plugin should delay listing the number of reports when a player logs in
+      # Default: true
+      useDelay: true
+      
+      # Delay, in seconds, from when a player joins the server
+      # that the plugin will list the number of reports.
+      # Default: 5
+      delay: 5
+  
+  # If the player that submitted the report can view their report
+  # Default: true
+  canViewSubmittedReports: true
+  
+  # If reports can be completed with out a summary being written
+  # Default: false
+  canCompleteWithoutSummary: false
+  
+  # General settings for reporting
+  reporting:
+    
+    # If the players should be limited on how many reports they can submit in a given amount of time
+    # Default: true
+    limitNumberOfReports: true
+    
+    # The number of reports the players can submit
+    # Default: 5
+    limitNumber: 5
+    
+    # The time, in seconds, before the player can report once reaching the limit number
+    # 60 Seconds = 1 Minute
+    # 300 Seconds = 5 Minutes
+    # 600 Seconds = 10 Minutes
+    # 3600 Seconds = 1 Hour
+    # Default: 600
+    limitTime: 600
+    
+    # If players should be limited on how many reports they can submit against another player
+    # Default: false
+    limitReportsAgainstPlayers: false
+    
+    # The number of reports a player can submit against another player
+    # Default: 2
+    limitNumberAgainstPlayers: 2
+    
+    # Alert the console when these events occur
+    alerts:
+      
+      # These alerts will be logged to the console.
+      toConsole:
+      
+        # If the console should log when a player
+        # has reached their allowed reporting limit
+        # Default: true
+        limitReached: true
+        
+        # If the console should log when a player
+        # is allowed to report again after reaching
+        # their reporting limit
+        # Default: true
+        allowedToReportAgain: true
+        
+        # If the console should log when a player
+        # has reached their allowed reporting limit
+        # against another player.
+        # Default: true
+        limitAgainstPlayerReached: true
+        
+        # If the console should log when a player
+        # is allowed to report another player
+        # after reaching their reporting limit.
+        # Default: true
+        allowedToReportPlayerAgain: true
+      
+      # These alerts will be sent to the players.
+      toPlayer:
+        
+        # If the player should be alerted when they are
+        # allowed to report again after reaching
+        # their reporting limit.
+        # Default: true
+        allowedToReportAgain: true
+        
+        # If the player should be alerted when
+        # they are allowed to report another player
+        # after reaching their reporting limit.
+        # Default: true
+        allowedToReportPlayerAgain: true
+  
+  # General viewing settings
+  viewing:
+    
+    # If the location of the report sender and reported player
+    # should be shown when someone views a report
+    # Default: true
+    displayLocation: true
+    
+    # If when viewing a report the player's
+    # real names will be displayed every time.
+    # This should be used if the server allows nicknames.
+    # Equivalent to /report view <index/...> name
+    # Default: false
+    displayRealName: false
+  
+  # Permissions settings
+  permissions:
+    
+    # If OPS should have all the permissions for this plugin by default.
+    # Default: true
+    opsHaveAllPermissions: true
+    
+# Settings related to the plugin
+plugin:
+  
+  # Settings related to plugin updates
+  updates:
+    
+    # If on startup the plugin should check BukkitDev for any updates
+    # NOTICE This does not download the new version for you
+    # Default: true
+    checkForUpdates: true
+    
+    # This is the lowest level of release that you would like to be alerted about
+    # Available levels are: RELEASE, RC, BETA, ALPHA, and ANY
+    # Default: RELEASE
+    releaseLevel: RELEASE
+
+# Locale related settings
+locale:
+  
+  # The locale file to use check out http://dev.bukkit.org/server-mods/reporter/forum/translations/
+  # for more information and translations
+  # Default: en_US
+  locale: en_US
+  
+  # Settings related to locale downloading and updates
+  updates:
+    
+    # If the locale file above does not exist on your machine should it be automatically downloaded and updated
+    # This only works if the specified locale is supported
+    # Default: true
+    autoDownload: true
+    
+    # If when starting the server the locale file should be downloaded and updated on a separate thread
+    # NOTE: If this is set to false server startup will pause when the locale file is initialized
+    # Default: true
+    asynchronousUpdate: true
+    
+    # If the backup file of the locale file should be retained after successfully updating the locale file
+    # Default: false
+    keepBackup: false
+    
+    # This is the lowest level of release that you would like download
+    # Available levels are: RELEASE, RC, BETA, ALPHA, and ANY
+    # Default: RELEASE
+    releaseLevel: RELEASE
+
+# Database settings for storing the reports
+database:
+
+  # sqlite or mysql
+  # Default: sqlite
+  type: sqlite
+  
+  # If you specified SQLite above this is the file name the database will use.
+  # If you specified MySQL above, this will be IGNORED.
+  # Default: reports.db
+  dbName: reports.db
+
+  # If you specified MySQL above, you MUST enter the appropriate details here.
+  # If you specified SQLite above, these will be IGNORED.
+  host: localhost:3306
+  database: Reporter
+  username: root
+  password: root

@@ -1,0 +1,36 @@
+Permission Nodes:
+	reporter.report
+		- Ability to submit reports.
+	reporter.report.nolimit
+		- Players with this permission will not have a report limit.
+	reporter.list
+		- Ability to list reports.
+	reporter.view
+		- Ability to view reports.
+	reporter.request
+		- Ability to request which reports have a specified player in them.
+	reporter.complete
+		- Ability to complete a report.
+	reporter.delete
+		- Ability to delete a report.
+	reporter.respond
+		- Ability to respond to a report (teleport to the report location).
+	reporter.assign
+		- Allows players to assign others to reports.
+	reporter.claim
+		- Allows players to claim and unclaim reports.
+	reporter.move
+		- Allows players to upgrade, downgrade and move reports to a different priority.
+	reporter.unassign
+		- Allows players to unassign others from reports.
+	
+	Mod Levels:
+		reporter.modlevel.low
+			- Players with this permission node will be designated as low level mods.
+		reporter.modlevel.normal
+			- Players with this permission node will be designated as normal level mods.
+		reporter.modlevel.high
+			- Players with this permission node will be designated as high level mods.
+		
+		NOTE: Giving the permission node reporter.modlevel.* will default to reporter.modlevel.high.
+		

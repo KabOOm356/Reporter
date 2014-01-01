@@ -1,0 +1,275 @@
+Changelog:
+
+	1.0
+				Initial Release
+	1.1
+				Fixed a little bug which stopped some users reporting. Only ops and players with reporter.reports will be notified of reports upon login.
+	1.1_01
+				Removed the option to ban players from reporting as it was conflicting with the '*' permission.
+	2.0		8/9/2011
+				Added MySQL support and a configuration file.
+	2.1.0	8/10/2011
+				Added X,Y,Z location of the sender and reported player
+	2.2.0	8/12/2011
+				Added anonymous reporting with /report <!/*> <details> and modulized some commands
+	2.3.0	8/13/2011
+				Added teleporting to the report location and help commands
+	2.4.0	8/18/2011
+				Features:
+					Added report summary with command /report <complete/finish> <Index> <Report Summary>
+					Bukkit built-in permissions now supported
+				Changes:
+					Report messages now only broadcast to players with the reporter.reports and reporter.mod permissions
+					Location removed from report view
+					Report ID added to the report view
+	2.4.1	8/21/2011
+				Fixes:
+					Fixed the broadcast message from being spammed
+					Fixed the broadcast message being sent to everyone now only sent to players with the permissions
+	2.5.0	8/29/2011
+				Features:
+					New configuration options:
+						listOnLogin - If the amount of reports should be shown to admins and mods when they login
+						reportList - The message to be sent when the /report list command is used.
+						reportSubmitted - The message to be broadcast when a report is submitted.
+						reportCompleted - The message to be broadcast when a report is completed.
+						dbName - The file name that SQLite will use.
+				Changes:
+					reporter.reports permission node now changed to reporter.admin
+					Default SQLite reports location changed from reports to reports.db
+				Fixes:
+					Players with the reporter.mod are notified how many reports their are when they login
+	2.5.1	8/30/2011
+				Fixes:
+					Fixed an indexOutOfBounds error when running /report
+	2.6.0	9/11/2011
+				Features:
+					Added ability to search for reports where a player was reported
+				Changes:
+					New permissions nodes:
+						reporter.report - Ability to submit reports.
+						reporter.list - Ability to list reports.
+						reporter.view - Ability to view reports.
+						reporter.request - Ability to request which reports have a specified player in them.
+						reporter.complete - Ability to complete a report.
+						reporter.delete - Ability to delete a report.
+						reporter.respond - Ability to respond to a report (teleport to the report location).
+				Fixes:
+					Better protection against SQL injection.
+					Better database resources handling.
+	2.7.0   9/24/2011
+				Features:
+					Multi-language support
+				Changes:
+					Config Options:
+				New:
+					locale -  The name of the locale file
+					localeAutoDownload - If the plugin should automatically download and updated the specified locale from BukkitDev
+				Removed:
+					reportList
+					reportSubmitted
+					reportCompleted
+	2.7.1	9/24/2011
+				Fixes:
+					Locale auto download/update now works properly
+	2.8.0	10/9/2011
+				Features:
+					Players can view the reports they submit
+				New Config Options:
+					canViewSubmittedReports - If the players that submitted reports can view their reports
+	2.8.1	11/5/2011
+				Features:
+					PermissionsEx support
+				Fixes:
+					Switched from the deprecated Configuration class to the current YamlConfiguration class
+					Fixed a cast exception when sending commands from console
+					Broadcast messages now go to players with the reporter.list permission node
+					The player is now alerted if an error occurs when running a command instead of just printing the error to the console
+					Re-wrote and optimized most of the code
+	2.9.0	12/31/2011
+				Features:
+					Added command aliases:
+						respond: rrespond or resp
+						report: rreport or rep
+					Ability to view the last viewed report with command /report view last
+					Ability to delete the last viewed report with command /report delete last
+					Ability to complete the last viewed report with command /report complete/finish last [Summary]
+					Ability to respond to the last viewed report with command /respond last [sender/reported]
+					Ability to report offline players
+					Ability to view a 'quick view' of all reports using command /report view all
+					Ability to complete a report without submitting a summary if canCompleteWithoutSummary is true
+					New Config Option:
+						canCompleteWithoutSummary - If reports can be completed without specifying a summary
+	2.9.1	1/14/2012
+				Fixes:
+					Fixed an error when trying to view a report using MySQL
+	2.10.0	2/8/2012
+				Features:
+					Implemented a backup system for when updating the locale file
+					When the plugin loads it checks BukkitDev if an update is available
+					New Config Options:
+						keepLocaleBackupFile - If you want to keep the backup file, instead of having it automatically deleted after a successful update
+						checkForUpdates - If when the plugin loads it should check if there is an update available on BukkitDev
+						checkForDevUpdates - If you should be alerted when Alpha, Beta, and other pre-releases are available on BukkitDev
+				Changes:
+					Config Changes:
+						general.locale node changed to locale.locale
+						general.localeAutoDownload node changed to locale.localeAutoDownload
+				Fixes:
+					Updated to the new Event system
+					Fixed an error when trying to complete a report with incorrect parameters, the player would be told it was both successful and unsuccessful when it really failed
+	2.10.1	2/13/2012
+				Fixes:
+					Removed debugging messages when a player would join or disconnect
+	2.10.2	2/15/2012
+				Fixes:
+					Fixed an error when using /report view all with MySQL and no reports in the database
+	2.10.3	2/22/2012
+				Fixes:
+					Fixed an error when trying to view a report without any parameters
+					Fixed an error when trying to view a report with MySQL
+					Fixed the unfinished reports header remaining in English even with a locale file being used
+	2.11.0	3/23/2012
+				Features:
+					Ability to list the indexes of completed and incomplete reports
+					Ability to use report commands from the console and rcon
+					Ability to view a list of only completed reports or only unfinished reports
+				Changes:
+					Information about where you teleported is now displayed when using the /respond command
+					Coordinates were added for each player when viewing a report
+					The /report request <Player Name> command has been reworked to find the player that most matches the player name given 
+				Fixes:
+					Fixed an error when trying to view your last report when using MySQL
+	2.12.0	5/30/2012
+				Features:
+					Ability to set a delay from the time a player logs in to the time the plugin lists the reports
+				New Config Options:
+					useDelay - If listing the reports should be delayed after a player logs in 
+					delay - How long, in seconds, the plugin should delay before listing the reports
+				Config Changes:
+					general.messaging.listOnLogin node changed to general.messaging.listOnLogin.listOnLogin
+	2.13.0	10/27/2012
+				Features:
+					The delete command now allows for deleting only completed or incomplete reports
+					Limit the amount of reports submitted by a player in a certain amount of time
+				Changes:
+					The location of the sender and reported player being displayed when a report is viewed is now configurable
+					Re-wrote the database system
+					Re-structured the entire code base
+				New Permission Node:
+					reporter.report.nolimit - Allows players with this permission node to report without being limited
+				New Config Options:
+					displayLocation - If the location of the sender and reported player should be displayed when someone views the report
+					limitNumberOfReports - If the plugin should limit the amount of reports a player can submit in a given amount of time
+					limitNumber - The number of reports a player can submit
+					limitTime - The time between each report
+				Fixes:
+					Fixed an error when the console would attempt to access it's last report after server startup
+					Cleared up default locale file inconsistencies
+					Fixed the request command to find the player that most matches the player name given
+	2.14.0	10/31/2012
+				Features:
+					The view command can now display the sender and reported player's real names
+					If a report is completed while the report sender is offline, a message stating that their report was completed will display the next time they login
+				New Config Options:
+					displayRealName - The view command will always display both player's display names and real names.
+					completedMessageOnLogin - If a message should appear the next time a report sender logs in after their report has been completed
+					completedMessageOnLogin.useDelay - Should there be a delay between when the report sender logs in and when the message is displayed
+					completedMessageOnLogin.delay - How long, in seconds, the plugin should delay before showing the completion message
+				Fixes:
+					Fixed players being able to bypass the reporting limit if they log off then log back in
+	2.14.1	11/1/2012
+				Fixes:
+					Re-compiled using Java 1.6 compliance
+					Fixed an error when responding to reports
+	2.14.2	12/23/2012
+				Changed deprecated Bukkit scheduler calls to the new methods.
+	2.14.3	1/1/2013
+				Added error handling for an error when one or more of the commands fail to register.
+	2.15.0	2/5/2013
+				Features:
+					Locale files can be updated/downloaded asynchronously. 
+				Changes:
+					Re-wrote the Locale initializer and downloader.
+					Downloaded locale files are now saved using the source's encoding.
+					Locale files are now hosted on Dropbox.
+					Locale initializer now increments through the backup files to see which, if any, loads.
+					When checking for updates, the actual version of the file is taken into consideration, not just to modification date like previously.
+					When checking for updates, levels of releases can be specified (replaces "check for dev updates" in the configuration).
+				Configuration:
+					Changed general.checkForUpdates to plugin.updates.checkForUpdate.
+					Changed general.checkForDevUpdates to plugin.updates.releaseLevel which now takes a string of the ReleaseLevel wanted.
+					Changed locale.localeAutoDownload to locale.updates.autoDownload
+					Changed locale.keepLocaleBackupFile to locale.updates.keepBackup
+					Added locale.updates.releaseLevel for the minimum release level to download or update to.
+					Added locale.updates.asynchronousUpdate to specify whether the locale file should be downloaded and updated on a separate thread.
+	2.15.1	2/11/2013
+				Fixes:
+					Removed some unneeded color codes.
+					Added default color formatting to the list command output.
+					Color codes in the locale should be correctly replaced in all output.
+	2.15.2	3/3/2013
+				Fixes:
+					Fixed the plugin update checker not messaging that a new version is available.
+					Fixed an error when viewing all, incomplete, or completed reports when the report details include a dollar sign character ($).
+	2.15.3	4/4/2013
+				Fixed the request command throwing an SQLException, while using SQLite, when searching for a player that was not reported in any reports.
+	2.15.4	6/1/2013
+				Fixed matching empty strings and spaces to a random player, when reporting.
+	3.0		8/19/2013
+				Features:
+					Added claiming system.
+					Added a priority system.
+					Added pages to the help command.
+				New Commands:
+					/report assign <Index/last> <Player>
+					/report claim <Index/last>
+					/report downgrade <Index/last>
+					/report list priority [indexes]
+					/report list claimed [indexes]
+					/report list claimed priority [indexes]
+					/report move <Index/last> <Priority>
+					/report unassign <Index/last>
+					/report unclaim <Index/last>
+					/report upgrade <Index/last>
+					/report view priority [name]
+					/report view priority <Priority> [name]
+					/report view claimed [name]
+					/report view claimed priority [name]
+					/report view claimed priority <Priority> [name]
+				New Permission Nodes:
+					reporter.assign
+					reporter.claim
+					reporter.move
+					reporter.unassign
+					Mod levels:
+						reporter.modlevel.low
+						reporter.modlevel.normal
+						reporter.modlevel.high
+				Changes:
+					Changed most of the display colors.
+					Changed default date format to "Year-Month-Day Hour:Minute:Second".
+				Database:
+					Increased the allowed number of characters in the report details from 100 to 200.
+					Increased the allowed number of characters in the report summary from 100 to 200.
+				Fixes:
+					Fixed a null pointer exception when reloading the plugin then trying to access the last viewed report index.
+	3.1		1/1/2014
+				Features:
+					Added the ability to limit the number of reports a player can submit against another player.
+				New commands:
+					/report request most
+					/report delete/remove <Player Name> [reported/sender]
+				New Configuration Options:
+					general.permissions.opsHaveAllPermissions - Specifies if OPs should have all the permissions for this plugin by default.
+					general.reporting.limitReportsAgainstPlayers - If players should be limited on how many reports they can submit against another player.
+					general.reporting.limitNumberAgainstPlayers - The number of reports a player can submit against another player.
+					general.reporting.alerts.toConsole.limitAgainstPlayerReached - If the console should log when a player has reached their allowed reporting limit against another player.
+					general.reporting.alerts.toConsole.allowedToReportPlayerAgain - If the console should log when a player is allowed to report another player.
+					general.reporting.alerts.toPlayer.allowedToReportAgain - If the player should be alerted when they are allowed to report again after reaching their reporting limit.
+					general.reporting.alerts.toPlayer.allowedToReportPlayerAgain - If the player should be alerted when they are allowed to report another player after reaching their reporting limit.
+				Changes:
+					Removed Permissions plugin support.
+					Configuration:
+						general.reporting.alerts.limitReached moved to general.reporting.alerts.toConsole.limitReached
+						general.reporting.alerts.allowedToReportAgain moved to general.reporting.alerts.toConsole.allowedToReportAgain
