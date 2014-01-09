@@ -273,3 +273,6 @@ Changelog:
 					Configuration:
 						general.reporting.alerts.limitReached moved to general.reporting.alerts.toConsole.limitReached
 						general.reporting.alerts.allowedToReportAgain moved to general.reporting.alerts.toConsole.allowedToReportAgain
+	3.1.1
+				Changes:
+					Plugin update checking now works with the ServerMods API.
