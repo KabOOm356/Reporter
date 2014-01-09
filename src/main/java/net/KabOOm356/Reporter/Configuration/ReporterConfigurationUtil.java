@@ -374,6 +374,13 @@ public class ReporterConfigurationUtil
 			updated = true;
 		}
 		
+		// Version 12
+		if(!configuration.isSet("plugin.updates.api-key"))
+		{
+			configuration.set("plugin.updates.api-key", "NO_KEY");
+			updated = true;
+		}
+		
 		if(updated)
 		{
 			configuration.options().header("Reporter Configuration File\n" +

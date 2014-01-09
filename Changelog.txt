@@ -276,3 +276,5 @@ Changelog:
 	3.1.1
 				Changes:
 					Plugin update checking now works with the ServerMods API.
+				New Configuration Option:
+					plugin.updates.api-key - The api-key to send with the plugin update request.

@@ -44,7 +44,7 @@ public class Reporter extends JavaPlugin
 	private static String pluginUpdateAPI = "https://api.curseforge.com/servermods/files?projectIds=31347";
 	
 	public static final String localeVersion = "9";
-	public static final String configVersion = "11";
+	public static final String configVersion = "12";
 	public static final String databaseVersion = "7";
 	
 	private static String version;
@@ -169,6 +169,12 @@ public class Reporter extends JavaPlugin
 				e.printStackTrace();
 				return;
 			}
+			
+			String apiKey = getConfig().getString("plugin.updates.api-key", "NO_KEY");
+			
+			// Set the X-API-Key if it is set in the configuration.
+			if(apiKey != null && !apiKey.equals("") && !apiKey.equalsIgnoreCase("NO_KEY"))
+				connection.addRequestProperty("X-API-Key", apiKey);
 			
 			String name = getDescription().getName();
 			List<String> authors = getDescription().getAuthors();

@@ -1,5 +1,5 @@
 # Reporter Configuration File
-# Config Version: 11
+# Config Version: 12
 
 # General plugin settings
 general:
@@ -156,6 +156,11 @@ plugin:
     # Available levels are: RELEASE, RC, BETA, ALPHA, and ANY
     # Default: RELEASE
     releaseLevel: RELEASE
+    
+    # If you wish to use your API key, read http://wiki.bukkit.org/ServerMods_API
+    # The default value, NO_KEY, will use anonymous access.
+    # DEFAULT: NO_KEY
+    api-key: NO_KEY
 
 # Locale related settings
 locale:
