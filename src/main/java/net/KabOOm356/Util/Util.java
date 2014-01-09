@@ -2,6 +2,7 @@ package net.KabOOm356.Util;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
@@ -100,7 +101,7 @@ public class Util
 	 * 
 	 * @return The string representation of the given indexes.
 	 */
-	public static <T> String indexesToString(ArrayList<T> indexes)
+	public static <T> String indexesToString(List<T> indexes)
 	{
 		String indexString = "";
 		

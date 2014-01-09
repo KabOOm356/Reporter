@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import net.KabOOm356.File.RevisionFile;
+
 /**
  * A class to help with file input and output.
  */
@@ -99,5 +101,37 @@ public class FileIO
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Creates a backup.
+	 * 
+	 * @param file The file to backup.
+	 * 
+	 * @return A {@link RevisionFile} where the given File was saved.
+	 */
+	public static RevisionFile createBackup(File file)
+	{
+		RevisionFile backup = null;
+		
+		try
+		{
+			backup = new RevisionFile(file.getParent(), file.getName() + ".backup");
+			
+			backup.incrementToNextRevision();
+			
+			backup.createNewFile();
+			
+			FileIO.copyTextFile(file, backup.getFile());
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			if(backup != null)
+				backup.delete();
+			return null;
+		}
+		
+		return backup;
 	}
 }

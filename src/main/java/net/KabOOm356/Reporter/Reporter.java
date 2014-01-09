@@ -1,9 +1,13 @@
 package net.KabOOm356.Reporter;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.KabOOm356.Command.ReporterCommandManager;
@@ -15,9 +19,9 @@ import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Locale.Entry.LocaleInfo;
 import net.KabOOm356.Reporter.Configuration.ReporterConfigurationUtil;
 import net.KabOOm356.Reporter.Database.ReporterDatabaseUtil;
-import net.KabOOm356.Reporter.Locale.ReporterLocaleUtil;
 import net.KabOOm356.Runnable.ReporterLocaleInitializer;
-import net.KabOOm356.Runnable.UpdateThread;
+import net.KabOOm356.Updater.PluginUpdater;
+import net.KabOOm356.Util.Util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -36,7 +40,8 @@ public class Reporter extends JavaPlugin
 	private static final String logPrefix = "[Reporter] ";
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static UpdateSite localeXMLUpdateSite = new UpdateSite("https://dl.dropbox.com/u/21577960/Reporter/Locale%20Files/latest.xml", UpdateSite.Type.XML);
-	private static UpdateSite bukkitDevRSSUpdateSite = new UpdateSite("http://dev.bukkit.org/server-mods/reporter/files.rss", UpdateSite.Type.RSS);
+	
+	private static String pluginUpdateAPI = "https://api.curseforge.com/servermods/files?projectIds=31347";
 	
 	public static final String localeVersion = "9";
 	public static final String configVersion = "11";
@@ -144,11 +149,42 @@ public class Reporter extends JavaPlugin
 	
 	private void checkForPluginUpdate()
 	{
-		ReleaseLevel pluginLevel = ReleaseLevel.getByName(getConfig().getString("plugin.updates.updateLevel", "RELEASE"));
-		
 		if(getConfig().getBoolean("plugin.updates.checkForUpdates", true))
-			Bukkit.getScheduler().runTaskAsynchronously(this, 
-					new UpdateThread(bukkitDevRSSUpdateSite, version, pluginLevel));
+		{
+			ReleaseLevel pluginLevel = ReleaseLevel.getByName(getConfig().getString("plugin.updates.updateLevel", "RELEASE"));
+			
+			URL url = null;
+			URLConnection connection = null;
+			
+			try
+			{
+				url = new URL(pluginUpdateAPI);
+			
+				connection = url.openConnection();
+			}
+			catch(IOException e)
+			{
+				getLog().warning(Reporter.getDefaultConsolePrefix() + 
+						"Could not open a connection to the ServerMods API to check for plugin updates!");
+				e.printStackTrace();
+				return;
+			}
+			
+			String name = getDescription().getName();
+			List<String> authors = getDescription().getAuthors();
+			
+			String authorsString = Util.indexesToString(authors);
+			
+			// userAgent = "Reporter v3.1.1 (By KabOOm356)"
+			String userAgent = name + " v" + version + " (By " + authorsString + ")";
+			
+			// Set User-Agent field, for connection to ServerMods API.
+			connection.addRequestProperty("User-Agent", userAgent);
+			
+			PluginUpdater update = new PluginUpdater(connection, name, version, pluginLevel);
+			
+			Bukkit.getScheduler().runTaskAsynchronously(this, update);
+		}
 	}
 	
 	private void initializeLocale()
@@ -161,15 +197,18 @@ public class Reporter extends JavaPlugin
 		
 		locale = new Locale();
 		
+		ReporterLocaleInitializer localeInitializer = 
+				new ReporterLocaleInitializer(this, localeName, getDataFolder(), autoDownload, localeLevel, keepBackup);
+		
 		if(asynchronousUpdate)
-		{
-			ReporterLocaleInitializer localeInitilizer = 
-					new ReporterLocaleInitializer(this, localeName, getDataFolder(), autoDownload, localeLevel, keepBackup);
-			
-			this.getServer().getScheduler().runTaskAsynchronously(this, localeInitilizer);
-		}
+			this.getServer().getScheduler().runTaskAsynchronously(this, localeInitializer);
 		else
-			setLocale(ReporterLocaleUtil.initLocale(localeName, getDataFolder(), autoDownload, localeLevel, keepBackup));
+		{
+			locale = localeInitializer.initLocale();
+			
+			if(locale != null)
+				setLocale(localeInitializer.initLocale());
+		}
 	}
 	
 	private void initializeDatabase()
@@ -282,11 +321,6 @@ public class Reporter extends JavaPlugin
 	public ReporterCommandManager getCommandManager()
 	{
 		return commandManager;
-	}
-
-	public static UpdateSite getBukkitDevRSSUpdateSite()
-	{
-		return bukkitDevRSSUpdateSite;
 	}
 	
 	public static UpdateSite getLocaleXMLUpdateSite()
