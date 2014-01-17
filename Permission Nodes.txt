@@ -23,6 +23,11 @@ Permission Nodes:
 		- Allows players to upgrade, downgrade and move reports to a different priority.
 	reporter.unassign
 		- Allows players to unassign others from reports.
+		
+	Alerts:
+		reporter.alerts.onLogin.reportedPlayerLogin
+			- Players with this permission will receive an alert when a reported player 
+			  from an unclaimed and unfinished report logs in.
 	
 	Mod Levels:
 		reporter.modlevel.low
