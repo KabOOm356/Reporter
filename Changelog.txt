@@ -278,6 +278,8 @@ Changelog:
 					Plugin update checking now works with the ServerMods API.
 				New Configuration Option:
 					plugin.updates.api-key - The api-key to send with the plugin update request.
+	3.1.2	1/17/2014
+				Fixed a ClassCastException when reporting with the console.
 	3.2
 				Features:
 					An alert will be sent when a reported player from an unfinished report logs in.
