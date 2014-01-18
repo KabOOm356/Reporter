@@ -229,7 +229,7 @@ public class ReportLimitManager
 		boolean canReport = limitReports && canReport(sender);
 		boolean canReportPlayer = limitReportsAgainstPlayers && canReport(sender, reportedPlayer);
 		
-		if(isPlayer && canReport || canReportPlayer)
+		if(isPlayer && (canReport || canReportPlayer))
 		{
 			Player player = (Player) sender;
 			boolean noLimit = plugin.getCommandManager().hasPermission(player, "reporter.report.nolimit");
