@@ -84,6 +84,9 @@ public class Util
 	 */
 	public static int parseInt(String s)
 	{
+		if(s == null)
+			throw new IllegalArgumentException("Given string cannot be null!");
+		
 		int i = -1;
 		
 		try
