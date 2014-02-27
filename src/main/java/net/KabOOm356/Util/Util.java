@@ -24,6 +24,10 @@ public class Util
 	 */
 	public static int countOccurrences(String s, char c)
 	{
+		// If the string does not contain the character return zero.
+		if(!s.contains(Character.toString(c)))
+			return 0;
+		
 		int it = 0;
 		int count = 0;
 		
