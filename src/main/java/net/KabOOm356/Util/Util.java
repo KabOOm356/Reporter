@@ -17,23 +17,43 @@ public class Util
 	/**
 	 * Counts the number of times a character occurs in a string.
 	 * 
-	 * @param s	The string.
-	 * @param c	The character to look for.
+	 * @param str	The string.
+	 * @param character	The character to look for.
 	 * 
 	 * @return	The number of times a character occurs in the string.
 	 */
-	public static int countOccurrences(String s, char c)
+	public static int countOccurrences(String str, char character)
 	{
+		String c = Character.toString(character);
+		
+		return countOccurrences(str, c);
+	}
+	
+	/**
+	 * Counts the number of times a substring occurs in a string.
+	 * 
+	 * @param str	The string.
+	 * @param needle	The String to look for.
+	 * 
+	 * @return	The number of times a character occurs in the string.
+	 */
+	public static int countOccurrences(String str, String needle)
+	{
+		if(str == null)
+			throw new IllegalArgumentException("Parameter 'str' cannot be null!");
+		if(needle == null)
+			throw new IllegalArgumentException("Parameter 'needle' cannot be null!");
+		
 		// If the string does not contain the character return zero.
-		if(!s.contains(Character.toString(c)))
+		if(!str.contains(needle))
 			return 0;
 		
 		int it = 0;
 		int count = 0;
 		
-		while(it != s.lastIndexOf(c))
+		while(it != str.lastIndexOf(needle))
 		{
-			it = s.indexOf(c, it+1);
+			it = str.indexOf(needle, it+1);
 			count++;
 		}
 		
@@ -49,6 +69,9 @@ public class Util
 	 */
 	public static <T> ArrayList<T> arrayToArrayList(T[] array)
 	{
+		if(array == null)
+			throw new IllegalArgumentException("Parameter 'array' cannot be null!");
+		
 		ArrayList<T> arrayList = new ArrayList<T>();
 		
 		for(T element : array)
@@ -78,20 +101,20 @@ public class Util
 	 * <br /><br />
 	 * <b>NOTE:</b> This will return -1 if the given String cannot be parsed.
 	 * 
-	 * @param s The String to parse into an int.
+	 * @param str The String to parse into an int.
 	 * 
 	 * @return The int that was parsed from the String.
 	 */
-	public static int parseInt(String s)
+	public static int parseInt(String str)
 	{
-		if(s == null)
-			throw new IllegalArgumentException("Given string cannot be null!");
+		if(str == null)
+			throw new IllegalArgumentException("Parameter 'str' cannot be null!");
 		
 		int i = -1;
 		
 		try
 		{
-			i = Integer.parseInt(s);
+			i = Integer.parseInt(str);
 		}
 		catch(Exception ex)
 		{
@@ -110,6 +133,9 @@ public class Util
 	 */
 	public static <T> String indexesToString(List<T> indexes)
 	{
+		if(indexes == null)
+			throw new IllegalArgumentException("Parameter 'indexes' cannot be null!");
+		
 		String indexString = "";
 		
 		for(T index : indexes)
@@ -132,6 +158,13 @@ public class Util
 	 */
 	public static <T> String indexesToString(ArrayList<T> indexes, ChatColor indexColor, ChatColor separatorColor)
 	{
+		if(indexes == null)
+			throw new IllegalArgumentException("Parameter 'indexes' cannot be null!");
+		if(indexColor == null)
+			throw new IllegalArgumentException("Parameter 'indexColor' cannot be null!");
+		if(separatorColor == null)
+			throw new IllegalArgumentException("Parameter 'separatorColor' cannot be null!");
+		
 		String indexString = "";
 		
 		for(T index : indexes)
@@ -157,6 +190,15 @@ public class Util
 	 */
 	public static String indexesToString(SQLResultSet resultSet, String columnName, ChatColor indexColor, ChatColor separatorColor)
 	{
+		if(resultSet == null)
+			throw new IllegalArgumentException("Parameter 'resultSet' cannot be null!");
+		if(columnName == null)
+			throw new IllegalArgumentException("Parameter 'columnName' cannot be null!");
+		if(indexColor == null)
+			throw new IllegalArgumentException("Parameter 'indexColor' cannot be null!");
+		if(separatorColor == null)
+			throw new IllegalArgumentException("Parameter 'separatorColor' cannot be null!");
+		
 		String indexString = "";
 		
 		for(ResultRow row : resultSet)
@@ -178,6 +220,11 @@ public class Util
 	 */
 	public static boolean endsWithIgnoreCase(String str, String suffix)
 	{
+		if(str == null)
+			throw new IllegalArgumentException("Parameter 'str' cannot be null!");
+		if(suffix == null)
+			throw new IllegalArgumentException("Parameter 'suffix' cannot be null!");
+		
 		if(str.length() < suffix.length())
 			return false;
 		
@@ -196,6 +243,11 @@ public class Util
 	 */
 	public static boolean startsWithIgnoreCase(String str, String prefix)
 	{
+		if(str == null)
+			throw new IllegalArgumentException("Parameter 'str' cannot be null!");
+		if(prefix == null)
+			throw new IllegalArgumentException("Parameter 'prefix' cannot be null!");
+		
 		if(str.length() < prefix.length())
 			return false;
 		
@@ -209,22 +261,25 @@ public class Util
 	/**
 	 *  Returns the given String in lower case with the first character capitalized.
 	 * 
-	 * @param word The String to convert to lower case then capitalized the first character.
+	 * @param str The String to convert to lower case then capitalized the first character.
 	 * 
 	 * @return The given String in lower case with the first character capitalized.
 	 */
-	public static String capitalizeFirstCharacter(String word)
+	public static String capitalizeFirstCharacter(String str)
 	{
-		if(word.length() <= 0)
+		if(str == null)
+			throw new IllegalArgumentException("Parameter 'str' cannot be null!");
+		
+		if(str.length() <= 0)
 			return "";
 		
-		word = word.toLowerCase();
+		str = str.toLowerCase();
 		
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(Character.toUpperCase(word.charAt(0)));
+		sb.append(Character.toUpperCase(str.charAt(0)));
 		
-		sb.append(word.substring(1));
+		sb.append(str.substring(1));
 		
 		return sb.toString();
 	}
