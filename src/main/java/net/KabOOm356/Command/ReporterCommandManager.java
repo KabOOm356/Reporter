@@ -33,6 +33,7 @@ import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Permission.ReporterPermissionManager;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
+import net.KabOOm356.Util.FormattingUtil;
 import net.KabOOm356.Util.Util;
 
 import org.bukkit.Bukkit;
@@ -215,7 +216,7 @@ public class ReporterCommandManager implements CommandExecutor
 		{
 			String subcommand = arguments.remove(0);
 			
-			command = getCommand(Util.capitalizeFirstCharacter(subcommand));
+			command = getCommand(FormattingUtil.capitalizeFirstCharacter(subcommand));
 			
 			// Report help command
 			if(subcommand.equalsIgnoreCase("help"))

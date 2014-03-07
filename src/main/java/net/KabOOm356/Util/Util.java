@@ -257,30 +257,4 @@ public class Util
 		
 		return beginning.equalsIgnoreCase(prefix);
 	}
-	
-	/**
-	 *  Returns the given String in lower case with the first character capitalized.
-	 * 
-	 * @param str The String to convert to lower case then capitalized the first character.
-	 * 
-	 * @return The given String in lower case with the first character capitalized.
-	 */
-	public static String capitalizeFirstCharacter(String str)
-	{
-		if(str == null)
-			throw new IllegalArgumentException("Parameter 'str' cannot be null!");
-		
-		if(str.length() <= 0)
-			return "";
-		
-		str = str.toLowerCase();
-		
-		StringBuilder sb = new StringBuilder();
-		
-		sb.append(Character.toUpperCase(str.charAt(0)));
-		
-		sb.append(str.substring(1));
-		
-		return sb.toString();
-	}
 }
