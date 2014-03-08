@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
 
+import net.KabOOm356.Util.FormattingUtil;
 import net.KabOOm356.Util.Util;
 
 /**
@@ -197,6 +198,6 @@ public class ReporterMessage extends Message
 		
 		sb.append("Full Message: " + this.getMessage());
 		
-		return sb.toString();
+		return FormattingUtil.addTabsToNewLines(sb.toString(), 1);
 	}
 }

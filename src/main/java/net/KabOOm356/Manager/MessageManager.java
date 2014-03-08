@@ -11,6 +11,7 @@ import net.KabOOm356.Manager.Messager.PlayerMessages;
 import net.KabOOm356.Manager.Messager.Messages.Message;
 import net.KabOOm356.Manager.Messager.Messages.ReporterMessage;
 import net.KabOOm356.Manager.Messager.Messages.SimpleMessage;
+import net.KabOOm356.Util.FormattingUtil;
 
 /**
  * A class to manage messaging players that are offline.
@@ -210,22 +211,23 @@ public class MessageManager
 	@Override
 	public String toString()
 	{
-		String str = "Message Manager:\n\tMessages:\n";
+		String str = FormattingUtil.addTabsToNewLines("Message Manager\nMessages", 1);
 		
 		for(Entry<String, GroupMessages> players : messages.entrySet())
 		{
-			str += "\t\tPlayer: " + players.getKey() + "\n";
+			str += FormattingUtil.addTabsToNewLines("\nPlayer: " + players.getKey(), 2);
 			
 			for(Entry<Group, PendingMessages> groupedMessages : players.getValue().entrySet())
 			{
-				str += "\t\t\t" + groupedMessages.getKey() + "\n";
+				str += FormattingUtil.addTabsToNewLines("\n" + groupedMessages.getKey(), 3);
 				
 				for(Message message : groupedMessages.getValue())
 				{
-					str += "\t\t\t\t" + message + "\n";
+					str += FormattingUtil.addTabsToNewLines("\n" + message, 4);
 				}
 			}
 		}
+		
 		
 		return str;
 	}

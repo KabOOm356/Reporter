@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import net.KabOOm356.Database.SQL.MySQL;
 import net.KabOOm356.Database.SQL.SQLite;
+import net.KabOOm356.Util.FormattingUtil;
 
 
 /**
@@ -211,8 +212,9 @@ public class DatabaseHandler
 	@Override
 	public String toString()
 	{
-		String toString = "Database Handler:\n";
-		toString += "\t" + database;
+		String toString = "Database Handler:\n" + database;
+		
+		toString = FormattingUtil.addTabsToNewLines(toString, 1);
 		
 		return toString;
 	}

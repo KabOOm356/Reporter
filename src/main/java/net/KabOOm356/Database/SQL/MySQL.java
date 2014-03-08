@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import net.KabOOm356.Database.Database;
 import net.KabOOm356.Database.DatabaseType;
+import net.KabOOm356.Util.FormattingUtil;
 
 
 /**
@@ -51,9 +52,11 @@ public class MySQL extends Database
 	public String toString()
 	{
 		String toString = "Database Type: MySQL\n";
-		toString += "\tDatabase Username: " + username;
-		toString += "\n\tDatabase Password: " + password;
-		toString += "\n\t" + super.toString();
+		toString += "Database Username: " + username;
+		toString += "\n" + super.toString();
+		
+		toString = FormattingUtil.addTabsToNewLines(toString, 1);
+		
 		return toString;
 	}
 }

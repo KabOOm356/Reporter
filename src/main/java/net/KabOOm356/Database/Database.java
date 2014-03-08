@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import net.KabOOm356.Util.FormattingUtil;
 import net.KabOOm356.Util.Util;
 
 
@@ -350,13 +351,16 @@ public abstract class Database
 	public String toString()
 	{
 		String toString = "Database Type: " + databaseType.toString();
-		toString += "\n\tDatabase Driver: " + databaseDriver;
-		toString += "\n\tConnection URL: " + connectionURL;
-		toString += "\n\tConnection Status: ";
+		toString += "\nDatabase Driver: " + databaseDriver;
+		toString += "\nConnection URL: " + connectionURL;
+		toString += "\nConnection Status: ";
 		if(isConnectionOpen())
 			toString += "Open\n";
 		else
 			toString += "Closed\n";
+		
+		toString = FormattingUtil.addTabsToNewLines(toString, 1);
+		
 		return toString;
 	}
 }
