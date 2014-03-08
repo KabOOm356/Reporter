@@ -178,6 +178,35 @@ public class MessageManager
 	}
 	
 	/**
+	 * Returns the number of pending messages there are for a player.
+	 * 
+	 * @param player The player.
+	 * 
+	 * @return The number of pending messages there are for the player.
+	 */
+	public int getNumberOfMessages(String player)
+	{
+		ArrayList<String> messages = getMessages(player);
+		
+		return messages.size();
+	}
+	
+	/**
+	 * Returns the number of pending messages in the given group for a player.
+	 * 
+	 * @param player The player.
+	 * @param group The group.
+	 * 
+	 * @return The number of pending messages in the given group for the player.
+	 */
+	public int getNumberOfMessages(String player, Group group)
+	{
+		ArrayList<String> messages = getMessages(player, group);
+		
+		return messages.size();
+	}
+	
+	/**
 	 * Removes all the pending messages for the given player name.
 	 * 
 	 * @param player The name of the player to be removed.
