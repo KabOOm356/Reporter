@@ -189,6 +189,32 @@ public class ReporterDatabaseUtil
 				"ClaimPriority TINYINT DEFAULT '0');";
 		
 		database.updateQuery(query);
+		
+		query = "CREATE TABLE IF NOT EXISTS ModStats ("
+				+ "ID INTEGER PRIMARY KEY, "
+				+ "ModName VARCHAR(50) NOT NULL, "
+				+ "ModNameRaw VARCHAR(16) NOT NULL, "
+				+ "ModLevel TINYINT NOT NULL DEFAULT '0', "
+				+ "AssignCount INTEGER NOT NULL DEFAULT '0', "
+				+ "ClaimedCount INTEGER NOT NULL DEFAULT '0', "
+				+ "CompletionCount INTEGER NOT NULL DEFAULT '0', "
+				+ "DeletionCount INTEGER NOT NULL DEFAULT '0', "
+				+ "MoveCount INTEGER NOT NULL DEFAULT '0', "
+				+ "RespondCount INTEGER NOT NULL DEFAULT '0', "
+				+ "UnassignCount INTEGER NOT NULL DEFAULT '0', "
+				+ "UnclaimCount INTEGER NOT NULL DEFAULT '0');";
+		
+		database.updateQuery(query);
+		
+		query = "CREATE TABLE IF NOT EXISTS PlayerStats ("
+				+ "ID INTEGER PRIMARY KEY, "
+				+ "Name VARCHAR(50) NOT NULL, "
+				+ "NameRaw VARCHAR(16) NOT NULL, "
+				+ "FirstReportDate VARCHAR(19) NOT NULL, "
+				+ "LastReportDate VARCHAR(19) NOT NULL, "
+				+ "ReportCount INTEGER NOT NULL DEFAULT '0');";
+		
+		database.updateQuery(query);
 	}
 
 	/**
@@ -203,7 +229,11 @@ public class ReporterDatabaseUtil
 	 */
 	public static boolean needsToCreateTables(Database database) throws ClassNotFoundException, SQLException
 	{
-		return !database.checkTable("Reports");
+		boolean createReportsTable = !database.checkTable("Reports");
+		boolean createModStatsTable = !database.checkTable("ModStats");
+		boolean createPlayerStatsTable = !database.checkTable("PlayerStats");
+		
+		return createReportsTable || createModStatsTable || createPlayerStatsTable;
 	}
 	
 	/**
@@ -214,6 +244,44 @@ public class ReporterDatabaseUtil
 	 * @return True if one or more of the tables was updated, otherwise false.
 	 */
 	public static boolean updateTables(Database database)
+	{
+		boolean updated = false;
+		
+		try
+		{
+			updated = updateReportsTable(database);
+			updated = updated || updateModStatsTable(database);
+			updated = updated || updatePlayerStatsTable(database);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+		finally
+		{
+			try
+			{
+				database.closeConnection();
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		
+		return updated;
+	}
+	
+	/**
+	 * Updates/repairs the Reports table in the database.
+	 * 
+	 * @param database The database.
+	 * 
+	 * @return True if the table was updated/repaired, otherwise false.
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public static boolean updateReportsTable(Database database) throws ClassNotFoundException, SQLException
 	{
 		Statement statement = null;
 		boolean updated = false;
@@ -363,30 +431,16 @@ public class ReporterDatabaseUtil
 				updated = true;
 			}
 			
-			
 			if(updated)
+			{
 				statement.executeBatch();
-		}
-		catch(Exception ex)
-		{
-			ex.printStackTrace();
+			}
 		}
 		finally
 		{
-			try
+			if(statement != null)
 			{
-				if(statement != null)
-					statement.close();
-			}
-			catch(Exception e)
-			{}
-			
-			try
-			{
-				database.closeConnection();
-			}
-			catch(Exception e)
-			{
+				statement.close();
 			}
 		}
 		
@@ -394,7 +448,175 @@ public class ReporterDatabaseUtil
 	}
 	
 	/**
-	 * Drops the reports and Reports tables, if they exist.
+	 * Updates/repairs the ModStats table in the database.
+	 * 
+	 * @param database The database.
+	 * 
+	 * @return True if the table was updated/repaired, otherwise false.
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public static boolean updateModStatsTable(Database database) throws ClassNotFoundException, SQLException
+	{
+		Statement statement = null;
+		boolean updated = false;
+		
+		try
+		{
+			ArrayList<String> cols = database.getColumns("ModStats");
+			
+			statement = database.createStatement();
+			
+			// Version 8 (Initial Table Version)
+			if(!cols.contains("ID"))
+			{
+				statement.addBatch("ALTER TABLE ModStats ADD ID INTEGER PRIMARY KEY");
+				updated = true;
+			}
+			if(!cols.contains("ModName"))
+			{
+				statement.addBatch("ALTER TABLE ModStats ADD ModName VARCHAR(50) NOT NULL");
+				updated = true;
+			}
+			if(!cols.contains("ModNameRaw"))
+			{
+				statement.addBatch("ALTER TABLE ModStats ADD ModNameRaw VARCHAR(16) NOT NULL");
+				updated = true;
+			}
+			if(!cols.contains("ModLevel"))
+			{
+				statement.addBatch("ALTER TABLE ModStats ADD ModLevel TINYINT NOT NULL DEFAULT '0'");
+				updated = true;
+			}
+			if(!cols.contains("AssignCount"))
+			{
+				statement.addBatch("ALTER TABLE ModStats ADD AssignCount INTEGER NOT NULL DEFAULT '0'");
+				updated = true;
+			}
+			if(!cols.contains("ClaimedCount"))
+			{
+				statement.addBatch("ALTER TABLE ModStats ADD ClaimedCount INTEGER NOT NULL DEFAULT '0'");
+				updated = true;
+			}
+			if(!cols.contains("CompletionCount"))
+			{
+				statement.addBatch("ALTER TABLE ModStats ADD CompletionCount INTEGER NOT NULL DEFAULT '0'");
+				updated = true;
+			}
+			if(!cols.contains("DeletionCount"))
+			{
+				statement.addBatch("ALTER TABLE ModStats ADD DeletionCount INTEGER NOT NULL DEFAULT '0'");
+				updated = true;
+			}
+			if(!cols.contains("MoveCount"))
+			{
+				statement.addBatch("ALTER TABLE ModStats ADD MoveCount INTEGER NOT NULL DEFAULT '0'");
+				updated = true;
+			}
+			if(!cols.contains("RespondCount"))
+			{
+				statement.addBatch("ALTER TABLE ModStats ADD RespondCount INTEGER NOT NULL DEFAULT '0'");
+				updated = true;
+			}
+			if(!cols.contains("UnassignCount"))
+			{
+				statement.addBatch("ALTER TABLE ModStats ADD UnassignCount INTEGER NOT NULL DEFAULT '0'");
+				updated = true;
+			}
+			if(!cols.contains("UnclaimCount"))
+			{
+				statement.addBatch("ALTER TABLE ModStats ADD UnclaimCount INTEGER NOT NULL DEFAULT '0'");
+				updated = true;
+			}
+			
+			if(updated)
+			{
+				statement.executeBatch();
+			}
+		}
+		finally
+		{
+			if(statement != null)
+			{
+				statement.close();
+			}
+		}
+		
+		return updated;
+	}
+	
+	/**
+	 * Updates/repairs the PlayerStats table in the database.
+	 * 
+	 * @param database The database.
+	 * 
+	 * @return True if the table was updated/repaired, otherwise false.
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public static boolean updatePlayerStatsTable(Database database) throws ClassNotFoundException, SQLException
+	{
+		Statement statement = null;
+		boolean updated = false;
+		
+		try
+		{
+			ArrayList<String> cols = database.getColumns("PlayerStats");
+			
+			statement = database.createStatement();
+			
+			// Version 8 (Initial Table Version)
+			if(!cols.contains("ID"))
+			{
+				statement.addBatch("ALTER TABLE PlayerStats ADD ID INTEGER PRIMARY KEY");
+				updated = true;
+			}
+			if(!cols.contains("Name"))
+			{
+				statement.addBatch("ALTER TABLE PlayerStats ADD Name VARCHAR(50) NOT NULL");
+				updated = true;
+			}
+			if(!cols.contains("NameRaw"))
+			{
+				statement.addBatch("ALTER TABLE PlayerStats ADD NameRaw VARCHAR(16) NOT NULL");
+				updated = true;
+			}
+			if(!cols.contains("FirstReportDate"))
+			{
+				statement.addBatch("ALTER TABLE PlayerStats ADD FirstReportDate VARCHAR(19) NOT NULL");
+				updated = true;
+			}
+			if(!cols.contains("LastReportDate"))
+			{
+				statement.addBatch("ALTER TABLE PlayerStats ADD LastReportDate VARCHAR(19) NOT NULL");
+				updated = true;
+			}
+			if(!cols.contains("ReportCount"))
+			{
+				statement.addBatch("ALTER TABLE PlayerStats ADD ReportCount INTEGER NOT NULL DEFAULT '0'");
+				updated = true;
+			}
+			
+			if(updated)
+			{
+				statement.executeBatch();
+			}
+		}
+		finally
+		{
+			if(statement != null)
+			{
+				statement.close();
+			}
+		}
+		
+		return updated;
+	}
+	
+	/**
+	 * Drops the reports, Reports, ModStats and PlayerStats tables, if they exist.
 	 * 
 	 * @param database The database to drop the tables from.
 	 * 
@@ -405,5 +627,7 @@ public class ReporterDatabaseUtil
 	{
 		database.updateQuery("DROP TABLE IF EXISTS reports");
 		database.updateQuery("DROP TABLE IF EXISTS Reports");
+		database.updateQuery("DROP TABLE IF EXISTS ModStats");
+		database.updateQuery("DROP TABLE IF EXISTS PlayerStats");
 	}
 }
