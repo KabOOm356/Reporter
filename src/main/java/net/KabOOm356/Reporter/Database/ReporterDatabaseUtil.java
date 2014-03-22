@@ -190,11 +190,23 @@ public class ReporterDatabaseUtil
 		
 		database.updateQuery(query);
 		
+		String primaryKey = "ID INTEGER PRIMARY KEY";
+		
+		// If the database is using MySQL, set the primary key to auto increment.
+		// SQLite does this automatically for primary keys.
+		if(database.getDatabaseType() == DatabaseType.MYSQL)
+		{
+			primaryKey += " AUTO_INCREMENT, ";
+		}
+		else
+		{
+			primaryKey += ", ";
+		}
+		
 		query = "CREATE TABLE IF NOT EXISTS ModStats ("
-				+ "ID INTEGER PRIMARY KEY, "
+				+ primaryKey
 				+ "ModName VARCHAR(50) NOT NULL, "
 				+ "ModNameRaw VARCHAR(16) NOT NULL, "
-				+ "ModLevel TINYINT NOT NULL DEFAULT '0', "
 				+ "AssignCount INTEGER NOT NULL DEFAULT '0', "
 				+ "ClaimedCount INTEGER NOT NULL DEFAULT '0', "
 				+ "CompletionCount INTEGER NOT NULL DEFAULT '0', "
@@ -207,7 +219,7 @@ public class ReporterDatabaseUtil
 		database.updateQuery(query);
 		
 		query = "CREATE TABLE IF NOT EXISTS PlayerStats ("
-				+ "ID INTEGER PRIMARY KEY, "
+				+ primaryKey
 				+ "Name VARCHAR(50) NOT NULL, "
 				+ "NameRaw VARCHAR(16) NOT NULL, "
 				+ "FirstReportDate VARCHAR(19) NOT NULL, "
@@ -471,7 +483,16 @@ public class ReporterDatabaseUtil
 			// Version 8 (Initial Table Version)
 			if(!cols.contains("ID"))
 			{
-				statement.addBatch("ALTER TABLE ModStats ADD ID INTEGER PRIMARY KEY");
+				String query = "ALTER TABLE ModStats ADD ID INTEGER PRIMARY KEY";
+				
+				// If the database is using MySQL, set the primary key to auto increment.
+				// SQLite does this automatically for primary keys.
+				if(database.getDatabaseType() == DatabaseType.MYSQL)
+				{
+					query += " AUTO_INCREMENT";
+				}
+				
+				statement.addBatch(query);
 				updated = true;
 			}
 			if(!cols.contains("ModName"))
@@ -482,11 +503,6 @@ public class ReporterDatabaseUtil
 			if(!cols.contains("ModNameRaw"))
 			{
 				statement.addBatch("ALTER TABLE ModStats ADD ModNameRaw VARCHAR(16) NOT NULL");
-				updated = true;
-			}
-			if(!cols.contains("ModLevel"))
-			{
-				statement.addBatch("ALTER TABLE ModStats ADD ModLevel TINYINT NOT NULL DEFAULT '0'");
 				updated = true;
 			}
 			if(!cols.contains("AssignCount"))
@@ -570,7 +586,16 @@ public class ReporterDatabaseUtil
 			// Version 8 (Initial Table Version)
 			if(!cols.contains("ID"))
 			{
-				statement.addBatch("ALTER TABLE PlayerStats ADD ID INTEGER PRIMARY KEY");
+				String query = "ALTER TABLE PlayerStats ADD ID INTEGER PRIMARY KEY";
+				
+				// If the database is using MySQL, set the primary key to auto increment.
+				// SQLite does this automatically for primary keys.
+				if(database.getDatabaseType() == DatabaseType.MYSQL)
+				{
+					query += " AUTO_INCREMENT";
+				}
+				
+				statement.addBatch(query);
 				updated = true;
 			}
 			if(!cols.contains("Name"))
