@@ -29,6 +29,8 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.ClaimPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Manager.MessageManager;
 import net.KabOOm356.Manager.ReportLimitManager;
+import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager;
+import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Permission.ReporterPermissionManager;
 import net.KabOOm356.Reporter.Reporter;
@@ -66,6 +68,9 @@ public class ReporterCommandManager implements CommandExecutor
 	private ReporterPermissionManager permissionManager;
 	private ReportLimitManager limitManager;
 	
+	private ModeratorStatManager modStatsManager;
+	private PlayerStatManager playerStatsManager;
+	
 	/**
 	 * Constructor.
 	 * 
@@ -80,6 +85,9 @@ public class ReporterCommandManager implements CommandExecutor
 		messageManager = new MessageManager();
 		
 		permissionManager = new ReporterPermissionManager();
+		
+		modStatsManager = new ModeratorStatManager(plugin.getDatabaseHandler());
+		playerStatsManager = new PlayerStatManager(plugin.getDatabaseHandler());
 		
 		initCommands();
 		
@@ -1024,5 +1032,15 @@ public class ReporterCommandManager implements CommandExecutor
 	public MessageManager getMessageManager()
 	{
 		return messageManager;
+	}
+	
+	public ModeratorStatManager getModStatsManager()
+	{
+		return modStatsManager;
+	}
+	
+	public PlayerStatManager getPlayerStatsManager()
+	{
+		return playerStatsManager;
 	}
 }
