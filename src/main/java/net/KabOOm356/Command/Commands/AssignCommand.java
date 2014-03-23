@@ -5,12 +5,14 @@ import java.util.Date;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Locale.Entry.LocalePhrases.AssignPhrases;
+import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
@@ -118,6 +120,10 @@ public class AssignCommand extends ReporterCommand
 		output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.WHITE);
 		
 		player.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + output);
+		
+		OfflinePlayer senderPlayer = Bukkit.getOfflinePlayer(sender.getName());
+		
+		getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.ASSIGNED);
 	}
 	
 	/**

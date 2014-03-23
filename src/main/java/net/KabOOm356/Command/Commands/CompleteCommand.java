@@ -8,12 +8,14 @@ import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.CompletePhrases;
 import net.KabOOm356.Manager.Messager.Group;
+import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -131,6 +133,10 @@ public class CompleteCommand extends ReporterCommand
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
 				ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
 				getManager().getLocale().getString(CompletePhrases.playerComplete)));
+		
+		OfflinePlayer senderPlayer = Bukkit.getOfflinePlayer(sender.getName());
+		
+		getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.COMPLETED);
 	}
 	
 	private boolean isSummaryValid(CommandSender sender, String summary)

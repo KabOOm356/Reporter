@@ -11,11 +11,13 @@ import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Database.SQL.QueryType;
 import net.KabOOm356.Locale.Entry.LocalePhrases.DeletePhrases;
+import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -140,6 +142,10 @@ public class DeleteCommand extends ReporterCommand
 			{
 			}
 		}
+		
+		OfflinePlayer senderPlayer = Bukkit.getOfflinePlayer(sender.getName());
+		
+		getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.DELETED);
 	}
 	
 	private void deleteReport(int index) throws ClassNotFoundException, SQLException

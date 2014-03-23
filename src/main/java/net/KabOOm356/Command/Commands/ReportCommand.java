@@ -7,6 +7,8 @@ import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ReportPhrases;
+import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager;
+import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager.PlayerStat;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
 
@@ -176,6 +178,13 @@ public class ReportCommand extends ReporterCommand
 			broadcastSubmittedMessage(getManager().getCount());
 			
 			getManager().getReportLimitManager().hasReported(sender, reported);
+			
+			PlayerStatManager stats = getManager().getPlayerStatsManager();
+			
+			String date = Reporter.getDateformat().format(new Date());
+			
+			stats.incrementStat(reported, PlayerStat.REPORTED);
+			stats.setStat(reported, PlayerStat.LASTREPORTDATE, date);
 			
 			// Alert the player when they reach their reporting limit
 			canReport(sender);

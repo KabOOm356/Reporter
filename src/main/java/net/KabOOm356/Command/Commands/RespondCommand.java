@@ -7,6 +7,7 @@ import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.RespondPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ViewPhrases;
+import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
@@ -211,6 +212,8 @@ public class RespondCommand extends ReporterCommand
 			Location loc = new Location(Bukkit.getWorld(World), X, Y, Z);
 
 			player.teleport(loc);
+			
+			getManager().getModStatsManager().incrementStat(player, ModeratorStat.RESPONDED);
 		}
 	}
 	

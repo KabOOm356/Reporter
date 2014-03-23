@@ -2,13 +2,16 @@ package net.KabOOm356.Command.Commands;
 
 import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.UnclaimPhrases;
+import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.Util;
 
@@ -140,6 +143,10 @@ public class UnclaimCommand extends ReporterCommand
 		output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.WHITE);
 		
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
+		
+		OfflinePlayer senderPlayer = Bukkit.getOfflinePlayer(sender.getName());
+		
+		getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.UNCLAIMED);
 	}
 	
 	/**
