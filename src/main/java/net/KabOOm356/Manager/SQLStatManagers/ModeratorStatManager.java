@@ -50,7 +50,7 @@ public class ModeratorStatManager extends SQLStatManager
 		/**
 		 * The number of times a moderator has used the unclaim command.
 		 */
-		public static final ModeratorStat UNCLAIMED = new ModeratorStat("UnassignCount");
+		public static final ModeratorStat UNCLAIMED = new ModeratorStat("UnclaimCount");
 		
 		/**
 		 * Constructor.
