@@ -73,7 +73,7 @@ public class DeleteCommand extends ReporterCommand
 			deleteReportBatch(sender, BatchDeletionType.INCOMPLETE);
 		else
 		{
-			if(Util.isInteger(args.get(0)))
+			if(Util.isInteger(args.get(0)) || args.get(0).equalsIgnoreCase("last"))
 			{
 				int index = Util.parseInt(args.get(0));
 				
