@@ -697,6 +697,9 @@ public class ReporterCommandManager implements CommandExecutor
 	 */
 	public boolean requireUnclaimedOrPriority(CommandSender sender, int index, CommandSender player)
 	{
+		if(sender.isOp() || sender instanceof ConsoleCommandSender)
+			return true;
+		
 		String query = "SELECT " +
 				"ClaimStatus, ClaimedBy, ClaimedByRaw, ClaimPriority " +
 				"FROM Reports " +

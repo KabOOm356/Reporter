@@ -6,6 +6,7 @@ import java.util.Date;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import net.KabOOm356.Command.ReporterCommand;
@@ -154,9 +155,13 @@ public class AssignCommand extends ReporterCommand
 			return false;
 		}
 		
+		ModLevel senderLevel = getManager().getModLevel(sender);
 		ModLevel playerLevel = getManager().getModLevel(player);
 		
-		if(getManager().getModLevel(sender).getLevel() <= getManager().getModLevel(player).getLevel())
+		boolean senderHasLowerModLevel = senderLevel.getLevel() <= playerLevel.getLevel();
+		boolean senderIsConsoleOrOp = sender.isOp() || sender instanceof ConsoleCommandSender;
+		
+		if(!senderIsConsoleOrOp && senderHasLowerModLevel)
 		{
 			output = getManager().getLocale().getString(AssignPhrases.cannotAssignHigherPriority);
 			
