@@ -45,7 +45,7 @@ public class Reporter extends JavaPlugin
 	
 	public static final String localeVersion = "9";
 	public static final String configVersion = "12";
-	public static final String databaseVersion = "7";
+	public static final String databaseVersion = "8";
 	
 	private static String version;
 	private static String defaultConsolePrefix;

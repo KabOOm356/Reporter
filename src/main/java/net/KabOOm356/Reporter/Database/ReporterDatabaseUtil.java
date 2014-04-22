@@ -163,8 +163,10 @@ public class ReporterDatabaseUtil
 		String query = "CREATE TABLE IF NOT EXISTS Reports (" +
 				"ID INTEGER PRIMARY KEY, " +
 				"Date VARCHAR(19) NOT NULL DEFAULT 'N/A', " +
+				"SenderUUID VARCHAR(36) NOT NULL, " +
 				"Sender VARCHAR(50) NOT NULL, " +
 				"SenderRaw VARCHAR(16) NOT NULL, " +
+				"ReportedUUID VARCHAR(36), " +
 				"Reported VARCHAR(50) NOT NULL DEFAULT '* (Anonymous)', " +
 				"ReportedRaw VARCHAR(16) NOT NULL DEFAULT '* (Anonymous)', " +
 				"Details VARCHAR(200) NOT NULL, " +
@@ -363,6 +365,18 @@ public class ReporterDatabaseUtil
 				updated = true;
 			}
 			
+			// Version 8 (UUID Update)
+			if(!cols.contains("SenderUUID"))
+			{
+				statement.addBatch("ALTER TABLE Reports ADD SenderUUID VARCHAR(36)");
+				updated = true;
+			}
+			if(!cols.contains("ReportedUUID"))
+			{
+				statement.addBatch("ALTER TABLE Reports ADD ReportedUUID VARCHAR(36)");
+				updated = true;
+			}
+						
 			
 			if(updated)
 				statement.executeBatch();
