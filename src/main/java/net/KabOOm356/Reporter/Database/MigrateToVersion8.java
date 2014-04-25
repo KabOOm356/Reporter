@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -118,6 +119,8 @@ public class MigrateToVersion8
 		
 		PreparedStatement statement = null;
 		
+		HashMap<String, UUID> players = new HashMap<String, UUID>();
+		
 		try
 		{
 			statement = database.prepareStatement(query);
@@ -130,14 +133,11 @@ public class MigrateToVersion8
 				String claimedBy = row.getString("ClaimedByRaw");
 				String completedBy = row.getString("CompletedByRaw");
 				
-				OfflinePlayer player = null;
 				UUID uuid = null;
 				
 				if(!senderName.equals("CONSOLE"))
 				{
-					player = Bukkit.getServer().getOfflinePlayer(senderName);
-					
-					uuid = player.getUniqueId();
+					uuid = getPlayerUUID(senderName, players);
 					
 					statement.setString(1, uuid.toString());
 				}
@@ -148,9 +148,7 @@ public class MigrateToVersion8
 				
 				if(!reportedName.equalsIgnoreCase("* (Anonymous)"))
 				{
-					player = Bukkit.getServer().getOfflinePlayer(reportedName);
-					
-					uuid = player.getUniqueId();
+					uuid = getPlayerUUID(reportedName, players);
 					
 					statement.setString(2, uuid.toString());
 				}
@@ -161,9 +159,7 @@ public class MigrateToVersion8
 				
 				if(!claimedBy.isEmpty() && !claimedBy.equals("CONSOLE"))
 				{
-					player = Bukkit.getServer().getOfflinePlayer(claimedBy);
-					
-					uuid = player.getUniqueId();
+					uuid = getPlayerUUID(claimedBy, players);
 					
 					statement.setString(3, uuid.toString());
 				}
@@ -174,9 +170,7 @@ public class MigrateToVersion8
 				
 				if(!completedBy.isEmpty() && !completedBy.equals("CONSOLE"))
 				{
-					player = Bukkit.getServer().getOfflinePlayer(completedBy);
-					
-					uuid = player.getUniqueId();
+					uuid = getPlayerUUID(completedBy, players);
 					
 					statement.setString(4, uuid.toString());
 				}
@@ -195,5 +189,25 @@ public class MigrateToVersion8
 		{
 			statement.close();
 		}
+	}
+	
+	private static UUID getPlayerUUID(String playerName, HashMap<String, UUID> players)
+	{
+		UUID uuid = null;
+		
+		if(players.containsKey(playerName))
+		{
+			uuid = players.get(playerName);
+		}
+		else
+		{
+			OfflinePlayer player = Bukkit.getServer().getOfflinePlayer(playerName);
+			
+			uuid = player.getUniqueId();
+			
+			players.put(playerName, uuid);
+		}
+		
+		return uuid;
 	}
 }
