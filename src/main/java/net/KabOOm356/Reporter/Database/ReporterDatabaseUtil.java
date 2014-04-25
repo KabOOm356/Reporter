@@ -163,12 +163,10 @@ public class ReporterDatabaseUtil
 		String query = "CREATE TABLE IF NOT EXISTS Reports (" +
 				"ID INTEGER PRIMARY KEY, " +
 				"Date VARCHAR(19) NOT NULL DEFAULT 'N/A', " +
-				"SenderUUID VARCHAR(36) NOT NULL, " +
-				"Sender VARCHAR(50) NOT NULL, " +
-				"SenderRaw VARCHAR(16) NOT NULL, " +
+				"SenderUUID VARCHAR(36), " +
+				"Sender VARCHAR(16), " +
 				"ReportedUUID VARCHAR(36), " +
-				"Reported VARCHAR(50) NOT NULL DEFAULT '* (Anonymous)', " +
-				"ReportedRaw VARCHAR(16) NOT NULL DEFAULT '* (Anonymous)', " +
+				"Reported VARCHAR(16) NOT NULL DEFAULT '* (Anonymous)', " +
 				"Details VARCHAR(200) NOT NULL, " +
 				"Priority TINYINT NOT NULL DEFAULT '0', " +
 				"SenderWorld VARCHAR(100) DEFAULT '', " +
@@ -180,14 +178,14 @@ public class ReporterDatabaseUtil
 				"ReportedY DOUBLE DEFAULT '0.0', " +
 				"ReportedZ DOUBLE DEFAULT '0.0', " +
 				"CompletionStatus BOOLEAN NOT NULL DEFAULT '0', " +
-				"CompletedBy VARCHAR(50) DEFAULT '', " +
-				"CompletedByRaw VARCHAR(16) DEFAULT '', " +
+				"CompletedByUUID VARCHAR(36), " +
+				"CompletedBy VARCHAR(16) DEFAULT '', " +
 				"CompletionDate VARCHAR(19) DEFAULT '', " +
 				"CompletionSummary VARCHAR(200) DEFAULT '', " +
 				"ClaimStatus BOOLEAN NOT NULL DEFAULT '0', " +
 				"ClaimDate VARCHAR(19) DEFAULT '', " +
-				"ClaimedBy VARCHAR(50) DEFAULT '', " +
-				"ClaimedByRaw VARCHAR(16) DEFAULT '', " +
+				"ClaimedByUUID VARCHAR(36), " +
+				"ClaimedBy VARCHAR(16) DEFAULT '', " +
 				"ClaimPriority TINYINT DEFAULT '0');";
 		
 		database.updateQuery(query);
@@ -234,12 +232,12 @@ public class ReporterDatabaseUtil
 			}
 			if(!cols.contains("Sender"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD Sender VARCHAR(50) NOT NULL");
+				statement.addBatch("ALTER TABLE Reports ADD Sender VARCHAR(16)");
 				updated = true;
 			}
 			if(!cols.contains("Reported"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD Reported VARCHAR(50) NOT NULL DEFAULT '* (Anonymous)'");
+				statement.addBatch("ALTER TABLE Reports ADD Reported VARCHAR(16) NOT NULL DEFAULT '* (Anonymous)'");
 				updated = true;
 			}
 			if(!cols.contains("Details"))
@@ -305,7 +303,7 @@ public class ReporterDatabaseUtil
 			}
 			if(!cols.contains("CompletedBy"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD CompletedBy VARCHAR(50) DEFAULT ''");
+				statement.addBatch("ALTER TABLE Reports ADD CompletedBy VARCHAR(16) DEFAULT ''");
 				updated = true;
 			}
 			if(!cols.contains("CompletionDate"))
@@ -320,18 +318,10 @@ public class ReporterDatabaseUtil
 			}
 			
 			// Version 5 (Request Update)
-			if(!cols.contains("ReportedRaw"))
-			{
-				statement.addBatch("ALTER TABLE Reports ADD ReportedRaw VARCHAR(19) NOT NULL DEFAULT '* (Anonymous)'");
-				updated = true;
-			}
+			// Removed in favor of the UUID player lookup.
 			
 			// Version 6 (Viewing Update)
-			if(!cols.contains("SenderRaw"))
-			{
-				statement.addBatch("ALTER TABLE Reports ADD SenderRaw VARCHAR(50) NOT NULL DEFAULT ''");
-				updated = true;
-			}
+			// Removed in favor of the UUID player lookup.
 			
 			// Version 7 (Claiming Update)
 			if(!cols.contains("Priority"))
@@ -351,12 +341,7 @@ public class ReporterDatabaseUtil
 			}
 			if(!cols.contains("ClaimedBy"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD ClaimedBy VARCHAR(50)");
-				updated = true;
-			}
-			if(!cols.contains("ClaimedByRaw"))
-			{
-				statement.addBatch("ALTER TABLE Reports ADD ClaimedByRaw VARCHAR(16)");
+				statement.addBatch("ALTER TABLE Reports ADD ClaimedBy VARCHAR(16)");
 				updated = true;
 			}
 			if(!cols.contains("ClaimPriority"))
@@ -366,6 +351,21 @@ public class ReporterDatabaseUtil
 			}
 			
 			// Version 8 (UUID Update)
+			if(cols.contains("ReportedRaw"))
+			{
+				statement.addBatch("ALTER TABLE Reports DROP COLUMN ReportedRaw");
+				updated = true;
+			}
+			if(cols.contains("SenderRaw"))
+			{
+				statement.addBatch("ALTER TABLE Reports DROP COLUMN SenderRaw");
+				updated = true;
+			}
+			if(cols.contains("ClaimedByRaw"))
+			{
+				statement.addBatch("ALTER TABLE Reports DROP COLUMN ClaimedByRaw");
+				updated = true;
+			}
 			if(!cols.contains("SenderUUID"))
 			{
 				statement.addBatch("ALTER TABLE Reports ADD SenderUUID VARCHAR(36)");
@@ -376,7 +376,16 @@ public class ReporterDatabaseUtil
 				statement.addBatch("ALTER TABLE Reports ADD ReportedUUID VARCHAR(36)");
 				updated = true;
 			}
-						
+			if(!cols.contains("CompletedByUUID"))
+			{
+				statement.addBatch("ALTER TABLE Reports ADD CompletedByUUID VARCHAR(36)");
+				updated = true;
+			}
+			if(!cols.contains("ClaimedByUUID"))
+			{
+				statement.addBatch("ALTER TABLE Reports ADD ClaimedByUUID VARCHAR(36)");
+				updated = true;
+			}
 			
 			if(updated)
 				statement.executeBatch();
