@@ -148,6 +148,7 @@ public class ReporterDatabaseUtil
 		boolean migrated = false;
 		
 		migrated = MigrateToVersion7.migrateToVersion7(database);
+		migrated = migrated || MigrateToVersion8.migrateToVersion8(database);
 		
 		return migrated;
 	}
