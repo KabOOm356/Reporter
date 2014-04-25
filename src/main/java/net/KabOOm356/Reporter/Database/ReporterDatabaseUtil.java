@@ -125,9 +125,11 @@ public class ReporterDatabaseUtil
 			else
 				Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Using existing " + database.getDatabaseType() + " tables.");
 			
-			if(migrateData(database) || updateTables(database))
+			if(updateTables(database))
+			{
 				Reporter.getLog().info(Reporter.getDefaultConsolePrefix() +
 						"The " + database.getDatabaseType() + " tables have been updated to version " + Reporter.getDatabaseVersion() + ".");
+			}
 		}
 		finally
 		{
@@ -216,6 +218,7 @@ public class ReporterDatabaseUtil
 	public static boolean updateTables(Database database)
 	{
 		Statement statement = null;
+		boolean migrated = migrateData(database);
 		boolean updated = false;
 		
 		try
@@ -366,6 +369,11 @@ public class ReporterDatabaseUtil
 				statement.addBatch("ALTER TABLE Reports DROP COLUMN ClaimedByRaw");
 				updated = true;
 			}
+			if(cols.contains("CompletedByRaw"))
+			{
+				statement.addBatch("ALTER TABLE Reports DROP COLUMN CompletedByRaw");
+				updated = true;
+			}
 			if(!cols.contains("SenderUUID"))
 			{
 				statement.addBatch("ALTER TABLE Reports ADD SenderUUID VARCHAR(36)");
@@ -413,7 +421,7 @@ public class ReporterDatabaseUtil
 			}
 		}
 		
-		return updated;
+		return migrated || updated;
 	}
 	
 	/**
