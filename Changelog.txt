@@ -283,3 +283,6 @@ Changelog:
 	3.1.3	4/13/2014
 				Fixed the delete command not working when trying to delete the last viewed report.
 				Fixed OPs and console not being able to alter or delete a report if the claiming player had a mod level above theirs.
+	3.1.4
+				Fixes:
+					Fixed a message saying the claiming player unassigned their self, when another player moved a report to a higher priority.

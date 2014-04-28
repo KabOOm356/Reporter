@@ -97,7 +97,7 @@ public class MoveCommand extends ReporterCommand
 				
 				if(claimingPlayer != null)
 				{
-					String playerName = BukkitUtil.formatPlayerName(claimingPlayer);
+					String playerName = BukkitUtil.formatPlayerName(sender);
 					
 					String output = getManager().getLocale().getString(MovePhrases.unassignedFromReport);
 					
