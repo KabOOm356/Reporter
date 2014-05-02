@@ -166,9 +166,9 @@ public class ReporterDatabaseUtil
 		String query = "CREATE TABLE IF NOT EXISTS Reports (" +
 				"ID INTEGER PRIMARY KEY, " +
 				"Date VARCHAR(19) NOT NULL DEFAULT 'N/A', " +
-				"SenderUUID VARCHAR(36), " +
+				"SenderUUID VARCHAR(36) DEFAULT '', " +
 				"Sender VARCHAR(16), " +
-				"ReportedUUID VARCHAR(36), " +
+				"ReportedUUID VARCHAR(36) DEFAULT '', " +
 				"Reported VARCHAR(16) NOT NULL DEFAULT '* (Anonymous)', " +
 				"Details VARCHAR(200) NOT NULL, " +
 				"Priority TINYINT NOT NULL DEFAULT '0', " +
@@ -181,13 +181,13 @@ public class ReporterDatabaseUtil
 				"ReportedY DOUBLE DEFAULT '0.0', " +
 				"ReportedZ DOUBLE DEFAULT '0.0', " +
 				"CompletionStatus BOOLEAN NOT NULL DEFAULT '0', " +
-				"CompletedByUUID VARCHAR(36), " +
+				"CompletedByUUID VARCHAR(36) DEFAULT '', " +
 				"CompletedBy VARCHAR(16) DEFAULT '', " +
 				"CompletionDate VARCHAR(19) DEFAULT '', " +
 				"CompletionSummary VARCHAR(200) DEFAULT '', " +
 				"ClaimStatus BOOLEAN NOT NULL DEFAULT '0', " +
 				"ClaimDate VARCHAR(19) DEFAULT '', " +
-				"ClaimedByUUID VARCHAR(36), " +
+				"ClaimedByUUID VARCHAR(36) DEFAULT '', " +
 				"ClaimedBy VARCHAR(16) DEFAULT '', " +
 				"ClaimPriority TINYINT DEFAULT '0');";
 		
@@ -377,22 +377,22 @@ public class ReporterDatabaseUtil
 			}
 			if(!cols.contains("SenderUUID"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD SenderUUID VARCHAR(36)");
+				statement.addBatch("ALTER TABLE Reports ADD SenderUUID VARCHAR(36) DEFAULT ''");
 				updated = true;
 			}
 			if(!cols.contains("ReportedUUID"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD ReportedUUID VARCHAR(36)");
+				statement.addBatch("ALTER TABLE Reports ADD ReportedUUID VARCHAR(36) DEFAULT ''");
 				updated = true;
 			}
 			if(!cols.contains("CompletedByUUID"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD CompletedByUUID VARCHAR(36)");
+				statement.addBatch("ALTER TABLE Reports ADD CompletedByUUID VARCHAR(36) DEFAULT ''");
 				updated = true;
 			}
 			if(!cols.contains("ClaimedByUUID"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD ClaimedByUUID VARCHAR(36)");
+				statement.addBatch("ALTER TABLE Reports ADD ClaimedByUUID VARCHAR(36) DEFAULT ''");
 				updated = true;
 			}
 			

@@ -63,13 +63,13 @@ public class MigrateToVersion8
 		Statement statement = database.createStatement();
 		
 		if(!cols.contains("SenderUUID"))
-			statement.addBatch("ALTER TABLE Reports ADD SenderUUID VARCHAR(36)");
+			statement.addBatch("ALTER TABLE Reports ADD SenderUUID VARCHAR(36) DEFAULT ''");
 		if(!cols.contains("ReportedUUID"))
-			statement.addBatch("ALTER TABLE Reports ADD ReportedUUID VARCHAR(36)");
+			statement.addBatch("ALTER TABLE Reports ADD ReportedUUID VARCHAR(36) DEFAULT ''");
 		if(!cols.contains("ClaimedByUUID"))
-			statement.addBatch("ALTER TABLE Reports ADD ClaimedByUUID VARCHAR(36)");
+			statement.addBatch("ALTER TABLE Reports ADD ClaimedByUUID VARCHAR(36) DEFAULT ''");
 		if(!cols.contains("CompletedByUUID"))
-			statement.addBatch("ALTER TABLE Reports ADD CompletedByUUID VARCHAR(36)");
+			statement.addBatch("ALTER TABLE Reports ADD CompletedByUUID VARCHAR(36) DEFAULT ''");
 		
 		statement.executeBatch();
 		
