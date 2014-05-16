@@ -84,9 +84,17 @@ public class MigrateToVersion8
 			
 			cols = database.getColumns("Reports");
 			
-			if(!cols.contains("SenderUUID") && !cols.contains("ReportedUUID")
-					&& !cols.contains("ClaimedByUUID") && !cols.contains("CompletedByUUID"))
+			if(!cols.contains("SenderUUID") &&
+					!cols.contains("ReportedUUID") &&
+					!cols.contains("ClaimedByUUID") &&
+					!cols.contains("CompletedByUUID") &&
+					cols.contains("SenderRaw") &&
+					cols.contains("ReportedRaw") &&
+					cols.contains("ClaimedByRaw") &&
+					cols.contains("CompletedByRaw"))
+			{
 				return true;
+			}
 		}
 		
 		return false;
