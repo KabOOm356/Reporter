@@ -2,6 +2,7 @@ package net.KabOOm356.Command.Commands;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
@@ -88,10 +89,17 @@ public class CompleteCommand extends ReporterCommand
 	{
 		ArrayList<String> params = new ArrayList<String>(5);
 		params.add(0, "1");
+		
+		// If the CommandSender is a player set the UUID in the database.
 		if(BukkitUtil.isPlayer(sender))
-			params.add(1, ((Player)sender).getDisplayName());
+		{
+			params.add(1, ((Player)sender).getUniqueId().toString());
+		}
 		else
-			params.add(1, sender.getName());
+		{
+			params.add(1, "");
+		}
+		
 		params.add(2, sender.getName());
 		params.add(3, Reporter.getDateformat().format(new Date()));
 		params.add(4, summary);
@@ -99,8 +107,8 @@ public class CompleteCommand extends ReporterCommand
 		
 		String query = "UPDATE Reports " +
 				"SET CompletionStatus=?, " +
+				"CompletedByUUID=?, " +
 				"CompletedBy=?, " +
-				"CompletedByRaw=?, " +
 				"CompletionDate=?, " +
 				"CompletionSummary=? " +
 				"WHERE id=?";
@@ -160,11 +168,21 @@ public class CompleteCommand extends ReporterCommand
 		{
 			try
 			{
-				String query = "SELECT SenderRaw FROM Reports WHERE ID=" + Integer.toString(index);
+				String query = "SELECT SenderUUID, Sender FROM Reports WHERE ID=" + Integer.toString(index);
 				
 				SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
 				
-				playerName = result.getString(0, "SenderRaw");
+				String uuidString = result.getString("SenderUUID");
+				
+				if(!uuidString.isEmpty())
+				{
+					UUID uuid = UUID.fromString(uuidString);
+					playerName = Bukkit.getOfflinePlayer(uuid).getName();
+				}
+				else
+				{
+					playerName = result.getString("Sender");
+				}
 			}
 			catch(Exception e)
 			{

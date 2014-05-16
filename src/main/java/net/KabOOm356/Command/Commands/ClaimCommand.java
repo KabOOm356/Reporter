@@ -65,17 +65,24 @@ public class ClaimCommand extends ReporterCommand
 		ArrayList<String> params = new ArrayList<String>();
 		
 		params.add("1");
+		
+		// If the CommandSender is a player set the UUID in the database.
 		if(BukkitUtil.isPlayer(sender))
-			params.add(((Player)sender).getDisplayName());
+		{
+			params.add(((Player)sender).getUniqueId().toString());
+		}
 		else
-			params.add(sender.getName());
+		{
+			params.add("");
+		}
+		
 		params.add(sender.getName());
 		params.add(Integer.toString(getManager().getModLevel(sender).getLevel()));
 		params.add(Reporter.getDateformat().format(new Date()));
 		params.add(Integer.toString(index));
 		
 		String query = "UPDATE Reports " +
-				"SET ClaimStatus=?, ClaimedBy=?, ClaimedByRaw=?, ClaimPriority=?, ClaimDate=? " +
+				"SET ClaimStatus=?, ClaimedByUUID=?, ClaimedBy=?, ClaimPriority=?, ClaimDate=? " +
 				"WHERE ID=?";
 		
 		try

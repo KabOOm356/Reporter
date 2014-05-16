@@ -2,6 +2,7 @@ package net.KabOOm356.Command.Commands;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
@@ -57,13 +58,13 @@ public class RequestCommand extends ReporterCommand
 	private void requestMostReported(CommandSender sender)
 	{
 		// Return the most reported players and the number of reports against them.
-		String query = "SELECT COUNT(*) AS Count, Reported, ReportedRaw " +
+		String query = "SELECT COUNT(*) AS Count, ReportedUUID, Reported " +
 				"FROM Reports " +
-				"GROUP BY ReportedRaw HAVING COUNT(*) = " +
+				"GROUP BY ReportedUUID HAVING COUNT(*) = " +
 				"(" +
 				"SELECT COUNT(*) " +
 				"FROM Reports " +
-				"GROUP BY ReportedRaw ORDER BY COUNT(*) DESC " +
+				"GROUP BY ReportedUUID ORDER BY COUNT(*) DESC " +
 				"LIMIT 1" +
 				")";
 		
@@ -79,10 +80,20 @@ public class RequestCommand extends ReporterCommand
 			{
 				numberOfReports = result.getInt("Count");
 				
-				String player = row.getString("Reported");
-				String playerRaw = row.getString("ReportedRaw");
+				String uuidString = row.getString("ReportedUUID");
 				
-				players.add(BukkitUtil.formatPlayerName(player, playerRaw));
+				if(!uuidString.isEmpty())
+				{
+					UUID uuid = UUID.fromString(uuidString);
+					
+					OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+					
+					players.add(BukkitUtil.formatPlayerName(player));
+				}
+				else
+				{
+					players.add(result.getString("Reported"));
+				}
 			}
 			
 			if(!players.isEmpty())
@@ -137,15 +148,20 @@ public class RequestCommand extends ReporterCommand
 			return;
 		}
 		
-		if(playerName.equalsIgnoreCase("* (Anonymous)"))
-			player = Bukkit.getOfflinePlayer(playerName);
-		
 		try
 		{
-			String query = "SELECT ID FROM Reports WHERE ReportedRaw=?";
 			ArrayList<String> params = new ArrayList<String>();
+			String query = "SELECT ID FROM Reports WHERE ReportedUUID=?";
 			
-			params.add(player.getName());
+			if(!playerName.equalsIgnoreCase("* (Anonymous)"))
+			{
+				params.add(player.getUniqueId().toString());
+			}
+			else
+			{
+				query = "SELECT ID FROM Reports WHERE ReportedRaw=?";
+				params.add(playerName);
+			}
 			
 			if(getManager().getDatabaseHandler().usingSQLite())
 				query += " COLLATE NOCASE";

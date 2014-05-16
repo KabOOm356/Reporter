@@ -284,5 +284,20 @@ Changelog:
 				Fixed the delete command not working when trying to delete the last viewed report.
 				Fixed OPs and console not being able to alter or delete a report if the claiming player had a mod level above theirs.
 	3.1.4
+				Changes:
+					Changed to use UUID player look-up and verification, whenever possible.
+					Database:
+						Added a 'SenderUUID' column.
+						Added a 'ReportedUUID' column.
+						Added a 'ClaimedByUUID' column.
+						Added a 'CompletedByUUID' column.
+						Removed the 'SenderRaw' column.
+						Removed the 'ReportedRaw' column.
+						Removed the 'ClaimedByRaw' column.
+						Removed the 'CompletedByRaw' column.
+						Changed the 'Sender' column to 16 characters.
+						Changed the 'Reported' column to 16 characters.
+						Changed the 'ClaimedBy' column to 16 characters.
+						Changed the 'CompletedBy' column to 16 characters.
 				Fixes:
 					Fixed a message saying the claiming player unassigned their self, when another player moved a report to a higher priority.

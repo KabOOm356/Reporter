@@ -20,10 +20,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 
 /**
  * A {@link ReporterCommand} that will handle deleting reports.
  */
+
 public class DeleteCommand extends ReporterCommand
 {
 	private static final String name = "Delete";
@@ -151,7 +153,7 @@ public class DeleteCommand extends ReporterCommand
 	
 	private void deletePlayer(CommandSender sender, PlayerDeletionType deletion, OfflinePlayer player)
 	{
-		String query = getQuery(sender, player.getName(), QueryType.SELECT, deletion);
+		String query = getQuery(sender, player, QueryType.SELECT, deletion);
 		
 		try
 		{
@@ -162,7 +164,7 @@ public class DeleteCommand extends ReporterCommand
 			for(ResultRow row : result)
 				remainingIndexes.add(row.getInt("ID"));
 			
-			query = getQuery(sender, player.getName(), QueryType.DELETE, deletion);
+			query = getQuery(sender, player, QueryType.DELETE, deletion);
 			
 			getManager().getDatabaseHandler().updateQuery(query);
 			
@@ -199,25 +201,35 @@ public class DeleteCommand extends ReporterCommand
 		}
 	}
 	
-	private String getQuery(CommandSender sender, String playerName, QueryType queryType, PlayerDeletionType deletion)
+	private String getQuery(CommandSender sender, OfflinePlayer player, QueryType queryType, PlayerDeletionType deletion)
 	{
 		if(queryType == QueryType.DELETE)
-			return getDeleteQuery(sender, playerName, deletion);
+			return getDeleteQuery(sender, player, deletion);
 		else
-			return getSelectQuery(sender, playerName, deletion);
+			return getSelectQuery(sender, player, deletion);
 	}
 	
-	private String getSelectQuery(CommandSender sender, String playerName, PlayerDeletionType deletion)
+	private String getSelectQuery(CommandSender sender, OfflinePlayer player, PlayerDeletionType deletion)
 	{
 		String query = "SELECT ID FROM Reports WHERE ";
 		ModLevel level = getManager().getModLevel(sender);
 		
 		if(sender.isOp() || sender instanceof ConsoleCommandSender)
 		{
-			if(deletion == PlayerDeletionType.REPORTED)
-				query += "ReportedRaw != '" + playerName + "'";
-			else if(deletion == PlayerDeletionType.SENDER)
-				query += "SenderRaw != '" + playerName + "'";
+			if(player.getName().equalsIgnoreCase("* (Anonymous)"))
+			{
+				if(deletion == PlayerDeletionType.REPORTED)
+					query += "Reported != '" + player.getName() + "'";
+				else if(deletion == PlayerDeletionType.SENDER)
+					query += "Sender != '" + player.getName() + "'";
+			}
+			else
+			{
+				if(deletion == PlayerDeletionType.REPORTED)
+					query += "ReportedUUID != '" + player.getUniqueId() + "'";
+				else if(deletion == PlayerDeletionType.SENDER)
+					query += "SenderUUID != '" + player.getUniqueId() + "'";
+			}
 		}
 		else
 		{
@@ -226,29 +238,59 @@ public class DeleteCommand extends ReporterCommand
 					"(ClaimStatus = 0 " +
 					"OR " +
 					"ClaimPriority < " + level.getLevel() + " " +
-					"OR " +
-					"ClaimedByRaw = '" + sender.getName() + "') ";
+					"OR ";
 			
-			if(deletion == PlayerDeletionType.REPORTED)
-				query += "AND ReportedRaw = '" + playerName + "')";
-			else if(deletion == PlayerDeletionType.SENDER)
-				query += "AND SenderRaw = '" + playerName + "')";
+			if(BukkitUtil.isPlayer(sender))
+			{
+				Player senderPlayer = (Player) sender;
+				
+				query += "ClaimedByUUID = '" + senderPlayer.getUniqueId() + "') ";
+			}
+			else
+			{
+				query += "ClaimedBy = '" + sender.getName() + "') ";
+			}
+			
+			if(player.getName().equalsIgnoreCase("* (Anonymous)"))
+			{
+				if(deletion == PlayerDeletionType.REPORTED)
+					query += "AND Reported = '" + player.getName() + "')";
+				else if(deletion == PlayerDeletionType.SENDER)
+					query += "AND Sender = '" + player.getName() + "')";
+			}
+			else
+			{
+				if(deletion == PlayerDeletionType.REPORTED)
+					query += "AND ReportedUUID = '" + player.getUniqueId() + "')";
+				else if(deletion == PlayerDeletionType.SENDER)
+					query += "AND SenderUUID = '" + player.getUniqueId() + "')";
+			}
 		}
 		
 		return query;
 	}
 	
-	private String getDeleteQuery(CommandSender sender, String playerName, PlayerDeletionType deletion)
+	private String getDeleteQuery(CommandSender sender, OfflinePlayer player, PlayerDeletionType deletion)
 	{
 		String query = "DELETE FROM Reports WHERE ";
 		ModLevel level = getManager().getModLevel(sender);
 		
 		if(sender.isOp() || sender instanceof ConsoleCommandSender)
 		{
-			if(deletion == PlayerDeletionType.REPORTED)
-				query += "ReportedRaw = '" + playerName + "'";
-			else if(deletion == PlayerDeletionType.SENDER)
-				query += "SenderRaw = '" + playerName + "'";
+			if(player.getName().equals("* (Anonymous)"))
+			{
+				if(deletion == PlayerDeletionType.REPORTED)
+					query += "Reported = '" + player.getName() + "'";
+				else if(deletion == PlayerDeletionType.SENDER)
+					query += "Sender = '" + player.getName() + "'";
+			}
+			else
+			{
+				if(deletion == PlayerDeletionType.REPORTED)
+					query += "ReportedUUID = '" + player.getUniqueId() + "'";
+				else if(deletion == PlayerDeletionType.SENDER)
+					query += "SenderUUID = '" + player.getUniqueId() + "'";
+			}
 		}
 		else
 		{
@@ -257,13 +299,33 @@ public class DeleteCommand extends ReporterCommand
 					"(ClaimStatus = 0 " +
 					"OR " +
 					"ClaimPriority < " + level.getLevel() + " " +
-					"OR " +
-					"ClaimedByRaw = '" + sender.getName() + "') ";
+					"OR ";
 			
-			if(deletion == PlayerDeletionType.REPORTED)
-				query += "AND ReportedRaw = '" + playerName + "')";
-			else if(deletion == PlayerDeletionType.SENDER)
-				query += "AND SenderRaw = '" + playerName + "')";
+			if(BukkitUtil.isPlayer(sender))
+			{
+				Player senderPlayer = (Player) sender;
+				
+				query += "ClaimedByUUID = '" + senderPlayer.getUniqueId() + "') ";
+			}
+			else
+			{
+				query += "ClaimedBy = '" + sender.getName() + "') ";
+			}
+					
+			if(player.getName().equals("* (Anonymous)"))
+			{
+				if(deletion == PlayerDeletionType.REPORTED)
+					query += "AND Reported = '" + player.getName() + "')";
+				else if(deletion == PlayerDeletionType.SENDER)
+					query += "AND Sender = '" + player.getName() + "')";
+			}
+			else
+			{
+				if(deletion == PlayerDeletionType.REPORTED)
+					query += "AND ReportedUUID = '" + player.getUniqueId() + "')";
+				else if(deletion == PlayerDeletionType.SENDER)
+					query += "AND SenderUUID = '" + player.getUniqueId() + "')";
+			}
 		}
 		
 		return query;
@@ -372,8 +434,19 @@ public class DeleteCommand extends ReporterCommand
 					"(ClaimStatus = 0 " +
 					"OR " +
 					"ClaimPriority < " + level.getLevel() + " " +
-					"OR " +
-					"ClaimedByRaw = '" + sender.getName() + "')";
+					"OR ";
+			
+			if(BukkitUtil.isPlayer(sender))
+			{
+				Player senderPlayer = (Player) sender;
+				
+				query += "ClaimedByUUID = '" + senderPlayer.getUniqueId() + "')";
+			}
+			else
+			{
+				query += "ClaimedBy = '" + sender.getName() + "')";
+			}
+					
 			
 			if (deletion == BatchDeletionType.ALL)
 				query += ")";
@@ -425,8 +498,18 @@ public class DeleteCommand extends ReporterCommand
 					"(ClaimStatus = 0 " +
 					"OR " +
 					"ClaimPriority < " + level.getLevel() + " " +
-					"OR " +
-					"ClaimedByRaw = '" + sender.getName() + "')";
+					"OR ";
+			
+			if(BukkitUtil.isPlayer(sender))
+			{
+				Player senderPlayer = (Player) sender;
+				
+				query += "ClaimedByUUID = '" + senderPlayer.getUniqueId() + "')";
+			}
+			else
+			{
+				query += "ClaimedBy = '" + sender.getName() + "')";
+			}
 			
 			// Append on the rest of the query to perform the required deletion type.
 			if (deletion == BatchDeletionType.ALL)

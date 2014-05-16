@@ -2,6 +2,7 @@ package net.KabOOm356.Command.Commands;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
@@ -13,7 +14,9 @@ import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -142,7 +145,7 @@ public class ViewCommand extends ReporterCommand
 	private void viewPriority(CommandSender sender, ModLevel level,
 			boolean displayRealName)
 	{
-		String query = "SELECT ID, Sender, SenderRaw, Reported, ReportedRaw, Details " +
+		String query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details " +
 				"FROM Reports " +
 				"WHERE Priority = " + level.getLevel();
 		
@@ -195,7 +198,20 @@ public class ViewCommand extends ReporterCommand
 	{
 		String query = "SELECT COUNT(*) AS Count " +
 				"FROM Reports " +
-				"WHERE ClaimStatus = 1 AND ClaimedByRaw = '" + sender.getName() + "' AND Priority = " + level.getLevel();
+				"WHERE ClaimStatus = 1 AND ClaimedBy = '" + sender.getName() + "' AND Priority = " + level.getLevel();
+		
+		Player senderPlayer = null;
+		
+		if(BukkitUtil.isPlayer(sender))
+		{
+			senderPlayer = (Player) sender;
+			
+			UUID uuid = senderPlayer.getUniqueId();
+			
+			query = "SELECT COUNT(*) AS Count " +
+					"FROM Reports " +
+					"WHERE ClaimStatus = 1 AND ClaimedByUUID = '" + uuid.toString() + "' AND Priority = " + level.getLevel();
+		}
 		
 		try
 		{
@@ -205,9 +221,18 @@ public class ViewCommand extends ReporterCommand
 			
 			getManager().getDatabaseHandler().closeConnection();
 			
-			query = "SELECT ID, Sender, SenderRaw, Reported, ReportedRaw, Details " +
-					"FROM Reports " +
-					"WHERE ClaimStatus = 1 AND ClaimedByRaw = '" + sender.getName() + "' AND Priority = " + level.getLevel();
+			if(senderPlayer != null)
+			{
+				query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details " +
+						"FROM Reports " +
+						"WHERE ClaimStatus = 1 AND ClaimedByUUID = '" + senderPlayer.getUniqueId() + "' AND Priority = " + level.getLevel();
+			}
+			else
+			{
+				query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details " +
+						"FROM Reports " +
+						"WHERE ClaimStatus = 1 AND ClaimedBy = '" + sender.getName() + "' AND Priority = " + level.getLevel();
+			}
 			
 			result = getManager().getDatabaseHandler().sqlQuery(query);
 			
@@ -244,7 +269,20 @@ public class ViewCommand extends ReporterCommand
 	{
 		String query = "SELECT COUNT(*) AS Count " +
 				"FROM Reports " +
-				"WHERE ClaimStatus = 1 AND ClaimedByRaw = '" + sender.getName() + "'";
+				"WHERE ClaimStatus = 1 AND ClaimedBy = '" + sender.getName() + "'";
+		
+		Player senderPlayer = null;
+		
+		if(BukkitUtil.isPlayer(sender))
+		{
+			senderPlayer = (Player) sender;
+			
+			UUID uuid = senderPlayer.getUniqueId();
+			
+			query = "SELECT COUNT(*) AS Count " +
+					"FROM Reports " +
+					"WHERE ClaimStatus = 1 AND ClaimedByUUID = '" + uuid + "'";
+		}
 		
 		try
 		{
@@ -256,9 +294,18 @@ public class ViewCommand extends ReporterCommand
 			
 			getManager().getDatabaseHandler().closeConnection();
 			
-			query = "SELECT ID, Sender, SenderRaw, Reported, ReportedRaw, Details " +
-					"FROM Reports " +
-					"WHERE ClaimStatus = 1 AND ClaimedByRaw = '" + sender.getName() + "'";
+			if(senderPlayer != null)
+			{
+				query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details " +
+						"FROM Reports " +
+						"WHERE ClaimStatus = 1 AND ClaimedByUUID = '" + senderPlayer.getUniqueId() + "'";
+			}
+			else
+			{
+				query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details " +
+						"FROM Reports " +
+						"WHERE ClaimStatus = 1 AND ClaimedBy = '" + sender.getName() + "'";
+			}
 			
 			int count = 0;
 			
@@ -336,21 +383,31 @@ public class ViewCommand extends ReporterCommand
 		
 		array[0] = row.getString("ID");
 		
-		String playerName = row.getString("Sender");
-		String rawName = row.getString("SenderRaw");
+		String senderName = row.getString("Sender");
 		
-		array[1] = BukkitUtil.formatPlayerName(
-				playerName,
-				rawName,
-				displayRealName);
+		if(!row.getString("SenderUUID").isEmpty())
+		{
+			UUID uuid = UUID.fromString(row.getString("SenderUUID"));
+			
+			OfflinePlayer sender = Bukkit.getOfflinePlayer(uuid);
+			
+			senderName = BukkitUtil.formatPlayerName(sender, displayRealName);
+		}
 		
-		playerName = row.getString("Reported");
-		rawName = row.getString("ReportedRaw");
+		array[1] = senderName;
 		
-		array[2] = BukkitUtil.formatPlayerName(
-				playerName,
-				rawName,
-				displayRealName);
+		String reportedName = row.getString("Reported");
+		
+		if(!row.getString("ReportedUUID").isEmpty())
+		{
+			UUID uuid = UUID.fromString(row.getString("ReportedUUID"));
+			
+			OfflinePlayer reported = Bukkit.getOfflinePlayer(uuid);
+			
+			reportedName = BukkitUtil.formatPlayerName(reported, displayRealName);
+		}
+		
+		array[2] = reportedName;
 		
 		array[3] = row.getString("Details");
 		
@@ -389,7 +446,7 @@ public class ViewCommand extends ReporterCommand
 
 	private void viewAll(CommandSender sender, boolean displayRealName)
 	{
-		String query = "SELECT ID, Sender, SenderRaw, Reported, ReportedRaw, Details, CompletionStatus FROM Reports";
+		String query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details, CompletionStatus FROM Reports";
 		
 		String notCompleted[][] = new String[getManager().getIncompleteReports()][4];
 		String completed[][] = new String[getManager().getCompletedReports()][4];
@@ -443,7 +500,7 @@ public class ViewCommand extends ReporterCommand
 	
 	private void viewCompleted(CommandSender sender, boolean displayRealName)
 	{
-		String query = "SELECT ID, Sender, SenderRaw, Reported, ReportedRaw, Details, CompletionStatus " +
+		String query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details, CompletionStatus " +
 				"FROM Reports " +
 				"WHERE CompletionStatus = 1";
 		
@@ -489,7 +546,7 @@ public class ViewCommand extends ReporterCommand
 	
 	private void viewIncomplete(CommandSender sender, boolean displayRealName)
 	{
-		String query = "SELECT ID, Sender, SenderRaw, Reported, ReportedRaw, Details, CompletionStatus " +
+		String query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details, CompletionStatus " +
 				"FROM Reports " +
 				"WHERE CompletionStatus = 0";
 		
@@ -548,15 +605,22 @@ public class ViewCommand extends ReporterCommand
 		boolean completionStatus = false;
 		String completedBy = null, completionDate = null, summaryDetails = null;
 		
+		OfflinePlayer player = null;
+		
 		try
 		{
 			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
 			
 			reporter = result.getString("Sender");
 			
-			String rawName = result.getString("SenderRaw");
-			
-			BukkitUtil.formatPlayerName(reporter, rawName, displayRealName);
+			if(!result.getString("SenderUUID").isEmpty())
+			{
+				UUID uuid = UUID.fromString(result.getString("SenderUUID"));
+				
+				player = Bukkit.getOfflinePlayer(uuid);
+				
+				reporter = BukkitUtil.formatPlayerName(player, displayRealName);
+			}
 			
 			senderWorld = result.getString("SenderWorld");
 			senderX = (int) Math.round(result.getDouble("SenderX"));
@@ -565,9 +629,14 @@ public class ViewCommand extends ReporterCommand
 			
 			reportedPlayer = result.getString("Reported");
 			
-			rawName = result.getString("ReportedRaw");
-			
-			reportedPlayer = BukkitUtil.formatPlayerName(reportedPlayer, rawName, displayRealName);
+			if(!result.getString("ReportedUUID").isEmpty())
+			{
+				UUID uuid = UUID.fromString(result.getString("ReportedUUID"));
+				
+				player = Bukkit.getOfflinePlayer(uuid);
+				
+				reportedPlayer = BukkitUtil.formatPlayerName(player, displayRealName);
+			}
 			
 			reportedWorld = result.getString("ReportedWorld");
 			reportedX = (int) Math.round(result.getDouble("ReportedX"));
@@ -587,9 +656,14 @@ public class ViewCommand extends ReporterCommand
 			
 			claimedBy = result.getString("ClaimedBy");
 			
-			rawName = result.getString("ClaimedByRaw");
-			
-			claimedBy = BukkitUtil.formatPlayerName(claimedBy, rawName, displayRealName);
+			if(!result.getString("ClaimedByUUID").isEmpty())
+			{
+				UUID uuid = UUID.fromString(result.getString("ClaimedByUUID"));
+				
+				player = Bukkit.getOfflinePlayer(uuid);
+				
+				claimedBy = BukkitUtil.formatPlayerName(player, displayRealName);
+			}
 			
 			claimDate = result.getString("ClaimDate");
 			
@@ -597,9 +671,14 @@ public class ViewCommand extends ReporterCommand
 			
 			completedBy = result.getString("CompletedBy");
 			
-			rawName = result.getString("CompletedByRaw");
-			
-			completedBy = BukkitUtil.formatPlayerName(completedBy, rawName, displayRealName);
+			if(!result.getString("CompletedByUUID").isEmpty())
+			{
+				UUID uuid = UUID.fromString(result.getString("CompletedByUUID"));
+				
+				player = Bukkit.getOfflinePlayer(uuid);
+				
+				completedBy = BukkitUtil.formatPlayerName(player, displayRealName);
+			}
 			
 			completionStatus = result.getBoolean("CompletionStatus");
 			

@@ -85,26 +85,26 @@ public class ReportCommand extends ReporterCommand
 			params.add(0, Integer.toString(count+1));
 			
 			if(BukkitUtil.isPlayer(sender))
-				params.add(1, ((Player)sender).getDisplayName());
+				params.add(1, ((Player)sender).getUniqueId().toString());
 			else
-				params.add(1, sender.getName());
+				params.add(1, "");
 			
 			params.add(2, sender.getName());
 			
-			if(reported.isOnline())
+			if(reported.isOnline() && BukkitUtil.isPlayerValid(reported))
 			{
 				reportedPlayer = reported.getPlayer();
 				
-				params.add(3, reportedPlayer.getDisplayName());
-				params.add(4, reportedPlayer.getName());
+				params.add(3, reportedPlayer.getUniqueId().toString());
 				
 				reportedLoc = reportedPlayer.getLocation();
 			}
 			else
 			{
-				params.add(3, reported.getName());
-				params.add(4, reported.getName());
+				params.add(3, "");
 			}
+			
+			params.add(4, reported.getName());
 			
 			params.add(5, details);
 			params.add(6, Reporter.getDateformat().format(new Date()));
@@ -148,7 +148,7 @@ public class ReportCommand extends ReporterCommand
 			{
 				String query = 
 						"INSERT INTO Reports " +
-						"(ID, Sender, SenderRaw, Reported, ReportedRaw, Details, Date, SenderWorld, SenderX, SenderY, SenderZ, ReportedWorld, ReportedX, ReportedY, ReportedZ, CompletionStatus, ClaimStatus) " +
+						"(ID, SenderUUID, Sender, ReportedUUID, Reported, Details, Date, SenderWorld, SenderX, SenderY, SenderZ, ReportedWorld, ReportedX, ReportedY, ReportedZ, CompletionStatus, ClaimStatus) " +
 						"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 				getManager().getDatabaseHandler().preparedUpdateQuery(query, params);
 			}

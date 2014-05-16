@@ -1,15 +1,20 @@
 package net.KabOOm356.Command.Commands;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.UnclaimPhrases;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 
 /**
@@ -58,7 +63,7 @@ public class UnclaimCommand extends ReporterCommand
 	
 	private boolean canUnclaimReport(CommandSender sender, int index)
 	{
-		String query = "SELECT ClaimStatus, ClaimedBy, ClaimedByRaw FROM Reports WHERE ID=" + index;
+		String query = "SELECT ClaimStatus, ClaimedByUUID, ClaimedBy FROM Reports WHERE ID=" + index;
 		
 		try
 		{
@@ -66,14 +71,44 @@ public class UnclaimCommand extends ReporterCommand
 			
 			if(result.getBoolean("ClaimStatus"))
 			{
-				if(!result.getString("ClaimedByRaw").equals(sender.getName()))
+				boolean senderIsClaimingPlayer = false;
+				OfflinePlayer claimingPlayer = null;
+				
+				// Do UUID player comparison.
+				if(!result.getString("ClaimedByUUID").isEmpty())
+				{
+					UUID uuid = UUID.fromString(result.getString("ClaimedByUUID"));
+					
+					claimingPlayer = Bukkit.getPlayer(uuid);
+					
+					if(BukkitUtil.isPlayer(sender))
+					{
+						Player senderPlayer = (Player) sender;
+						
+						if(senderPlayer.getUniqueId().equals(claimingPlayer.getUniqueId()))
+						{
+							senderIsClaimingPlayer = true;
+						}
+					}
+				}
+				else // Do name based player comparison.
+				{
+					if(sender.getName().equals(result.getString("ClaimedBy")))
+					{
+						senderIsClaimingPlayer = true;
+					}
+				}
+				
+				if(!senderIsClaimingPlayer)
 				{
 					String output = getManager().getLocale().getString(UnclaimPhrases.reportAlreadyClaimed);
 					
-					String claimedBy = result.getString("ClaimedBy") +
-							ChatColor.GOLD + " (" +
-							result.getString("ClaimedByRaw") +
-							")";
+					String claimedBy = result.getString("ClaimedBy");
+					
+					if(claimingPlayer != null)
+					{
+						claimedBy = BukkitUtil.formatPlayerName(claimingPlayer);
+					}
 					
 					output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.RED);
 					output = output.replaceAll("%c", ChatColor.BLUE + claimedBy + ChatColor.RED);
@@ -111,7 +146,7 @@ public class UnclaimCommand extends ReporterCommand
 	{
 		String query = "UPDATE Reports " +
 				"SET " +
-				"ClaimStatus=0, ClaimedBy='', ClaimedByRaw='', ClaimPriority=0, ClaimDate='' " +
+				"ClaimStatus=0, ClaimedByUUID='', ClaimedBy='', ClaimPriority=0, ClaimDate='' " +
 				"WHERE ID=" + index;
 		
 		try
