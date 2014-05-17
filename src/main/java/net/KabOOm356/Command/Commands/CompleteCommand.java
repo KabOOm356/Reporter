@@ -15,6 +15,7 @@ import net.KabOOm356.Util.Util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -161,6 +162,8 @@ public class CompleteCommand extends ReporterCommand
 		
 		reportCompleted = reportCompleted.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.WHITE);
 		
+		OfflinePlayer sender = null;
+		
 		String playerName = null;
 		String yourReportCompleted = null;
 		
@@ -177,7 +180,8 @@ public class CompleteCommand extends ReporterCommand
 				if(!uuidString.isEmpty())
 				{
 					UUID uuid = UUID.fromString(uuidString);
-					playerName = Bukkit.getOfflinePlayer(uuid).getName();
+					sender = Bukkit.getOfflinePlayer(uuid);
+					playerName = sender.getName();
 				}
 				else
 				{
@@ -218,12 +222,19 @@ public class CompleteCommand extends ReporterCommand
 			}
 		}
 		
-		if(sendMessage && !isReporterOnline && playerName != null && !playerName.equals(""))
+		if(sendMessage && !isReporterOnline)
 		{
 			String message = ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + 
 					getManager().getLocale().getString(CompletePhrases.yourReportsCompleted);
 			
-			getManager().getMessageManager().addMessage(playerName, messageGroup, message, index);
+			if(sender != null)
+			{
+				getManager().getMessageManager().addMessage(sender.getUniqueId().toString(), messageGroup, message, index);
+			}
+			else if(playerName != null && !playerName.equals(""))
+			{
+				getManager().getMessageManager().addMessage(playerName, messageGroup, message, index);
+			}
 		}
 	}
 	
