@@ -91,17 +91,20 @@ public class ReportCommand extends ReporterCommand
 			
 			params.add(2, sender.getName());
 			
-			if(reported.isOnline() && BukkitUtil.isPlayerValid(reported))
+			if(BukkitUtil.isPlayerValid(reported))
 			{
-				reportedPlayer = reported.getPlayer();
-				
-				params.add(3, reportedPlayer.getUniqueId().toString());
-				
-				reportedLoc = reportedPlayer.getLocation();
+				params.add(3, reported.getUniqueId().toString());
 			}
 			else
 			{
 				params.add(3, "");
+			}
+			
+			if(reported.isOnline())
+			{
+				reportedPlayer = reported.getPlayer();
+				
+				reportedLoc = reportedPlayer.getLocation();
 			}
 			
 			params.add(4, reported.getName());
