@@ -286,3 +286,4 @@ Changelog:
 	3.1.4
 				Fixes:
 					Fixed a message saying the claiming player unassigned their self, when another player moved a report to a higher priority.
+					Fixed the claimed and completion statuses, when using SQLite, incorrectly stating the report is unclaimed or unfinished.
