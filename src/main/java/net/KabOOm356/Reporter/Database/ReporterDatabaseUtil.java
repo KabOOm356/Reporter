@@ -355,26 +355,6 @@ public class ReporterDatabaseUtil
 			}
 			
 			// Version 8 (UUID Update)
-			if(cols.contains("ReportedRaw"))
-			{
-				statement.addBatch("ALTER TABLE Reports DROP COLUMN ReportedRaw");
-				updated = true;
-			}
-			if(cols.contains("SenderRaw"))
-			{
-				statement.addBatch("ALTER TABLE Reports DROP COLUMN SenderRaw");
-				updated = true;
-			}
-			if(cols.contains("ClaimedByRaw"))
-			{
-				statement.addBatch("ALTER TABLE Reports DROP COLUMN ClaimedByRaw");
-				updated = true;
-			}
-			if(cols.contains("CompletedByRaw"))
-			{
-				statement.addBatch("ALTER TABLE Reports DROP COLUMN CompletedByRaw");
-				updated = true;
-			}
 			if(!cols.contains("SenderUUID"))
 			{
 				statement.addBatch("ALTER TABLE Reports ADD SenderUUID VARCHAR(36) DEFAULT ''");

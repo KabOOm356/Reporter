@@ -3,7 +3,6 @@ package net.KabOOm356.Reporter.Database;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -29,9 +28,15 @@ public class MigrateToVersion8
 		{
 			if(needsMigration(database))
 			{
-				addColumns(database);
+				createTemporaryTable(database);
+				
+				database.updateQuery("DROP TABLE IF EXISTS Reports");
+				
+				ReporterDatabaseUtil.createTables(database);
 				
 				migrateTable(database);
+				
+				deleteTemporaryTable(database);
 				
 				updated = true;
 			}
@@ -56,24 +61,45 @@ public class MigrateToVersion8
 		return updated;
 	}
 	
-	protected static void addColumns(Database database) throws ClassNotFoundException, SQLException
+	private static void deleteTemporaryTable(Database database) throws ClassNotFoundException, SQLException
 	{
-		ArrayList<String> cols = database.getColumns("Reports");
+		database.updateQuery("DROP TABLE IF EXISTS Version8Temporary");
+	}
+
+	private static void createTemporaryTable(Database database) throws ClassNotFoundException, SQLException
+	{
+		String query = "CREATE TABLE IF NOT EXISTS Version8Temporary (" +
+				"ID INTEGER PRIMARY KEY, " +
+				"Date VARCHAR(19) NOT NULL DEFAULT 'N/A', " +
+				"Sender VARCHAR(50) NOT NULL, " +
+				"SenderRaw VARCHAR(16) NOT NULL, " +
+				"Reported VARCHAR(50) NOT NULL DEFAULT '* (Anonymous)', " +
+				"ReportedRaw VARCHAR(16) NOT NULL DEFAULT '* (Anonymous)', " +
+				"Details VARCHAR(200) NOT NULL, " +
+				"Priority TINYINT NOT NULL DEFAULT '0', " +
+				"SenderWorld VARCHAR(100) DEFAULT '', " +
+				"SenderX DOUBLE NOT NULL DEFAULT '0.0', " +
+				"SenderY DOUBLE NOT NULL DEFAULT '0.0', " +
+				"SenderZ DOUBLE NOT NULL DEFAULT '0.0', " +
+				"ReportedWorld VARCHAR(100) DEFAULT '', " +
+				"ReportedX DOUBLE DEFAULT '0.0', " +
+				"ReportedY DOUBLE DEFAULT '0.0', " +
+				"ReportedZ DOUBLE DEFAULT '0.0', " +
+				"CompletionStatus BOOLEAN NOT NULL DEFAULT '0', " +
+				"CompletedBy VARCHAR(50), " +
+				"CompletedByRaw VARCHAR(16), " +
+				"CompletionDate VARCHAR(19), " +
+				"CompletionSummary VARCHAR(200), " +
+				"ClaimStatus BOOLEAN NOT NULL DEFAULT '0', " +
+				"ClaimDate VARCHAR(19), " +
+				"ClaimedBy VARCHAR(50), " +
+				"ClaimedByRaw VARCHAR(16), " +
+				"ClaimPriority TINYINT);";
 		
-		Statement statement = database.createStatement();
+		database.updateQuery(query);
 		
-		if(!cols.contains("SenderUUID"))
-			statement.addBatch("ALTER TABLE Reports ADD SenderUUID VARCHAR(36) DEFAULT ''");
-		if(!cols.contains("ReportedUUID"))
-			statement.addBatch("ALTER TABLE Reports ADD ReportedUUID VARCHAR(36) DEFAULT ''");
-		if(!cols.contains("ClaimedByUUID"))
-			statement.addBatch("ALTER TABLE Reports ADD ClaimedByUUID VARCHAR(36) DEFAULT ''");
-		if(!cols.contains("CompletedByUUID"))
-			statement.addBatch("ALTER TABLE Reports ADD CompletedByUUID VARCHAR(36) DEFAULT ''");
-		
-		statement.executeBatch();
-		
-		statement.close();
+		database.updateQuery("INSERT INTO Version8Temporary " +
+				"SELECT * FROM Reports");
 	}
 
 	protected static boolean needsMigration(Database database) throws ClassNotFoundException, SQLException
@@ -102,7 +128,11 @@ public class MigrateToVersion8
 	
 	private static void migrateTable(Database database) throws ClassNotFoundException, SQLException
 	{
-		String query = "SELECT ID, SenderRaw, ReportedRaw, ClaimedByRaw, CompletedByRaw FROM Reports";
+		String query = "INSERT INTO Reports SELECT * FROM Version8Temporary";
+		
+		database.updateQuery(query);
+		
+		query = "SELECT * FROM Version8Temporary";
 		
 		ResultSet rs = null;
 		SQLResultSet resultSet = new SQLResultSet();
@@ -122,7 +152,7 @@ public class MigrateToVersion8
 		}
 		
 		query = "UPDATE Reports "
-				+ "SET SenderUUID=?, ReportedUUID=?, ClaimedByUUID=?, CompletedByUUID=? "
+				+ "SET SenderUUID=?, Sender=?, ReportedUUID=?, Reported=?, ClaimedByUUID=?, ClaimedBy=?, CompletedByUUID=?, CompletedBy=? "
 				+ "WHERE ID=?";
 		
 		PreparedStatement statement = null;
@@ -154,20 +184,11 @@ public class MigrateToVersion8
 					statement.setString(1, "");
 				}
 				
+				statement.setString(2, senderName);
+				
 				if(!reportedName.equalsIgnoreCase("* (Anonymous)"))
 				{
 					uuid = getPlayerUUID(reportedName, players);
-					
-					statement.setString(2, uuid.toString());
-				}
-				else
-				{
-					statement.setString(2, "");
-				}
-				
-				if(!claimedBy.isEmpty() && !claimedBy.equals("CONSOLE"))
-				{
-					uuid = getPlayerUUID(claimedBy, players);
 					
 					statement.setString(3, uuid.toString());
 				}
@@ -176,18 +197,35 @@ public class MigrateToVersion8
 					statement.setString(3, "");
 				}
 				
+				statement.setString(4, reportedName);
+				
+				if(!claimedBy.isEmpty() && !claimedBy.equals("CONSOLE"))
+				{
+					uuid = getPlayerUUID(claimedBy, players);
+					
+					statement.setString(5, uuid.toString());
+				}
+				else
+				{
+					statement.setString(5, "");
+				}
+				
+				statement.setString(6, claimedBy);
+				
 				if(!completedBy.isEmpty() && !completedBy.equals("CONSOLE"))
 				{
 					uuid = getPlayerUUID(completedBy, players);
 					
-					statement.setString(4, uuid.toString());
+					statement.setString(7, uuid.toString());
 				}
 				else
 				{
-					statement.setString(4, "");
+					statement.setString(7, "");
 				}
 				
-				statement.setInt(5, id);
+				statement.setString(8, completedBy);
+				
+				statement.setInt(9, id);
 				
 				statement.executeUpdate();
 				statement.clearParameters();
