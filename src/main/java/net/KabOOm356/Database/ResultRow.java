@@ -81,7 +81,13 @@ public class ResultRow extends LinkedHashMap<String, Object>
 	{
 		if(get(colName) == null)
 			return null;
-		return Boolean.parseBoolean(getString(colName));
+		
+		// Try to parse for the Boolean, only returns true if the string value is "true".
+		Boolean value = Boolean.parseBoolean(getString(colName));
+		// Tries to parse for the Boolean by Integer value, true if the string value is "1".
+		value = value || getString(colName).equals("1");
+		
+		return value;
 	}
 	
 	/**

@@ -2,7 +2,7 @@ name: Reporter
 author: KabOOm 356
 website: http://dev.bukkit.org/server-mods/reporter/
 main: net.KabOOm356.Reporter.Reporter
-version: 3.1.4 BETA
+version: 3.1.5 BETA
 softdepend: [PermissionsEx]
 commands:
   report:
