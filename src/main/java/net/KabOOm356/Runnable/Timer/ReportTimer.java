@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
  * 
  * @see ReportLimitManager
  */
-public class ReportTimer extends Thread
+public class ReportTimer extends Thread implements Comparable<ReportTimer>
 {
 	/**
 	 * {@link ReportTimer} comparator that compares the based on the time remaining.
@@ -125,5 +125,11 @@ public class ReportTimer extends Thread
 		long currentTime = Calendar.getInstance().getTimeInMillis();
 		
 		return (int) ((executionTime - currentTime)/1000);
+	}
+
+	@Override
+	public int compareTo(ReportTimer arg0)
+	{
+		return compareByTimeRemaining.compare(this, arg0);
 	}
 }

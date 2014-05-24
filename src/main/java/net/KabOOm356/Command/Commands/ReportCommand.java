@@ -233,7 +233,7 @@ public class ReportCommand extends ReporterCommand
 		
 		timeRemaining = timeRemaining.replaceAll("%r", ChatColor.BLUE + reportedNameFormatted + ChatColor.WHITE);
 		
-		int seconds = getManager().getReportLimitManager().getRemainingTime(sender, reported.getName());
+		int seconds = getManager().getReportLimitManager().getRemainingTime(sender, reported);
 		
 		return formatTimeRemaining(timeRemaining, seconds);
 	}
