@@ -14,8 +14,11 @@ public class VersionedNetworkFile extends NetworkFile
 	/** The versions split into indexes. */
 	private ArrayList<String> versions;
 	
-	/** The level of this release */
+	/** The level of this release. */
 	private ReleaseLevel releaseLevel;
+	
+	/** The release version of the current level. */
+	private int releaseLevelVersion;
 	
 	/**
 	 * An enumerated type to express levels of releases of a project.
@@ -287,6 +290,16 @@ public class VersionedNetworkFile extends NetworkFile
 	}
 	
 	/**
+	 * Returns the release level version of this file.
+	 * 
+	 * @return The release level version of this file.
+	 */
+	public int getReleaseLevelVersion()
+	{
+		return releaseLevelVersion;
+	}
+	
+	/**
 	 * Returns the version number at the given depth, if there is no version number at the given depth zero is returned.
 	 *
 	 * @param depth The depth of the version number to get, starting at 0.
@@ -302,14 +315,7 @@ public class VersionedNetworkFile extends NetworkFile
 		else
 			versionNumber = "0";
 		
-		try
-		{
-			return Integer.parseInt(versionNumber);
-		}
-		catch(NumberFormatException e)
-		{
-			return 0;
-		}
+		return parseInt(versionNumber);
 	}
 	
 	/**
@@ -359,7 +365,7 @@ public class VersionedNetworkFile extends NetworkFile
 		String[] array = version.split("[\\.]|[-]|[_]|[ ]");
 		
 		for(String str : array)
-			list.add(str);
+			list.add(str.toLowerCase());
 		
 		return list;
 	}
@@ -375,25 +381,53 @@ public class VersionedNetworkFile extends NetworkFile
 		
 		ArrayList<String> separatedVersions = separateVersion();
 		
-		String lastIndex = separatedVersions.get(separatedVersions.size()-1);
+		int index;
+		int lastIndex = separatedVersions.size()-1;
 		
-		if(lastIndex.equalsIgnoreCase("alpha"))
+		if(separatedVersions.contains("alpha"))
 		{
 			this.releaseLevel = ReleaseLevel.ALPHA;
-			separatedVersions.remove(separatedVersions.size()-1);
+			
+			index = separatedVersions.indexOf("alpha");
+			
+			if(index == lastIndex-1)
+			{
+				this.releaseLevelVersion = parseInt(separatedVersions.remove(lastIndex));
+			}
+			
+			separatedVersions.remove(index);
 		}
-		else if(lastIndex.equalsIgnoreCase("beta"))
+		else if(separatedVersions.contains("beta"))
 		{
 			this.releaseLevel = ReleaseLevel.BETA;
-			separatedVersions.remove(separatedVersions.size()-1);
+			
+			index = separatedVersions.indexOf("beta");
+			
+			if(index == lastIndex-1)
+			{
+				this.releaseLevelVersion = parseInt(separatedVersions.remove(lastIndex));
+			}
+			
+			separatedVersions.remove(index);
 		}
-		else if(lastIndex.equalsIgnoreCase("rc"))
+		else if(separatedVersions.contains("rc"))
 		{
 			this.releaseLevel = ReleaseLevel.RC;
-			separatedVersions.remove(separatedVersions.size()-1);
+			
+			index = separatedVersions.indexOf("rc");
+			
+			if(index == lastIndex-1)
+			{
+				this.releaseLevelVersion = parseInt(separatedVersions.remove(lastIndex));
+			}
+			
+			separatedVersions.remove(index);
 		}
 		else
+		{
 			this.releaseLevel = ReleaseLevel.RELEASE;
+			this.releaseLevelVersion = 0;
+		}
 		
 		this.versions = separatedVersions;
 	}
@@ -434,6 +468,12 @@ public class VersionedNetworkFile extends NetworkFile
 		// Take release level into account if the two versions are the same.
 		if(difference == 0)
 			difference = this.getReleaseLevel().value - comp.getReleaseLevel().value;
+		
+		// Take the release level version into account if the two versions are the same.
+		if(difference == 0)
+		{
+			difference = this.getReleaseLevelVersion() - comp.getReleaseLevelVersion();
+		}
 		
 		return difference;
 	}
@@ -489,6 +529,18 @@ public class VersionedNetworkFile extends NetworkFile
 		return f.compareVersionTo(comp2);
 	}
 	
+	private int parseInt(String str)
+	{
+		try
+		{
+			return Integer.parseInt(str);
+		}
+		catch(NumberFormatException e)
+		{
+			return 0;
+		}
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -498,6 +550,11 @@ public class VersionedNetworkFile extends NetworkFile
 		String string = super.toString();
 		string += "\nVersion: " + version;
 		string += "\nRelease Level: " + releaseLevel;
+		
+		if(releaseLevelVersion != 0)
+		{
+			string += " " + releaseLevelVersion;
+		}
 		
 		return string;
 	}
