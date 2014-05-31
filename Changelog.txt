@@ -292,6 +292,7 @@ Changelog:
 	3.1.5
 				Changes:
 					Changed to use UUID player look-up and verification, whenever possible.
+					Changed to loading the default locale file with a Reader type, instead of an InputStream.
 					Database:
 						Added a 'SenderUUID' column.
 						Added a 'ReportedUUID' column.

@@ -1,7 +1,7 @@
 package net.KabOOm356.Reporter;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
@@ -275,15 +275,15 @@ public class Reporter extends JavaPlugin
 	
 	private boolean setLocaleDefaults(Locale locale)
 	{
-		InputStream defaultLocaleStream = getResource("en_US.yml");
+		Reader defaultLocaleReader = getTextResource("en_US.yml");
 		
-		if(defaultLocaleStream != null)
+		if(defaultLocaleReader != null)
 		{
 			YamlConfiguration defaultLocale = new YamlConfiguration();
 			
 			try
 			{
-				defaultLocale.load(defaultLocaleStream);
+				defaultLocale.load(defaultLocaleReader);
 				locale.setDefaults(defaultLocale);
 				return true;
 			}
