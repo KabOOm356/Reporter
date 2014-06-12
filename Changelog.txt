@@ -289,7 +289,7 @@ Changelog:
 					Fixed the claimed and completion statuses, when using SQLite, incorrectly stating the report is unclaimed or unfinished.
 	3.1.4.1	5/31/2014
 				Added support for a release level version, ex. '3.1.4 BETA 2'.
-	3.1.5
+	3.1.5	6/12/2014
 				Changes:
 					Changed to use UUID player look-up and verification, whenever possible.
 					Changed to loading the default locale file with a Reader type, instead of an InputStream.
