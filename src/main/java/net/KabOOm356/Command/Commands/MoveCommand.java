@@ -1,6 +1,7 @@
 package net.KabOOm356.Command.Commands;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -71,7 +72,9 @@ public class MoveCommand extends ReporterCommand
 	
 	protected void moveReport(CommandSender sender, int index, ModLevel level)
 	{
-		String query = "SELECT ClaimStatus, ClaimedByRaw, ClaimPriority FROM Reports WHERE ID=" + index;
+		String query = "SELECT ClaimStatus, ClaimedByUUID, ClaimPriority "
+				+ "FROM Reports "
+				+ "WHERE ID=" + index;
 		
 		SQLResultSet result;
 		
@@ -80,8 +83,14 @@ public class MoveCommand extends ReporterCommand
 			result = getManager().getDatabaseHandler().sqlQuery(query);
 			
 			boolean isClaimed = result.getBoolean("ClaimStatus");
-			String claimedBy = result.getString("ClaimedByRaw");
 			int currentPriority = result.getInt("ClaimPriority");
+			String claimedByUUIDString = result.getString("ClaimedByUUID");
+			UUID claimedByUUID = null;
+			
+			if(!claimedByUUIDString.isEmpty())
+			{
+				claimedByUUID = UUID.fromString(claimedByUUIDString);
+			}
 			
 			if(isClaimed && level.getLevel() > currentPriority)
 			{
@@ -89,17 +98,23 @@ public class MoveCommand extends ReporterCommand
 				query = "UPDATE Reports " +
 						"SET " +
 						"ClaimStatus='0', " +
+						"ClaimedByUUID='', " +
 						"ClaimedBy='', " +
 						"ClaimDate='', " +
 						"ClaimPriority=0, " +
 						"Priority=" + level.getLevel() + " " +
 						"WHERE ID=" + index;
 				
-				Player claimingPlayer = Bukkit.getPlayer(claimedBy);
+				Player claimingPlayer = null;
+				
+				if(claimedByUUID != null)
+				{
+					claimingPlayer = Bukkit.getPlayer(claimedByUUID);
+				}
 				
 				if(claimingPlayer != null)
 				{
-					String playerName = BukkitUtil.formatPlayerName(claimingPlayer);
+					String playerName = BukkitUtil.formatPlayerName(sender);
 					
 					String output = getManager().getLocale().getString(MovePhrases.unassignedFromReport);
 					

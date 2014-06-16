@@ -2,6 +2,7 @@ package net.KabOOm356.Command.Commands;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
@@ -90,10 +91,17 @@ public class CompleteCommand extends ReporterCommand
 	{
 		ArrayList<String> params = new ArrayList<String>(5);
 		params.add(0, "1");
+		
+		// If the CommandSender is a player set the UUID in the database.
 		if(BukkitUtil.isPlayer(sender))
-			params.add(1, ((Player)sender).getDisplayName());
+		{
+			params.add(1, ((Player)sender).getUniqueId().toString());
+		}
 		else
-			params.add(1, sender.getName());
+		{
+			params.add(1, "");
+		}
+		
 		params.add(2, sender.getName());
 		params.add(3, Reporter.getDateformat().format(new Date()));
 		params.add(4, summary);
@@ -101,8 +109,8 @@ public class CompleteCommand extends ReporterCommand
 		
 		String query = "UPDATE Reports " +
 				"SET CompletionStatus=?, " +
+				"CompletedByUUID=?, " +
 				"CompletedBy=?, " +
-				"CompletedByRaw=?, " +
 				"CompletionDate=?, " +
 				"CompletionSummary=? " +
 				"WHERE id=?";
@@ -159,6 +167,8 @@ public class CompleteCommand extends ReporterCommand
 		
 		reportCompleted = reportCompleted.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.WHITE);
 		
+		OfflinePlayer sender = null;
+		
 		String playerName = null;
 		String yourReportCompleted = null;
 		
@@ -166,11 +176,22 @@ public class CompleteCommand extends ReporterCommand
 		{
 			try
 			{
-				String query = "SELECT SenderRaw FROM Reports WHERE ID=" + Integer.toString(index);
+				String query = "SELECT SenderUUID, Sender FROM Reports WHERE ID=" + Integer.toString(index);
 				
 				SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
 				
-				playerName = result.getString(0, "SenderRaw");
+				String uuidString = result.getString("SenderUUID");
+				
+				if(!uuidString.isEmpty())
+				{
+					UUID uuid = UUID.fromString(uuidString);
+					sender = Bukkit.getOfflinePlayer(uuid);
+					playerName = sender.getName();
+				}
+				else
+				{
+					playerName = result.getString("Sender");
+				}
 			}
 			catch(Exception e)
 			{
@@ -206,12 +227,19 @@ public class CompleteCommand extends ReporterCommand
 			}
 		}
 		
-		if(sendMessage && !isReporterOnline && playerName != null && !playerName.equals(""))
+		if(sendMessage && !isReporterOnline)
 		{
 			String message = ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + 
 					getManager().getLocale().getString(CompletePhrases.yourReportsCompleted);
 			
-			getManager().getMessageManager().addMessage(playerName, messageGroup, message, index);
+			if(sender != null)
+			{
+				getManager().getMessageManager().addMessage(sender.getUniqueId().toString(), messageGroup, message, index);
+			}
+			else if(playerName != null && !playerName.equals(""))
+			{
+				getManager().getMessageManager().addMessage(playerName, messageGroup, message, index);
+			}
 		}
 	}
 	

@@ -7,6 +7,7 @@ import net.KabOOm356.Command.Commands.ViewCommand;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.AlertPhrases;
+import net.KabOOm356.Manager.MessageManager;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Runnable.DelayedMessage;
 import net.KabOOm356.Runnable.ListOnLoginThread;
@@ -52,7 +53,9 @@ public class ReporterPlayerListener implements Listener
 		
 		plugin.getCommandManager().getLastViewed().put(player, -1);
 		
-		if(plugin.getCommandManager().getMessageManager().hasMessages(player.getName()))
+		MessageManager messageManager = plugin.getCommandManager().getMessageManager();
+		
+		if(messageManager.hasMessages(player.getUniqueId().toString()) || messageManager.hasMessages(player.getName()))
 			sendMessages(player);
 		
 		if(plugin.getConfig().getBoolean("general.messaging.listOnLogin.listOnLogin", true))
@@ -61,7 +64,7 @@ public class ReporterPlayerListener implements Listener
 		if(isPlayerReported(event.getPlayer()))
 			alertThatReportedPlayerLogin(event.getPlayer());
 	}
-
+	
 	/**
 	 * Runs when a player quits.
 	 * 
@@ -89,13 +92,22 @@ public class ReporterPlayerListener implements Listener
 	
 	private void sendMessages(Player player)
 	{
+		// Players can view a message if they have permission to view all reports or their submitted reports.
 		boolean canView = plugin.getCommandManager().hasPermission(player, ViewCommand.getCommandPermissionNode());
 		canView = canView || plugin.getConfig().getBoolean("general.canViewSubmittedReports", true);
 		
-		// No point to send the message if the player can't view their report.
+		MessageManager messageManager = plugin.getCommandManager().getMessageManager();
+		
+		// No point to send the message if the player can't view any reports.
 		if(canView)
 		{
-			ArrayList<String> messages = plugin.getCommandManager().getMessageManager().getMessages(player.getName());
+			// Get the messages for the player using their UUID.
+			ArrayList<String> messages = messageManager.getMessages(player.getUniqueId().toString());
+			// Get the messages for the player using their player name.
+			ArrayList<String> playerNameMessages = messageManager.getMessages(player.getName());
+			
+			// Append the message pools.
+			messages.addAll(playerNameMessages);
 			
 			if(plugin.getConfig().getBoolean("general.messaging.completedMessageOnLogin.useDelay", true))
 			{
@@ -128,7 +140,9 @@ public class ReporterPlayerListener implements Listener
 			}
 		}
 		
-		plugin.getCommandManager().getMessageManager().removePlayerMessages(player.getName());
+		// Remove the messages for the player.
+		messageManager.removePlayerMessages(player.getUniqueId().toString());
+		messageManager.removePlayerMessages(player.getName());
 	}
 	
 	private boolean isPlayerReported(Player player)

@@ -95,7 +95,17 @@ public class ListCommand extends ReporterCommand
 	{
 		String query = "SELECT COUNT(*) AS Count " +
 				"FROM Reports " +
-				"WHERE ClaimStatus = 1 AND ClaimedByRaw = '" + sender.getName() + "'";
+				"WHERE ClaimStatus = 1 AND ";
+		
+		if(BukkitUtil.isPlayer(sender))
+		{
+			Player p = (Player) sender;
+			query += "ClaimedByUUID = '" + p.getUniqueId() + "'";
+		}
+		else
+		{
+			query += "ClaimedBy = '" + sender.getName() + "'";
+		}
 		
 		try
 		{
@@ -128,11 +138,26 @@ public class ListCommand extends ReporterCommand
 
 	private void listClaimedPriority(CommandSender sender)
 	{
-		String queryFormat = "SELECT COUNT(*) AS Count " +
-				"FROM Reports " +
-				"WHERE ClaimStatus = 1 " +
-				"AND ClaimedByRaw = '" + sender.getName() + "' " +
-				"AND Priority = ";
+		String queryFormat = null;
+		
+		if(BukkitUtil.isPlayer(sender))
+		{
+			Player p = (Player) sender;
+			
+			queryFormat = "SELECT COUNT(*) AS Count " +
+					"FROM Reports " +
+					"WHERE ClaimStatus = 1 " +
+					"AND ClaimedByUUID = '" + p.getUniqueId() + "' " +
+					"AND Priority = ";
+		}
+		else
+		{
+			queryFormat = "SELECT COUNT(*) AS Count " +
+					"FROM Reports " +
+					"WHERE ClaimStatus = 1 " +
+					"AND ClaimedByRaw = '" + sender.getName() + "' " +
+					"AND Priority = ";
+		}
 		
 		int noPriorityCount = 0;
 		int lowPriorityCount = 0;
@@ -197,7 +222,17 @@ public class ListCommand extends ReporterCommand
 	{
 		String query = "SELECT ID " +
 				"FROM Reports " +
-				"WHERE ClaimStatus = 1 AND ClaimedByRaw = '" + sender.getName() + "'";
+				"WHERE ClaimStatus = 1 AND ";
+		
+		if(BukkitUtil.isPlayer(sender))
+		{
+			Player p = (Player) sender;
+			query += "ClaimedByUUID = '" + p.getUniqueId() + "'";
+		}
+		else
+		{
+			query += "ClaimedBy = '" + sender.getName() + "'";
+		}
 		
 		try
 		{
@@ -232,12 +267,27 @@ public class ListCommand extends ReporterCommand
 
 	private void listClaimedPriorityIndexes(CommandSender sender)
 	{
-		String queryFormat = "SELECT ID " +
-				"FROM Reports " +
-				"WHERE " +
-				"ClaimStatus = 1 " +
-				"AND ClaimedByRaw = '" + sender.getName() + "' " +
-				"AND Priority = ";
+		String queryFormat = null;
+		
+		if(BukkitUtil.isPlayer(sender))
+		{
+			Player p = (Player) sender;
+			queryFormat += "SELECT ID " +
+					"FROM Reports " +
+					"WHERE " +
+					"ClaimStatus = 1 " +
+					"AND ClaimedByUUID = '" + p.getUniqueId() + "' " +
+					"AND Priority = ";
+		}
+		else
+		{
+			queryFormat += "SELECT ID " +
+					"FROM Reports " +
+					"WHERE " +
+					"ClaimStatus = 1 " +
+					"AND ClaimedBy = '" + sender.getName() + "' " +
+					"AND Priority = ";
+		}
 		
 		String noPriorityIndexes;
 		String lowPriorityIndexes;

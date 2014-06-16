@@ -1,6 +1,7 @@
 package net.KabOOm356.Command.Commands;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
@@ -15,6 +16,7 @@ import net.KabOOm356.Util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -95,7 +97,7 @@ public class RespondCommand extends ReporterCommand
 			
 			try
 			{
-				String query = "SELECT ID, Reported, Sender, Details, SenderX, SenderY, SenderZ, SenderWorld, ReportedX, ReportedY, ReportedZ, ReportedWorld " +
+				String query = "SELECT ID, ReportedUUID, Reported, SenderUUID, Sender, Details, SenderX, SenderY, SenderZ, SenderWorld, ReportedX, ReportedY, ReportedZ, ReportedWorld " +
 						"FROM Reports " +
 						"WHERE ID=" + index;
 
@@ -134,8 +136,32 @@ public class RespondCommand extends ReporterCommand
 				
 				id = result.getInt("ID");
 				
-				reported = result.getString("Reported");
-				sender = result.getString("Sender");
+				if(!result.getString("ReportedUUID").isEmpty())
+				{
+					UUID uuid = UUID.fromString(result.getString("ReportedUUID"));
+					
+					OfflinePlayer reportedPlayer = Bukkit.getPlayer(uuid);
+					
+					reported = BukkitUtil.formatPlayerName(reportedPlayer);
+				}
+				else
+				{
+					reported = result.getString("Reported");
+				}
+				
+				if(!result.getString("SenderUUID").isEmpty())
+				{
+					UUID uuid = UUID.fromString(result.getString("SenderUUID"));
+					
+					OfflinePlayer senderPlayer = Bukkit.getPlayer(uuid);
+					
+					reported = BukkitUtil.formatPlayerName(senderPlayer);
+				}
+				else
+				{
+					reported = result.getString("Sender");
+				}
+				
 				details = result.getString("Details");
 			}
 			catch(Exception ex)

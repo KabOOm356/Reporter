@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import net.KabOOm356.Command.Commands.AssignCommand;
 import net.KabOOm356.Command.Commands.ClaimCommand;
@@ -340,7 +341,10 @@ public class ReporterCommandManager implements CommandExecutor
 	 * 
 	 * @see org.bukkit.Server#getPlayer(String)
 	 * @see org.bukkit.Server#getOfflinePlayer(String)
+	 * 
+	 * @deprecated Deprecated due to dependency deprecation.
 	 */
+	@Deprecated
 	public OfflinePlayer getPlayer(String playerName)
 	{
 		playerName = playerName.replaceAll("\\ ", "");
@@ -402,14 +406,27 @@ public class ReporterCommandManager implements CommandExecutor
 	 */
 	public ArrayList<Integer> getViewableReports(CommandSender sender)
 	{
-		String query = "SELECT ID FROM Reports WHERE SenderRaw=?";
+		String query = null;
+		ArrayList<String> params = new ArrayList<String>();
+		
+		if(BukkitUtil.isPlayer(sender))
+		{
+			OfflinePlayer player = (OfflinePlayer) sender;
+			
+			query = "SELECT ID FROM Reports WHERE SenderUUID=?";
+			
+			params.add(player.getUniqueId().toString());
+		}
+		else
+		{
+			query = "SELECT ID FROM Reports WHERE Sender=?";
+			params.add(sender.getName());
+		}
+		
 		ArrayList<Integer> indexes = new ArrayList<Integer>();
+		
 		try
 		{
-			ArrayList<String> params = new ArrayList<String>();
-			
-			params.add(sender.getName());
-			
 			SQLResultSet result = plugin.getDatabaseHandler().preparedSQLQuery(query, params);
 			
 			for(ResultRow row : result)
@@ -710,33 +727,90 @@ public class ReporterCommandManager implements CommandExecutor
 			return true;
 		
 		String query = "SELECT " +
-				"ClaimStatus, ClaimedBy, ClaimedByRaw, ClaimPriority " +
+				"ClaimStatus, ClaimedByUUID, ClaimedBy, ClaimPriority " +
 				"FROM Reports " +
 				"WHERE ID=" + index;
 		
 		boolean isClaimed;
-		String claimedBy, claimedByRaw;
+		UUID claimedBy = null;
+		String claimedByName;
 		int claimPriority;
+		Player playerObject = null;
+		Player senderObject = null;
+		boolean isClaimedBySender = false;
+		boolean isClaimedByPlayer = false;
+		
+		if(BukkitUtil.isPlayer(sender))
+		{
+			senderObject = (Player) sender;
+		}
+		
+		if(BukkitUtil.isPlayer(player))
+		{
+			playerObject = (Player) player;
+		}
 		
 		try
 		{
 			SQLResultSet result = getDatabaseHandler().sqlQuery(query);
 			
-			claimedBy = result.getString("ClaimedBy");
+			if(!result.getString("ClaimedByUUID").isEmpty())
+			{
+				claimedBy = UUID.fromString(result.getString("ClaimedBy"));
+			}
+			
 			isClaimed = result.getBoolean("ClaimStatus");
-			claimedByRaw = result.getString("ClaimedByRaw");
+			claimedByName = result.getString("ClaimedBy");
 			claimPriority = result.getInt("ClaimPriority");
 			
-			if(isClaimed && !player.getName().equals(claimedByRaw) && !sender.getName().equals(claimedByRaw) && claimPriority >= getModLevel(player).getLevel())
+			// Check if the sender is the player claiming the report.
+			// UUID based check.
+			if(claimedBy != null && senderObject != null)
+			{
+				if(BukkitUtil.equals(senderObject, claimedBy))
+				{
+					isClaimedBySender = true;
+				}
+			}
+			else // Name based check.
+			{
+				if(sender.getName().equals(claimedByName))
+				{
+					isClaimedBySender = true;
+				}
+			}
+			
+			// Check if the player is the player claiming the report.
+			// UUID based check.
+			if(claimedBy != null && playerObject != null)
+			{
+				if(BukkitUtil.equals(playerObject, claimedBy))
+				{
+					isClaimedByPlayer = true;
+				}
+			}
+			else // Name based check.
+			{
+				if(player.getName().equals(claimedByName))
+				{
+					isClaimedByPlayer = true;
+				}
+			}
+			
+			if(isClaimed && !isClaimedBySender && !isClaimedByPlayer && claimPriority >= getModLevel(player).getLevel())
 			{
 				String output = getLocale().getString(ClaimPhrases.reportAlreadyClaimed);
 				
-				if(!claimedBy.equals(claimedByRaw))
-					claimedBy += ChatColor.GOLD + " (" + claimedByRaw + ")";
+				if(claimedBy != null)
+				{
+					OfflinePlayer claimingPlayer = Bukkit.getServer().getOfflinePlayer(claimedBy);
+					
+					claimedByName = BukkitUtil.formatPlayerName(claimingPlayer);
+				}
 				
 				output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.RED);
 				
-				output = output.replaceAll("%c", ChatColor.BLUE + claimedBy + ChatColor.RED);
+				output = output.replaceAll("%c", ChatColor.BLUE + claimedByName + ChatColor.RED);
 				
 				sender.sendMessage(ChatColor.RED + output);
 				

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.KabOOm356</groupId>
   <artifactId>Reporter</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.4-SNAPSHOT</version>
   <properties>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   	<project.mainClass>net.KabOOm356.Reporter.Reporter</project.mainClass>
@@ -22,11 +22,6 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>1.7.2-R0.3</version>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
@@ -38,6 +33,11 @@
       <version>1.20.4</version>
       <scope>system</scope>
       <systemPath>${project.basedir}/lib/PermissionsEx.jar</systemPath>
+    </dependency>
+    <dependency>
+    	<groupId>org.bukkit</groupId>
+    	<artifactId>bukkit</artifactId>
+    	<version>1.7.9-R0.2</version>
     </dependency>
   </dependencies>
   <repositories>

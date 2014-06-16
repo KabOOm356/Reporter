@@ -1,12 +1,12 @@
 package net.KabOOm356.Command.Commands;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
@@ -65,19 +65,19 @@ public class UnassignCommand extends ReporterCommand
 
 	private void unassignReport(CommandSender sender, int index)
 	{
-		String query = "SELECT ClaimedBy, ClaimedByRaw FROM Reports WHERE ID=" + index;
-		String claimedBy, claimedByRaw;
+		String query = "SELECT ClaimedByUUID, ClaimedBy FROM Reports WHERE ID=" + index;
+		String claimedByUUID, claimedBy;
 		
 		try
 		{
 			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
 			
+			claimedByUUID = result.getString("ClaimedByUUID");
 			claimedBy = result.getString("ClaimedBy");
-			claimedByRaw = result.getString("ClaimedByRaw");
 			
 			query = "UPDATE Reports " +
 					"SET " +
-					"ClaimStatus=0, ClaimedBy='', ClaimedByRaw='', ClaimPriority=0, ClaimDate='' " +
+					"ClaimStatus=0, ClaimedByUUID='', ClaimedBy='', ClaimPriority=0, ClaimDate='' " +
 					"WHERE ID=" + index;
 			
 			getManager().getDatabaseHandler().updateQuery(query);
@@ -99,7 +99,17 @@ public class UnassignCommand extends ReporterCommand
 			}
 		}
 		
-		String playerName = BukkitUtil.formatPlayerName(claimedBy, claimedByRaw);
+		String playerName = claimedBy;
+		OfflinePlayer claimingPlayer = null;
+		
+		if(!claimedByUUID.isEmpty())
+		{
+			UUID uuid = UUID.fromString(claimedByUUID);
+			
+			claimingPlayer = Bukkit.getOfflinePlayer(uuid);
+			
+			playerName = BukkitUtil.formatPlayerName(claimingPlayer);
+		}
 		
 		String output = getManager().getLocale().getString(UnassignPhrases.reportUnassignSuccess);
 		
@@ -112,8 +122,6 @@ public class UnassignCommand extends ReporterCommand
 		
 		getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.UNASSIGNED);
 		
-		Player claimingPlayer = Bukkit.getPlayer(claimedByRaw);
-		
 		if(claimingPlayer != null && claimingPlayer.isOnline())
 		{
 			playerName = BukkitUtil.formatPlayerName(sender);
@@ -123,7 +131,7 @@ public class UnassignCommand extends ReporterCommand
 			output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.RED);
 			output = output.replaceAll("%s", ChatColor.GOLD + playerName + ChatColor.RED);
 			
-			claimingPlayer.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.RED + output);
+			claimingPlayer.getPlayer().sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.RED + output);
 		}
 	}
 
