@@ -208,8 +208,8 @@ public class ReporterDatabaseUtil
 		
 		query = "CREATE TABLE IF NOT EXISTS ModStats ("
 				+ primaryKey
-				+ "ModName VARCHAR(50) NOT NULL, "
-				+ "ModNameRaw VARCHAR(16) NOT NULL, "
+				+ "Mod VARCHAR(16) NOT NULL, "
+				+ "ModUUID VARCHAR(36) NOT NULL, "
 				+ "AssignCount INTEGER NOT NULL DEFAULT '0', "
 				+ "ClaimedCount INTEGER NOT NULL DEFAULT '0', "
 				+ "CompletionCount INTEGER NOT NULL DEFAULT '0', "
@@ -223,8 +223,8 @@ public class ReporterDatabaseUtil
 		
 		query = "CREATE TABLE IF NOT EXISTS PlayerStats ("
 				+ primaryKey
-				+ "Name VARCHAR(50) NOT NULL, "
-				+ "NameRaw VARCHAR(16) NOT NULL, "
+				+ "Name VARCHAR(16) NOT NULL, "
+				+ "UUID VARCHAR(36) NOT NULL, "
 				+ "FirstReportDate VARCHAR(19) NOT NULL, "
 				+ "LastReportDate VARCHAR(19) NOT NULL, "
 				+ "ReportCount INTEGER NOT NULL DEFAULT '0');";
@@ -507,14 +507,14 @@ public class ReporterDatabaseUtil
 				statement.addBatch(query);
 				updated = true;
 			}
-			if(!cols.contains("ModName"))
+			if(!cols.contains("Mod"))
 			{
-				statement.addBatch("ALTER TABLE ModStats ADD ModName VARCHAR(50) NOT NULL");
+				statement.addBatch("ALTER TABLE ModStats ADD Mod VARCHAR(16) NOT NULL");
 				updated = true;
 			}
-			if(!cols.contains("ModNameRaw"))
+			if(!cols.contains("ModUUID"))
 			{
-				statement.addBatch("ALTER TABLE ModStats ADD ModNameRaw VARCHAR(16) NOT NULL");
+				statement.addBatch("ALTER TABLE ModStats ADD ModUUID VARCHAR(36) NOT NULL");
 				updated = true;
 			}
 			if(!cols.contains("AssignCount"))
@@ -612,12 +612,12 @@ public class ReporterDatabaseUtil
 			}
 			if(!cols.contains("Name"))
 			{
-				statement.addBatch("ALTER TABLE PlayerStats ADD Name VARCHAR(50) NOT NULL");
+				statement.addBatch("ALTER TABLE PlayerStats ADD Name VARCHAR(16) NOT NULL");
 				updated = true;
 			}
 			if(!cols.contains("NameRaw"))
 			{
-				statement.addBatch("ALTER TABLE PlayerStats ADD NameRaw VARCHAR(16) NOT NULL");
+				statement.addBatch("ALTER TABLE PlayerStats ADD UUID VARCHAR(36) NOT NULL");
 				updated = true;
 			}
 			if(!cols.contains("FirstReportDate"))
