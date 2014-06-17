@@ -208,7 +208,7 @@ public class ReporterDatabaseUtil
 		
 		query = "CREATE TABLE IF NOT EXISTS ModStats ("
 				+ primaryKey
-				+ "Mod VARCHAR(16) NOT NULL, "
+				+ "ModName VARCHAR(16) NOT NULL, "
 				+ "ModUUID VARCHAR(36) NOT NULL, "
 				+ "AssignCount INTEGER NOT NULL DEFAULT '0', "
 				+ "ClaimedCount INTEGER NOT NULL DEFAULT '0', "
@@ -615,7 +615,7 @@ public class ReporterDatabaseUtil
 				statement.addBatch("ALTER TABLE PlayerStats ADD Name VARCHAR(16) NOT NULL");
 				updated = true;
 			}
-			if(!cols.contains("NameRaw"))
+			if(!cols.contains("UUID"))
 			{
 				statement.addBatch("ALTER TABLE PlayerStats ADD UUID VARCHAR(36) NOT NULL");
 				updated = true;
