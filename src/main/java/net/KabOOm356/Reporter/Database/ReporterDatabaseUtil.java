@@ -492,7 +492,7 @@ public class ReporterDatabaseUtil
 			
 			statement = database.createStatement();
 			
-			// Version 8 (Initial Table Version)
+			// Version 9 (Initial Table Version)
 			if(!cols.contains("ID"))
 			{
 				String query = "ALTER TABLE ModStats ADD ID INTEGER PRIMARY KEY";
@@ -507,9 +507,9 @@ public class ReporterDatabaseUtil
 				statement.addBatch(query);
 				updated = true;
 			}
-			if(!cols.contains("Mod"))
+			if(!cols.contains("ModName"))
 			{
-				statement.addBatch("ALTER TABLE ModStats ADD Mod VARCHAR(16) NOT NULL");
+				statement.addBatch("ALTER TABLE ModStats ADD ModName VARCHAR(16) NOT NULL");
 				updated = true;
 			}
 			if(!cols.contains("ModUUID"))
@@ -595,7 +595,7 @@ public class ReporterDatabaseUtil
 			
 			statement = database.createStatement();
 			
-			// Version 8 (Initial Table Version)
+			// Version 9 (Initial Table Version)
 			if(!cols.contains("ID"))
 			{
 				String query = "ALTER TABLE PlayerStats ADD ID INTEGER PRIMARY KEY";
