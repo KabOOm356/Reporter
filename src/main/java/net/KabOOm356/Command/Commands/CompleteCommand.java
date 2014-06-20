@@ -142,9 +142,12 @@ public class CompleteCommand extends ReporterCommand
 				ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
 				getManager().getLocale().getString(CompletePhrases.playerComplete)));
 		
-		OfflinePlayer senderPlayer = Bukkit.getOfflinePlayer(sender.getName());
+		if(BukkitUtil.isOfflinePlayer(sender))
+		{
+			OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 		
-		getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.COMPLETED);
+			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.COMPLETED);
+		}
 	}
 	
 	private boolean isSummaryValid(CommandSender sender, String summary)

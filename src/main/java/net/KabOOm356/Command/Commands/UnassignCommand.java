@@ -118,9 +118,12 @@ public class UnassignCommand extends ReporterCommand
 		
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 		
-		OfflinePlayer senderPlayer = Bukkit.getOfflinePlayer(sender.getName());
+		if(BukkitUtil.isOfflinePlayer(sender))
+		{
+			OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 		
-		getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.UNASSIGNED);
+			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.UNASSIGNED);
+		}
 		
 		if(claimingPlayer != null && claimingPlayer.isOnline())
 		{

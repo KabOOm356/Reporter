@@ -3,7 +3,6 @@ package net.KabOOm356.Command.Commands;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -115,9 +114,12 @@ public class ClaimCommand extends ReporterCommand
 		 
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 		
-		OfflinePlayer senderPlayer = Bukkit.getOfflinePlayer(sender.getName());
+		if(BukkitUtil.isOfflinePlayer(sender))
+		{
+			OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 		
-		getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.CLAIMED);
+			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.CLAIMED);
+		}
 	}
 
 	/**

@@ -10,6 +10,7 @@ import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Manager.SQLStatManager;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Util.BukkitUtil;
 
 /**
  * A class to manage setting player statistics held in an SQL database.
@@ -52,7 +53,7 @@ public class PlayerStatManager extends SQLStatManager
 	/**
 	 * The case-sensitive column name that should be used as an index.
 	 */
-	public static final String indexColumn = "NameRaw";
+	public static final String indexColumn = "UUID";
 	
 	/**
 	 * Constructor.
@@ -67,7 +68,7 @@ public class PlayerStatManager extends SQLStatManager
 	@Override
 	protected void addRow(OfflinePlayer player)
 	{
-		String query = "SELECT ID FROM " + tableName + " WHERE " + indexColumn + " = '" + player.getName() + "'";
+		String query = "SELECT ID FROM " + tableName + " WHERE " + indexColumn + " = '" + player.getUniqueId() + "'";
 		
 		SQLResultSet rs = null;
 		
@@ -78,22 +79,24 @@ public class PlayerStatManager extends SQLStatManager
 			if(rs.isEmpty())
 			{
 				query = "INSERT INTO " + tableName + " "
-						+ "(Name, NameRaw, FirstReportDate, LastReportDate) "
+						+ "(Name, UUID, FirstReportDate, LastReportDate) "
 						+ "VALUES (?,?,?,?)";
 				
 				ArrayList<String> params = new ArrayList<String>();
 				
 				String date = Reporter.getDateformat().format(new Date());
 				
-				String name = player.getName();
+				params.add(player.getName());
 				
-				if(player.isOnline())
+				if(BukkitUtil.isPlayerValid(player))
 				{
-					name = player.getPlayer().getDisplayName();
+					params.add(player.getUniqueId().toString());
+				}
+				else
+				{
+					params.add("");
 				}
 				
-				params.add(name);
-				params.add(player.getName());
 				params.add(date);
 				params.add(date);
 				

@@ -70,14 +70,14 @@ public class AssignCommand extends ReporterCommand
 	
 	private void assignReport(CommandSender sender, int index, Player player)
 	{
-		String query = "UPDATE Reports SET ClaimStatus=?, ClaimDate=?, ClaimedBy=?, ClaimedByRaw=?, ClaimPriority=? WHERE ID=?";
+		String query = "UPDATE Reports SET ClaimStatus=?, ClaimDate=?, ClaimedBy=?, ClaimedByUUID=?, ClaimPriority=? WHERE ID=?";
 		
 		ArrayList<String> params = new ArrayList<String>();
 		
 		params.add(0, "1");
 		params.add(1, Reporter.getDateformat().format(new Date()));
-		params.add(2, player.getDisplayName());
-		params.add(3, player.getName());
+		params.add(2, player.getName());
+		params.add(3, player.getUniqueId().toString());
 		params.add(4, Integer.toString(getManager().getModLevel(player).getLevel()));
 		params.add(5, Integer.toString(index));
 		
@@ -122,9 +122,12 @@ public class AssignCommand extends ReporterCommand
 		
 		player.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + output);
 		
-		OfflinePlayer senderPlayer = Bukkit.getOfflinePlayer(sender.getName());
-		
-		getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.ASSIGNED);
+		if(BukkitUtil.isOfflinePlayer(sender))
+		{
+			OfflinePlayer senderPlayer = (OfflinePlayer) sender;
+			
+			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.ASSIGNED);
+		}
 	}
 	
 	/**

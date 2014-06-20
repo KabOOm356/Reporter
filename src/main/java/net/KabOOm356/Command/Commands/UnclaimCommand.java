@@ -177,9 +177,12 @@ public class UnclaimCommand extends ReporterCommand
 		
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 		
-		OfflinePlayer senderPlayer = Bukkit.getOfflinePlayer(sender.getName());
+		if(BukkitUtil.isOfflinePlayer(sender))
+		{
+			OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 		
-		getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.UNCLAIMED);
+			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.UNCLAIMED);
+		}
 	}
 	
 	/**

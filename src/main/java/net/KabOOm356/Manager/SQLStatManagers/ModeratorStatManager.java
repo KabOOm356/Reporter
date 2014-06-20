@@ -70,7 +70,7 @@ public class ModeratorStatManager extends SQLStatManager
 	/**
 	 * The case-sensitive column name that should be used as an index.
 	 */
-	public static final String indexColumn = "ModNameRaw";
+	public static final String indexColumn = "ModUUID";
 	
 	/**
 	 * Constructor.
@@ -85,7 +85,7 @@ public class ModeratorStatManager extends SQLStatManager
 	@Override
 	protected void addRow(OfflinePlayer player)
 	{
-		String query = "SELECT ID FROM ModStats WHERE ModNameRaw = '" + player.getName() + "'";
+		String query = "SELECT ID FROM ModStats WHERE ModUUID = '" + player.getUniqueId() + "'";
 		
 		SQLResultSet rs = null;
 		
@@ -96,20 +96,13 @@ public class ModeratorStatManager extends SQLStatManager
 			if(rs.isEmpty())
 			{
 				query = "INSERT INTO ModStats "
-						+ "(ModName, ModNameRaw) "
+						+ "(ModName, ModUUID) "
 						+ "VALUES (?,?)";
 				
 				ArrayList<String> params = new ArrayList<String>();
 				
-				String name = player.getName();
-				
-				if(player.isOnline())
-				{
-					name = player.getPlayer().getDisplayName();
-				}
-				
-				params.add(name);
 				params.add(player.getName());
+				params.add(player.getUniqueId().toString());
 				
 				getDatabase().preparedUpdateQuery(query, params);
 			}

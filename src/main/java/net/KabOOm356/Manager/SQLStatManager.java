@@ -116,7 +116,7 @@ public abstract class SQLStatManager
 		
 		String query = "UPDATE " + tableName + " "
 				+ "SET " + statColumn + " = " + statColumn + " + 1 "
-				+ "WHERE " + indexColumn + " = '" + player.getName() + "'";
+				+ "WHERE " + indexColumn + " = '" + player.getUniqueId() + "'";
 		
 		try
 		{
@@ -152,7 +152,7 @@ public abstract class SQLStatManager
 		
 		String query = "UPDATE " + tableName + " "
 				+ "SET " + statColumn + " = " + statColumn + " - 1 "
-				+ "WHERE " + indexColumn + " = '" + player.getName() + "'";
+				+ "WHERE " + indexColumn + " = '" + player.getUniqueId() + "'";
 		
 		try
 		{
@@ -196,7 +196,7 @@ public abstract class SQLStatManager
 		ArrayList<String> params = new ArrayList<String>();
 		
 		params.add(value);
-		params.add(player.getName());
+		params.add(player.getUniqueId().toString());
 		
 		try
 		{
@@ -237,7 +237,7 @@ public abstract class SQLStatManager
 		
 		ArrayList<String> params = new ArrayList<String>();
 		
-		params.add(player.getName());
+		params.add(player.getUniqueId().toString());
 		
 		ResultRow resultRow = null;
 		

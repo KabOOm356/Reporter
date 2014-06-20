@@ -1,6 +1,7 @@
 package net.KabOOm356.Listeners;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import net.KabOOm356.Command.Commands.ListCommand;
 import net.KabOOm356.Command.Commands.ViewCommand;
@@ -149,7 +150,7 @@ public class ReporterPlayerListener implements Listener
 	{
 		String query = "SELECT ID " +
 				"FROM Reports " +
-				"WHERE ReportedRaw = '" + player.getName() + "' AND !CompletionStatus";
+				"WHERE ReportedUUID = '" + player.getUniqueId() + "' AND !CompletionStatus";
 		
 		SQLResultSet result = null;
 		
@@ -170,9 +171,9 @@ public class ReporterPlayerListener implements Listener
 	
 	private void alertThatReportedPlayerLogin(Player reportedPlayer)
 	{
-		String query = "SELECT ID, ClaimStatus, ClaimedByRaw " +
+		String query = "SELECT ID, ClaimStatus, ClaimedByUUID " +
 				"FROM Reports " +
-				"WHERE ReportedRaw = '" + reportedPlayer.getName() + "' AND !CompletionStatus";
+				"WHERE ReportedUUID = '" + reportedPlayer.getUniqueId() + "' AND !CompletionStatus";
 		
 		SQLResultSet result = null;
 		
@@ -196,7 +197,11 @@ public class ReporterPlayerListener implements Listener
 			// If a report is claimed send a message to the claimer, if they are online.
 			if(row.getBoolean("ClaimStatus"))
 			{
-				OfflinePlayer player = Bukkit.getOfflinePlayer(row.getString("ClaimedByRaw"));
+				String uuidString = row.getString("ClaimedByUUID");
+				
+				UUID uuid = UUID.fromString(uuidString);
+				
+				OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
 				
 				if(player.isOnline())
 				{

@@ -17,7 +17,6 @@ import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -145,9 +144,12 @@ public class DeleteCommand extends ReporterCommand
 			}
 		}
 		
-		OfflinePlayer senderPlayer = Bukkit.getOfflinePlayer(sender.getName());
+		if(BukkitUtil.isOfflinePlayer(sender))
+		{
+			OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 		
-		getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.DELETED);
+			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.DELETED);
+		}
 	}
 	
 	private void deleteReport(int index) throws ClassNotFoundException, SQLException
