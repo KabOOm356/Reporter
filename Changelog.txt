@@ -306,3 +306,5 @@ Changelog:
 						Changed the 'Reported' column to 16 characters.
 						Changed the 'ClaimedBy' column to 16 characters.
 						Changed the 'CompletedBy' column to 16 characters.
+	3.1.6	6/20/2014
+				Fixed a null pointer exception when trying to match a name to an offline player.

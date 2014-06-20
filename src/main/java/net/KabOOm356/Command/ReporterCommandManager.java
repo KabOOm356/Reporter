@@ -370,18 +370,21 @@ public class ReporterCommandManager implements CommandExecutor
 		
 		for (OfflinePlayer op : Bukkit.getServer().getOfflinePlayers())
 		{
-			if (op.getName().toLowerCase().startsWith(lowerName))
+			if (op != null && op.getName() != null)
 			{
-				int curDelta = op.getName().length() - lowerName.length();
-				
-				if (curDelta < delta)
+				if (op.getName().toLowerCase().startsWith(lowerName))
 				{
-					player = op;
-					delta = curDelta;
+					int curDelta = op.getName().length() - lowerName.length();
+					
+					if (curDelta < delta)
+					{
+						player = op;
+						delta = curDelta;
+					}
+					
+					if(curDelta == 0)
+						break;
 				}
-				
-				if(curDelta == 0)
-					break;
 			}
 		}
 		
