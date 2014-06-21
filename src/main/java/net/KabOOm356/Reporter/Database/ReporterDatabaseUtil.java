@@ -225,9 +225,12 @@ public class ReporterDatabaseUtil
 				+ primaryKey
 				+ "Name VARCHAR(16) NOT NULL, "
 				+ "UUID VARCHAR(36) NOT NULL, "
-				+ "FirstReportDate VARCHAR(19) NOT NULL, "
-				+ "LastReportDate VARCHAR(19) NOT NULL, "
-				+ "ReportCount INTEGER NOT NULL DEFAULT '0');";
+				+ "FirstReportDate VARCHAR(19) NOT NULL DEFAULT '', "
+				+ "LastReportDate VARCHAR(19) NOT NULL DEFAULT '', "
+				+ "ReportCount INTEGER NOT NULL DEFAULT '0', "
+				+ "FirstReportedDate VARCHAR(19) NOT NULL DEFAULT '', "
+				+ "LastReportedDate VARCHAR(19) NOT NULL DEFAULT '', "
+				+ "ReportedCount INTEGER NOT NULL DEFAULT '0');";
 		
 		database.updateQuery(query);
 	}
@@ -622,17 +625,32 @@ public class ReporterDatabaseUtil
 			}
 			if(!cols.contains("FirstReportDate"))
 			{
-				statement.addBatch("ALTER TABLE PlayerStats ADD FirstReportDate VARCHAR(19) NOT NULL");
+				statement.addBatch("ALTER TABLE PlayerStats ADD FirstReportDate VARCHAR(19) NOT NULL DEFAULT ''");
 				updated = true;
 			}
 			if(!cols.contains("LastReportDate"))
 			{
-				statement.addBatch("ALTER TABLE PlayerStats ADD LastReportDate VARCHAR(19) NOT NULL");
+				statement.addBatch("ALTER TABLE PlayerStats ADD LastReportDate VARCHAR(19) NOT NULL DEFAULT ''");
 				updated = true;
 			}
 			if(!cols.contains("ReportCount"))
 			{
 				statement.addBatch("ALTER TABLE PlayerStats ADD ReportCount INTEGER NOT NULL DEFAULT '0'");
+				updated = true;
+			}
+			if(!cols.contains("FirstReportedDate"))
+			{
+				statement.addBatch("ALTER TABLE PlayerStats ADD FirstReportedDate VARCHAR(19) NOT NULL DEFAULT ''");
+				updated = true;
+			}
+			if(!cols.contains("LastReportedDate"))
+			{
+				statement.addBatch("ALTER TABLE PlayerStats ADD LastReportedDate VARCHAR(19) NOT NULL DEFAULT ''");
+				updated = true;
+			}
+			if(!cols.contains("ReportedCount"))
+			{
+				statement.addBatch("ALTER TABLE PlayerStats ADD ReportedCount INTEGER NOT NULL DEFAULT '0'");
 				updated = true;
 			}
 			
