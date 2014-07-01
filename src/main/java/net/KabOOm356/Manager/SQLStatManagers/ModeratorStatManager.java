@@ -1,12 +1,6 @@
 package net.KabOOm356.Manager.SQLStatManagers;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
-import org.bukkit.OfflinePlayer;
-
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
-import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Manager.SQLStatManager;
 
 /**
@@ -71,6 +65,10 @@ public class ModeratorStatManager extends SQLStatManager
 	 * The case-sensitive column name that should be used as an index.
 	 */
 	public static final String indexColumn = "ModUUID";
+	/**
+	 * The case-sensitive column name that should be used as a secondary index.
+	 */
+	public static final String secondaryIndexColumn = "ModName";
 	
 	/**
 	 * Constructor.
@@ -79,47 +77,6 @@ public class ModeratorStatManager extends SQLStatManager
 	 */
 	public ModeratorStatManager(ExtendedDatabaseHandler database)
 	{
-		super(database, tableName, indexColumn);
-	}
-
-	@Override
-	protected void addRow(OfflinePlayer player)
-	{
-		String query = "SELECT ID FROM ModStats WHERE ModUUID = '" + player.getUniqueId() + "'";
-		
-		SQLResultSet rs = null;
-		
-		try
-		{
-			rs = getDatabase().sqlQuery(query);
-			
-			if(rs.isEmpty())
-			{
-				query = "INSERT INTO ModStats "
-						+ "(ModName, ModUUID) "
-						+ "VALUES (?,?)";
-				
-				ArrayList<String> params = new ArrayList<String>();
-				
-				params.add(player.getName());
-				params.add(player.getUniqueId().toString());
-				
-				getDatabase().preparedUpdateQuery(query, params);
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			try
-			{
-				getDatabase().closeConnection();
-			}
-			catch (SQLException e)
-			{
-			}
-		}
+		super(database, tableName, indexColumn, secondaryIndexColumn);
 	}
 }

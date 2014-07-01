@@ -8,11 +8,12 @@ import org.bukkit.OfflinePlayer;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
+import net.KabOOm356.Util.BukkitUtil;
 
 /**
  * A class to manage setting statistics held in an SQL database.
  */
-public abstract class SQLStatManager
+public class SQLStatManager
 {
 	/**
 	 * A class that represents a statistic column in an SQL database.
@@ -37,6 +38,16 @@ public abstract class SQLStatManager
 		protected SQLStat(String columnName)
 		{
 			this.columnName = columnName;
+		}
+		
+		/**
+		 * Returns the column name of this SQLStat.
+		 * 
+		 * @return The column name of this SQLStat.
+		 */
+		public String getColumnName()
+		{
+			return columnName;
 		}
 		
 		@Override
@@ -70,6 +81,10 @@ public abstract class SQLStatManager
 	 * The case-sensitive name of the column that should be used as the index.
 	 */
 	private String indexColumn;
+	/**
+	 * The case-sensitive column name that should be used as a secondary index.
+	 */
+	private String secondaryIndexColumn;
 	
 	/**
 	 * Constructor.
@@ -80,7 +95,7 @@ public abstract class SQLStatManager
 	 * 
 	 * @throws IllegalArgumentException Thrown if any of the parameters are null.
 	 */
-	public SQLStatManager(ExtendedDatabaseHandler database, String tableName, String indexColumn)
+	public SQLStatManager(ExtendedDatabaseHandler database, String tableName, String indexColumn, String secondaryIndexColumn)
 	{
 		if(database == null)
 		{
@@ -97,9 +112,15 @@ public abstract class SQLStatManager
 			throw new IllegalArgumentException("Parameter 'indexColumn' cannot be null!");
 		}
 		
+		if(secondaryIndexColumn == null)
+		{
+			throw new IllegalArgumentException("Parameter 'secondaryIndexColumn' cannot be null!");
+		}
+		
 		this.database = database;
 		this.tableName = tableName;
 		this.indexColumn = indexColumn;
+		this.secondaryIndexColumn = secondaryIndexColumn;
 	}
 	
 	/**
@@ -116,11 +137,17 @@ public abstract class SQLStatManager
 		
 		String query = "UPDATE " + tableName + " "
 				+ "SET " + statColumn + " = " + statColumn + " + 1 "
-				+ "WHERE " + indexColumn + " = '" + player.getUniqueId() + "'";
+				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ? "
+				+ "LIMIT 1";
+		
+		ArrayList<String> params = new ArrayList<String>();
+		
+		params.add(player.getUniqueId().toString());
+		params.add(player.getName());
 		
 		try
 		{
-			getDatabase().updateQuery(query);
+			getDatabase().preparedUpdateQuery(query, params);
 		}
 		catch (Exception e)
 		{
@@ -152,11 +179,17 @@ public abstract class SQLStatManager
 		
 		String query = "UPDATE " + tableName + " "
 				+ "SET " + statColumn + " = " + statColumn + " - 1 "
-				+ "WHERE " + indexColumn + " = '" + player.getUniqueId() + "'";
+				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ? "
+				+ "LIMIT 1";
+		
+		ArrayList<String> params = new ArrayList<String>();
+		
+		params.add(player.getUniqueId().toString());
+		params.add(player.getName());
 		
 		try
 		{
-			getDatabase().updateQuery(query);
+			getDatabase().preparedUpdateQuery(query, params);
 		}
 		catch (Exception e)
 		{
@@ -191,12 +224,14 @@ public abstract class SQLStatManager
 		
 		String query = "UPDATE " + tableName + " "
 				+ "SET " + statColumn + " = ? "
-				+ "WHERE " + indexColumn + " = ?";
+				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ? "
+				+ "LIMIT 1";
 		
 		ArrayList<String> params = new ArrayList<String>();
 		
 		params.add(value);
 		params.add(player.getUniqueId().toString());
+		params.add(player.getName());
 		
 		try
 		{
@@ -233,11 +268,13 @@ public abstract class SQLStatManager
 		
 		String query = "SELECT " + statColumn
 				+ " FROM " + tableName
-				+ " WHERE " + indexColumn + " = ?";
+				+ " WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ? "
+				+ "LIMIT 1";
 		
 		ArrayList<String> params = new ArrayList<String>();
 		
 		params.add(player.getUniqueId().toString());
+		params.add(player.getName());
 		
 		ResultRow resultRow = null;
 		
@@ -296,7 +333,74 @@ public abstract class SQLStatManager
 	 * 
 	 * @param player The player to create a new row for, if one does not already exist.
 	 */
-	protected abstract void addRow(OfflinePlayer player);
+	protected void addRow(OfflinePlayer player)
+	{
+		try
+		{
+			SQLResultSet rs = getIndex(player);
+			
+			if(rs.isEmpty())
+			{
+				String query = "INSERT INTO " + tableName + " "
+						+ "(" + indexColumn + "," + secondaryIndexColumn + ") "
+						+ "VALUES (?,?)";
+				
+				ArrayList<String> params = new ArrayList<String>();
+				
+				if(BukkitUtil.isPlayerValid(player))
+				{
+					params.add(player.getUniqueId().toString());
+				}
+				else
+				{
+					params.add("");
+				}
+				
+				params.add(player.getName());
+				
+				getDatabase().preparedUpdateQuery(query, params);
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			try
+			{
+				getDatabase().closeConnection();
+			}
+			catch (SQLException e)
+			{
+			}
+		}
+	}
+	
+	/**
+	 * Gets the SQL index for the given player.
+	 * 
+	 * @param player The {@link OfflinePlayer} to get the index for.
+	 * 
+	 * @return An {@link SQLResultSet} that either contains the ID for the given player, or is empty.
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	private SQLResultSet getIndex(OfflinePlayer player) throws ClassNotFoundException, SQLException
+	{
+		String query = "SELECT ID "
+				+ "FROM " + tableName + " "
+				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ? "
+				+ "LIMIT 1";
+		
+		ArrayList<String> params = new ArrayList<String>();
+		
+		params.add(player.getUniqueId().toString());
+		params.add(player.getName());
+		
+		return database.preparedSQLQuery(query, params);
+	}
 	
 	/**
 	 * Returns the database the statistics are being stored.

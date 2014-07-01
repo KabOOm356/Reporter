@@ -1,16 +1,7 @@
 package net.KabOOm356.Manager.SQLStatManagers;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-
-import org.bukkit.OfflinePlayer;
-
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
-import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Manager.SQLStatManager;
-import net.KabOOm356.Reporter.Reporter;
-import net.KabOOm356.Util.BukkitUtil;
 
 /**
  * A class to manage setting player statistics held in an SQL database.
@@ -23,17 +14,29 @@ public class PlayerStatManager extends SQLStatManager
 	public static class PlayerStat extends SQLStat
 	{
 		/**
-		 * The number of times this player has been reported.
+		 * The number of times this player has reported someone else.
 		 */
-		public static final PlayerStat REPORTED = new PlayerStat("ReportCount");
+		public static final PlayerStat REPORTCOUNT = new PlayerStat("ReportCount");
 		/**
-		 * The date this player was first reported.
+		 * The date this player first reported someone else.
 		 */
 		public static final PlayerStat FIRSTREPORTDATE = new PlayerStat("FirstReportDate");
 		/**
-		 * The date this player was last reported.
+		 * The date this player last reported someone else.
 		 */
 		public static final PlayerStat LASTREPORTDATE = new PlayerStat("LastReportDate");
+		/**
+		 * The number of times this player has been reported.
+		 */
+		public static final PlayerStat REPORTED = new PlayerStat("ReportedCount");
+		/**
+		 * The date this player was first reported.
+		 */
+		public static final PlayerStat FIRSTREPORTEDDATE = new PlayerStat("FirstReportedDate");
+		/**
+		 * The date this player was last reported.
+		 */
+		public static final PlayerStat LASTREPORTEDDATE = new PlayerStat("LastReportedDate");
 		
 		/**
 		 * Constructor.
@@ -54,6 +57,10 @@ public class PlayerStatManager extends SQLStatManager
 	 * The case-sensitive column name that should be used as an index.
 	 */
 	public static final String indexColumn = "UUID";
+	/**
+	 * The case-sensitive column name that should be used as a secondary index.
+	 */
+	public static final String secondaryIndexColumn = "Name";
 	
 	/**
 	 * Constructor.
@@ -62,60 +69,6 @@ public class PlayerStatManager extends SQLStatManager
 	 */
 	public PlayerStatManager(ExtendedDatabaseHandler database)
 	{
-		super(database, tableName, indexColumn);
-	}
-
-	@Override
-	protected void addRow(OfflinePlayer player)
-	{
-		String query = "SELECT ID FROM " + tableName + " WHERE " + indexColumn + " = '" + player.getUniqueId() + "'";
-		
-		SQLResultSet rs = null;
-		
-		try
-		{
-			rs = getDatabase().sqlQuery(query);
-			
-			if(rs.isEmpty())
-			{
-				query = "INSERT INTO " + tableName + " "
-						+ "(Name, UUID, FirstReportDate, LastReportDate) "
-						+ "VALUES (?,?,?,?)";
-				
-				ArrayList<String> params = new ArrayList<String>();
-				
-				String date = Reporter.getDateformat().format(new Date());
-				
-				params.add(player.getName());
-				
-				if(BukkitUtil.isPlayerValid(player))
-				{
-					params.add(player.getUniqueId().toString());
-				}
-				else
-				{
-					params.add("");
-				}
-				
-				params.add(date);
-				params.add(date);
-				
-				getDatabase().preparedUpdateQuery(query, params);
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			try
-			{
-				getDatabase().closeConnection();
-			}
-			catch (SQLException e)
-			{
-			}
-		}
+		super(database, tableName, indexColumn, secondaryIndexColumn);
 	}
 }
