@@ -5,6 +5,7 @@ import java.util.Date;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ReportPhrases;
 import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager;
@@ -186,8 +187,34 @@ public class ReportCommand extends ReporterCommand
 			
 			String date = Reporter.getDateformat().format(new Date());
 			
+			if(BukkitUtil.isPlayer(sender))
+			{
+				Player senderPlayer = (Player) sender;
+				
+				stats.incrementStat(senderPlayer, PlayerStat.REPORTCOUNT);
+				stats.setStat(senderPlayer, PlayerStat.LASTREPORTDATE, date);
+				
+				ResultRow result = stats.getStat(senderPlayer, PlayerStat.FIRSTREPORTDATE);
+				
+				String firstReportDate = result.getString(PlayerStat.FIRSTREPORTDATE.getColumnName());
+				
+				if(firstReportDate.equals(""))
+				{
+					stats.setStat(senderPlayer, PlayerStat.FIRSTREPORTDATE, date);
+				}
+			}
+			
 			stats.incrementStat(reported, PlayerStat.REPORTED);
-			stats.setStat(reported, PlayerStat.LASTREPORTDATE, date);
+			stats.setStat(reported, PlayerStat.LASTREPORTEDDATE, date);
+			
+			ResultRow result = stats.getStat(reported, PlayerStat.FIRSTREPORTEDDATE);
+			
+			String firstReportedDate = result.getString(PlayerStat.FIRSTREPORTEDDATE.getColumnName());
+			
+			if(firstReportedDate.equals(""))
+			{
+				stats.setStat(reported, PlayerStat.FIRSTREPORTEDDATE, date);
+			}
 			
 			// Alert the player when they reach their reporting limit
 			canReport(sender);
