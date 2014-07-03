@@ -2,6 +2,7 @@ package net.KabOOm356.Database;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,7 +16,7 @@ import net.KabOOm356.Database.SQL.SQLite;
 /**
  * Handler for a {@link Database}.
  */
-public class DatabaseHandler
+public class DatabaseHandler implements DatabaseInterface
 {
 	/** The {@link Database} the Handler will use. */
 	private Database database;
@@ -59,29 +60,28 @@ public class DatabaseHandler
 	}
 	
 	/**
+	 * Constructor.
+	 * 
+	 * @param database The {@link Database} to be used.
+	 */
+	public DatabaseHandler(Database database)
+	{
+		this.database = database;
+	}
+	
+	/**
 	 * @return The {@link Database} this DatabaseHandler is using.
 	 */
 	public Database getDatabase()
 	{
 		return database;
 	}
-
-	/**
-	 * @see Database#openConnection()
-	 * 
-	 * @throws ClassNotFoundException
-	 * @throws SQLException
-	 */
+	
 	public void openConnection() throws ClassNotFoundException, SQLException
 	{
 		database.openConnection();
 	}
 	
-	/**
-	 * @see Database#closeConnection()
-	 * 
-	 * @throws SQLException
-	 */
 	public void closeConnection() throws SQLException
 	{
 		database.closeConnection();
@@ -106,108 +106,62 @@ public class DatabaseHandler
 	{
 		return database.getDatabaseType() == DatabaseType.MYSQL;
 	}
-
-	/**
-	 * @see Database#checkTable(String)
-	 * 
-	 * @throws ClassNotFoundException
-	 * @throws SQLException
-	 */
+	
 	public boolean checkTable(String table) throws ClassNotFoundException, SQLException
 	{
 		return database.checkTable(table);
 	}
-
-	/**
-	 * @see Database#updateQuery(String)
-	 * 
-	 * @throws ClassNotFoundException
-	 * @throws SQLException
-	 */
+	
 	public void updateQuery(String query) throws ClassNotFoundException, SQLException
 	{
 		database.updateQuery(query);
 	}
 	
-	/**
-	 * @see Database#getColumns(String)
-	 * 
-	 * @throws SQLException
-	 * @throws ClassNotFoundException
-	 */
-	public ArrayList<String> getColumns(String table) throws SQLException, ClassNotFoundException
+	public ArrayList<String> getColumnNames(String table) throws SQLException, ClassNotFoundException
 	{
-		return database.getColumns(table);
+		return database.getColumnNames(table);
 	}
-
-	/**
-	 * @see Database#query(String)
-	 * 
-	 * @throws ClassNotFoundException
-	 * @throws SQLException
-	 */
+	
+	public DatabaseMetaData getMetaData() throws ClassNotFoundException, SQLException
+	{
+		return database.getMetaData();
+	}
+	
+	public ResultSet getColumnMetaData(String table) throws ClassNotFoundException, SQLException
+	{
+		return database.getColumnMetaData(table);
+	}
+	
 	public ResultSet query(String query) throws ClassNotFoundException, SQLException
 	{
 		return database.query(query);
 	}
-
-	/**
-	 * @see Database#preparedQuery(String, ArrayList)
-	 * 
-	 * @throws ClassNotFoundException
-	 * @throws SQLException
-	 */
+	
 	public ResultSet preparedQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException
 	{
 		return database.preparedQuery(query, params);
 	}
-
-	/**
-	 * @see Database#preparedUpdateQuery(String, ArrayList)
-	 * 
-	 * @throws ClassNotFoundException
-	 * @throws SQLException
-	 */
+	
 	public void preparedUpdateQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException
 	{
 		database.preparedUpdateQuery(query, params);
 	}
 	
-	/**
-	 * @see Database#createStatement()
-	 * 
-	 * @throws ClassNotFoundException
-	 * @throws SQLException
-	 */
 	public Statement createStatement() throws ClassNotFoundException, SQLException
 	{
 		return database.createStatement();
 	}
 	
-	/**
-	 * @see Database#prepareStatement(String)
-	 * 
-	 * @throws ClassNotFoundException
-	 * @throws SQLException
-	 */
 	public PreparedStatement prepareStatement(String query) throws ClassNotFoundException, SQLException
 	{
 		return database.prepareStatement(query);
 	}
 	
-	/**
-	 * @see Database#getDatabaseType()
-	 */
 	public DatabaseType getDatabaseType()
 	{
 		return database.getDatabaseType();
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString()
 	{

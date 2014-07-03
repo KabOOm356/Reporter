@@ -224,7 +224,7 @@ public class ReporterDatabaseUtil
 		
 		try
 		{
-			ArrayList<String> cols = database.getColumns("Reports");
+			ArrayList<String> cols = database.getColumnNames("Reports");
 			
 			statement = database.createStatement();
 			

@@ -31,6 +31,16 @@ public class ExtendedDatabaseHandler extends DatabaseHandler
 	}
 	
 	/**
+	 * Constructor.
+	 * 
+	 * @see DatabaseHandler#DatabaseHandler(Database)
+	 */
+	public ExtendedDatabaseHandler(Database database)
+	{
+		super(database);
+	}
+	
+	/**
 	 * Performs an SQL query on the database that returns a {@link SQLResultSet} containing the results.
 	 * 
 	 * @param query The query to send to the database.
@@ -57,6 +67,7 @@ public class ExtendedDatabaseHandler extends DatabaseHandler
 		}
 		finally
 		{
+			resultSet.close();
 			closeConnection();
 		}
 	}
@@ -89,6 +100,37 @@ public class ExtendedDatabaseHandler extends DatabaseHandler
 		}
 		finally
 		{
+			resultSet.close();
+			closeConnection();
+		}
+	}
+	
+	/**
+	 * Returns the {@link Database}'s column meta data.
+	 * 
+	 * @param table The name of the table to get the meta data for.
+	 * 
+	 * @return An {@link SQLResultSet} containing the database's column meta data.
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public SQLResultSet getSQLColumnMetaData(String table) throws ClassNotFoundException, SQLException
+	{
+		ResultSet resultSet = null;
+		
+		try
+		{
+			resultSet = super.getColumnMetaData(table);
+			
+			if(!usingSQLite() && !resultSet.isBeforeFirst())
+				resultSet.beforeFirst();
+			
+			return new SQLResultSet(resultSet);
+		}
+		finally
+		{
+			resultSet.close();
 			closeConnection();
 		}
 	}

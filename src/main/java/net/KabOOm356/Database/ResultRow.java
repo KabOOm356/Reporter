@@ -3,12 +3,12 @@ package net.KabOOm356.Database;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 
 /**
- * A {@link LinkedHashMap} that represents a row returned from a SQL query.
+ * A {@link HashMap} that represents a row returned from a SQL query.
  */
-public class ResultRow extends LinkedHashMap<String, Object>
+public class ResultRow extends HashMap<String, Object>
 {
 	/**
 	 * Generated Serial-ID.
@@ -20,7 +20,7 @@ public class ResultRow extends LinkedHashMap<String, Object>
 	 */
 	public ResultRow()
 	{
-		super(16, 0.75f, false);
+		super();
 	}
 	
 	/**
@@ -32,7 +32,7 @@ public class ResultRow extends LinkedHashMap<String, Object>
 	 */
 	public ResultRow(ResultSet result) throws SQLException
 	{
-		super(16, 0.75f, false);
+		super();
 		
 		set(result);
 	}

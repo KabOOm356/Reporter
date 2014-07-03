@@ -108,7 +108,7 @@ public class MigrateToVersion8
 		{
 			ArrayList<String> cols = null;
 			
-			cols = database.getColumns("Reports");
+			cols = database.getColumnNames("Reports");
 			
 			if(!cols.contains("SenderUUID") &&
 					!cols.contains("ReportedUUID") &&
