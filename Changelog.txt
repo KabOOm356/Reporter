@@ -308,3 +308,16 @@ Changelog:
 						Changed the 'CompletedBy' column to 16 characters.
 	3.1.6	6/20/2014
 				Fixed a null pointer exception when trying to match a name to an offline player.
+	3.1.7
+				Database Changes:
+					Changed the 'Sender' column to 32 characters.
+					Changed the 'Reported' column to 32 characters.
+					Changed the 'ClaimedBy' column to 32 characters.
+					Changed the 'CompletedBy' column to 32 characters.
+					Changed the 'Date' column from a VARCHAR type to a CHAR type.
+					Changed the 'SenderUUID' column from a VARCHAR type to a CHAR type.
+					Changed the 'ReportedUUID' column from a VARCHAR type to a CHAR type.
+					Changed the 'ClaimedByUUID' column from a VARCHAR type to a CHAR type.
+					Changed the 'CompletedByUUID' column from a VARCHAR type to a CHAR type.
+					Changed the 'ClaimedDate' column from a VARCHAR type to a CHAR type.
+					Changed the 'CompletionDate' column from a VARCHAR type to a CHAR type.
