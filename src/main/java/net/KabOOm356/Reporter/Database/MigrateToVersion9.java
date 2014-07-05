@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import net.KabOOm356.Database.Database;
+import net.KabOOm356.Database.DatabaseType;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Reporter.Reporter;
 
@@ -99,6 +100,9 @@ public class MigrateToVersion9
 			String columnName = "COLUMN_NAME";
 			String columnSize = "COLUMN_SIZE";
 			
+			if(database.getDatabaseType() == DatabaseType.SQLITE)
+				columnSize = "TYPE_NAME";
+			
 			SQLResultSet cols = new SQLResultSet();
 			ResultSet rs = null;
 			
@@ -120,10 +124,12 @@ public class MigrateToVersion9
 				}
 			}
 			
-			if((cols.contains(columnName, "Sender") && cols.get(columnName, "Sender").getInt(columnSize) != 32)
-					&& (cols.contains(columnName, "Reported") && cols.get(columnName, "Reported").getInt(columnSize) != 32)
-					&& (cols.contains(columnName, "ClaimedBy") && cols.get(columnName, "ClaimedBy").getInt(columnSize) != 32)
-					&& (cols.contains(columnName, "CompletedBy") && cols.get(columnName, "CompletedBy").getInt(columnSize) != 32))
+			boolean sender = cols.get(columnName, "Sender").getString(columnSize).contains("32");
+			boolean reported = cols.get(columnName, "Reported").getString(columnSize).contains("32");
+			boolean claimedBy = cols.get(columnName, "ClaimedBy").getString(columnSize).contains("32");
+			boolean completedBy = cols.get(columnName, "CompletedBy").getString(columnSize).contains("32");
+			
+			if(!sender && !reported && !claimedBy && !completedBy)
 			{
 				return true;
 			}
