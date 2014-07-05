@@ -308,7 +308,7 @@ Changelog:
 						Changed the 'CompletedBy' column to 16 characters.
 	3.1.6	6/20/2014
 				Fixed a null pointer exception when trying to match a name to an offline player.
-	3.1.7
+	3.1.7	7/4/2014
 				Database Changes:
 					Changed the 'Sender' column to 32 characters.
 					Changed the 'Reported' column to 32 characters.
