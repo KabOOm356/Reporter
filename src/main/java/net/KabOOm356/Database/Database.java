@@ -16,7 +16,7 @@ import net.KabOOm356.Util.Util;
 /**
  * A simple class to handle connections and queries to a database.
  */
-public abstract class Database
+public abstract class Database implements DatabaseInterface
 {
 	/** The {@link DatabaseType} representation of the type of this database. */
 	private DatabaseType databaseType;
@@ -42,12 +42,6 @@ public abstract class Database
 		connection = null;
 	}
 	
-	/**
-	 * Attempts to open a connection to the database.
-	 * 
-	 * @throws ClassNotFoundException 
-	 * @throws SQLException 
-	 */
 	public void openConnection() throws ClassNotFoundException, SQLException
 	{
 		if(connection != null)
@@ -75,18 +69,6 @@ public abstract class Database
 		connection = DriverManager.getConnection(connectionURL, username, password);
 	}
 	
-	/**
-	 * Attempts to perform a query on the database and returns a ResultSet of data.
-	 * <br /><br />
-	 * <b>NOTE:</b> closeConnection() should be called after calling this method.
-	 * 
-	 * @param query	The string to query the database with.
-	 * 
-	 * @return	A {@link ResultSet} of information returned from the database.
-	 * 
-	 * @throws SQLException 
-	 * @throws ClassNotFoundException 
-	 */
 	public ResultSet query(String query) throws ClassNotFoundException, SQLException
 	{
 		openConnection();
@@ -94,14 +76,6 @@ public abstract class Database
 		return connection.createStatement().executeQuery(query);
 	}
 	
-	/**
-	 * Attempts to perform a query on the database that returns no data.
-	 * 
-	 * @param query	The string to query the database with.
-	 * 
-	 * @throws SQLException 
-	 * @throws ClassNotFoundException 
-	 */
 	public void updateQuery(String query) throws ClassNotFoundException, SQLException
 	{
 		openConnection();
@@ -120,20 +94,6 @@ public abstract class Database
 		}
 	}
 	
-	/**
-	 * Attempts to perform a prepared query on the database that returns a ResultSet of data.
-	 * <br /><br />
-	 * <b>NOTE:</b> closeConnection() should be called after calling this method.
-	 * 
-	 * @param query The string to query the database with.
-	 * @param params The parameters of the query.
-	 * 
-	 * @return Returns a {@link ResultSet} of data if there are enough entries in params.
-	 * 
-	 * @throws SQLException 
-	 * @throws ClassNotFoundException
-	 * @throws IllegalArgumentException If the number of parameters given do not match the number of parameters required. 
-	 */
 	public ResultSet preparedQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException
 	{
 		int numberOfOccurances = Util.countOccurrences(query, '?');
@@ -157,16 +117,6 @@ public abstract class Database
 		}
 	}
 	
-	/**
-	 * Attempts to perform a query on the database that returns no data.
-	 * 
-	 * @param query The string to query the database with.
-	 * @param params The parameters of the query.
-	 * 
-	 * @throws SQLException 
-	 * @throws ClassNotFoundException 
-	 * @throws IllegalArgumentException If the number of parameters given do not match the number of parameters required.
-	 */
 	public void preparedUpdateQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException
 	{
 		int numberOfOccurances = Util.countOccurrences(query, '?');
@@ -200,16 +150,6 @@ public abstract class Database
 		}
 	}
 	
-	/**
-	 * Checks the database if a table exists.
-	 * 
-	 * @param table The name of the table to check for.
-	 * 
-	 * @return If the table exists then returns true, otherwise false.
-	 * 
-	 * @throws SQLException 
-	 * @throws ClassNotFoundException 
-	 */
 	public boolean checkTable(String table) throws ClassNotFoundException, SQLException
 	{
 		ResultSet tables = null;
@@ -233,17 +173,7 @@ public abstract class Database
 		}
 	}
 	
-	/**
-	 * Returns the columns in a table.
-	 * 
-	 * @param table	The name of the table to get the columns from.
-	 * 
-	 * @return An {@link ArrayList} containing the names of the columns.
-	 * 
-	 * @throws SQLException 
-	 * @throws ClassNotFoundException 
-	 */
-	public ArrayList<String> getColumns(String table) throws SQLException, ClassNotFoundException
+	public ArrayList<String> getColumnNames(String table) throws SQLException, ClassNotFoundException
 	{
 		openConnection();
 		
@@ -253,8 +183,7 @@ public abstract class Database
 		
 		try
 		{
-			DatabaseMetaData d = connection.getMetaData();
-			rs = d.getColumns(null,null,table,null);
+			rs = getColumnMetaData(table);
 
 			while(rs.next())
 				col.add(rs.getString("COLUMN_NAME"));
@@ -268,6 +197,20 @@ public abstract class Database
 		}
 	}
 	
+	public DatabaseMetaData getMetaData() throws ClassNotFoundException, SQLException
+	{
+		openConnection();
+		
+		return connection.getMetaData();
+	}
+	
+	public ResultSet getColumnMetaData(String table) throws ClassNotFoundException, SQLException
+	{
+		openConnection();
+		
+		return getMetaData().getColumns(null, null, table, null);
+	}
+	
 	/**
 	 * Checks if the connection is open.
 	 * 
@@ -278,11 +221,6 @@ public abstract class Database
 		return connection != null;
 	}
 	
-	/**
-	 * Closes the connection to the database.
-	 * 
-	 * @throws SQLException 
-	 */
 	public void closeConnection() throws SQLException
 	{
 		if(connection != null)
@@ -302,14 +240,6 @@ public abstract class Database
 		return connection;
 	}
 	
-	/**
-	 * Returns a Statement from the database connection.
-	 * 
-	 * @return A Statement from the database.
-	 * 
-	 * @throws SQLException
-	 * @throws ClassNotFoundException 
-	 */
 	public Statement createStatement() throws SQLException, ClassNotFoundException
 	{
 		openConnection();
@@ -317,16 +247,6 @@ public abstract class Database
 		return connection.createStatement();
 	}
 	
-	/**
-	 * Returns a PreparedStatement from the database connection.
-	 * 
-	 * @param query The SQL query to create the PreparedStatement from.
-	 * 
-	 * @return A PreparedStatement created from the given query.
-	 * 
-	 * @throws SQLException
-	 * @throws ClassNotFoundException 
-	 */
 	public PreparedStatement prepareStatement(String query) throws SQLException, ClassNotFoundException
 	{
 		openConnection();
@@ -334,19 +254,11 @@ public abstract class Database
 		return connection.prepareStatement(query);
 	}
 	
-	/**
-	 * Returns the {@link DatabaseType} of this database.
-	 * 
-	 * @return The {@link DatabaseType} of this database.
-	 */
 	public DatabaseType getDatabaseType()
 	{
 		return databaseType;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
+	
 	@Override
 	public String toString()
 	{

@@ -102,7 +102,7 @@ public class MigrateToVersion7
 		{
 			ArrayList<String> cols = null;
 			
-			cols = database.getColumns("reports");
+			cols = database.getColumnNames("reports");
 			
 			if(!cols.contains("ClaimStatus") && 
 					!cols.contains("ClaimDate") && 

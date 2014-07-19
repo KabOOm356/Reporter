@@ -177,4 +177,69 @@ public class SQLResultSet extends ArrayList<ResultRow>
 	{
 		return getDouble(FIRSTROW, colName);
 	}
+	
+	/**
+	 * Checks if this {@link SQLResultSet} contains the given value in the given column.
+	 * 
+	 * @param colName The name of the column to check.
+	 * @param value The value of the column.
+	 * 
+	 * @return True if the value is present in the given column, otherwise false.
+	 */
+	public boolean contains(String colName, Object value)
+	{
+		if(this.get(colName, value) != null)
+			return true;
+		return false;
+	}
+	
+	/**
+	 * Returns a {@link ResultRow} where the given column equals the given value.
+	 * 
+	 * @param colName The name of the column.
+	 * @param value The value.
+	 * 
+	 * @return If the given value exists in the given column a 
+	 * {@link ResultRow} is returned, otherwise null is returned.
+	 */
+	public ResultRow get(String colName, Object value)
+	{
+		for(ResultRow row : this)
+		{
+			Object rowValue = row.get(colName);
+			
+			if(rowValue != null && rowValue.equals(value))
+			{
+				return row;
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Returns all {@link ResultRow}s where the given column equals the given value.
+	 * 
+	 * @param colName The name of the column.
+	 * @param value The value.
+	 * 
+	 * @return Returns an {@link SQLResultSet} containing all {@link ResultRow}s 
+	 * where the given column equals the given value.
+	 */
+	public SQLResultSet getAll(String colName, Object value)
+	{
+		SQLResultSet set = new SQLResultSet();
+		
+		for(ResultRow row : this)
+		{
+			Object rowValue = row.get(colName);
+			
+			if(rowValue != null && rowValue.equals(value))
+			{
+				set.add(row);
+			}
+		}
+		
+		return set;
+	}
 }

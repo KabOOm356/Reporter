@@ -149,6 +149,7 @@ public class ReporterDatabaseUtil
 		
 		migrated = MigrateToVersion7.migrateToVersion7(database);
 		migrated = migrated || MigrateToVersion8.migrateToVersion8(database);
+		migrated = migrated || MigrateToVersion9.migrateToVersion9(database);
 		
 		return migrated;
 	}
@@ -165,11 +166,11 @@ public class ReporterDatabaseUtil
 	{
 		String query = "CREATE TABLE IF NOT EXISTS Reports (" +
 				"ID INTEGER PRIMARY KEY, " +
-				"Date VARCHAR(19) NOT NULL DEFAULT 'N/A', " +
-				"SenderUUID VARCHAR(36) DEFAULT '', " +
-				"Sender VARCHAR(16), " +
-				"ReportedUUID VARCHAR(36) DEFAULT '', " +
-				"Reported VARCHAR(16) NOT NULL DEFAULT '* (Anonymous)', " +
+				"Date CHAR(19) NOT NULL DEFAULT 'N/A', " +
+				"SenderUUID CHAR(36) DEFAULT '', " +
+				"Sender VARCHAR(32), " +
+				"ReportedUUID CHAR(36) DEFAULT '', " +
+				"Reported VARCHAR(32) NOT NULL DEFAULT '* (Anonymous)', " +
 				"Details VARCHAR(200) NOT NULL, " +
 				"Priority TINYINT NOT NULL DEFAULT '0', " +
 				"SenderWorld VARCHAR(100) DEFAULT '', " +
@@ -181,14 +182,14 @@ public class ReporterDatabaseUtil
 				"ReportedY DOUBLE DEFAULT '0.0', " +
 				"ReportedZ DOUBLE DEFAULT '0.0', " +
 				"CompletionStatus BOOLEAN NOT NULL DEFAULT '0', " +
-				"CompletedByUUID VARCHAR(36) DEFAULT '', " +
-				"CompletedBy VARCHAR(16) DEFAULT '', " +
-				"CompletionDate VARCHAR(19) DEFAULT '', " +
+				"CompletedByUUID CHAR(36) DEFAULT '', " +
+				"CompletedBy VARCHAR(32) DEFAULT '', " +
+				"CompletionDate CHAR(19) DEFAULT '', " +
 				"CompletionSummary VARCHAR(200) DEFAULT '', " +
 				"ClaimStatus BOOLEAN NOT NULL DEFAULT '0', " +
-				"ClaimDate VARCHAR(19) DEFAULT '', " +
-				"ClaimedByUUID VARCHAR(36) DEFAULT '', " +
-				"ClaimedBy VARCHAR(16) DEFAULT '', " +
+				"ClaimDate CHAR(19) DEFAULT '', " +
+				"ClaimedByUUID CHAR(36) DEFAULT '', " +
+				"ClaimedBy VARCHAR(32) DEFAULT '', " +
 				"ClaimPriority TINYINT DEFAULT '0');";
 		
 		database.updateQuery(query);
@@ -306,7 +307,7 @@ public class ReporterDatabaseUtil
 		
 		try
 		{
-			ArrayList<String> cols = database.getColumns("Reports");
+			ArrayList<String> cols = database.getColumnNames("Reports");
 			
 			statement = database.createStatement();
 			
@@ -318,12 +319,12 @@ public class ReporterDatabaseUtil
 			}
 			if(!cols.contains("Sender"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD Sender VARCHAR(16)");
+				statement.addBatch("ALTER TABLE Reports ADD Sender VARCHAR(32)");
 				updated = true;
 			}
 			if(!cols.contains("Reported"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD Reported VARCHAR(16) NOT NULL DEFAULT '* (Anonymous)'");
+				statement.addBatch("ALTER TABLE Reports ADD Reported VARCHAR(32) NOT NULL DEFAULT '* (Anonymous)'");
 				updated = true;
 			}
 			if(!cols.contains("Details"))
@@ -333,7 +334,7 @@ public class ReporterDatabaseUtil
 			}
 			if(!cols.contains("Date"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD Date VARCHAR(19) NOT NULL DEFAULT 'N/A'");
+				statement.addBatch("ALTER TABLE Reports ADD Date CHAR(19) NOT NULL DEFAULT 'N/A'");
 				updated = true;
 			}
 			
@@ -389,12 +390,12 @@ public class ReporterDatabaseUtil
 			}
 			if(!cols.contains("CompletedBy"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD CompletedBy VARCHAR(16) DEFAULT ''");
+				statement.addBatch("ALTER TABLE Reports ADD CompletedBy VARCHAR(32) DEFAULT ''");
 				updated = true;
 			}
 			if(!cols.contains("CompletionDate"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD CompletionDate VARCHAR(19) DEFAULT ''");
+				statement.addBatch("ALTER TABLE Reports ADD CompletionDate CHAR(19) DEFAULT ''");
 				updated = true;
 			}
 			if(!cols.contains("CompletionSummary"))
@@ -422,12 +423,12 @@ public class ReporterDatabaseUtil
 			}
 			if(!cols.contains("ClaimDate"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD ClaimDate VARCHAR(19)");
+				statement.addBatch("ALTER TABLE Reports ADD ClaimDate CHAR(19)");
 				updated = true;
 			}
 			if(!cols.contains("ClaimedBy"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD ClaimedBy VARCHAR(16)");
+				statement.addBatch("ALTER TABLE Reports ADD ClaimedBy VARCHAR(32)");
 				updated = true;
 			}
 			if(!cols.contains("ClaimPriority"))
@@ -439,24 +440,26 @@ public class ReporterDatabaseUtil
 			// Version 8 (UUID Update)
 			if(!cols.contains("SenderUUID"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD SenderUUID VARCHAR(36) DEFAULT ''");
+				statement.addBatch("ALTER TABLE Reports ADD SenderUUID CHAR(36) DEFAULT ''");
 				updated = true;
 			}
 			if(!cols.contains("ReportedUUID"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD ReportedUUID VARCHAR(36) DEFAULT ''");
+				statement.addBatch("ALTER TABLE Reports ADD ReportedUUID CHAR(36) DEFAULT ''");
 				updated = true;
 			}
 			if(!cols.contains("CompletedByUUID"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD CompletedByUUID VARCHAR(36) DEFAULT ''");
+				statement.addBatch("ALTER TABLE Reports ADD CompletedByUUID CHAR(36) DEFAULT ''");
 				updated = true;
 			}
 			if(!cols.contains("ClaimedByUUID"))
 			{
-				statement.addBatch("ALTER TABLE Reports ADD ClaimedByUUID VARCHAR(36) DEFAULT ''");
+				statement.addBatch("ALTER TABLE Reports ADD ClaimedByUUID CHAR(36) DEFAULT ''");
 				updated = true;
 			}
+			
+			// Version 9
 			
 			if(updated)
 			{
@@ -491,11 +494,11 @@ public class ReporterDatabaseUtil
 		
 		try
 		{
-			ArrayList<String> cols = database.getColumns("ModStats");
+			ArrayList<String> cols = database.getColumnNames("ModStats");
 			
 			statement = database.createStatement();
 			
-			// Version 9 (Initial Table Version)
+			// Version 10 (Initial Table Version)
 			if(!cols.contains("ID"))
 			{
 				String query = "ALTER TABLE ModStats ADD ID INTEGER PRIMARY KEY";
@@ -594,11 +597,11 @@ public class ReporterDatabaseUtil
 		
 		try
 		{
-			ArrayList<String> cols = database.getColumns("PlayerStats");
+			ArrayList<String> cols = database.getColumnNames("PlayerStats");
 			
 			statement = database.createStatement();
 			
-			// Version 9 (Initial Table Version)
+			// Version 10 (Initial Table Version)
 			if(!cols.contains("ID"))
 			{
 				String query = "ALTER TABLE PlayerStats ADD ID INTEGER PRIMARY KEY";
