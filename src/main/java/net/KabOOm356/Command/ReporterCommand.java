@@ -9,10 +9,10 @@ import org.bukkit.command.CommandSender;
 /**
  * Abstract Reporter Command.
  */
-public abstract class ReporterCommand extends MultiUsageCommand
+public abstract class ReporterCommand extends Command
 {
 	/**
-	 * @see MultiUsageCommand#MultiUsageCommand(ReporterCommandManager, String, String, String, String, int)
+	 * @see Command#Command(ReporterCommandManager, String, String, String, String, int)
 	 */
 	protected ReporterCommand(
 			ReporterCommandManager manager,
@@ -26,7 +26,7 @@ public abstract class ReporterCommand extends MultiUsageCommand
 	}
 	
 	/**
-	 * @see MultiUsageCommand#MultiUsageCommand(ReporterCommandManager, String, String, int)
+	 * @see Command#Command(ReporterCommandManager, String, String, int)
 	 */
 	protected ReporterCommand(
 			ReporterCommandManager manager,

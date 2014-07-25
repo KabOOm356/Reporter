@@ -9,6 +9,7 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.ListPhrases;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
+import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
 
 import org.bukkit.ChatColor;
@@ -506,23 +507,34 @@ public class ListCommand extends ReporterCommand
 	 */
 	public void updateDocumentation()
 	{
-		super.updateDocumentation(
-				"/report list [indexes]",
-				getManager().getLocale().getString(ListPhrases.listHelpDetails));
+		ArrayList<ObjectPair<String, String>> usages = super.getUsages();
+		
+		usages.clear();
+		
+		String usage = "/report list [indexes]";
+		String description = getManager().getLocale().getString(ListPhrases.listHelpDetails);
 				
+		ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
 		
-		removeAllAlternateUsages();
-		removeAllAlternateDescriptions();
+		usages.add(entry);
 		
-		addUsage("/report list priority [indexes]");
-		addDescription(getManager().getLocale().getString(ListPhrases.listHelpPriorityDetails));
+		usage = "/report list priority [indexes]";
+		description = getManager().getLocale().getString(ListPhrases.listHelpPriorityDetails);
 		
-		addUsage("/report list claimed [indexes]");
-		addDescription(getManager().getLocale().getString(ListPhrases.listHelpClaimedDetails));
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
 		
-		addUsage("/report list claimed priority [indexes]");
-		addDescription(getManager().getLocale().getString(ListPhrases.listHelpClaimedPriorityDetails));
+		usage = "/report list claimed [indexes]";
+		description = getManager().getLocale().getString(ListPhrases.listHelpClaimedDetails);
 		
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
+		
+		usage = "/report list claimed priority [indexes]";
+		description = getManager().getLocale().getString(ListPhrases.listHelpClaimedPriorityDetails);
+		
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
 	}
 	
 	/**

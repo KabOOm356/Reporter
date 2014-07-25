@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -9,6 +10,7 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.HelpPhrases;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
+import net.KabOOm356.Util.ObjectPair;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -150,31 +152,33 @@ public class HelpCommand
 		{
 			ReporterCommand cmd = e.getValue();
 			
-			if (numberOfUsagesEqualNumberOfDescriptions(cmd))
+			ArrayList<ObjectPair<String, String>> usages = cmd.getUsages();
+			int usagesCount = usages.size();
+			
+			if ((current+usagesCount) > startNumber)
 			{
-				if ((current+cmd.getNumberOfUsages()) > startNumber)
+				for(int LCV = 0; LCV < usagesCount; LCV++)
 				{
-					for(int LCV = 0; LCV < cmd.getNumberOfUsages(); LCV++)
+					if (current >= startNumber && current <= endNumber)
 					{
-						if (current >= startNumber && current <= endNumber)
-						{
-							usagesAndDescriptions[arrayCount][0] = cmd.getUsage(LCV);
-							usagesAndDescriptions[arrayCount][1] = cmd.getDescription(LCV);
-							
-							arrayCount++;
-						}
+						ObjectPair<String, String> usage = usages.get(LCV);
 						
-						current++;
+						usagesAndDescriptions[arrayCount][0] = usage.getKey();
+						usagesAndDescriptions[arrayCount][1] = usage.getValue();
 						
-						if(current > endNumber || arrayCount >= difference)
-							break;
+						arrayCount++;
 					}
+					
+					current++;
+					
+					if(current > endNumber || arrayCount >= difference)
+						break;
 				}
-				else
-					current += cmd.getNumberOfUsages();
 			}
 			else
-				current += cmd.getNumberOfUsages();
+			{
+				current += usagesCount;
+			}
 			
 			if(current > endNumber || arrayCount >= difference)
 				break;
@@ -195,7 +199,7 @@ public class HelpCommand
 		int numberOfHelpMessages = 0;
 		
 		for(Entry<String, ReporterCommand> e : commands.entrySet())
-			numberOfHelpMessages += e.getValue().getNumberOfUsages();
+			numberOfHelpMessages += e.getValue().getUsages().size();
 		
 		return numberOfHelpMessages;
 	}
@@ -287,31 +291,5 @@ public class HelpCommand
 		String line = format.replaceAll("%usage", usage);
 		line = line.replaceAll("%description", description);
 		sender.sendMessage(BukkitUtil.colorCodeReplaceAll(line));
-	}
-	
-	/**
-	 * Checks if the number of alternate usages equals the number of descriptions for the given command.
-	 * <br /><br />
-	 * This is for preventing a runtime {@link IndexOutOfBoundsException}.
-	 * 
-	 * @param command The {@link ReporterCommand} to check.
-	 * 
-	 * @return True if the number of alternate usages equal the number of alternate descriptions, otherwise false.
-	 */
-	private static boolean numberOfUsagesEqualNumberOfDescriptions(ReporterCommand command)
-	{
-		if(command.getNumberOfUsages() != command.getNumberOfDescriptions())
-		{
-			int usageSize = command.getNumberOfUsages();
-			int descriptionSize = command.getNumberOfDescriptions();
-			
-			Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() +
-					command.getName() + ": " +
-					"Usages size (" + usageSize + ") != Descriptions size (" + descriptionSize + ")!");
-			
-			return false;
-		}
-		
-		return true;
 	}
 }

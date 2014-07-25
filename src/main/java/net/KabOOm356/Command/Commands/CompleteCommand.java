@@ -41,7 +41,7 @@ public class CompleteCommand extends ReporterCommand
 	{
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 		
-		super.addAlias("Finish");
+		super.getAliases().add("Finish");
 		
 		sendMessage = getManager().getConfig().getBoolean(
 				"general.messaging.completedMessageOnLogin.completedMessageOnLogin", true);

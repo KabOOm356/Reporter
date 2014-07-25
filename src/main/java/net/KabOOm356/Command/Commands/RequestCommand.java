@@ -12,6 +12,7 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.RequestPhrases;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
+import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
 
 import org.bukkit.Bukkit;
@@ -217,15 +218,20 @@ public class RequestCommand extends ReporterCommand
 	 */
 	public void updateDocumentation()
 	{
-		super.updateDocumentation(
-				getManager().getLocale().getString(RequestPhrases.requestHelp),
-				getManager().getLocale().getString(RequestPhrases.requestHelpDetails));
+		ArrayList<ObjectPair<String, String>> usages = super.getUsages();
+		usages.clear();
 		
-		removeAllAlternateUsages();
-		removeAllAlternateDescriptions();
+		String usage = getManager().getLocale().getString(RequestPhrases.requestHelp);
+		String description = getManager().getLocale().getString(RequestPhrases.requestHelpDetails);
 		
-		super.addUsage("/report request most");
-		super.addDescription(getManager().getLocale().getString(RequestPhrases.requestMostHelpDetails));
+		ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
+		
+		usage = "/report request most";
+		description = getManager().getLocale().getString(RequestPhrases.requestMostHelpDetails);
+		
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
 	}
 	
 	/**

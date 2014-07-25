@@ -15,6 +15,7 @@ import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
+import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
 
 import org.bukkit.ChatColor;
@@ -42,7 +43,7 @@ public class DeleteCommand extends ReporterCommand
 	{
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 		
-		super.addAlias("Remove");
+		super.getAliases().add("Remove");
 		
 		updateDocumentation();
 	}
@@ -681,23 +682,39 @@ public class DeleteCommand extends ReporterCommand
 	@Override
 	public void updateDocumentation()
 	{
-		super.updateDocumentation(
-				getManager().getLocale().getString(DeletePhrases.deleteHelp),
-				getManager().getLocale().getString(DeletePhrases.deleteHelpDetails));
+		ArrayList<ObjectPair<String, String>> usages = super.getUsages();
 		
-		removeAllAlternateUsagesAndDescriptions();
+		usages.clear();
 		
-		addUsage("/report delete/remove all");
-		addDescription(getManager().getLocale().getString(DeletePhrases.deleteHelpAllDetails));
+		String usage = getManager().getLocale().getString(DeletePhrases.deleteHelp);
+		String description = getManager().getLocale().getString(DeletePhrases.deleteHelpDetails);
 		
-		addUsage("/report delete/remove completed|finished");
-		addDescription(getManager().getLocale().getString(DeletePhrases.deleteHelpCompletedDetails));
+		ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
 		
-		addUsage("/report delete/remove incomplete|unfinished");
-		addDescription(getManager().getLocale().getString(DeletePhrases.deleteHelpIncompleteDetails));
+		usage = "/report delete/remove all";
+		description = getManager().getLocale().getString(DeletePhrases.deleteHelpAllDetails);
 		
-		addUsage(getManager().getLocale().getString(DeletePhrases.deleteHelpPlayer));
-		addDescription(getManager().getLocale().getString(DeletePhrases.deleteHelpPlayerDetails));
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
+		
+		usage = "/report delete/remove completed|finished";
+		description = getManager().getLocale().getString(DeletePhrases.deleteHelpCompletedDetails);
+		
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
+		
+		usage = "/report delete/remove incomplete|unfinished";
+		description = getManager().getLocale().getString(DeletePhrases.deleteHelpIncompleteDetails);
+		
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
+		
+		usage = getManager().getLocale().getString(DeletePhrases.deleteHelpPlayer);
+		description = getManager().getLocale().getString(DeletePhrases.deleteHelpPlayerDetails);
+		
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
 	}
 	
 	/**

@@ -12,6 +12,7 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.ListPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ViewPhrases;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Util.BukkitUtil;
+import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
 
 import org.bukkit.Bukkit;
@@ -879,36 +880,62 @@ public class ViewCommand extends ReporterCommand
 	@Override
 	public void updateDocumentation()
 	{
-		super.updateDocumentation(
-				getManager().getLocale().getString(ViewPhrases.viewHelp),
-				getManager().getLocale().getString(ViewPhrases.viewHelpDetails));
+		ArrayList<ObjectPair<String, String>> usages = super.getUsages();
+		usages.clear();
 		
-		removeAllAlternateUsages();
-		removeAllAlternateDescriptions();
+		String usage = getManager().getLocale().getString(ViewPhrases.viewHelp);
+		String description = getManager().getLocale().getString(ViewPhrases.viewHelpDetails);
 		
-		addUsage("/report view all [name]");
-		addDescription(getManager().getLocale().getString(ViewPhrases.viewHelpAllDetails));
+		ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
 		
-		addUsage("/report view completed|finished [name]");
-		addDescription(getManager().getLocale().getString(ViewPhrases.viewHelpCompletedDetails));
+		usage = "/report view all [name]";
+		description = getManager().getLocale().getString(ViewPhrases.viewHelpAllDetails);
 		
-		addUsage("/report view incomplete|unfinished [name]");
-		addDescription(getManager().getLocale().getString(ViewPhrases.viewHelpIncompleteDetails));
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
 		
-		addUsage("/report view priority [name]");
-		addDescription(getManager().getLocale().getString(ViewPhrases.viewHelpPriorityDetails));
+		usage = "/report view completed|finished [name]";
+		description = getManager().getLocale().getString(ViewPhrases.viewHelpCompletedDetails);
 		
-		addUsage(getManager().getLocale().getString(ViewPhrases.viewHelpGivenPriority));
-		addDescription(getManager().getLocale().getString(ViewPhrases.viewHelpGivenPriorityDetails));
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
 		
-		addUsage("/report view claimed [name]");
-		addDescription(getManager().getLocale().getString(ViewPhrases.viewHelpClaimedDetails));
+		usage = "/report view incomplete|unfinished [name]";
+		description = getManager().getLocale().getString(ViewPhrases.viewHelpIncompleteDetails);
 		
-		addUsage("/report view claimed priority [name]");
-		addDescription(getManager().getLocale().getString(ViewPhrases.viewHelpClaimedPriorityDetails));
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
 		
-		addUsage(getManager().getLocale().getString(ViewPhrases.viewHelpClaimedGivenPriority));
-		addDescription(getManager().getLocale().getString(ViewPhrases.viewHelpClaimedPriorityDetails));
+		usage = "/report view priority [name]";
+		description = getManager().getLocale().getString(ViewPhrases.viewHelpPriorityDetails);
+		
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
+		
+		usage = getManager().getLocale().getString(ViewPhrases.viewHelpGivenPriority);
+		description = getManager().getLocale().getString(ViewPhrases.viewHelpGivenPriorityDetails);
+		
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
+		
+		usage = "/report view claimed [name]";
+		description = getManager().getLocale().getString(ViewPhrases.viewHelpClaimedDetails);
+		
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
+		
+		usage = "/report view claimed priority [name]";
+		description = getManager().getLocale().getString(ViewPhrases.viewHelpClaimedPriorityDetails);
+		
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
+		
+		usage = getManager().getLocale().getString(ViewPhrases.viewHelpClaimedGivenPriority);
+		description = getManager().getLocale().getString(ViewPhrases.viewHelpClaimedPriorityDetails);
+		
+		entry = new ObjectPair<String, String>(usage, description);
+		usages.add(entry);
 	}
 	
 	/**
