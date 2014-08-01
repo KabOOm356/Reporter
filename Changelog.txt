@@ -321,3 +321,5 @@ Changelog:
 					Changed the 'CompletedByUUID' column from a VARCHAR type to a CHAR type.
 					Changed the 'ClaimedDate' column from a VARCHAR type to a CHAR type.
 					Changed the 'CompletionDate' column from a VARCHAR type to a CHAR type.
+	3.1.8	8/1/2014
+				Fixed trying to find a player even if the username is invalid.
