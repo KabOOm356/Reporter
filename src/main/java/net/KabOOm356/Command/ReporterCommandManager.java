@@ -352,15 +352,23 @@ public class ReporterCommandManager implements CommandExecutor
 		if(playerName.equals(""))
 			return null;
 		
-		OfflinePlayer player = Bukkit.getServer().getPlayer(playerName);
+		if(BukkitUtil.isUsernameValid(playerName))
+		{
+			OfflinePlayer player = Bukkit.getServer().getPlayer(playerName);
+			
+			if(player == null)
+			{
+				player = matchOfflinePlayer(playerName);
+			}
+			
+			return player;
+		}
+		else if(playerName.equalsIgnoreCase("!") || playerName.equalsIgnoreCase("*"))
+		{
+			return Bukkit.getServer().getOfflinePlayer("* (Anonymous)");
+		}
 		
-		if(playerName.equalsIgnoreCase("!") || playerName.equalsIgnoreCase("*"))
-			player = Bukkit.getServer().getOfflinePlayer("* (Anonymous)");
-
-		if(player == null)
-			player = matchOfflinePlayer(playerName);
-		
-		return player;
+		return null;
 	}
 	
 	/**

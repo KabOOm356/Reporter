@@ -1,6 +1,8 @@
 package net.KabOOm356.Util;
 
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -18,6 +20,11 @@ public class BukkitUtil
 	 * A UUID that Bukkit assigns to players without a valid username.
 	 */
 	public static final UUID invalidUserUUID = UUID.nameUUIDFromBytes("InvalidUsername".getBytes(Charsets.UTF_8));
+	
+	/**
+	 * A {@link Pattern} that a valid Minecraft username must match.
+	 */
+	public static final Pattern validUsernamePattern = Pattern.compile("^[a-zA-Z0-9_]{2,32}$");
 	
 	/**
 	 * Returns the given player's name in a custom display format.
@@ -182,6 +189,20 @@ public class BukkitUtil
 	public static boolean isPlayerValid(OfflinePlayer player)
 	{
 		return !player.getUniqueId().equals(invalidUserUUID);
+	}
+	
+	/**
+	 * Returns if the given Minecraft username is valid or not.
+	 * 
+	 * @param name The username to check.
+	 * 
+	 * @return True if the username is valid, otherwise false.
+	 */
+	public static boolean isUsernameValid(String name)
+	{
+		Matcher matcher = validUsernamePattern.matcher(name);
+		
+		return matcher.matches();
 	}
 	
 	/**
