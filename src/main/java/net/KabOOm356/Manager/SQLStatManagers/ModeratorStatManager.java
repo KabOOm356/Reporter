@@ -16,44 +16,45 @@ public class ModeratorStatManager extends SQLStatManager
 		/**
 		 * The number of times a moderator has used the assign command.
 		 */
-		public static final ModeratorStat ASSIGNED = new ModeratorStat("AssignCount");
+		public static final ModeratorStat ASSIGNED = new ModeratorStat("Assigned", "AssignCount");
 		/**
 		 * The number of times a moderator has used the claim command.
 		 */
-		public static final ModeratorStat CLAIMED = new ModeratorStat("ClaimedCount");
+		public static final ModeratorStat CLAIMED = new ModeratorStat("Claimed", "ClaimedCount");
 		/**
 		 * The number of times a moderator has used the complete command.
 		 */
-		public static final ModeratorStat COMPLETED = new ModeratorStat("CompletionCount");
+		public static final ModeratorStat COMPLETED = new ModeratorStat("Completed", "CompletionCount");
 		/**
 		 * The number of times a moderator has used the delete command.
 		 */
-		public static final ModeratorStat DELETED = new ModeratorStat("DeletionCount");
+		public static final ModeratorStat DELETED = new ModeratorStat("Deleted", "DeletionCount");
 		/**
 		 * The number of times a moderator has used the move command.
 		 */
-		public static final ModeratorStat MOVED = new ModeratorStat("MoveCount");
+		public static final ModeratorStat MOVED = new ModeratorStat("Moved", "MoveCount");
 		/**
 		 * The number of times a moderator has used the respond command.
 		 */
-		public static final ModeratorStat RESPONDED = new ModeratorStat("RespondCount");
+		public static final ModeratorStat RESPONDED = new ModeratorStat("Responded", "RespondCount");
 		/**
 		 * The number of times a moderator has used the unassign command.
 		 */
-		public static final ModeratorStat UNASSIGNED = new ModeratorStat("UnassignCount");
+		public static final ModeratorStat UNASSIGNED = new ModeratorStat("Unassigned", "UnassignCount");
 		/**
 		 * The number of times a moderator has used the unclaim command.
 		 */
-		public static final ModeratorStat UNCLAIMED = new ModeratorStat("UnclaimCount");
+		public static final ModeratorStat UNCLAIMED = new ModeratorStat("Unclaimed", "UnclaimCount");
 		
 		/**
 		 * Constructor.
 		 * 
+		 * @param name The name of the statistic.
 		 * @param columnName The case-sensitive column name of the statistic.
 		 */
-		protected ModeratorStat(String columnName)
+		protected ModeratorStat(String name, String columnName)
 		{
-			super(columnName);
+			super(name, columnName);
 		}
 	}
 	

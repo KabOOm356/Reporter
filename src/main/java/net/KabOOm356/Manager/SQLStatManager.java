@@ -1,5 +1,7 @@
 package net.KabOOm356.Manager;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -8,6 +10,8 @@ import org.bukkit.OfflinePlayer;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
+import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
+import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager.PlayerStat;
 import net.KabOOm356.Util.BukkitUtil;
 
 /**
@@ -23,7 +27,7 @@ public class SQLStatManager
 		/**
 		 * Represents all statistic columns in the database.
 		 */
-		public static final SQLStat ALL = new SQLStat("*");
+		public static final SQLStat ALL = new SQLStat("All", "*");
 		
 		/**
 		 * The case-sensitive column name of the statistic this SQLStat represents.
@@ -31,12 +35,19 @@ public class SQLStatManager
 		private String columnName;
 		
 		/**
+		 * The name of this statistic.
+		 */
+		private String name;
+		
+		/**
 		 * Constructor.
 		 * 
+		 * @param name The name of the statistic.
 		 * @param columnName The case-sensitive column name of the statistic.
 		 */
-		protected SQLStat(String columnName)
+		protected SQLStat(String name, String columnName)
 		{
+			this.name = name;
 			this.columnName = columnName;
 		}
 		
@@ -50,22 +61,82 @@ public class SQLStatManager
 			return columnName;
 		}
 		
+		/**
+		 * Returns the name of this SQLStat.
+		 * 
+		 * @return The name of this SQLStat.
+		 */
+		public String getName()
+		{
+			return name;
+		}
+		
 		@Override
 		public String toString()
 		{
-			return columnName;
+			return name;
 		}
 		
 		/**
-		 * Checks if this SQLStat's column name equals the given column name.
+		 * Gets an {@link SQLStat}, {@link PlayerStat}, or a {@link ModeratorStat} by the given name.
 		 * 
-		 * @param column The name of the column to check.
+		 * @param name The name of the {@link SQLStat} to return.
 		 * 
-		 * @return True if this SQLStat's column name equals the given column name, otherwise false.
+		 * @return An {@link SQLStat} if one matches the given name, otherwise null.
 		 */
-		public boolean equals(String column)
+		public static SQLStat getByName(String name)
 		{
-			return columnName.equals(column);
+			if(name.equalsIgnoreCase("all"))
+			{
+				return SQLStat.ALL;
+			}
+			else
+			{
+				ArrayList<SQLStat> stats = SQLStat.getAll(ModeratorStat.class);
+				stats.addAll(SQLStat.getAll(PlayerStat.class));
+				
+				for(SQLStat stat : stats)
+				{
+					if(name.equalsIgnoreCase(stat.getName()))
+					{
+						return stat;
+					}
+				}
+			}
+			
+			return null;
+		}
+		
+		/**
+		 * Returns all {@link SQLStat}s that are static fields of the given Class.
+		 * 
+		 * @param clazz The Class to get the static {@link SQLStat} fields from.
+		 * 
+		 * @return An {@link ArrayList} containing all the {@link SQLStat}s from the given class.
+		 */
+		public static <T extends SQLStat> ArrayList<SQLStat> getAll(Class<T> clazz)
+		{
+			ArrayList<SQLStat> stats = new ArrayList<SQLStat>();
+			
+			for(Field f : clazz.getDeclaredFields())
+			{
+				try
+				{
+					// Only care if the field is static and an instance of a SQLStat.
+					if(Modifier.isStatic(f.getModifiers()) && f.get(null) instanceof SQLStat)
+					{
+						SQLStat stat = (SQLStat) f.get(null);
+						
+						stats.add(stat);
+					}
+				}
+				catch(IllegalAccessException e)
+				{
+					e.printStackTrace();
+				}
+			}
+			
+			return stats;
 		}
 	}
 	
@@ -133,7 +204,7 @@ public class SQLStatManager
 	{
 		addRow(player);
 		
-		String statColumn = stat.toString();
+		String statColumn = stat.getColumnName();
 		
 		String query = "UPDATE " + tableName + " "
 				+ "SET " + statColumn + " = " + statColumn + " + 1 "
@@ -175,7 +246,7 @@ public class SQLStatManager
 	{
 		addRow(player);
 		
-		String statColumn = stat.toString();
+		String statColumn = stat.getColumnName();
 		
 		String query = "UPDATE " + tableName + " "
 				+ "SET " + statColumn + " = " + statColumn + " - 1 "
@@ -220,7 +291,7 @@ public class SQLStatManager
 	{
 		addRow(player);
 		
-		String statColumn = stat.toString();
+		String statColumn = stat.getColumnName();
 		
 		String query = "UPDATE " + tableName + " "
 				+ "SET " + statColumn + " = ? "
@@ -259,12 +330,13 @@ public class SQLStatManager
 	 * @param player The player to get the statistic for.
 	 * @param stat The statistic to get.
 	 * 
-	 * @return A {@link ResultRow} containing the statistic requested.
+	 * @return An {@link ResultRow} containing the statistic requested.
+	 * An empty {@link ResultRow} is returned if there is not an entry for the given player.
 	 * If an exception is thrown while querying the database, null is returned.
 	 */
 	public ResultRow getStat(OfflinePlayer player, SQLStat stat)
 	{
-		String statColumn = stat.toString();
+		String statColumn = stat.getColumnName();
 		
 		String query = "SELECT " + statColumn
 				+ " FROM " + tableName
@@ -276,17 +348,21 @@ public class SQLStatManager
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 		
-		ResultRow resultRow = null;
+		ResultRow resultRow = new ResultRow();
 		
 		try
 		{
 			SQLResultSet result = getDatabase().preparedSQLQuery(query, params);
 			
-			resultRow = result.get(SQLResultSet.FIRSTROW);
+			if(result != null && !result.isEmpty())
+			{
+				resultRow = result.get(SQLResultSet.FIRSTROW);
+			}
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			return null;
 		}
 		finally
 		{

@@ -16,36 +16,37 @@ public class PlayerStatManager extends SQLStatManager
 		/**
 		 * The number of times this player has reported someone else.
 		 */
-		public static final PlayerStat REPORTCOUNT = new PlayerStat("ReportCount");
+		public static final PlayerStat REPORTCOUNT = new PlayerStat("Report", "ReportCount");
 		/**
 		 * The date this player first reported someone else.
 		 */
-		public static final PlayerStat FIRSTREPORTDATE = new PlayerStat("FirstReportDate");
+		public static final PlayerStat FIRSTREPORTDATE = new PlayerStat("FirstReport", "FirstReportDate");
 		/**
 		 * The date this player last reported someone else.
 		 */
-		public static final PlayerStat LASTREPORTDATE = new PlayerStat("LastReportDate");
+		public static final PlayerStat LASTREPORTDATE = new PlayerStat("LastReport", "LastReportDate");
 		/**
 		 * The number of times this player has been reported.
 		 */
-		public static final PlayerStat REPORTED = new PlayerStat("ReportedCount");
+		public static final PlayerStat REPORTED = new PlayerStat("Reported", "ReportedCount");
 		/**
 		 * The date this player was first reported.
 		 */
-		public static final PlayerStat FIRSTREPORTEDDATE = new PlayerStat("FirstReportedDate");
+		public static final PlayerStat FIRSTREPORTEDDATE = new PlayerStat("FirstReported", "FirstReportedDate");
 		/**
 		 * The date this player was last reported.
 		 */
-		public static final PlayerStat LASTREPORTEDDATE = new PlayerStat("LastReportedDate");
+		public static final PlayerStat LASTREPORTEDDATE = new PlayerStat("LastReported", "LastReportedDate");
 		
 		/**
 		 * Constructor.
 		 * 
+		 * @param name The name of the statistic.
 		 * @param columnName The case-sensitive column name of the statistic.
 		 */
-		protected PlayerStat(String columnName)
+		protected PlayerStat(String name, String columnName)
 		{
-			super(columnName);
+			super(name, columnName);
 		}
 	}
 	
