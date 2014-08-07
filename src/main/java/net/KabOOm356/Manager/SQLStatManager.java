@@ -202,12 +202,31 @@ public class SQLStatManager
 	 */
 	public void incrementStat(OfflinePlayer player, SQLStat stat)
 	{
+		incrementStat(player, stat, 1);
+	}
+	
+	/**
+	 * Increments a statistic by the given increment value.
+	 * 
+	 * @param player The player to increment the statistic for.
+	 * @param stat The SQLStat to increment.
+	 * @param increment The value to increment the statistic by.
+	 * 
+	 * @throws IllegalArgumentException If the increment value is less than one (1).
+	 */
+	public void incrementStat(OfflinePlayer player, SQLStat stat, int increment)
+	{
+		if(increment < 1)
+		{
+			throw new IllegalArgumentException("'increment' cannot be less than one (1)!");
+		}
+		
 		addRow(player);
 		
 		String statColumn = stat.getColumnName();
 		
 		String query = "UPDATE " + tableName + " "
-				+ "SET " + statColumn + " = " + statColumn + " + 1 "
+				+ "SET " + statColumn + " = " + statColumn + " + " + Integer.toString(increment) + " "
 				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ? "
 				+ "LIMIT 1";
 		
@@ -244,12 +263,31 @@ public class SQLStatManager
 	 */
 	public void decrementStat(OfflinePlayer player, SQLStat stat)
 	{
+		decrementStat(player, stat, 1);
+	}
+	
+	/**
+	 * Decrements a statistic by one (1).
+	 * 
+	 * @param player The player to decrement the statistic for.
+	 * @param stat The SQLStat to decrement.
+	 * @param decrement The value to decrement the statistic by.
+	 * 
+	 * @throws IllegalArgumentException If the decrement value is less than one (1).
+	 */
+	public void decrementStat(OfflinePlayer player, SQLStat stat, int decrement)
+	{
+		if(decrement < 1)
+		{
+			throw new IllegalArgumentException("'decrement' cannot be less than one (1)!");
+		}
+		
 		addRow(player);
 		
 		String statColumn = stat.getColumnName();
 		
 		String query = "UPDATE " + tableName + " "
-				+ "SET " + statColumn + " = " + statColumn + " - 1 "
+				+ "SET " + statColumn + " = " + statColumn + " - " + Integer.toString(decrement) + " "
 				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ? "
 				+ "LIMIT 1";
 		
