@@ -166,6 +166,8 @@ public class DeleteCommand extends ReporterCommand
 		
 		try
 		{
+			int count = getManager().getCount();
+			
 			ArrayList<Integer> remainingIndexes = new ArrayList<Integer>();
 			
 			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
@@ -196,11 +198,28 @@ public class DeleteCommand extends ReporterCommand
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + 
 					ChatColor.WHITE + message);
 			
+			int totalDeleted = count - remainingIndexes.size();
+			
+			// Display the total number of reports delete.
+			displayTotalReportsDeleted(sender, totalDeleted);
+			
 			reformatTables(sender, remainingIndexes);
 			
 			updateLastViewed(remainingIndexes);
 			
 			getManager().getMessageManager().reindexMessages(remainingIndexes);
+			
+			// Log the statistic.
+			if(BukkitUtil.isPlayer(sender))
+			{
+				Player senderPlayer = (Player) sender;
+				
+				getManager().getModStatsManager().incrementStat(
+						senderPlayer,
+						ModeratorStat.DELETED,
+						totalDeleted);
+			}
+			
 		}
 		catch (Exception e)
 		{
@@ -344,7 +363,13 @@ public class DeleteCommand extends ReporterCommand
 	{
 		try
 		{
+			int beforeDeletion = getManager().getCount();
+			
 			ArrayList<Integer> remainingIndexes = getRemainingIndexes(sender, deletion);
+			
+			int afterDeletion = remainingIndexes.size();
+			
+			int totalDeleted = beforeDeletion - afterDeletion;
 			
 			deleteBatch(sender, deletion);
 			
@@ -364,6 +389,19 @@ public class DeleteCommand extends ReporterCommand
 				message = getManager().getLocale().getString(DeletePhrases.deleteIncomplete);
 			
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + message);
+			
+			displayTotalReportsDeleted(sender, totalDeleted);
+			
+			// Log the statistic.
+			if(BukkitUtil.isPlayer(sender))
+			{
+				Player senderPlayer = (Player) sender;
+				
+				getManager().getModStatsManager().incrementStat(
+						senderPlayer,
+						ModeratorStat.DELETED,
+						totalDeleted);
+			}
 		}
 		catch (Exception e)
 		{
@@ -674,6 +712,15 @@ public class DeleteCommand extends ReporterCommand
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
 					ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(DeletePhrases.SQLTablesReformat)));
+	}
+	
+	private void displayTotalReportsDeleted(CommandSender sender, int totalDeleted)
+	{
+		String message = getManager().getLocale().getString(DeletePhrases.deletedReportsTotal);
+		
+		message = message.replaceAll("%r", ChatColor.RED + Integer.toString(totalDeleted) + ChatColor.WHITE);
+		
+		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + message);
 	}
 	
 	/**

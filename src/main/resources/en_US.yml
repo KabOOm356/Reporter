@@ -18,6 +18,8 @@ locale:
     alertClaimedPlayerLogin: "%r from your claimed report %i has logged in!"
     alertUnclaimedPlayerLogin: "%r from the unclaimed report(s) %i has logged in!"
     
+    deletedTotalReports: "A total of %r report(s) have been deleted!"
+    
     # Version 9
     
     allowedToReportPlayerAgain: "You are now allowed to report %r again!"

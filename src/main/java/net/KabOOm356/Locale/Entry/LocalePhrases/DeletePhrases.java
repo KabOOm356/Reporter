@@ -105,4 +105,11 @@ public abstract class DeletePhrases
 	public final static LocalePhrase deleteHelpPlayerDetails = new LocalePhrase(
 			"deleteHelpPlayerDetails",
 			"Deletes all reports where the given player is either reported or the submitter of the report.");
+	
+	/**
+	 * A total of %r report(s) have been deleted!
+	 */
+	public static final LocalePhrase deletedReportsTotal = new LocalePhrase(
+			"deletedTotalReports",
+			"A total of %r report(s) have been deleted!");
 }

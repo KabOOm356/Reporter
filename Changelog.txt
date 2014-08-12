@@ -326,5 +326,7 @@ Changelog:
 	3.2
 				Features:
 					An alert will be sent when a reported player from an unfinished report logs in.
+				Changes:
+					A message of how many reports were deleted is displayed when deleting groups of reports.
 				New Permission Nodes:
 					reporter.alerts.onLogin.reportedPlayerLogin
