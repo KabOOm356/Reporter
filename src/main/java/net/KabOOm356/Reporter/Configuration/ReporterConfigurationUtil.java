@@ -381,6 +381,13 @@ public class ReporterConfigurationUtil
 			updated = true;
 		}
 		
+		// Version 13
+		if(!configuration.isSet("general.matchPartialOfflineUsernames"))
+		{
+			configuration.set("general.matchPartialOfflineUsernames", true);
+			updated = true;
+		}
+		
 		if(updated)
 		{
 			configuration.options().header("Reporter Configuration File\n" +
