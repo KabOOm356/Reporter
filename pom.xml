@@ -25,25 +25,29 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
-      <scope>compile</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>ru.tehkode</groupId>
       <artifactId>PermissionsEx</artifactId>
-      <version>1.20.4</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/lib/PermissionsEx.jar</systemPath>
+      <version>1.22</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
     	<groupId>org.bukkit</groupId>
     	<artifactId>bukkit</artifactId>
     	<version>1.7.9-R0.2</version>
+    	<scope>provided</scope>
     </dependency>
   </dependencies>
   <repositories>
 	<repository>
       <id>bukkit-repo</id>
       <url>http://repo.bukkit.org/content/groups/public</url>
+    </repository>
+    <repository>
+      <id>pex-repo</id>
+      <url>http://pex-repo.zachsthings.com</url>
     </repository>
   </repositories>
 </project>
