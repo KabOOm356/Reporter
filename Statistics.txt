@@ -1,0 +1,49 @@
+Statistics:
+
+	Player Statistics:
+	
+		Report
+			- The number of times this player has reported someone else.
+			
+		FirstReport
+			- The date this player first reported someone else.
+			
+		LastReport
+			- The date this player last reported someone else.
+			
+		Reported
+			- The number of times this player has been reported.
+			
+		FirstReported
+			- The date this player was first reported.
+			
+		LastReported
+			- The date this player was last reported.
+	
+	Moderator Statistics:
+	
+		Assigned
+			- The number of players assigned to reports by this moderator.
+			
+		Claimed
+			- The number of reports that have been claimed by this moderator.
+			
+		Completed
+			- The number of times a moderator has completed a report.
+			
+		Deleted
+			- The number of reports deleted by this moderator.
+			
+		Moved
+			- The number of reports moved to a different priority by this moderator.
+			- This includes upgrading and downgrading report priorities.
+			
+		Responded
+			- The number of reports this moderator has responded to.
+			
+		Unassigned
+			- The number of players unassigned from reports by this moderator.
+			
+		Unclaimed
+			- The number of reports unclaimed by this moderator.
+		

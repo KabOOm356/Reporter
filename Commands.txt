@@ -54,6 +54,18 @@ Commands
 	
 	/report request most
 		- Displays the player or players with the most reports against them.
+	
+	/report statistic/stat <Player Name> <Statistic>
+		- Gets a statistic for the given player.
+	
+	/report statistic/stat list
+		- Lists all available statistics.
+	
+	/report statistic/stat <Player Name> all
+		- Displays all statistics for the given player.
+	
+	/report statistic/stat <Player Name> all mod|player
+		- Displays all mod or player statistics for the given player.
 		
 	/report unassign <Index/last>
 		- Opposite of assigning a report.  Removes the player currently claiming the specified report.

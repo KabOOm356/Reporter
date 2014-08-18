@@ -326,7 +326,19 @@ Changelog:
 	3.2
 				Features:
 					An alert will be sent when a reported player from an unfinished report logs in.
+					Added a statistics system.
 				Changes:
 					A message of how many reports were deleted is displayed when deleting groups of reports.
+					Database:
+						Created a PlayerStats table.
+						Created a ModStats table.
+				New Commands:
+					/report statistic/stat list
+					/report statistic/stat <Player Name> <Statistic>
+					/report statistic/stat <Player Name> all
+					/report statistic/stat <Player Name> all mod|player
 				New Permission Nodes:
 					reporter.alerts.onLogin.reportedPlayerLogin
+					reporter.statistic.list
+					reporter.statistic.read.mod
+					reporter.statistic.read.player

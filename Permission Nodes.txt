@@ -23,6 +23,12 @@ Permission Nodes:
 		- Allows players to upgrade, downgrade and move reports to a different priority.
 	reporter.unassign
 		- Allows players to unassign others from reports.
+	reporter.statistic.list
+		- Allows players to list the available statistics.
+	reporter.statistic.read.mod
+		- Allows players to view moderator statistics.
+	reporter.statistic.read.player
+		- Allows players to view player statistics.
 		
 	Alerts:
 		reporter.alerts.onLogin.reportedPlayerLogin

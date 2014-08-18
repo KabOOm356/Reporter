@@ -20,6 +20,25 @@ locale:
     
     deletedTotalReports: "A total of %r report(s) have been deleted!"
     
+    statisticHelp: "/report statistic/stat <Player Name> <Statistic>"
+    statisticHelpDetails: "Gets a statistic for the given player."
+    
+    statisticListHelpDetails: "Lists all available statistics."
+    
+    statisticAllHelpDetails: "Displays all statistics for the given player."
+    statisticAllModPlayerHelpDetails: "Displays all mod or player statistics for the given player."
+    
+    notValidStatistic: "The given statistic is not valid."
+    
+    noStatisticEntry: "The player %p does not have an entry for the statistic %s!"
+    displayStatistic: "The %s statistic for player %p is %v"
+    
+    availablePlayerStatistics: "Available Player Statistics: %s"
+    availableModeratorStatistics: "Available Moderator Statistics: %s"
+    
+    tryStatisticList: "Try /report statistic list"
+    
+    
     # Version 9
     
     allowedToReportPlayerAgain: "You are now allowed to report %r again!"

@@ -18,6 +18,7 @@ import net.KabOOm356.Command.Commands.MoveCommand;
 import net.KabOOm356.Command.Commands.ReportCommand;
 import net.KabOOm356.Command.Commands.RequestCommand;
 import net.KabOOm356.Command.Commands.RespondCommand;
+import net.KabOOm356.Command.Commands.StatisticCommand;
 import net.KabOOm356.Command.Commands.UnassignCommand;
 import net.KabOOm356.Command.Commands.UnclaimCommand;
 import net.KabOOm356.Command.Commands.UpgradeCommand;
@@ -122,6 +123,7 @@ public class ReporterCommandManager implements CommandExecutor
 		initReportCommand(new MoveCommand(this));
 		initReportCommand(new ReportCommand(this));
 		initReportCommand(new RequestCommand(this));
+		initReportCommand(new StatisticCommand(this));
 		initReportCommand(new UnassignCommand(this));
 		initReportCommand(new UnclaimCommand(this));
 		initReportCommand(new UpgradeCommand(this));
