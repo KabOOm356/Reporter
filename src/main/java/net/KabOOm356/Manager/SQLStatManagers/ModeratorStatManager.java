@@ -14,35 +14,36 @@ public class ModeratorStatManager extends SQLStatManager
 	public static class ModeratorStat extends SQLStat
 	{
 		/**
-		 * The number of times a moderator has used the assign command.
+		 * The number of players assigned to reports by this moderator.
 		 */
 		public static final ModeratorStat ASSIGNED = new ModeratorStat("Assigned", "AssignCount");
 		/**
-		 * The number of times a moderator has used the claim command.
+		 * The number of reports that have been claimed by this moderator.
 		 */
 		public static final ModeratorStat CLAIMED = new ModeratorStat("Claimed", "ClaimedCount");
 		/**
-		 * The number of times a moderator has used the complete command.
+		 * The number of reports claimed by this moderator.
 		 */
 		public static final ModeratorStat COMPLETED = new ModeratorStat("Completed", "CompletionCount");
 		/**
-		 * The number of times a moderator has used the delete command.
+		 * The number of reports deleted by this moderator.
 		 */
 		public static final ModeratorStat DELETED = new ModeratorStat("Deleted", "DeletionCount");
 		/**
-		 * The number of times a moderator has used the move command.
+		 * The number of reports moved to a different priority by this moderator.
+		 * This includes upgrading and downgrading report priorities.
 		 */
 		public static final ModeratorStat MOVED = new ModeratorStat("Moved", "MoveCount");
 		/**
-		 * The number of times a moderator has used the respond command.
+		 * The number of reports this moderator has responded to.
 		 */
 		public static final ModeratorStat RESPONDED = new ModeratorStat("Responded", "RespondCount");
 		/**
-		 * The number of times a moderator has used the unassign command.
+		 * The number of players unassigned from reports by this moderator.
 		 */
 		public static final ModeratorStat UNASSIGNED = new ModeratorStat("Unassigned", "UnassignCount");
 		/**
-		 * The number of times a moderator has used the unclaim command.
+		 * The number of reports unclaimed by this moderator.
 		 */
 		public static final ModeratorStat UNCLAIMED = new ModeratorStat("Unclaimed", "UnclaimCount");
 		
