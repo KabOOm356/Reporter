@@ -356,11 +356,27 @@ public class ReporterCommandManager implements CommandExecutor
 		
 		if(BukkitUtil.isUsernameValid(playerName))
 		{
+			// Attempt to get an online player.
 			OfflinePlayer player = Bukkit.getServer().getPlayer(playerName);
 			
 			if(player == null)
 			{
-				player = matchOfflinePlayer(playerName);
+				// Attempt to get an OfflinePlayer with an exact name.
+				player = Bukkit.getServer().getOfflinePlayer(playerName);
+				
+				// If the OfflinePlayer has not played before.
+				if(!player.hasPlayedBefore())
+				{
+					// If the configuration allows for partial username matching, match the player.
+					if(getConfig().getBoolean("general.matchPartialOfflineUsernames", true))
+					{
+						player = matchOfflinePlayer(playerName);
+					}
+					else // The player was not found.
+					{
+						player = null;
+					}
+				}
 			}
 			
 			return player;

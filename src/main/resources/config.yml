@@ -1,5 +1,5 @@
 # Reporter Configuration File
-# Config Version: 12
+# Config Version: 13
 
 # General plugin settings
 general:
@@ -47,6 +47,10 @@ general:
   # If reports can be completed with out a summary being written
   # Default: false
   canCompleteWithoutSummary: false
+  
+  # If partial usernames should be matched to offline players
+  # Default: true
+  matchPartialOfflineUsernames: true
   
   # General settings for reporting
   reporting:

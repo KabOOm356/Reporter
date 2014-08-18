@@ -44,7 +44,7 @@ public class Reporter extends JavaPlugin
 	private static String pluginUpdateAPI = "https://api.curseforge.com/servermods/files?projectIds=31347";
 	
 	public static final String localeVersion = "10";
-	public static final String configVersion = "12";
+	public static final String configVersion = "13";
 	public static final String databaseVersion = "10";
 	
 	private static String version;

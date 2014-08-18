@@ -323,6 +323,10 @@ Changelog:
 					Changed the 'CompletionDate' column from a VARCHAR type to a CHAR type.
 	3.1.8	8/1/2014
 				Fixed trying to find a player even if the username is invalid.
+	3.1.9	8/13/2014
+				Increased efficiency of getting players.
+				New Configuration Option:
+					general.matchPartialOfflineUsernames - If the plugin should attempt to match a partial username to an offline player.
 	3.2
 				Features:
 					An alert will be sent when a reported player from an unfinished report logs in.
