@@ -17,10 +17,12 @@ import net.KabOOm356.File.AbstractFiles.VersionedNetworkFile.ReleaseLevel;
 import net.KabOOm356.Listeners.ReporterPlayerListener;
 import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Locale.Entry.LocaleInfo;
+import net.KabOOm356.Metrics.FeaturePlotter;
 import net.KabOOm356.Reporter.Configuration.ReporterConfigurationUtil;
 import net.KabOOm356.Reporter.Database.ReporterDatabaseUtil;
 import net.KabOOm356.Runnable.ReporterLocaleInitializer;
 import net.KabOOm356.Updater.PluginUpdater;
+import net.KabOOm356.Util.FormattingUtil;
 import net.KabOOm356.Util.Util;
 
 import org.bukkit.Bukkit;
@@ -28,6 +30,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.mcstats.Metrics;
+import org.mcstats.Metrics.Graph;
 
 /**
  * The main Reporter class.
@@ -44,7 +48,7 @@ public class Reporter extends JavaPlugin
 	private static String pluginUpdateAPI = "https://api.curseforge.com/servermods/files?projectIds=31347";
 	
 	public static final String localeVersion = "10";
-	public static final String configVersion = "13";
+	public static final String configVersion = "14";
 	public static final String databaseVersion = "10";
 	
 	private static String version;
@@ -84,6 +88,8 @@ public class Reporter extends JavaPlugin
 		initializeLocale();
 
 		initializeDatabase();
+		
+		initializeStatistics();
 		
 		playerListener = new ReporterPlayerListener(this);
 		commandManager = new ReporterCommandManager(this);
@@ -226,6 +232,52 @@ public class Reporter extends JavaPlugin
 			Reporter.getLog().severe(Reporter.getDefaultConsolePrefix() + "Disabling plugin!");
 			getServer().getPluginManager().disablePlugin(this);
 			return;
+		}
+	}
+	
+	private void initializeStatistics()
+	{
+		if(!getConfig().getBoolean("plugin.statistics.opt-out", false))
+		{
+			try
+			{
+				// Initialize Metrics.
+				Metrics metrics = new Metrics(this);
+				
+				// Create a graph to track the locale language being used.
+				Graph localeGraph = metrics.createGraph("Locale");
+				
+				String language = locale.getString(LocaleInfo.language);
+				language = FormattingUtil.capitalizeFirstCharacter(language);
+				
+				// Increment the language.
+				localeGraph.addPlotter(new FeaturePlotter(language));
+				
+				// Create a graph to track the locale version being used.
+				Graph localeVersionGraph = metrics.createGraph("Locale Version");
+				
+				String localeVersion = "Version " + locale.getString(LocaleInfo.version);
+				
+				// Increment the locale version.
+				localeVersionGraph.addPlotter(new FeaturePlotter(localeVersion));
+				
+				// Create a graph to track the database engine being used.
+				Graph databaseEngineGraph = metrics.createGraph("Database Engine");
+				
+				String databaseEngine = getDatabaseHandler().getDatabaseType().toString();
+				
+				// Increment the database engine.
+				databaseEngineGraph.addPlotter(new FeaturePlotter(databaseEngine));
+				
+				metrics.start();
+			}
+			catch (IOException e)
+			{
+				Reporter.getLog().warning(
+						Reporter.getDefaultConsolePrefix() +
+						"Could not enable statistics tracking with MCStats!");
+				e.printStackTrace();
+			}
 		}
 	}
 	

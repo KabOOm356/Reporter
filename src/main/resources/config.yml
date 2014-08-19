@@ -1,5 +1,5 @@
 # Reporter Configuration File
-# Config Version: 13
+# Config Version: 14
 
 # General plugin settings
 general:
@@ -147,6 +147,15 @@ general:
     
 # Settings related to the plugin
 plugin:
+
+  # Settings related to plugin statistics
+  statistics:
+    
+    # If you would like to opt-out from sending statistics
+    # Statistics posted by the plugin are available at:
+    # http://mcstats.org/plugin/Reporter
+    # Default: false
+    opt-out: false
   
   # Settings related to plugin updates
   updates:

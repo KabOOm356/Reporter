@@ -388,6 +388,13 @@ public class ReporterConfigurationUtil
 			updated = true;
 		}
 		
+		// Version 14
+		if(!configuration.isSet("plugin.statistics.opt-out"))
+		{
+			configuration.set("plugin.statistics.opt-out", false);
+			updated = true;
+		}
+		
 		if(updated)
 		{
 			configuration.options().header("Reporter Configuration File\n" +

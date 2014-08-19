@@ -331,11 +331,14 @@ Changelog:
 				Features:
 					An alert will be sent when a reported player from an unfinished report logs in.
 					Added a statistics system.
+					Added plugin metrics, using MCStats.
 				Changes:
 					A message of how many reports were deleted is displayed when deleting groups of reports.
 					Database:
 						Created a PlayerStats table.
 						Created a ModStats table.
+				New Configuration Option:
+					plugin.statistics.opt-out
 				New Commands:
 					/report statistic/stat list
 					/report statistic/stat <Player Name> <Statistic>
