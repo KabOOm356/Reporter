@@ -327,7 +327,7 @@ Changelog:
 				Increased efficiency of getting players.
 				New Configuration Option:
 					general.matchPartialOfflineUsernames - If the plugin should attempt to match a partial username to an offline player.
-	3.2
+	3.2		8/19/2014
 				Features:
 					An alert will be sent when a reported player from an unfinished report logs in.
 					Added a statistics system.
