@@ -349,3 +349,5 @@ Changelog:
 					reporter.statistic.list
 					reporter.statistic.read.mod
 					reporter.statistic.read.player
+	3.2.0.1	8/26/2014
+				Version bump for BukkitDev re-submission.
