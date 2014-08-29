@@ -1,4 +1,4 @@
-package net.KabOOm356.Runnable;
+package net.KabOOm356.Reporter.Locale;
 
 import java.io.File;
 import java.io.IOException;

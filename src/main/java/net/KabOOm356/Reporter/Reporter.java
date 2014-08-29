@@ -20,7 +20,7 @@ import net.KabOOm356.Locale.Entry.LocaleInfo;
 import net.KabOOm356.Metrics.FeaturePlotter;
 import net.KabOOm356.Reporter.Configuration.ReporterConfigurationUtil;
 import net.KabOOm356.Reporter.Database.ReporterDatabaseUtil;
-import net.KabOOm356.Runnable.ReporterLocaleInitializer;
+import net.KabOOm356.Reporter.Locale.ReporterLocaleInitializer;
 import net.KabOOm356.Updater.PluginUpdater;
 import net.KabOOm356.Util.FormattingUtil;
 import net.KabOOm356.Util.Util;
