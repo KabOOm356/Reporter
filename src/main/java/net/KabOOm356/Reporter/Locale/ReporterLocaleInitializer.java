@@ -47,6 +47,9 @@ public class ReporterLocaleInitializer implements Runnable
 	public ReporterLocaleInitializer(Reporter plugin, String localeName, File dataFolder, boolean autoDownload, ReleaseLevel lowestLevel, boolean keepBackup)
 	{
 		this.plugin = plugin;
+		
+		this.locale = plugin.getLocale();
+		
 		this.localeName = localeName;
 		this.dataFolder = dataFolder;
 		this.autoDownload = autoDownload;
@@ -57,9 +60,16 @@ public class ReporterLocaleInitializer implements Runnable
 	@Override
 	public void run()
 	{
-		locale = initLocale();
+		// There should be no other action on the locale until the initialization/update is completed.
+		synchronized(locale)
+		{
+			initLocale();
+			
+			// Notify other threads that the locale is initialized.
+			locale.notify();
+		}
 		
-		plugin.updateLocale(locale);
+		plugin.loadLocale();
 	}
 	
 	/**
@@ -71,8 +81,6 @@ public class ReporterLocaleInitializer implements Runnable
 	 */
 	public Locale initLocale()
 	{
-		locale = new Locale();
-		
 		if(localeName.equalsIgnoreCase("en_US"))
 			return locale;
 		
@@ -271,7 +279,6 @@ public class ReporterLocaleInitializer implements Runnable
 			{
 				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + e.getMessage());
 				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Failed to load backup revision: " + localeBackupFile.getRevision());
-				locale = new Locale();
 				localeBackupFile.decrementRevision();
 				loadSuccessful = false;
 			}

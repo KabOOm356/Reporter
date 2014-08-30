@@ -216,10 +216,9 @@ public class Reporter extends JavaPlugin
 			this.getServer().getScheduler().runTaskAsynchronously(this, localeInitializer);
 		else
 		{
-			locale = localeInitializer.initLocale();
+			localeInitializer.initLocale();
 			
-			if(locale != null)
-				setLocale(locale);
+			loadLocale();
 		}
 	}
 	
@@ -231,7 +230,6 @@ public class Reporter extends JavaPlugin
 		{
 			Reporter.getLog().severe(Reporter.getDefaultConsolePrefix() + "Disabling plugin!");
 			getServer().getPluginManager().disablePlugin(this);
-			return;
 		}
 	}
 	
@@ -311,10 +309,8 @@ public class Reporter extends JavaPlugin
 		return (cs instanceof org.bukkit.entity.Player) || (cs instanceof org.bukkit.command.ConsoleCommandSender) || (cs instanceof org.bukkit.command.RemoteConsoleCommandSender);
 	}
 	
-	public void setLocale(Locale locale)
+	public void loadLocale()
 	{
-		this.locale = locale;
-		
 		if(!setLocaleDefaults(locale))
 		{
 			log.warning(Reporter.getDefaultConsolePrefix() + "Unable to set defaults for the locale!");
@@ -323,6 +319,8 @@ public class Reporter extends JavaPlugin
 		log.info(Reporter.getDefaultConsolePrefix() + "Language: " + locale.getString(LocaleInfo.language)
 				+ " v" + locale.getString(LocaleInfo.version) 
 				+ " By " + locale.getString(LocaleInfo.author));
+		
+		updateDocumentation();
 	}
 	
 	private boolean setLocaleDefaults(Locale locale)
@@ -353,10 +351,8 @@ public class Reporter extends JavaPlugin
 		return false;
 	}
 	
-	public void updateLocale(Locale locale)
+	private void updateDocumentation()
 	{
-		setLocale(locale);
-		
 		// Update the documentation for all the commands
 		commandManager.updateDocumentation();
 	}
