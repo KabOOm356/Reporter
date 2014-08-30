@@ -354,3 +354,6 @@ Changelog:
 	3.2.1
 				Fixes:
 					Fixed the locale being initialized twice while using synchronous initialization.
+					Fixed metrics submitting locale information before the locale is initialized.
+					Fixed metrics submitting locale language as English, even if a different language is being used.
+					Fixed metrics submitting the locale version as 10, even if a different version is being used.
