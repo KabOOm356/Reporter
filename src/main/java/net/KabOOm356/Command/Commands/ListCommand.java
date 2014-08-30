@@ -156,7 +156,7 @@ public class ListCommand extends ReporterCommand
 			queryFormat = "SELECT COUNT(*) AS Count " +
 					"FROM Reports " +
 					"WHERE ClaimStatus = 1 " +
-					"AND ClaimedByRaw = '" + sender.getName() + "' " +
+					"AND ClaimedBy = '" + sender.getName() + "' " +
 					"AND Priority = ";
 		}
 		
