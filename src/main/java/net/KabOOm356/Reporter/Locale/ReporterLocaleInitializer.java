@@ -63,11 +63,7 @@ public class ReporterLocaleInitializer implements Runnable
 		// There should be no other action on the locale until the initialization/update is completed.
 		synchronized(locale)
 		{
-			// No need to initialize the locale if it is already initialized.
-			if(!locale.isInitialized())
-			{
-				initLocale();
-			}
+			initLocale();
 			
 			// Set the locale as initialized.
 			locale.initialized();
@@ -88,6 +84,10 @@ public class ReporterLocaleInitializer implements Runnable
 	 */
 	public Locale initLocale()
 	{
+		// No need to initialize the locale if it is already initialized.
+		if(locale.isInitialized())
+			return locale;
+		
 		if(localeName.equalsIgnoreCase("en_US"))
 			return locale;
 		
