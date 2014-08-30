@@ -160,7 +160,7 @@ public class RequestCommand extends ReporterCommand
 			}
 			else
 			{
-				query = "SELECT ID FROM Reports WHERE ReportedRaw=?";
+				query = "SELECT ID FROM Reports WHERE Reported=?";
 				params.add(playerName);
 			}
 			
