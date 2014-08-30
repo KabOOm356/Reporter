@@ -3,14 +3,17 @@ package net.KabOOm356.Locale;
 import net.KabOOm356.Locale.Entry.LocaleEntry;
 import net.KabOOm356.Locale.Entry.LocaleInfo;
 import net.KabOOm356.Locale.Entry.LocalePhrase;
+import net.KabOOm356.Util.Initializable;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
 /**
  * A class to help with reading a locale file.
  */
-public class Locale extends YamlConfiguration
+public class Locale extends YamlConfiguration implements Initializable
 {
+	private boolean isInitialized = Initializable.isInitialized;
+	
 	/**
 	 * Gets an entry from the locale file.
 	 * 
@@ -45,5 +48,17 @@ public class Locale extends YamlConfiguration
 	public String getInfo(String info)
 	{
 		return getString(LocaleEntry.prefix + LocaleInfo.prefix + info);
+	}
+
+	@Override
+	public boolean isInitialized()
+	{
+		return isInitialized;
+	}
+
+	@Override
+	public void initialized()
+	{
+		isInitialized = true;
 	}
 }
