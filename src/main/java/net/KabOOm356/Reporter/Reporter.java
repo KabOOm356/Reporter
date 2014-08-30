@@ -219,7 +219,7 @@ public class Reporter extends JavaPlugin
 			locale = localeInitializer.initLocale();
 			
 			if(locale != null)
-				setLocale(localeInitializer.initLocale());
+				setLocale(locale);
 		}
 	}
 	
