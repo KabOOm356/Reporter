@@ -65,9 +65,6 @@ public class ReporterLocaleInitializer implements Runnable
 		{
 			initLocale();
 			
-			// Set the locale as initialized.
-			locale.initialized();
-			
 			// Notify other threads that the locale is initialized.
 			locale.notify();
 		}
@@ -89,7 +86,10 @@ public class ReporterLocaleInitializer implements Runnable
 			return locale;
 		
 		if(localeName.equalsIgnoreCase("en_US"))
+		{
+			locale.initialized();
 			return locale;
+		}
 		
 		File localeFile = getLocaleFile(dataFolder, localeName);
 		
@@ -160,6 +160,8 @@ public class ReporterLocaleInitializer implements Runnable
 			else
 				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Using English default.");
 		}
+		
+		locale.initialized();
 		
 		return locale;
 	}
