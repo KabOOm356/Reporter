@@ -91,17 +91,7 @@ public class CompleteCommand extends ReporterCommand
 	{
 		ArrayList<String> params = new ArrayList<String>(5);
 		params.add(0, "1");
-		
-		// If the CommandSender is a player set the UUID in the database.
-		if(BukkitUtil.isPlayer(sender))
-		{
-			params.add(1, ((Player)sender).getUniqueId().toString());
-		}
-		else
-		{
-			params.add(1, "");
-		}
-		
+		params.add(BukkitUtil.getUUIDString(sender));
 		params.add(2, sender.getName());
 		params.add(3, Reporter.getDateformat().format(new Date()));
 		params.add(4, summary);

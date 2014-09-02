@@ -283,4 +283,42 @@ public class BukkitUtil
 	{
 		return str.replaceAll("(&([a-f0-9]))", "\u00A7$2");
 	}
+	
+	/**
+	 * Returns a String representation of the sender's UUID.
+	 * 
+	 * @param sender The {@link CommandSender} to get the UUID from.
+	 * 
+	 * @return If the sender is a valid player a String representation of the
+	 * sender's UUID, otherwise an empty String ("").
+	 */
+	public static String getUUIDString(CommandSender sender)
+	{
+		if(isOfflinePlayer(sender))
+		{
+			OfflinePlayer player = (OfflinePlayer) sender;
+			
+			return getUUIDString(player);
+		}
+		
+		return "";
+	}
+	
+	/**
+	 * Return a String representation of the player's UUID.
+	 * 
+	 * @param player The {@link OfflinePlayer} to get the UUID from.
+	 * 
+	 * @return If the player is valid a String representation of the
+	 * player's UUID, otherwise an empty String ("").
+	 */
+	public static String getUUIDString(OfflinePlayer player)
+	{
+		if(isPlayerValid(player))
+		{
+			return player.getUniqueId().toString();
+		}
+		
+		return "";
+	}
 }

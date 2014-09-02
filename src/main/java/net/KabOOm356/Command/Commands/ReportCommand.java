@@ -80,32 +80,20 @@ public class ReportCommand extends ReporterCommand
 	{
 		ArrayList<String> params = new ArrayList<String>();
 		int count = getManager().getCount();
-		Player reportedPlayer = null;
 		Location reportedLoc = null;
 		
 		if(count != -1)
 		{
 			params.add(0, Integer.toString(count+1));
 			
-			if(BukkitUtil.isPlayer(sender))
-				params.add(1, ((Player)sender).getUniqueId().toString());
-			else
-				params.add(1, "");
-			
+			params.add(1, BukkitUtil.getUUIDString(sender));
 			params.add(2, sender.getName());
 			
-			if(BukkitUtil.isPlayerValid(reported))
-			{
-				params.add(3, reported.getUniqueId().toString());
-			}
-			else
-			{
-				params.add(3, "");
-			}
+			params.add(3, BukkitUtil.getUUIDString(reported));
 			
 			if(reported.isOnline())
 			{
-				reportedPlayer = reported.getPlayer();
+				Player reportedPlayer = reported.getPlayer();
 				
 				reportedLoc = reportedPlayer.getLocation();
 			}
