@@ -133,35 +133,30 @@ public class RequestCommand extends ReporterCommand
 	
 	private void requestPlayer(CommandSender sender, String playerName)
 	{
-		String indexes = "";
+		OfflinePlayer player = getManager().getPlayer(playerName);
 		
-		OfflinePlayer player = null;
-		
-		if(playerName.equals("!") || playerName.equals("*"))
-			playerName = "* (Anonymous)";
-		else
-			player = getManager().getPlayer(playerName);
-		
-		if(player == null && !playerName.equalsIgnoreCase("* (Anonymous)"))
+		if(player == null)
 		{
 			sender.sendMessage(ChatColor.RED + BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(GeneralPhrases.playerDoesNotExist)));
 			return;
 		}
 		
+		String indexes = "";
+		
 		try
 		{
 			ArrayList<String> params = new ArrayList<String>();
 			String query = "SELECT ID FROM Reports WHERE ReportedUUID=?";
 			
-			if(!playerName.equalsIgnoreCase("* (Anonymous)"))
+			if(!player.getName().equalsIgnoreCase("* (Anonymous)"))
 			{
 				params.add(player.getUniqueId().toString());
 			}
 			else
 			{
 				query = "SELECT ID FROM Reports WHERE Reported=?";
-				params.add(playerName);
+				params.add(player.getName());
 			}
 			
 			if(getManager().getDatabaseHandler().usingSQLite())
@@ -189,7 +184,7 @@ public class RequestCommand extends ReporterCommand
 		}
 		
 		String out = null;
-		if(indexes.equals(""))
+		if(indexes.isEmpty())
 		{
 			out = BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(RequestPhrases.reqNF));

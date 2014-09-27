@@ -359,3 +359,4 @@ Changelog:
 					Fixed metrics submitting the locale version as 10, even if a different version is being used.
 					Fixed an error when using the command '/report list claimed priority' with the console.
 					Fixed an error when using the command '/report request *'.
+					Fixed a NullPointerException when using the request command.
