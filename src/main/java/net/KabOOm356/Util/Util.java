@@ -2,7 +2,6 @@ package net.KabOOm356.Util;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
@@ -127,53 +126,58 @@ public class Util
 	/**
 	 * Converts the given array into a string representation.
 	 * 
-	 * @param indexes The indexes in ArrayList format.
+	 * @param array The array to format.
 	 * 
 	 * @return The string representation of the given indexes.
 	 */
-	public static <T> String indexesToString(List<T> indexes)
+	public static <T extends Iterable<V>, V> String indexesToString(T array)
 	{
-		if(indexes == null)
-			throw new IllegalArgumentException("Parameter 'indexes' cannot be null!");
+		if(array == null)
+			throw new IllegalArgumentException("Parameter 'array' cannot be null!");
 		
-		String indexString = "";
+		StringBuilder builder = new StringBuilder();
 		
-		for(T index : indexes)
-			indexString = indexString + index.toString() + ", ";
+		for(V index : array)
+			builder.append(index.toString()).append(", ");
 		
-		if(!indexString.equals(""))
-			indexString = indexString.substring(0, indexString.length() - 2);
+		if(builder.length() > 2)
+			return builder.substring(0, builder.length() - 2);
 		
-		return indexString;
+		return builder.toString();
 	}
 	
 	/**
 	 * Converts the given array into a string representation.
 	 * 
-	 * @param indexes The ArrayList to format.
+	 * @param array The array to format.
 	 * @param indexColor The color to make the indexes.
 	 * @param separatorColor The color to make the separator.
 	 * 
-	 * @return The string representation of the given indexes.
+	 * @return The string representation of the given array.
 	 */
-	public static <T> String indexesToString(ArrayList<T> indexes, ChatColor indexColor, ChatColor separatorColor)
+	public static <T extends Iterable<V>, V> String indexesToString(T array, ChatColor indexColor, ChatColor separatorColor)
 	{
-		if(indexes == null)
-			throw new IllegalArgumentException("Parameter 'indexes' cannot be null!");
+		if(array == null)
+			throw new IllegalArgumentException("Parameter 'array' cannot be null!");
 		if(indexColor == null)
 			throw new IllegalArgumentException("Parameter 'indexColor' cannot be null!");
 		if(separatorColor == null)
 			throw new IllegalArgumentException("Parameter 'separatorColor' cannot be null!");
 		
-		String indexString = "";
+		StringBuilder builder = new StringBuilder();
 		
-		for(T index : indexes)
-			indexString = indexString + indexColor + index.toString() + separatorColor + ", ";
+		for(V index : array)
+		{
+			builder.append(indexColor);
+			builder.append(index.toString());
+			builder.append(separatorColor);
+			builder.append(", ");
+		}
 		
-		if(!indexString.equals(""))
-			indexString = indexString.substring(0, indexString.length() - 2);
+		if(builder.length() > 2)
+			return builder.substring(0, builder.length() - 2);
 		
-		return indexString;
+		return builder.toString();
 	}
 	
 	/**
@@ -199,15 +203,20 @@ public class Util
 		if(separatorColor == null)
 			throw new IllegalArgumentException("Parameter 'separatorColor' cannot be null!");
 		
-		String indexString = "";
+		StringBuilder indexString = new StringBuilder();
 		
 		for(ResultRow row : resultSet)
-			indexString = indexString + indexColor + row.getString(columnName) + separatorColor + ", ";
+		{
+			indexString.append(indexColor);
+			indexString.append(row.getString(columnName));
+			indexString.append(separatorColor);
+			indexString.append(", ");
+		}
 		
-		if(!indexString.equals(""))
-			indexString = indexString.substring(0, indexString.length() - 2);
+		if(indexString.length() > 2)
+			return indexString.substring(0, indexString.length() - 2);
 		
-		return indexString;
+		return indexString.toString();
 	}
 	
 	/**
