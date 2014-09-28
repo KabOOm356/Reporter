@@ -227,8 +227,7 @@ public class SQLStatManager
 		
 		String query = "UPDATE " + tableName + " "
 				+ "SET " + statColumn + " = " + statColumn + " + " + Integer.toString(increment) + " "
-				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ? "
-				+ "LIMIT 1";
+				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ?";
 		
 		ArrayList<String> params = new ArrayList<String>();
 		
@@ -288,8 +287,7 @@ public class SQLStatManager
 		
 		String query = "UPDATE " + tableName + " "
 				+ "SET " + statColumn + " = " + statColumn + " - " + Integer.toString(decrement) + " "
-				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ? "
-				+ "LIMIT 1";
+				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ?";
 		
 		ArrayList<String> params = new ArrayList<String>();
 		
@@ -333,8 +331,7 @@ public class SQLStatManager
 		
 		String query = "UPDATE " + tableName + " "
 				+ "SET " + statColumn + " = ? "
-				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ? "
-				+ "LIMIT 1";
+				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ?";
 		
 		ArrayList<String> params = new ArrayList<String>();
 		
@@ -378,8 +375,7 @@ public class SQLStatManager
 		
 		String query = "SELECT " + statColumn
 				+ " FROM " + tableName
-				+ " WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ? "
-				+ "LIMIT 1";
+				+ " WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ?";
 		
 		ArrayList<String> params = new ArrayList<String>();
 		
@@ -505,8 +501,7 @@ public class SQLStatManager
 	{
 		String query = "SELECT ID "
 				+ "FROM " + tableName + " "
-				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ? "
-				+ "LIMIT 1";
+				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ?";
 		
 		ArrayList<String> params = new ArrayList<String>();
 		

@@ -363,3 +363,4 @@ Changelog:
 	3.2.2
 				SQLite Fixes:
 					Fixed a NullPointerException when a player logs in.
+					Fixed multiple NullPointerExceptions when running any command that sets a statistic.
