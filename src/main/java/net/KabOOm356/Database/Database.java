@@ -89,8 +89,19 @@ public abstract class Database implements DatabaseInterface
 		}
 		finally
 		{
-			statement.close();
-			closeConnection();
+			try
+			{
+				statement.close();
+			}
+			catch(Exception e)
+			{}
+			
+			try
+			{
+				closeConnection();
+			}
+			catch(Exception e)
+			{}
 		}
 	}
 	
@@ -138,8 +149,19 @@ public abstract class Database implements DatabaseInterface
 			}
 			finally
 			{
-				preparedStatement.close();
-				closeConnection();
+				try
+				{
+					preparedStatement.close();
+				}
+				catch(Exception e)
+				{}
+				
+				try
+				{
+					closeConnection();
+				}
+				catch(Exception e)
+				{}
 			}
 		}
 		else 
@@ -192,8 +214,19 @@ public abstract class Database implements DatabaseInterface
 		}
 		finally
 		{
-			rs.close();
-			closeConnection();
+			try
+			{
+				rs.close();
+			}
+			catch(Exception e)
+			{}
+			
+			try
+			{
+				closeConnection();
+			}
+			catch(Exception e)
+			{}
 		}
 	}
 	

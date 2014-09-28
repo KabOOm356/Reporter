@@ -67,8 +67,19 @@ public class ExtendedDatabaseHandler extends DatabaseHandler
 		}
 		finally
 		{
-			resultSet.close();
-			closeConnection();
+			try
+			{
+				resultSet.close();
+			}
+			catch(Exception e)
+			{}
+			
+			try
+			{
+				closeConnection();
+			}
+			catch(Exception e)
+			{}
 		}
 	}
 	
@@ -100,8 +111,19 @@ public class ExtendedDatabaseHandler extends DatabaseHandler
 		}
 		finally
 		{
-			resultSet.close();
-			closeConnection();
+			try
+			{
+				resultSet.close();
+			}
+			catch(Exception e)
+			{}
+			
+			try
+			{
+				closeConnection();
+			}
+			catch(Exception e)
+			{}
 		}
 	}
 	
@@ -130,8 +152,19 @@ public class ExtendedDatabaseHandler extends DatabaseHandler
 		}
 		finally
 		{
-			resultSet.close();
-			closeConnection();
+			try
+			{
+				resultSet.close();
+			}
+			catch(Exception e)
+			{}
+			
+			try
+			{
+				closeConnection();
+			}
+			catch(Exception e)
+			{}
 		}
 	}
 }
