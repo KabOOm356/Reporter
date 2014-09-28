@@ -150,7 +150,7 @@ public class ReporterPlayerListener implements Listener
 	{
 		String query = "SELECT ID " +
 				"FROM Reports " +
-				"WHERE ReportedUUID = '" + player.getUniqueId() + "' AND !CompletionStatus";
+				"WHERE ReportedUUID = '" + player.getUniqueId() + "' AND CompletionStatus = 0";
 		
 		SQLResultSet result = null;
 		
@@ -173,7 +173,7 @@ public class ReporterPlayerListener implements Listener
 	{
 		String query = "SELECT ID, ClaimStatus, ClaimedByUUID " +
 				"FROM Reports " +
-				"WHERE ReportedUUID = '" + reportedPlayer.getUniqueId() + "' AND !CompletionStatus";
+				"WHERE ReportedUUID = '" + reportedPlayer.getUniqueId() + "' AND CompletionStatus = 0";
 		
 		SQLResultSet result = null;
 		

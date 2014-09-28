@@ -360,3 +360,6 @@ Changelog:
 					Fixed an error when using the command '/report list claimed priority' with the console.
 					Fixed an error when using the command '/report request *'.
 					Fixed a NullPointerException when using the request command.
+	3.2.2
+				SQLite Fixes:
+					Fixed a NullPointerException when a player logs in.
