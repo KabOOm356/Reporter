@@ -155,11 +155,11 @@ public class RespondCommand extends ReporterCommand
 					
 					OfflinePlayer senderPlayer = Bukkit.getPlayer(uuid);
 					
-					reported = BukkitUtil.formatPlayerName(senderPlayer);
+					sender = BukkitUtil.formatPlayerName(senderPlayer);
 				}
 				else
 				{
-					reported = result.getString("Sender");
+					sender = result.getString("Sender");
 				}
 				
 				details = result.getString("Details");
