@@ -785,7 +785,7 @@ public class ReporterCommandManager implements CommandExecutor
 			
 			if(!result.getString("ClaimedByUUID").isEmpty())
 			{
-				claimedBy = UUID.fromString(result.getString("ClaimedBy"));
+				claimedBy = UUID.fromString(result.getString("ClaimedByUUID"));
 			}
 			
 			isClaimed = result.getBoolean("ClaimStatus");
