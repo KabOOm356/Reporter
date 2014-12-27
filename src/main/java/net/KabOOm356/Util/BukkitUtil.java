@@ -314,7 +314,7 @@ public class BukkitUtil
 	 */
 	public static String getUUIDString(OfflinePlayer player)
 	{
-		if(isPlayerValid(player))
+		if(isUsernameValid(player.getName()) && isPlayerValid(player))
 		{
 			return player.getUniqueId().toString();
 		}

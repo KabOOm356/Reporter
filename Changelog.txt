@@ -368,3 +368,5 @@ Changelog:
 				Fixed the respond message saying null reported someone.
 	3.2.4	12/24/2014
 				Fixed an IllegalArgumentException when players try to alter a claimed report.
+	3.2.5	12/26/2014
+				Fixed a Spigot specific error when trying to respond to a report where an anonymous player was reported.
