@@ -370,3 +370,5 @@ Changelog:
 				Fixed an IllegalArgumentException when players try to alter a claimed report.
 	3.2.5	12/26/2014
 				Fixed a Spigot specific error when trying to respond to a report where an anonymous player was reported.
+	3.2.6	12/31/2014
+				Fixed a NullPointerException when trying to respond to a report where the sender or reported player is offline.

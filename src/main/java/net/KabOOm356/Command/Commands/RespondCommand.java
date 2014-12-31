@@ -140,7 +140,7 @@ public class RespondCommand extends ReporterCommand
 				{
 					UUID uuid = UUID.fromString(result.getString("ReportedUUID"));
 					
-					OfflinePlayer reportedPlayer = Bukkit.getPlayer(uuid);
+					OfflinePlayer reportedPlayer = Bukkit.getOfflinePlayer(uuid);
 					
 					reported = BukkitUtil.formatPlayerName(reportedPlayer);
 				}
@@ -153,7 +153,7 @@ public class RespondCommand extends ReporterCommand
 				{
 					UUID uuid = UUID.fromString(result.getString("SenderUUID"));
 					
-					OfflinePlayer senderPlayer = Bukkit.getPlayer(uuid);
+					OfflinePlayer senderPlayer = Bukkit.getOfflinePlayer(uuid);
 					
 					sender = BukkitUtil.formatPlayerName(senderPlayer);
 				}
