@@ -55,7 +55,7 @@
     <dependency>
       <groupId>ru.tehkode</groupId>
       <artifactId>PermissionsEx</artifactId>
-      <version>1.22</version>
+      <version>1.23.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -78,7 +78,7 @@
     </repository>
     <repository>
       <id>pex-repo</id>
-      <url>http://pex-repo.zachsthings.com</url>
+      <url>http://pex-repo.aoeu.xyz/</url>
     </repository>
     <repository>
       <id>Plugin Metrics</id>
