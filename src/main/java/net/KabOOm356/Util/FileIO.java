@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.KabOOm356.File.RevisionFile;
 
 /**
@@ -15,10 +18,14 @@ import net.KabOOm356.File.RevisionFile;
  */
 public class FileIO
 {
+	private static final Logger log = LogManager.getLogger(FileIO.class);
+	
 	/**
 	 * The encoding to always use when writing to a file.
 	 */
-	public static String encoding = "UTF-8";
+	public static final String encoding = "UTF-8";
+	
+	public static final String BACKUP_FILE_EXTENSION = ".backup";
 	
 	/**
 	 * Copies a given text {@link File} to another {@link File}.
@@ -116,7 +123,7 @@ public class FileIO
 		
 		try
 		{
-			backup = new RevisionFile(file.getParent(), file.getName() + ".backup");
+			backup = new RevisionFile(file.getParent(), file.getName() + BACKUP_FILE_EXTENSION);
 			
 			backup.incrementToNextRevision();
 			
@@ -124,9 +131,9 @@ public class FileIO
 			
 			FileIO.copyTextFile(file, backup.getFile());
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
-			e.printStackTrace();
+			log.error("Failed to create backup file for " + file.getName() , e);
 			if(backup != null)
 				backup.delete();
 			return null;

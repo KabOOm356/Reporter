@@ -14,6 +14,9 @@ import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -25,6 +28,8 @@ import org.bukkit.entity.Player;
  */
 public class CompleteCommand extends ReporterCommand
 {
+	private static final Logger log = LogManager.getLogger(CompleteCommand.class);
+	
 	private static final String name = "Complete";
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.complete";
@@ -111,21 +116,15 @@ public class CompleteCommand extends ReporterCommand
 			
 			broadcastCompletedMessage(index);
 		}
-		catch(Exception ex)
+		catch(final Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.ERROR, "Failed to complete report!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
@@ -186,19 +185,13 @@ public class CompleteCommand extends ReporterCommand
 					playerName = result.getString("Sender");
 				}
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
-				e.printStackTrace();
+				log.log(Level.WARN, "Failed to broadcast report completion message!", e);
 			}
 			finally
 			{
-				try
-				{
-					getManager().getDatabaseHandler().closeConnection();
-				}
-				catch(Exception e)
-				{
-				}
+				getManager().getDatabaseHandler().closeConnection();
 			}
 			
 			yourReportCompleted = BukkitUtil.colorCodeReplaceAll(

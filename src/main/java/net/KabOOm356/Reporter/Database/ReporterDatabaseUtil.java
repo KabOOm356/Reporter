@@ -10,6 +10,9 @@ import net.KabOOm356.Database.DatabaseType;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Reporter.Reporter;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
@@ -17,6 +20,8 @@ import org.bukkit.configuration.file.FileConfiguration;
  */
 public class ReporterDatabaseUtil
 {
+	private static final Logger log = LogManager.getLogger(ReporterDatabaseUtil.class);
+	
 	/**
 	 * Initializes the database.
 	 * 
@@ -42,7 +47,7 @@ public class ReporterDatabaseUtil
 		{
 			try
 			{
-				Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Connecting to MySQL server...");
+				log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Connecting to MySQL server...");
 				
 				String host = configuration.getString("database.host", "localhost:3306");
 				String database = configuration.getString("database.database", "Reporter");
@@ -57,22 +62,15 @@ public class ReporterDatabaseUtil
 				
 				initDatabaseTables(databaseHandler.getDatabase());
 			}
-			catch(Exception ex)
+			catch(final Exception e)
 			{
-				ex.printStackTrace();
 				databaseHandler = null;
 				fallbackToNextDB = true;
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Error connecting to MySQL server using SQLite.");
+				log.log(Level.ERROR, Reporter.getDefaultConsolePrefix() + "Error connecting to MySQL server using SQLite.", e);
 			}
 			finally
 			{
-				try
-				{
-					databaseHandler.closeConnection();
-				}
-				catch(Exception ex)
-				{
-				}
+				databaseHandler.closeConnection();
 			}
 		}
 		else
@@ -89,13 +87,10 @@ public class ReporterDatabaseUtil
 				
 				initDatabaseTables(databaseHandler.getDatabase());
 			}
-			catch(Exception ex)
+			catch(final Exception e)
 			{
-				ex.printStackTrace();
-				
 				databaseHandler = null;
-				
-				Reporter.getLog().severe(Reporter.getDefaultConsolePrefix() + "A severe error occurred connecting to the database file!");
+				log.fatal(Reporter.getDefaultConsolePrefix() + "A severe error occurred connecting to the database file!", e);
 			}
 		}
 		
@@ -112,34 +107,28 @@ public class ReporterDatabaseUtil
 	 */
 	private static void initDatabaseTables(Database database) throws ClassNotFoundException, SQLException
 	{
-		Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Checking " + database.getDatabaseType() + " tables...");
+		log.info(Reporter.getDefaultConsolePrefix() + "Checking " + database.getDatabaseType() + " tables...");
 		
 		try
 		{
 			if (needsToCreateTables(database))
 			{	
-				Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Creating " + database.getDatabaseType() + " tables...");
+				log.info(Reporter.getDefaultConsolePrefix() + "Creating " + database.getDatabaseType() + " tables...");
 
 				createTables(database);
 			}
 			else
-				Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Using existing " + database.getDatabaseType() + " tables.");
+				log.info(Reporter.getDefaultConsolePrefix() + "Using existing " + database.getDatabaseType() + " tables.");
 			
 			if(migrateData(database) || updateTables(database))
 			{
-				Reporter.getLog().info(Reporter.getDefaultConsolePrefix() +
+				log.info(Reporter.getDefaultConsolePrefix() +
 						"The " + database.getDatabaseType() + " tables have been updated to version " + Reporter.getDatabaseVersion() + ".");
 			}
 		}
 		finally
 		{
-			try
-			{
-				database.closeConnection();
-			}
-			catch(Exception ex)
-			{
-			}
+			database.closeConnection();
 		}
 	}
 	
@@ -272,19 +261,13 @@ public class ReporterDatabaseUtil
 			updated = updated || updateModStatsTable(database);
 			updated = updated || updatePlayerStatsTable(database);
 		}
-		catch(Exception ex)
+		catch(final Exception e)
 		{
-			ex.printStackTrace();
+			log.error("Error updating Reporter tables!", e);
 		}
 		finally
 		{
-			try
-			{
-				database.closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			database.closeConnection();
 		}
 		
 		return updated;

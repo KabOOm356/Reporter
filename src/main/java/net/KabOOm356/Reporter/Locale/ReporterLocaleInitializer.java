@@ -6,12 +6,16 @@ import java.text.ParseException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.xml.sax.SAXException;
 
 import net.KabOOm356.File.RevisionFile;
 import net.KabOOm356.File.AbstractFiles.UpdateSite;
 import net.KabOOm356.File.AbstractFiles.VersionedNetworkFile.ReleaseLevel;
+import net.KabOOm356.Locale.ConstantsLocale;
 import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Updater.LocaleUpdater;
@@ -23,28 +27,36 @@ import net.KabOOm356.Updater.LocaleUpdater;
  */
 public class ReporterLocaleInitializer implements Runnable
 {
-	private Reporter plugin;
-	private String localeName;
-	private File dataFolder;
-	private boolean autoDownload;
-	private ReleaseLevel lowestLevel;
-	private boolean keepBackup;
+	private static final Logger log = LogManager.getLogger(ReporterLocaleInitializer.class);
+	
+	private final Reporter plugin;
+	private final String localeName;
+	private final File dataFolder;
+	private final boolean autoDownload;
+	private final ReleaseLevel lowestLevel;
+	private final boolean keepBackup;
 	
 	private boolean update = false;
 	
-	private Locale locale;
+	private final Locale locale;
 	
 	/**
 	 * Constructor.
 	 * 
 	 * @param plugin The main {@link Reporter} instance.
 	 * @param localeName The name of the locale.
-	 * @param dataFolder The folder the locale should be in .
+	 * @param dataFolder The folder the locale should be in.
 	 * @param autoDownload If the locale should be automatically download and updated.
 	 * @param lowestLevel The lowest level of {@link ReleaseLevel} that should be downloaded or updated to.
 	 * @param keepBackup Whether the old locale file should be retained after a successful locale update.
 	 */
-	public ReporterLocaleInitializer(Reporter plugin, String localeName, File dataFolder, boolean autoDownload, ReleaseLevel lowestLevel, boolean keepBackup)
+	public ReporterLocaleInitializer(
+			final Reporter plugin,
+			final String localeName,
+			final File dataFolder,
+			final boolean autoDownload,
+			final ReleaseLevel lowestLevel,
+			final boolean keepBackup)
 	{
 		this.plugin = plugin;
 		
@@ -85,7 +97,7 @@ public class ReporterLocaleInitializer implements Runnable
 		if(locale.isInitialized())
 			return locale;
 		
-		if(localeName.equalsIgnoreCase("en_US"))
+		if(localeName.equalsIgnoreCase(ConstantsLocale.ENGLISH_LOCALE))
 		{
 			locale.initialized();
 			return locale;
@@ -95,30 +107,28 @@ public class ReporterLocaleInitializer implements Runnable
 		
 		boolean downloaded = false;
 		
-		if(autoDownload)
-		{
-			try
-			{
+		if(autoDownload) {
+			try {
 				downloaded = downloadOrUpdate(localeFile);
 			}
-			catch (Exception e)
-			{
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + 
-						"Error downloading or updating the locale file!");
-				e.printStackTrace();
+			catch (final Exception e) {
+				log.error(Reporter.getDefaultConsolePrefix() + 
+						"Error downloading or updating the locale file!", e);
 			}
 		}
 		else if(!localeFile.exists())
 		{
-			Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Locale file " + localeName + " does not exist locally!");
-			Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Try setting locale.updates.autoDownload to true in the configuration.");
-			Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Using English default.");
+			log.warn(Reporter.getDefaultConsolePrefix() + "Locale file " + localeName + " does not exist locally!");
+			log.warn(Reporter.getDefaultConsolePrefix() + "Try setting locale.updates.autoDownload to true in the configuration.");
+			log.warn(Reporter.getDefaultConsolePrefix() + "Using English default.");
 		}
 		
 		if(!localeFile.exists())
 			localeFile = null;
 	
-		RevisionFile localeBackupFile = new RevisionFile(dataFolder, localeName+".yml.backup");
+		final RevisionFile localeBackupFile = new RevisionFile(
+				dataFolder,
+				localeName + ConstantsLocale.LOCALE_FILE_EXTENSION + ConstantsLocale.BACKUP_FILE_EXTENSION);
 		
 		localeBackupFile.incrementToLatestRevision();
 		
@@ -126,7 +136,7 @@ public class ReporterLocaleInitializer implements Runnable
 		{
 			if(localeFile != null)
 			{
-				Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Loading locale file: " + localeFile.getName());
+				log.info(Reporter.getDefaultConsolePrefix() + "Loading locale file: " + localeFile.getName());
 				
 				locale.load(localeFile);
 				
@@ -134,31 +144,29 @@ public class ReporterLocaleInitializer implements Runnable
 				{
 					if(!keepBackup)
 					{
-						Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Purging backup file " + localeBackupFile.getFileName());
+						log.info(Reporter.getDefaultConsolePrefix() + "Purging backup file " + localeBackupFile.getFileName());
 						localeBackupFile.delete();
 					}
 					else
-						Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Retaining backup file " + localeBackupFile.getFileName());
+						log.info(Reporter.getDefaultConsolePrefix() + "Retaining backup file " + localeBackupFile.getFileName());
 				}
 			}
 		}
-		catch(Exception ex)
+		catch(Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.ERROR, Reporter.getDefaultConsolePrefix() + "There was an error loading " + localeFile.getName(), e);
 			
-			Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "There was an error loading " + localeFile.getName());
-			
-			if(ex.getMessage().contains("unacceptable character"))
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Try converting the file to UTF-8 without BOM (Byte Order Marks) then try to reload it.");
+			if(e.getMessage().contains(ConstantsLocale.CONVERT_LOCALE_EXCEPTION_MESSAGE))
+				log.warn(Reporter.getDefaultConsolePrefix() + "Try converting the file to UTF-8 without BOM (Byte Order Marks) then try to reload it.");
 			else
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Please let the author know this.");
+				log.warn(Reporter.getDefaultConsolePrefix() + "Please let the author know this.");
 			
 			if(update)
 			{
 				this.restoreBackup(localeFile, localeBackupFile);
 			}
 			else
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Using English default.");
+				log.warn(Reporter.getDefaultConsolePrefix() + "Using English default.");
 		}
 		
 		locale.initialized();
@@ -175,7 +183,7 @@ public class ReporterLocaleInitializer implements Runnable
 	 * 
 	 * @throws IOException
 	 */
-	private LocaleUpdater initUpdater(File localeFile) throws IOException
+	private LocaleUpdater initUpdater(final File localeFile) throws IOException
 	{
 		String localLocaleVersion = "1";
 		try
@@ -183,9 +191,9 @@ public class ReporterLocaleInitializer implements Runnable
 			YamlConfiguration localLocale = YamlConfiguration.loadConfiguration(localeFile);
 			localLocaleVersion = localLocale.getString("locale.info.version", "1");
 		}
-		catch(Exception ex)
+		catch(final Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.WARN, "Failed to pre-load locale file!", e);
 		}
 		
 		UpdateSite localeXMLUpdateSite = Reporter.getLocaleXMLUpdateSite();
@@ -210,20 +218,16 @@ public class ReporterLocaleInitializer implements Runnable
 	 * @throws ParseException
 	 * @throws IOException
 	 */
-	private boolean downloadOrUpdate(File localeFile) throws ParserConfigurationException, SAXException, ParseException, IOException
+	private boolean downloadOrUpdate(final File localeFile) throws ParserConfigurationException, SAXException, ParseException, IOException
 	{
-		LocaleUpdater updater = initUpdater(localeFile);
+		final LocaleUpdater updater = initUpdater(localeFile);
 		
-		if(localeFile.exists())
-		{
+		if(localeFile.exists()) {
 			update = true;
-			
 			return updater.localeUpdateProcess(localeFile);
 		}
-		else
-		{
+		else {
 			update = false;
-			
 			return updater.localeDownloadProcess(localeFile);
 		}
 	}
@@ -234,24 +238,24 @@ public class ReporterLocaleInitializer implements Runnable
 	 * @param localeFile The file the main locale resides.
 	 * @param localeBackupFile The backup {@link RevisionFile} for the locale.
 	 */
-	private void restoreBackup(File localeFile, RevisionFile localeBackupFile)
+	private void restoreBackup(final File localeFile, final RevisionFile localeBackupFile)
 	{
 		if(!localeBackupFile.exists())
 		{
-			Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "The backup file does not exist.");
-			Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Using English default.");
+			log.warn(Reporter.getDefaultConsolePrefix() + "The backup file does not exist.");
+			log.warn(Reporter.getDefaultConsolePrefix() + "Using English default.");
 		}
 		else
 		{
 			boolean loadSuccessful = attemptToLoadBackups(localeFile, localeBackupFile);
 			
 			if(loadSuccessful)
-				Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Successfully restored and loaded backup file.");
+				log.info(Reporter.getDefaultConsolePrefix() + "Successfully restored and loaded backup file.");
 			else
 			{
 				localeFile.delete();
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Failed to restore backups.");
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Using English default.");
+				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to restore backups.");
+				log.warn(Reporter.getDefaultConsolePrefix() + "Using English default.");
 			}
 		}
 	}
@@ -266,7 +270,7 @@ public class ReporterLocaleInitializer implements Runnable
 	 * 
 	 * @return True on successful load and restore of one of the backups, otherwise false.
 	 */
-	private boolean attemptToLoadBackups(File localeFile, RevisionFile localeBackupFile)
+	private boolean attemptToLoadBackups(final File localeFile, final RevisionFile localeBackupFile)
 	{
 		boolean loadSuccessful = false;
 		
@@ -275,7 +279,7 @@ public class ReporterLocaleInitializer implements Runnable
 		
 		do
 		{
-			Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Attempting to restore backup revision: " + localeBackupFile.getRevision());
+			log.info(Reporter.getDefaultConsolePrefix() + "Attempting to restore backup revision: " + localeBackupFile.getRevision());
 			
 			localeBackupFile.renameTo(localeFile);
 			localeBackupFile.delete();
@@ -284,10 +288,9 @@ public class ReporterLocaleInitializer implements Runnable
 			{
 				locale.load(localeFile);
 			}
-			catch(Exception e) // On error reset locale and decrement the backup revision.
+			catch(final Exception e) // On error reset locale and decrement the backup revision.
 			{
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + e.getMessage());
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Failed to load backup revision: " + localeBackupFile.getRevision());
+				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to load backup revision: " + localeBackupFile.getRevision(), e);
 				localeBackupFile.decrementRevision();
 				loadSuccessful = false;
 			}
@@ -310,6 +313,6 @@ public class ReporterLocaleInitializer implements Runnable
 		if(localeName.contains("."))
 			localeName = localeName.substring(0, localeName.indexOf("."));
 		
-		return new File(dataFolder, localeName + ".yml");
+		return new File(dataFolder, localeName + ConstantsLocale.LOCALE_FILE_EXTENSION);
 	}
 }

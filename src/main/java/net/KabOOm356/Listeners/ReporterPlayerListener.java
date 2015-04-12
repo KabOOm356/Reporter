@@ -15,6 +15,9 @@ import net.KabOOm356.Runnable.ListOnLoginThread;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -30,7 +33,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
  */
 public class ReporterPlayerListener implements Listener
 {
-	private Reporter plugin;
+	private static final Logger log = LogManager.getLogger(ReporterPlayerListener.class);
+	
+	private final Reporter plugin;
 
 	/**
 	 * Constructor.
@@ -154,13 +159,10 @@ public class ReporterPlayerListener implements Listener
 		
 		SQLResultSet result = null;
 		
-		try
-		{
+		try {
 			result = plugin.getDatabaseHandler().sqlQuery(query);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to execute sql query!", e);
 			return false;
 		}
 		
@@ -177,13 +179,10 @@ public class ReporterPlayerListener implements Listener
 		
 		SQLResultSet result = null;
 		
-		try
-		{
+		try {
 			result = plugin.getDatabaseHandler().sqlQuery(query);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to execute sql query!", e);
 			return;
 		}
 		

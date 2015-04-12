@@ -18,6 +18,9 @@ import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -30,6 +33,8 @@ import org.bukkit.entity.Player;
 
 public class DeleteCommand extends ReporterCommand
 {
+	private static final Logger log = LogManager.getLogger(DeleteCommand.class);
+	
 	private static final String name = "Delete";
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.delete";
@@ -128,21 +133,15 @@ public class DeleteCommand extends ReporterCommand
 			
 			getManager().getMessageManager().removeMessage(index);
 		}
-		catch (Exception ex)
+		catch (final Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.ERROR, "Failed to delete report!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		if(BukkitUtil.isOfflinePlayer(sender))
@@ -221,10 +220,10 @@ public class DeleteCommand extends ReporterCommand
 			}
 			
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
+			log.log(Level.ERROR, "Failed to delete reports for a player!", e);
 			sender.sendMessage(getErrorMessage());
-			e.printStackTrace();
 			return;
 		}
 	}
@@ -239,7 +238,8 @@ public class DeleteCommand extends ReporterCommand
 	
 	private String getSelectQuery(CommandSender sender, OfflinePlayer player, PlayerDeletionType deletion)
 	{
-		String query = "SELECT ID FROM Reports WHERE ";
+		final StringBuilder query = new StringBuilder();
+		query.append("SELECT ID FROM Reports WHERE ");
 		ModLevel level = getManager().getModLevel(sender);
 		
 		if(sender.isOp() || sender instanceof ConsoleCommandSender)
@@ -247,60 +247,58 @@ public class DeleteCommand extends ReporterCommand
 			if(player.getName().equalsIgnoreCase("* (Anonymous)"))
 			{
 				if(deletion == PlayerDeletionType.REPORTED)
-					query += "Reported != '" + player.getName() + "'";
+					query.append("Reported != '").append(player.getName()).append("'");
 				else if(deletion == PlayerDeletionType.SENDER)
-					query += "Sender != '" + player.getName() + "'";
+					query.append("Sender != '").append(player.getName()).append("'");
 			}
 			else
 			{
 				if(deletion == PlayerDeletionType.REPORTED)
-					query += "ReportedUUID != '" + player.getUniqueId() + "'";
+					query.append("ReportedUUID != '").append(player.getUniqueId()).append("'");
 				else if(deletion == PlayerDeletionType.SENDER)
-					query += "SenderUUID != '" + player.getUniqueId() + "'";
+					query.append("SenderUUID != '").append(player.getUniqueId()).append("'");
 			}
 		}
 		else
 		{
-			query += "NOT (Priority <= " + level.getLevel() + " " +
-					"AND " +
-					"(ClaimStatus = 0 " +
-					"OR " +
-					"ClaimPriority < " + level.getLevel() + " " +
-					"OR ";
+			query.append("NOT (Priority <= ").append(level.getLevel())
+					.append(" AND (ClaimStatus = 0 OR ClaimPriority < ").append(level.getLevel())
+					.append(" OR ");
 			
 			if(BukkitUtil.isPlayer(sender))
 			{
 				Player senderPlayer = (Player) sender;
 				
-				query += "ClaimedByUUID = '" + senderPlayer.getUniqueId() + "') ";
+				query.append("ClaimedByUUID = '").append(senderPlayer.getUniqueId()).append("') ");
 			}
 			else
 			{
-				query += "ClaimedBy = '" + sender.getName() + "') ";
+				query.append("ClaimedBy = '").append(sender.getName()).append("') ");
 			}
 			
 			if(player.getName().equalsIgnoreCase("* (Anonymous)"))
 			{
 				if(deletion == PlayerDeletionType.REPORTED)
-					query += "AND Reported = '" + player.getName() + "')";
+					query.append("AND Reported = '").append(player.getName()).append("')");
 				else if(deletion == PlayerDeletionType.SENDER)
-					query += "AND Sender = '" + player.getName() + "')";
+					query.append("AND Sender = '").append(player.getName()).append("')");
 			}
 			else
 			{
 				if(deletion == PlayerDeletionType.REPORTED)
-					query += "AND ReportedUUID = '" + player.getUniqueId() + "')";
+					query.append("AND ReportedUUID = '").append(player.getUniqueId()).append("')");
 				else if(deletion == PlayerDeletionType.SENDER)
-					query += "AND SenderUUID = '" + player.getUniqueId() + "')";
+					query.append("AND SenderUUID = '").append(player.getUniqueId()).append("')");
 			}
 		}
 		
-		return query;
+		return query.toString();
 	}
 	
 	private String getDeleteQuery(CommandSender sender, OfflinePlayer player, PlayerDeletionType deletion)
 	{
-		String query = "DELETE FROM Reports WHERE ";
+		final StringBuilder query = new StringBuilder();
+		query.append("DELETE FROM Reports WHERE ");
 		ModLevel level = getManager().getModLevel(sender);
 		
 		if(sender.isOp() || sender instanceof ConsoleCommandSender)
@@ -308,55 +306,53 @@ public class DeleteCommand extends ReporterCommand
 			if(player.getName().equals("* (Anonymous)"))
 			{
 				if(deletion == PlayerDeletionType.REPORTED)
-					query += "Reported = '" + player.getName() + "'";
+					query.append("Reported = '").append(player.getName()).append("'");
 				else if(deletion == PlayerDeletionType.SENDER)
-					query += "Sender = '" + player.getName() + "'";
+					query.append("Sender = '").append(player.getName()).append("'");
 			}
 			else
 			{
 				if(deletion == PlayerDeletionType.REPORTED)
-					query += "ReportedUUID = '" + player.getUniqueId() + "'";
+					query.append("ReportedUUID = '").append(player.getUniqueId()).append("'");
 				else if(deletion == PlayerDeletionType.SENDER)
-					query += "SenderUUID = '" + player.getUniqueId() + "'";
+					query.append("SenderUUID = '").append(player.getUniqueId()).append("'");
 			}
 		}
 		else
 		{
-			query += "(Priority <= " + level.getLevel() + " " +
-					"AND " +
-					"(ClaimStatus = 0 " +
-					"OR " +
-					"ClaimPriority < " + level.getLevel() + " " +
-					"OR ";
+			query.append("(Priority <= ").append(level.getLevel())
+					.append(" AND (ClaimStatus = 0 OR ")
+					.append("ClaimPriority < ").append(level.getLevel())
+					.append(" OR ");
 			
 			if(BukkitUtil.isPlayer(sender))
 			{
 				Player senderPlayer = (Player) sender;
 				
-				query += "ClaimedByUUID = '" + senderPlayer.getUniqueId() + "') ";
+				query.append("ClaimedByUUID = '").append(senderPlayer.getUniqueId()).append("') ");
 			}
 			else
 			{
-				query += "ClaimedBy = '" + sender.getName() + "') ";
+				query.append("ClaimedBy = '").append(sender.getName()).append("') ");
 			}
 					
 			if(player.getName().equals("* (Anonymous)"))
 			{
 				if(deletion == PlayerDeletionType.REPORTED)
-					query += "AND Reported = '" + player.getName() + "')";
+					query.append("AND Reported = '").append(player.getName()).append("')");
 				else if(deletion == PlayerDeletionType.SENDER)
-					query += "AND Sender = '" + player.getName() + "')";
+					query.append("AND Sender = '").append(player.getName()).append("')");
 			}
 			else
 			{
 				if(deletion == PlayerDeletionType.REPORTED)
-					query += "AND ReportedUUID = '" + player.getUniqueId() + "')";
+					query.append("AND ReportedUUID = '").append(player.getUniqueId()).append("')");
 				else if(deletion == PlayerDeletionType.SENDER)
-					query += "AND SenderUUID = '" + player.getUniqueId() + "')";
+					query.append("AND SenderUUID = '").append(player.getUniqueId()).append("')");
 			}
 		}
 		
-		return query;
+		return query.toString();
 	}
 	
 	private void deleteReportBatch(CommandSender sender, BatchDeletionType deletion)
@@ -403,20 +399,15 @@ public class DeleteCommand extends ReporterCommand
 						totalDeleted);
 			}
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to delete batch of reports!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch (Exception e)
-			{}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 	}
 	
@@ -430,12 +421,7 @@ public class DeleteCommand extends ReporterCommand
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch (Exception e)
-			{}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 	}
 	
@@ -452,16 +438,17 @@ public class DeleteCommand extends ReporterCommand
 	
 	private String getSelectQuery(CommandSender sender, BatchDeletionType deletion)
 	{
-		String query = "SELECT ID FROM Reports WHERE ";
+		final StringBuilder query = new StringBuilder();
+		query.append("SELECT ID FROM Reports WHERE ");
 		
 		if(sender.isOp() || sender instanceof ConsoleCommandSender)
 		{
 			if (deletion == BatchDeletionType.ALL)
-				query += "0";
+				query.append("0");
 			else if (deletion == BatchDeletionType.COMPLETE)
-				query += "CompletionStatus = 0";
+				query.append("CompletionStatus = 0");
 			else if (deletion == BatchDeletionType.INCOMPLETE)
-				query += "CompletionStatus = 1";
+				query.append("CompletionStatus = 1");
 		}
 		else
 		{
@@ -476,56 +463,57 @@ public class DeleteCommand extends ReporterCommand
 			 *    or claimed by another player with a lower modlevel,
 			 *    or claimed by the sender.
 			 */
-			query += "NOT (Priority <= " + level.getLevel() + " " +
-					"AND " +
-					"(ClaimStatus = 0 " +
-					"OR " +
-					"ClaimPriority < " + level.getLevel() + " " +
-					"OR ";
+			query.append("NOT (Priority <= ").append(level.getLevel()).append(" ")
+					.append("AND ")
+					.append("(ClaimStatus = 0 ")
+					.append("OR ")
+					.append("ClaimPriority < ").append(level.getLevel()).append(" ")
+					.append("OR ");
 			
 			if(BukkitUtil.isPlayer(sender))
 			{
 				Player senderPlayer = (Player) sender;
 				
-				query += "ClaimedByUUID = '" + senderPlayer.getUniqueId() + "')";
+				query.append("ClaimedByUUID = '").append(senderPlayer.getUniqueId()).append("')");
 			}
 			else
 			{
-				query += "ClaimedBy = '" + sender.getName() + "')";
+				query.append("ClaimedBy = '").append(sender.getName()).append("')");
 			}
 					
 			
 			if (deletion == BatchDeletionType.ALL)
-				query += ")";
+				query.append(")");
 			else if (deletion == BatchDeletionType.COMPLETE)
 			{
-				query += " " +
-						"AND " +
-						"CompletionStatus = 0)";
+				query.append(" ")
+						.append("AND ")
+						.append("CompletionStatus = 0)");
 			}
 			else if (deletion == BatchDeletionType.INCOMPLETE)
 			{
-				query += " " +
-						"AND " +
-						"CompletionStatus = 1)";
+				query.append(" ")
+						.append("AND ")
+						.append("CompletionStatus = 1)");
 			}
 		}
 		
-		return query;
+		return query.toString();
 	}
 	
 	private String getDeleteQuery(CommandSender sender, BatchDeletionType deletion)
 	{
-		String query = "DELETE FROM Reports WHERE ";
+		final StringBuilder query = new StringBuilder();
+		query.append("DELETE FROM Reports WHERE ");
 		
 		if(sender.isOp() || sender instanceof ConsoleCommandSender)
 		{
 			if (deletion == BatchDeletionType.ALL)
-				query += "1";
+				query.append("1");
 			else if (deletion == BatchDeletionType.COMPLETE)
-				query += "CompletionStatus = 1";
+				query.append("CompletionStatus = 1");
 			else if (deletion == BatchDeletionType.INCOMPLETE)
-				query += "CompletionStatus = 0";
+				query.append("CompletionStatus = 0");
 		}
 		else
 		{
@@ -540,42 +528,42 @@ public class DeleteCommand extends ReporterCommand
 			 *    or claimed by another player with a lower modlevel,
 			 *    or claimed by the sender.
 			 */
-			query += "(Priority <= " + level.getLevel() + " " +
-					"AND " +
-					"(ClaimStatus = 0 " +
-					"OR " +
-					"ClaimPriority < " + level.getLevel() + " " +
-					"OR ";
+			query.append("(Priority <= ").append(level.getLevel()).append(" ")
+					.append("AND ")
+					.append("(ClaimStatus = 0 ")
+					.append("OR ")
+					.append("ClaimPriority < ").append(level.getLevel()).append(" ")
+					.append("OR ");
 			
 			if(BukkitUtil.isPlayer(sender))
 			{
 				Player senderPlayer = (Player) sender;
 				
-				query += "ClaimedByUUID = '" + senderPlayer.getUniqueId() + "')";
+				query.append("ClaimedByUUID = '").append(senderPlayer.getUniqueId()).append("')");
 			}
 			else
 			{
-				query += "ClaimedBy = '" + sender.getName() + "')";
+				query.append("ClaimedBy = '").append(sender.getName()).append("')");
 			}
 			
 			// Append on the rest of the query to perform the required deletion type.
 			if (deletion == BatchDeletionType.ALL)
-				query += ")";
+				query.append(")");
 			else if (deletion == BatchDeletionType.COMPLETE)
 			{
-				query += " " +
-						"AND " +
-						"CompletionStatus = 1)";
+				query.append(" ")
+						.append("AND ")
+						.append("CompletionStatus = 1)");
 			}
 			else if (deletion == BatchDeletionType.INCOMPLETE)
 			{
-				query += " " +
-						"AND " +
-						"CompletionStatus = 0)";
+				query.append(" ")
+						.append("AND ")
+						.append("CompletionStatus = 0)");
 			}
 		}
 		
-		return query;
+		return query.toString();
 	}
 	
 	private ArrayList<Integer> getRemainingIndexes(CommandSender sender, BatchDeletionType deletion) throws ClassNotFoundException, SQLException
@@ -593,13 +581,7 @@ public class DeleteCommand extends ReporterCommand
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		return remainingIDs;
@@ -629,7 +611,7 @@ public class DeleteCommand extends ReporterCommand
 	
 	private void reformatTables(CommandSender sender, ArrayList<Integer> remainingIndexes)
 	{
-		String query;
+		StringBuilder query;
 		Statement stmt = null;
 		
 		try
@@ -638,16 +620,17 @@ public class DeleteCommand extends ReporterCommand
 			
 			for(int LCV = 0; LCV < remainingIndexes.size(); LCV++)
 			{
-				query = "UPDATE Reports SET ID=" + (LCV+1) + " WHERE ID=" + remainingIndexes.get(LCV);
+				query = new StringBuilder();
+				query.append("UPDATE Reports SET ID=").append((LCV+1)).append(" WHERE ID=").append(remainingIndexes.get(LCV));
 				
-				stmt.addBatch(query);
+				stmt.addBatch(query.toString());
 			}
 			
 			stmt.executeBatch();
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed reformatting tables after batch delete!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
@@ -662,13 +645,7 @@ public class DeleteCommand extends ReporterCommand
 			{
 			}
 			
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch (Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
@@ -682,30 +659,25 @@ public class DeleteCommand extends ReporterCommand
 		
 		try
 		{
-			String formatQuery;
+			StringBuilder formatQuery;
 			
 			for (int LCV = removedIndex; LCV <= count; LCV++)
 			{
-				formatQuery = "UPDATE Reports SET ID=" + LCV + " WHERE ID=" + (LCV+1);
+				formatQuery = new StringBuilder();
+				formatQuery.append("UPDATE Reports SET ID=").append(LCV).append(" WHERE ID=").append((LCV+1));
 				
-				getManager().getDatabaseHandler().updateQuery(formatQuery);
+				getManager().getDatabaseHandler().updateQuery(formatQuery.toString());
 			}
 		}
-		catch(Exception ex)
+		catch(final Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.ERROR, "Failed to reformat table after delete!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		if(count != -1)

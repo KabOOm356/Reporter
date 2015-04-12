@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.KabOOm356</groupId>
   <artifactId>Reporter</artifactId>
-  <version>1.0.7</version>
+  <version>1.0.8-SNAPSHOT</version>
   <properties>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   	<project.mainClass>net.KabOOm356.Reporter.Reporter</project.mainClass>
@@ -69,6 +69,12 @@
       <artifactId>metrics</artifactId>
       <version>R7</version>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.logging.log4j</groupId>
+    	<artifactId>log4j-core</artifactId>
+    	<version>2.0-beta9</version>
+    	<scope>provided</scope>
     </dependency>
   </dependencies>
   <repositories>

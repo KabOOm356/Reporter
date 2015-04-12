@@ -4,6 +4,10 @@ package net.KabOOm356.Reporter.Database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.KabOOm356.Database.Database;
 import net.KabOOm356.Database.DatabaseType;
 import net.KabOOm356.Database.SQLResultSet;
@@ -11,6 +15,8 @@ import net.KabOOm356.Reporter.Reporter;
 
 public class MigrateToVersion9
 {
+	private static final Logger log = LogManager.getLogger(MigrateToVersion9.class);
+	
 	protected static boolean migrateToVersion9(Database database)
 	{
 		boolean updated = false;
@@ -34,19 +40,12 @@ public class MigrateToVersion9
 		}
 		catch(Exception ex)
 		{
-			ex.printStackTrace();
-			Reporter.getLog().severe(Reporter.getDefaultConsolePrefix() + "An error occured while upgrading database data to version 9!");
-			Reporter.getLog().severe(Reporter.getDefaultConsolePrefix() + "If you receive more errors, you may have to delete your database!");
+			log.log(Level.FATAL, Reporter.getDefaultConsolePrefix() + "An error occured while upgrading database data to version 9!", ex);
+			log.log(Level.FATAL, Reporter.getDefaultConsolePrefix() + "If you receive more errors, you may have to delete your database!");
 		}
 		finally
 		{
-			try
-			{
-				database.closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			database.closeConnection();
 		}
 		
 		return updated;
@@ -114,14 +113,15 @@ public class MigrateToVersion9
 			}
 			finally
 			{
-				try
-				{
+				try {
 					rs.close();
-					database.closeConnection();
+				} catch (final SQLException e) {
+					if (log.isDebugEnabled()) {
+						log.log(Level.WARN, "Failed to close ResultSet!", e);
+					}
 				}
-				catch(SQLException e)
-				{
-				}
+				
+				database.closeConnection();
 			}
 			
 			boolean sender = cols.get(columnName, "Sender").getString(columnSize).contains("32");

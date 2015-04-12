@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
@@ -20,6 +23,8 @@ import net.KabOOm356.Reporter.Reporter;
  */
 public class MigrateToVersion8
 {
+	private static final Logger log = LogManager.getLogger(MigrateToVersion8.class);
+	
 	protected static boolean migrateToVersion8(Database database)
 	{
 		boolean updated = false;
@@ -43,19 +48,12 @@ public class MigrateToVersion8
 		}
 		catch(Exception ex)
 		{
-			ex.printStackTrace();
-			Reporter.getLog().severe(Reporter.getDefaultConsolePrefix() + "An error occured while upgrading database data to version 8!");
-			Reporter.getLog().severe(Reporter.getDefaultConsolePrefix() + "If you receive more errors, you may have to delete your database!");
+			log.log(Level.FATAL, Reporter.getDefaultConsolePrefix() + "An error occured while upgrading database data to version 8!", ex);
+			log.log(Level.FATAL, Reporter.getDefaultConsolePrefix() + "If you receive more errors, you may have to delete your database!");
 		}
 		finally
 		{
-			try
-			{
-				database.closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			database.closeConnection();
 		}
 		
 		return updated;

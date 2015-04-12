@@ -10,6 +10,9 @@ import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Runnable.Timer.ReportTimer;
 import net.KabOOm356.Util.BukkitUtil;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -21,6 +24,8 @@ import org.bukkit.entity.Player;
  */
 public class ReportLimitManager
 {
+	private static final Logger log = LogManager.getLogger(ReportLimitManager.class);
+	
 	/** An instance of the main class. */
 	private Reporter plugin;
 	
@@ -257,7 +262,7 @@ public class ReportLimitManager
 					
 					output = output.replaceAll("%p", player.getName());
 					
-					Reporter.getLog().info(Reporter.getLogPrefix() + output);
+					log.log(Level.INFO, Reporter.getLogPrefix() + output);
 				}
 				
 				alert = limitReportsAgainstPlayers && !canReport(sender, reportedPlayer);
@@ -270,7 +275,7 @@ public class ReportLimitManager
 					output = output.replaceAll("%p", player.getName());
 					output = output.replaceAll("%r", BukkitUtil.formatPlayerName(reportedPlayer));
 					
-					Reporter.getLog().info(Reporter.getLogPrefix() + output);
+					log.log(Level.INFO, Reporter.getLogPrefix() + output);
 				}
 			}
 		}
@@ -430,7 +435,7 @@ public class ReportLimitManager
 			// Alert console if configured to
 			if(alertConsoleWhenAllowedToReportAgain)
 			{
-				Reporter.getLog().info(Reporter.getLogPrefix() +
+				log.log(Level.INFO, Reporter.getLogPrefix() +
 					expired.getPlayer().getName() + " is now allowed to report again!");
 			}
 		}
@@ -457,7 +462,7 @@ public class ReportLimitManager
 				output = output.replaceAll("%p", BukkitUtil.formatPlayerName(expired.getPlayer()));
 				output = output.replaceAll("%r", BukkitUtil.formatPlayerName(expired.getReported()));
 				
-				Reporter.getLog().info(Reporter.getLogPrefix() + output);
+				log.log(Level.INFO, Reporter.getLogPrefix() + output);
 			}
 		}
 		

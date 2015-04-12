@@ -3,6 +3,9 @@ package net.KabOOm356.Command.Commands;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -24,6 +27,8 @@ import net.KabOOm356.Util.Util;
  */
 public class MoveCommand extends ReporterCommand
 {
+	private static final Logger log = LogManager.getLogger(MoveCommand.class);
+	
 	private static final String name = "Move";
 	private static final int minimumNumberOfArguments = 2;
 	private final static String permissionNode = "reporter.move";
@@ -72,6 +77,7 @@ public class MoveCommand extends ReporterCommand
 	
 	protected void moveReport(CommandSender sender, int index, ModLevel level)
 	{
+		// LOW Long String concatenation.
 		String query = "SELECT ClaimStatus, ClaimedByUUID, ClaimPriority "
 				+ "FROM Reports "
 				+ "WHERE ID=" + index;
@@ -95,6 +101,7 @@ public class MoveCommand extends ReporterCommand
 			if(isClaimed && level.getLevel() > currentPriority)
 			{
 				// Clear the claim and upgrade the priority
+				// LOW Long String concatenation.
 				query = "UPDATE Reports " +
 						"SET " +
 						"ClaimStatus='0', " +
@@ -127,6 +134,7 @@ public class MoveCommand extends ReporterCommand
 			}
 			else
 			{
+				// LOW Long String concatenation.
 				query = "UPDATE Reports " +
 						"SET " +
 						"Priority = " + level.getLevel() + " " +
@@ -135,21 +143,15 @@ public class MoveCommand extends ReporterCommand
 			
 			getManager().getDatabaseHandler().updateQuery(query);
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to move report priority!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		String output = getManager().getLocale().getString(MovePhrases.moveReportSuccess);

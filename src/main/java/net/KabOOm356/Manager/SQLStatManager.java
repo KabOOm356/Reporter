@@ -5,6 +5,9 @@ import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.OfflinePlayer;
 
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -19,6 +22,8 @@ import net.KabOOm356.Util.BukkitUtil;
  */
 public class SQLStatManager
 {
+	private static final Logger log = LogManager.getLogger(SQLStatManager.class);
+	
 	/**
 	 * A class that represents a statistic column in an SQL database.
 	 */
@@ -129,10 +134,10 @@ public class SQLStatManager
 						
 						stats.add(stat);
 					}
-				}
-				catch(IllegalAccessException e)
-				{
-					e.printStackTrace();
+				} catch(final IllegalAccessException e) {
+					if (log.isDebugEnabled()) {
+						log.log(Level.WARN, "Could not access field: " + f.getName(), e);
+					}
 				}
 			}
 			
@@ -234,23 +239,12 @@ public class SQLStatManager
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 		
-		try
-		{
+		try {
 			getDatabase().preparedUpdateQuery(query, params);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			try
-			{
-				getDatabase().closeConnection();
-			}
-			catch (SQLException e)
-			{
-			}
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Could not execute prepared update query!", e);
+		} finally {
+			getDatabase().closeConnection();
 		}
 	}
 	
@@ -294,23 +288,12 @@ public class SQLStatManager
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 		
-		try
-		{
+		try {
 			getDatabase().preparedUpdateQuery(query, params);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			try
-			{
-				getDatabase().closeConnection();
-			}
-			catch (SQLException e)
-			{
-			}
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to execute prepared update query!", e);
+		} finally {
+			getDatabase().closeConnection();
 		}
 	}
 	
@@ -339,23 +322,12 @@ public class SQLStatManager
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 		
-		try
-		{
+		try {
 			getDatabase().preparedUpdateQuery(query, params);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			try
-			{
-				getDatabase().closeConnection();
-			}
-			catch (SQLException e)
-			{
-			}
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to execute prepared update query!", e);
+		} finally {
+			getDatabase().closeConnection();
 		}
 	}
 	
@@ -384,29 +356,17 @@ public class SQLStatManager
 		
 		ResultRow resultRow = new ResultRow();
 		
-		try
-		{
+		try {
 			SQLResultSet result = getDatabase().preparedSQLQuery(query, params);
 			
-			if(result != null && !result.isEmpty())
-			{
+			if(result != null && !result.isEmpty()) {
 				resultRow = result.get(SQLResultSet.FIRSTROW);
 			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
+		} catch(final Exception e) {
+			log.log(Level.ERROR, "Failed to get SQL stat!", e);
 			return null;
-		}
-		finally
-		{
-			try
-			{
-				getDatabase().closeConnection();
-			}
-			catch (SQLException e)
-			{
-			}
+		} finally {
+			getDatabase().closeConnection();
 		}
 		
 		return resultRow;
@@ -445,24 +405,20 @@ public class SQLStatManager
 	 */
 	protected void addRow(OfflinePlayer player)
 	{
-		try
-		{
+		try {
 			SQLResultSet rs = getIndex(player);
 			
-			if(rs.isEmpty())
-			{
+			if(rs.isEmpty()) {
 				String query = "INSERT INTO " + tableName + " "
 						+ "(" + indexColumn + "," + secondaryIndexColumn + ") "
 						+ "VALUES (?,?)";
 				
 				ArrayList<String> params = new ArrayList<String>();
 				
-				if(BukkitUtil.isPlayerValid(player))
-				{
+				if(BukkitUtil.isPlayerValid(player)) {
 					params.add(player.getUniqueId().toString());
 				}
-				else
-				{
+				else {
 					params.add("");
 				}
 				
@@ -470,20 +426,10 @@ public class SQLStatManager
 				
 				getDatabase().preparedUpdateQuery(query, params);
 			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			try
-			{
-				getDatabase().closeConnection();
-			}
-			catch (SQLException e)
-			{
-			}
+		} catch(final Exception e) {
+			log.log(Level.ERROR, "Failed to insert new SQL stat row!", e);
+		} finally {
+			getDatabase().closeConnection();
 		}
 	}
 	

@@ -12,6 +12,9 @@ import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -21,6 +24,8 @@ import org.bukkit.entity.Player;
  */
 public class ListCommand extends ReporterCommand
 {
+	private static final Logger log = LogManager.getLogger(ListCommand.class);
+	
 	private static final String name = "List";
 	private static final int minimumNumberOfArguments = 0;
 	private final static String permissionNode = "reporter.list";
@@ -72,7 +77,14 @@ public class ListCommand extends ReporterCommand
 		}
 		else if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true))
 		{
-			ArrayList<Integer> indexes = getManager().getViewableReports((Player)sender);
+			ArrayList<Integer> indexes = null;
+			try {
+				indexes = getManager().getViewableReports((Player)sender);
+			} catch (final Exception e) {
+				sender.sendMessage(getErrorMessage());
+				log.log(Level.ERROR, "Failed to list submitted reports!", e);
+				return;
+			}
 			
 			String indexesString = Util.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
 			
@@ -94,6 +106,7 @@ public class ListCommand extends ReporterCommand
 	
 	private void listClaimed(CommandSender sender)
 	{
+		// LOW Long String concatenation.
 		String query = "SELECT COUNT(*) AS Count " +
 				"FROM Reports " +
 				"WHERE ClaimStatus = 1 AND ";
@@ -120,20 +133,15 @@ public class ListCommand extends ReporterCommand
 			
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + message);
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to list claimed reports!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch (Exception e)
-			{}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 	}
 
@@ -144,7 +152,7 @@ public class ListCommand extends ReporterCommand
 		if(BukkitUtil.isPlayer(sender))
 		{
 			Player p = (Player) sender;
-			
+			// LOW Long String concatenation.
 			queryFormat = "SELECT COUNT(*) AS Count " +
 					"FROM Reports " +
 					"WHERE ClaimStatus = 1 " +
@@ -153,6 +161,7 @@ public class ListCommand extends ReporterCommand
 		}
 		else
 		{
+			// LOW Long String concatenation.
 			queryFormat = "SELECT COUNT(*) AS Count " +
 					"FROM Reports " +
 					"WHERE ClaimStatus = 1 " +
@@ -185,20 +194,15 @@ public class ListCommand extends ReporterCommand
 			
 			highPriorityCount = result.getInt("Count");
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to list claimed reports by priority!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch (Exception e)
-			{}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		printClaimedPriorityCount(sender, ModLevel.NONE, noPriorityCount);
@@ -221,6 +225,7 @@ public class ListCommand extends ReporterCommand
 
 	private void listClaimedIndexes(CommandSender sender)
 	{
+		// LOW Long String concatenation.
 		String query = "SELECT ID " +
 				"FROM Reports " +
 				"WHERE ClaimStatus = 1 AND ";
@@ -249,20 +254,15 @@ public class ListCommand extends ReporterCommand
 			
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + message);
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to list claimed report indexes!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch (Exception e)
-			{}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 	}
 
@@ -273,6 +273,7 @@ public class ListCommand extends ReporterCommand
 		if(BukkitUtil.isPlayer(sender))
 		{
 			Player p = (Player) sender;
+			// LOW Long String concatenation.
 			queryFormat += "SELECT ID " +
 					"FROM Reports " +
 					"WHERE " +
@@ -282,6 +283,7 @@ public class ListCommand extends ReporterCommand
 		}
 		else
 		{
+			// LOW Long String concatenation.
 			queryFormat += "SELECT ID " +
 					"FROM Reports " +
 					"WHERE " +
@@ -311,20 +313,15 @@ public class ListCommand extends ReporterCommand
 			result = getManager().getDatabaseHandler().sqlQuery(queryFormat + ModLevel.HIGH.getLevel());
 			highPriorityIndexes = Util.indexesToString(result, "ID", ModLevel.HIGH.getColor(), ChatColor.WHITE);
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to list claimed report indexes by priority!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch (Exception e)
-			{}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		printClaimedPriorityIndexes(sender, ModLevel.NONE, noPriorityIndexes);
@@ -368,9 +365,9 @@ public class ListCommand extends ReporterCommand
 			normalPriorityCount = getManager().getNumberOfPriority(ModLevel.NORMAL);
 			highPriorityCount = getManager().getNumberOfPriority(ModLevel.HIGH);
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to list reports by priority!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
@@ -407,9 +404,9 @@ public class ListCommand extends ReporterCommand
 			normalPriorityIndexes = getManager().getIndexesOfPriority(ModLevel.NORMAL);
 			highPriorityIndexes = getManager().getIndexesOfPriority(ModLevel.HIGH);
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to list report indexes by priority!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
@@ -447,8 +444,16 @@ public class ListCommand extends ReporterCommand
 		String listString = BukkitUtil.colorCodeReplaceAll(
 				getManager().getLocale().getString(ListPhrases.reportList));
 		
-		int incompleteReports = getManager().getIncompleteReports();
-		int completeReports = getManager().getCompletedReports();
+		int incompleteReports;
+		int completeReports;
+		try {
+			incompleteReports = getManager().getIncompleteReports();
+			completeReports = getManager().getCompletedReports();
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to get number of complete and incomplete reports!", e);
+			sender.sendMessage(getErrorMessage());
+			return;
+		}
 		
 		if(completeReports != -1 && incompleteReports != -1)
 		{
@@ -469,8 +474,16 @@ public class ListCommand extends ReporterCommand
 	
 	private void listIndexes(CommandSender sender)
 	{
-		ArrayList<Integer> completeIndexes = getManager().getCompletedReportIndexes();
-		ArrayList<Integer> incompleteIndexes = getManager().getIncompleteReportIndexes();
+		ArrayList<Integer> completeIndexes;
+		ArrayList<Integer> incompleteIndexes;
+		try {
+			completeIndexes = getManager().getCompletedReportIndexes();
+			incompleteIndexes = getManager().getIncompleteReportIndexes();
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to get number of complete and incomplete reports!", e);
+			sender.sendMessage(getErrorMessage());
+			return;
+		}
 		
 		String complete = Util.indexesToString(completeIndexes, ChatColor.GREEN, ChatColor.WHITE);
 		String incomplete = Util.indexesToString(incompleteIndexes, ChatColor.RED, ChatColor.WHITE);

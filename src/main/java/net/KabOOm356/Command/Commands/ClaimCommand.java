@@ -3,6 +3,9 @@ package net.KabOOm356.Command.Commands;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -20,6 +23,8 @@ import net.KabOOm356.Util.Util;
  */
 public class ClaimCommand extends ReporterCommand
 {
+	private static final Logger log = LogManager.getLogger(ClaimCommand.class);
+	
 	private static final String name = "Claim";
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.claim";
@@ -82,19 +87,13 @@ public class ClaimCommand extends ReporterCommand
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to claim report!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		String output = getManager().getLocale().getString(ClaimPhrases.reportClaimSuccess);

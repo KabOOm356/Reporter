@@ -3,6 +3,9 @@ package net.KabOOm356.Command.Commands;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -23,6 +26,8 @@ import net.KabOOm356.Util.Util;
  */
 public class UnclaimCommand extends ReporterCommand
 {
+	private static final Logger log = LogManager.getLogger(UnclaimCommand.class);
+	
 	private static final String name = "Unclaim";
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.claim";
@@ -130,14 +135,11 @@ public class UnclaimCommand extends ReporterCommand
 				return false;
 			}
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to unclaim report!", e);
 			sender.sendMessage(getErrorMessage());
 			return false;
-		}
-		finally
-		{
 		}
 		
 		return true;
@@ -154,21 +156,15 @@ public class UnclaimCommand extends ReporterCommand
 		{
 			getManager().getDatabaseHandler().updateQuery(query);
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to unclaim report!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		String output = getManager().getLocale().getString(UnclaimPhrases.reportUnclaimSuccess);

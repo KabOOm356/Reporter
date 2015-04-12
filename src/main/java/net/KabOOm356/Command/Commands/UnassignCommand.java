@@ -3,6 +3,9 @@ package net.KabOOm356.Command.Commands;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -22,9 +25,11 @@ import net.KabOOm356.Util.Util;
  */
 public class UnassignCommand extends ReporterCommand
 {
-	private final static String name = "Unassign";
-	private final static int minimumNumberOfArguments = 1;
-	private final static String permissionNode = "reporter.unassign";
+	private static final Logger log = LogManager.getLogger(UnassignCommand.class);
+	
+	private static final String name = "Unassign";
+	private static final int minimumNumberOfArguments = 1;
+	private static final String permissionNode = "reporter.unassign";
 	
 	/**
 	 * Constructor.
@@ -65,6 +70,7 @@ public class UnassignCommand extends ReporterCommand
 
 	private void unassignReport(CommandSender sender, int index)
 	{
+		// LOW Long String concatenation.
 		String query = "SELECT ClaimedByUUID, ClaimedBy FROM Reports WHERE ID=" + index;
 		String claimedByUUID, claimedBy;
 		
@@ -82,21 +88,15 @@ public class UnassignCommand extends ReporterCommand
 			
 			getManager().getDatabaseHandler().updateQuery(query);
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to unassign report!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		String playerName = claimedBy;

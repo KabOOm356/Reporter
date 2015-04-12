@@ -1,8 +1,10 @@
 package net.KabOOm356.Command.Commands;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -18,6 +20,8 @@ import net.KabOOm356.Util.Util;
  */
 public class UpgradeCommand extends ReporterCommand
 {
+	private static final Logger log = LogManager.getLogger(UpgradeCommand.class);
+	
 	private static final String name = "Upgrade";
 	private static int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.move";
@@ -87,19 +91,15 @@ public class UpgradeCommand extends ReporterCommand
 			
 			return ModLevel.getByLevel(currentPriorityLevel+1);
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
-			e.printStackTrace();
+			if (log.isDebugEnabled()) { 
+				log.log(Level.WARN, "Failed to get the next highest priority!", e);
+			}
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch (SQLException e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		return ModLevel.UNKNOWN;

@@ -2,6 +2,9 @@ package net.KabOOm356.Permission;
 
 import net.KabOOm356.Reporter.Reporter;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -13,6 +16,8 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
  */
 public class ReporterPermissionManager
 {
+	private static final Logger log = LogManager.getLogger(ReporterPermissionManager.class);
+	
 	/** The type of permissions system being used. */
 	private PermissionType type;
 	
@@ -31,7 +36,7 @@ public class ReporterPermissionManager
 		if(type == null)
 			type = PermissionType.SuperPerms;
 		
-		Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + type + " support enabled.");
+		log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + type + " support enabled.");
 	}
 	
 	/**
@@ -45,8 +50,8 @@ public class ReporterPermissionManager
 			
 			if(permissionsExHandler == null)
 			{
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Failed to obtain PermissionsEx handler.");
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "PermissionsEx support could not be enabled.");
+				log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Failed to obtain PermissionsEx handler.");
+				log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "PermissionsEx support could not be enabled.");
 			}
 			else
 				type = PermissionType.PermissionsEx;

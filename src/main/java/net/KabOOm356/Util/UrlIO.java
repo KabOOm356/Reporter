@@ -28,6 +28,10 @@ public class UrlIO
 	/** The encoding to use when writing files. */
 	public static Charset outputCharset = Charset.forName("UTF-8");
 	
+	public static final String ALPHA = "alpha";
+	public static final String BETA = "beta";
+	public static final String RELEASE_CANDIDATE = "rc";
+	
 	/**
 	 * Returns the response code from the given URLConnection.
 	 * 
@@ -152,7 +156,7 @@ public class UrlIO
 			 * If the release level is appended behind the version separated with a space
 			 * append it to the numeral version and re-parse for a space.
 			 */
-			if(version.equalsIgnoreCase("alpha") || version.equalsIgnoreCase("beta") || version.equalsIgnoreCase("rc"))
+			if(version.equalsIgnoreCase(ALPHA) || version.equalsIgnoreCase(BETA) || version.equalsIgnoreCase(RELEASE_CANDIDATE))
 				version = getVersion(fileName + "-" + version);
 			
 			return version;

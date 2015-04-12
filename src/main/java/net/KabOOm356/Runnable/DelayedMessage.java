@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
 public class DelayedMessage implements Runnable
 {
 	/** The {@link Player} to send the message to. */
-	private Player player;
+	private final Player player;
 	/** The message to send the {@link Player}. */
-	private String message;
+	private final String message;
 	
 	/**
 	 * Constructor
@@ -18,7 +18,7 @@ public class DelayedMessage implements Runnable
 	 * @param player The {@link Player} to send the message to.
 	 * @param message The message to send the {@link Player}.
 	 */
-	public DelayedMessage(Player player, String message)
+	public DelayedMessage(final Player player, final String message)
 	{
 		this.player = player;
 		this.message = message;

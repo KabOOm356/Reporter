@@ -11,9 +11,9 @@ import org.bukkit.entity.Player;
 public class ListOnLoginThread implements Runnable
 {
 	/** The {@link ReporterCommandManager} that will give this thread the {@link net.KabOOm356.Command.Commands.ListCommand} to execute. */
-	private ReporterCommandManager manager;
+	private final ReporterCommandManager manager;
 	/** The {@link Player} to execute the {@link net.KabOOm356.Command.Commands.ListCommand} for. */
-	private Player player;
+	private final Player player;
 	
 	/**
 	 * Constructor

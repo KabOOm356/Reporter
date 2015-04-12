@@ -83,7 +83,7 @@ public class DatabaseHandler implements DatabaseInterface
 		database.openConnection();
 	}
 	
-	public void closeConnection() throws SQLException
+	public void closeConnection()
 	{
 		database.closeConnection();
 	}

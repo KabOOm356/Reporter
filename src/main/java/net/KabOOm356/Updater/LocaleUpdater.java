@@ -13,11 +13,15 @@ import net.KabOOm356.File.RevisionFile;
 import net.KabOOm356.File.AbstractFiles.UpdateSite;
 import net.KabOOm356.File.AbstractFiles.VersionedNetworkFile;
 import net.KabOOm356.File.AbstractFiles.VersionedNetworkFile.ReleaseLevel;
+import net.KabOOm356.Locale.ConstantsLocale;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.FileIO;
 import net.KabOOm356.Util.UrlIO;
 import net.KabOOm356.Util.Util;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -29,6 +33,8 @@ import org.xml.sax.SAXException;
  */
 public class LocaleUpdater extends Updater
 {
+	private static final Logger log = LogManager.getLogger(LocaleUpdater.class);
+	
 	/**
 	 * Constructor.
 	 * 
@@ -127,10 +133,10 @@ public class LocaleUpdater extends Updater
 	{
 		String localeName = getName();
 		
-		if(localeName.contains(".yml"))
-			localeName = localeName.substring(0, localeName.indexOf(".yml"));
+		if(localeName.contains(ConstantsLocale.LOCALE_FILE_EXTENSION))
+			localeName = localeName.substring(0, localeName.indexOf(ConstantsLocale.LOCALE_FILE_EXTENSION));
 		
-		Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Checking for file: " + destination.getName());
+		log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Checking for file: " + destination.getName());
 		
 		VersionedNetworkFile downloadFile = null;
 		
@@ -140,19 +146,19 @@ public class LocaleUpdater extends Updater
 		}
 		catch(FileNotFoundException e)
 		{
-			Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Could not find the locale file " + localeName + ".yml!");
+			log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Could not find the locale file " + localeName + ".yml!", e);
 		}
 		
 		if(downloadFile != null)
 		{
-			Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Downloading the locale file: " + localeName + ".yml version " + downloadFile.getVersion() + "...");
+			log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Downloading the locale file: " + localeName + ".yml version " + downloadFile.getVersion() + "...");
 			UrlIO.downloadFile(downloadFile, destination);
-			Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Locale file successfully downloaded.");
+			log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Locale file successfully downloaded.");
 			return true;
 		}
 		
-		Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Failed to download locale file!");
-		Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Using English default.");
+		log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Failed to download locale file!");
+		log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Using English default.");
 		
 		return false;
 	}
@@ -172,9 +178,9 @@ public class LocaleUpdater extends Updater
 		String localeName = getName();
 		
 		if(localeName.contains(".yml"))
-			localeName = localeName.substring(0, localeName.indexOf(".yml"));
+			localeName = localeName.substring(0, localeName.indexOf(ConstantsLocale.LOCALE_FILE_EXTENSION));
 		
-		Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Checking for update for file: " + destination.getName());
+		log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Checking for update for file: " + destination.getName());
 		
 		VersionedNetworkFile updateNetworkFile = null;
 		
@@ -184,55 +190,44 @@ public class LocaleUpdater extends Updater
 		}
 		catch(FileNotFoundException e)
 		{
-			Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Could not find the locale file " + localeName + ".yml!");
-			Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Failed to check for locale update!");
+			log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Could not find the locale file " + localeName + ".yml!", e);
+			log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Failed to check for locale update!");
 		}
 		
 		if(updateNetworkFile == null)
-			Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Locale file is up to date.");
+			log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Locale file is up to date.");
 		else
 		{
 			// Create backup
 			RevisionFile localeBackupFile = null;
 			
-			Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Updating " + localeName + ".yml from version " + getLocalVersion() + " to version " + updateNetworkFile.getVersion() + "...");
-			Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Creating backup of the locale file...");
+			log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Updating " + localeName + ".yml from version " + getLocalVersion() + " to version " + updateNetworkFile.getVersion() + "...");
+			log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Creating backup of the locale file...");
 			
 			localeBackupFile = FileIO.createBackup(destination);
 			
 			if(localeBackupFile != null)
 			{
-				Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Locale backup successful.");
-				Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Locale backup created in file: " + localeBackupFile.getFileName());
+				log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Locale backup successful.");
+				log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Locale backup created in file: " + localeBackupFile.getFileName());
 				destination.delete();
 			}
 			else
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Creating backup unsuccessful.");
-			
-			boolean successful;
+				log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Creating backup unsuccessful.");
 			
 			try
 			{
-				successful = UrlIO.downloadFile(updateNetworkFile, destination);
+				UrlIO.downloadFile(updateNetworkFile, destination);
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
-				successful = false;
+				log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Updating the locale file failed.", e);
+				destination.delete();
+				return false;
 			}
 			
-			if(successful)
-			{
-				Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Locale file successfully updated.");
-				
-				return true;
-			}
-			else
-			{
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Updating the locale file failed.");
-				
-				destination.delete();
-			}
+			log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Locale file successfully updated.");
+			return true;
 		}
 		
 		return false;

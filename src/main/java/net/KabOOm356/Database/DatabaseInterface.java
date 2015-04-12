@@ -115,10 +115,8 @@ public interface DatabaseInterface
 	
 	/**
 	 * Closes the connection to the database.
-	 * 
-	 * @throws SQLException 
 	 */
-	public void closeConnection() throws SQLException;
+	public void closeConnection();
 	
 	/**
 	 * Returns a Statement from the database connection.

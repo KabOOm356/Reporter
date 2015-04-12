@@ -2,7 +2,6 @@ package net.KabOOm356.Manager.Messager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 import net.KabOOm356.Manager.Messager.Messages.Message;
 

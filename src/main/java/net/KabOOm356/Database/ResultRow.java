@@ -5,11 +5,17 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * A {@link HashMap} that represents a row returned from a SQL query.
  */
 public class ResultRow extends HashMap<String, Object>
 {
+	private static final Logger log = LogManager.getLogger(ResultRow.class);
+	
 	/**
 	 * Generated Serial-ID.
 	 */
@@ -44,16 +50,21 @@ public class ResultRow extends HashMap<String, Object>
 	 * 
 	 * @throws SQLException
 	 */
-	public void set(ResultSet result) throws SQLException
+	public void set(final ResultSet result) throws SQLException
 	{
-		clear();
-		
-		ResultSetMetaData metaData = result.getMetaData();
-		
-		int columns = metaData.getColumnCount();
-		
-		for(int LCV = 1; LCV <= columns; LCV++)
-			put(metaData.getColumnName(LCV), result.getObject(LCV));
+		try {
+			final ResultSetMetaData metaData = result.getMetaData();
+			int columns = metaData.getColumnCount();
+			clear();
+			for(int LCV = 1; LCV <= columns; LCV++) {
+				put(metaData.getColumnName(LCV), result.getObject(LCV));
+			}
+		} catch (final SQLException e) {
+			if (log.isDebugEnabled()) {
+				log.log(Level.WARN, "Failed to set ResultRow contents!");
+				throw e;
+			}
+		}
 	}
 	
 	/**

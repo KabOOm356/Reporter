@@ -5,11 +5,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * An class that extends the functionality of {@link DatabaseHandler}.
  */
 public class ExtendedDatabaseHandler extends DatabaseHandler
 {
+	private static final Logger log = LogManager.getLogger(ExtendedDatabaseHandler.class);
+	
 	/**
 	 * Constructor.
 	 * 
@@ -67,19 +73,14 @@ public class ExtendedDatabaseHandler extends DatabaseHandler
 		}
 		finally
 		{
-			try
-			{
+			try {
 				resultSet.close();
+			} catch(final Exception e) {
+				if (log.isDebugEnabled()) {
+					log.log(Level.WARN, "Failed to close result set!", e);
+				}
 			}
-			catch(Exception e)
-			{}
-			
-			try
-			{
-				closeConnection();
-			}
-			catch(Exception e)
-			{}
+			closeConnection();
 		}
 	}
 	
@@ -111,19 +112,14 @@ public class ExtendedDatabaseHandler extends DatabaseHandler
 		}
 		finally
 		{
-			try
-			{
+			try {
 				resultSet.close();
+			} catch(final Exception e) {
+				if (log.isDebugEnabled()) {
+					log.log(Level.WARN, "Failed to close result set!", e);
+				}
 			}
-			catch(Exception e)
-			{}
-			
-			try
-			{
-				closeConnection();
-			}
-			catch(Exception e)
-			{}
+			closeConnection();
 		}
 	}
 	
@@ -152,19 +148,14 @@ public class ExtendedDatabaseHandler extends DatabaseHandler
 		}
 		finally
 		{
-			try
-			{
+			try {
 				resultSet.close();
+			} catch(final Exception e) {
+				if (log.isDebugEnabled()) {
+					log.log(Level.WARN, "Failed to close result set!", e);
+				}
 			}
-			catch(Exception e)
-			{}
-			
-			try
-			{
-				closeConnection();
-			}
-			catch(Exception e)
-			{}
+			closeConnection();
 		}
 	}
 }

@@ -3,6 +3,10 @@ package net.KabOOm356.Reporter.Database;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.KabOOm356.Database.Database;
 import net.KabOOm356.Reporter.Reporter;
 
@@ -11,6 +15,8 @@ import net.KabOOm356.Reporter.Reporter;
  */
 public class MigrateToVersion7
 {
+	private static final Logger log = LogManager.getLogger(MigrateToVersion7.class);
+	
 	protected static boolean migrateToVersion7(Database database)
 	{
 		boolean updated = false;
@@ -34,19 +40,12 @@ public class MigrateToVersion7
 		}
 		catch(Exception ex)
 		{
-			ex.printStackTrace();
-			Reporter.getLog().severe(Reporter.getDefaultConsolePrefix() + "An error occured while upgrading database data to version 7!");
-			Reporter.getLog().severe(Reporter.getDefaultConsolePrefix() + "If you receive more errors, you may have to delete your database!");
+			log.log(Level.FATAL, Reporter.getDefaultConsolePrefix() + "An error occured while upgrading database data to version 7!", ex);
+			log.log(Level.FATAL, Reporter.getDefaultConsolePrefix() + "If you receive more errors, you may have to delete your database!");
 		}
 		finally
 		{
-			try
-			{
-				database.closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			database.closeConnection();
 		}
 		
 		return updated;

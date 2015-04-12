@@ -40,6 +40,9 @@ import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.FormattingUtil;
 import net.KabOOm356.Util.Util;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -55,6 +58,8 @@ import org.bukkit.entity.Player;
  */
 public class ReporterCommandManager implements CommandExecutor
 {
+	private static final Logger log = LogManager.getLogger(ReporterCommandManager.class);
+	
 	private Reporter plugin;
 	
 	private LinkedHashMap<String, ReporterCommand> reportCommands;
@@ -432,8 +437,9 @@ public class ReporterCommandManager implements CommandExecutor
 	 * @param sender The {@link CommandSender}
 	 * 
 	 * @return An {@link ArrayList} of integers that contains all the report indexes the {@link CommandSender} can view.
+	 * @throws Exception 
 	 */
-	public ArrayList<Integer> getViewableReports(CommandSender sender)
+	public ArrayList<Integer> getViewableReports(CommandSender sender) throws Exception
 	{
 		String query = null;
 		ArrayList<String> params = new ArrayList<String>();
@@ -461,19 +467,14 @@ public class ReporterCommandManager implements CommandExecutor
 			for(ResultRow row : result)
 				indexes.add(row.getInt("ID"));
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.WARN, "Failed to get viewable reports!");
+			throw e;
 		}
 		finally
 		{	
-			try
-			{
-				plugin.getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}	
+			plugin.getDatabaseHandler().closeConnection();
 		}
 		
 		return indexes;
@@ -514,28 +515,41 @@ public class ReporterCommandManager implements CommandExecutor
 	 * Returns the current number of incomplete reports in the database.
 	 * 
 	 * @return The current number of incomplete reports in the database.
+	 * @throws Exception 
 	 */
-	public int getIncompleteReports()
+	public int getIncompleteReports() throws Exception
 	{
-		return getIncompleteReportIndexes().size();
+		try {
+			return getIncompleteReportIndexes().size();
+		} catch (final Exception e) {
+			log.log(Level.WARN, "Failed to get the number of incomplete reports!");
+			throw e;
+		}
 	}
 	
 	/**
 	 * Returns the current number of complete reports in the database.
 	 * 
 	 * @return The current number of complete reports in the database.
+	 * @throws Exception 
 	 */
-	public int getCompletedReports()
+	public int getCompletedReports() throws Exception
 	{
-		return getCompletedReportIndexes().size();
+		try {
+			return getCompletedReportIndexes().size();
+		} catch (final Exception e) {
+			log.log(Level.WARN, "Failed to get number of completed reports!");
+			throw e;
+		}
 	}
 	
 	/**
 	 * Returns the indexes of the completed reports in the database.
 	 * 
 	 * @return An {@link ArrayList} of integers containing the indexes to all the completed reports in the database.
+	 * @throws Exception 
 	 */
-	public ArrayList<Integer> getCompletedReportIndexes()
+	public ArrayList<Integer> getCompletedReportIndexes() throws Exception
 	{
 		ArrayList<Integer> indexes = new ArrayList<Integer>();
 		
@@ -548,19 +562,14 @@ public class ReporterCommandManager implements CommandExecutor
 			for(ResultRow row : result)
 				indexes.add(row.getInt("ID"));
 		}
-		catch (Exception ex)
+		catch (final Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.WARN, "Failed to get completed report indexes!");
+			throw e;
 		}
 		finally
 		{
-			try
-			{
-				plugin.getDatabaseHandler().closeConnection();
-			}
-			catch(Exception ex)
-			{
-			}
+			plugin.getDatabaseHandler().closeConnection();
 		}
 		
 		return indexes;
@@ -570,8 +579,9 @@ public class ReporterCommandManager implements CommandExecutor
 	 * Returns the indexes of the incomplete reports in the database.
 	 * 
 	 * @return An {@link ArrayList} of integers containing the indexes to all the incomplete reports in the database.
+	 * @throws Exception 
 	 */
-	public ArrayList<Integer> getIncompleteReportIndexes()
+	public ArrayList<Integer> getIncompleteReportIndexes() throws Exception
 	{
 		ArrayList<Integer> indexes = new ArrayList<Integer>();
 		
@@ -584,19 +594,14 @@ public class ReporterCommandManager implements CommandExecutor
 			for(ResultRow row : result)
 				indexes.add(row.getInt("ID"));
 		}
-		catch (Exception ex)
+		catch (final Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.WARN, "Failed to get incomplete report indexes!");
+			throw e;
 		}
 		finally
 		{
-			try
-			{
-				plugin.getDatabaseHandler().closeConnection();
-			}
-			catch(Exception ex)
-			{
-			}
+			plugin.getDatabaseHandler().closeConnection();
 		}
 		
 		return indexes;
@@ -619,19 +624,13 @@ public class ReporterCommandManager implements CommandExecutor
 			
 			count = result.getInt("Count");
 		}
-		catch (Exception ex)
+		catch (final Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.WARN, "Failed to get total report count!", e);
 		}
 		finally
 		{
-			try
-			{
-				plugin.getDatabaseHandler().closeConnection();
-			}
-			catch(Exception ex)
-			{
-			}
+			plugin.getDatabaseHandler().closeConnection();
 		}
 		
 		return count;
@@ -846,21 +845,15 @@ public class ReporterCommandManager implements CommandExecutor
 				return false;
 			}
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to check if report can be altered by player!", e);
 			sender.sendMessage(ChatColor.RED + Reporter.getLogPrefix() + getLocale().getString(GeneralPhrases.error));
 			return false;
 		}
 		finally
 		{
-			try
-			{
-				getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getDatabaseHandler().closeConnection();
 		}
 		
 		return true;
@@ -940,9 +933,9 @@ public class ReporterCommandManager implements CommandExecutor
 				return false;
 			}
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to check priority!", e);
 			sender.sendMessage(ChatColor.RED + Reporter.getLogPrefix() + getLocale().getString(GeneralPhrases.error));
 			return false;
 		}
@@ -964,13 +957,7 @@ public class ReporterCommandManager implements CommandExecutor
 		}
 		finally
 		{
-			try
-			{
-				getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getDatabaseHandler().closeConnection();
 		}
 	}
 	
@@ -997,13 +984,7 @@ public class ReporterCommandManager implements CommandExecutor
 		}
 		finally
 		{
-			try
-			{
-				getDatabaseHandler().closeConnection();
-			}
-			catch (SQLException e)
-			{
-			}
+			getDatabaseHandler().closeConnection();
 		}
 		
 		return count;

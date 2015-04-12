@@ -15,6 +15,9 @@ import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -26,6 +29,8 @@ import org.bukkit.entity.Player;
  */
 public class ViewCommand extends ReporterCommand
 {
+	private static final Logger log = LogManager.getLogger(ViewCommand.class);
+	
 	private static final String name = "View";
 	private static final int minimumNumberOfArguments = 1;
 	private static final String permissionNode = "reporter.view";
@@ -107,7 +112,14 @@ public class ViewCommand extends ReporterCommand
 		}
 		else if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true))
 		{
-			ArrayList<Integer> indexes = getManager().getViewableReports((Player)sender);
+			ArrayList<Integer> indexes = null;
+			try {
+				indexes = getManager().getViewableReports((Player)sender);
+			} catch (final Exception e) {
+				sender.sendMessage(getErrorMessage());
+				log.log(Level.ERROR, "Failed to view submitted report!", e);
+				return;
+			}
 			
 			int index;
 			
@@ -168,20 +180,15 @@ public class ViewCommand extends ReporterCommand
 			
 			printPriority(sender, level, reports);
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to view priority!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch (SQLException e)
-			{}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 	}
 
@@ -249,20 +256,15 @@ public class ViewCommand extends ReporterCommand
 			
 			printPriority(sender, level, reports);
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to view claimed reports by priority!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch (SQLException e)
-			{}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 	}
 
@@ -324,20 +326,15 @@ public class ViewCommand extends ReporterCommand
 			
 			printQuickView(sender, claimed);
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to view claimed reports!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch (SQLException e)
-			{}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 	}
 	
@@ -449,8 +446,16 @@ public class ViewCommand extends ReporterCommand
 	{
 		String query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details, CompletionStatus FROM Reports";
 		
-		String notCompleted[][] = new String[getManager().getIncompleteReports()][4];
-		String completed[][] = new String[getManager().getCompletedReports()][4];
+		String notCompleted[][] = null;
+		String completed[][] = null;
+		try {
+			notCompleted = new String[getManager().getIncompleteReports()][4];
+			completed = new String[getManager().getCompletedReports()][4];
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to initialize report arrays!", e);
+			sender.sendMessage(getErrorMessage());
+			return;
+		}
 		
 		int cIndex = 0;
 		int ncIndex = 0;
@@ -473,21 +478,15 @@ public class ViewCommand extends ReporterCommand
 				}
 			}
 		}
-		catch (Exception ex)
+		catch (final Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.ERROR, "Failed to view all reports!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		if(cIndex != 0 || ncIndex != 0)
@@ -505,7 +504,14 @@ public class ViewCommand extends ReporterCommand
 				"FROM Reports " +
 				"WHERE CompletionStatus = 1";
 		
-		String reports[][] = new String[getManager().getCompletedReports()][4];
+		String reports[][] = null;
+		try {
+			reports = new String[getManager().getCompletedReports()][4];
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to initialize completed report array!", e);
+			sender.sendMessage(getErrorMessage());
+			return;
+		}
 		
 		int index = 0;
 		
@@ -519,21 +525,15 @@ public class ViewCommand extends ReporterCommand
 				index++;
 			}
 		}
-		catch (Exception ex)
+		catch (final Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.ERROR, "Failed to view all completed reports!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		if(index != 0)
@@ -551,7 +551,14 @@ public class ViewCommand extends ReporterCommand
 				"FROM Reports " +
 				"WHERE CompletionStatus = 0";
 		
-		String reports[][] = new String[getManager().getIncompleteReports()][4];
+		String reports[][] = null;
+		try {
+			reports = new String[getManager().getIncompleteReports()][4];
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to initialize unfinished report array!", e);
+			sender.sendMessage(getErrorMessage());
+			return;
+		}
 		
 		int index = 0;
 		
@@ -565,21 +572,15 @@ public class ViewCommand extends ReporterCommand
 				index++;
 			}
 		}
-		catch (Exception ex)
+		catch (final Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.ERROR, "Failed to view all incomplete reports!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		if(index != 0)
@@ -686,21 +687,15 @@ public class ViewCommand extends ReporterCommand
 			completionDate = result.getString("CompletionDate");
 			summaryDetails = result.getString("CompletionSummary");
 		}
-		catch (Exception ex)
+		catch (final Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.ERROR, "Failed to view report!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		printReport(sender, 

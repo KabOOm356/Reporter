@@ -26,6 +26,9 @@ public class BukkitUtil
 	 */
 	public static final Pattern validUsernamePattern = Pattern.compile("^[a-zA-Z0-9_]{2,32}$");
 	
+	public static final String BUKKIT_COLOR_CODE_PATTERN = "(&([a-f0-9]))";
+	public static final String BUKKIT_COLOR_CODE_REPLACEMENT = "\u00A7$2";
+	
 	/**
 	 * Returns the given player's name in a custom display format.
 	 * <br />
@@ -281,7 +284,7 @@ public class BukkitUtil
 	 */
 	public static String colorCodeReplaceAll(String str)
 	{
-		return str.replaceAll("(&([a-f0-9]))", "\u00A7$2");
+		return str.replaceAll(BUKKIT_COLOR_CODE_PATTERN, BUKKIT_COLOR_CODE_REPLACEMENT);
 	}
 	
 	/**

@@ -1,6 +1,5 @@
 package net.KabOOm356.Command.Commands;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -15,6 +14,9 @@ import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -25,6 +27,8 @@ import org.bukkit.command.CommandSender;
  */
 public class RequestCommand extends ReporterCommand
 {
+	private static final Logger log = LogManager.getLogger(RequestCommand.class);
+	
 	private static final String name = "Request";
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.request";
@@ -59,6 +63,7 @@ public class RequestCommand extends ReporterCommand
 	private void requestMostReported(CommandSender sender)
 	{
 		// Return the most reported players and the number of reports against them.
+		// LOW Long String concatenation.
 		String query = "SELECT COUNT(*) AS Count, ReportedUUID, Reported " +
 				"FROM Reports " +
 				"GROUP BY ReportedUUID HAVING COUNT(*) = " +
@@ -113,21 +118,15 @@ public class RequestCommand extends ReporterCommand
 						ChatColor.WHITE + getManager().getLocale().getString(GeneralPhrases.noReports));
 			}
 		}
-		catch (Exception ex)
+		catch (final Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.ERROR, "Failed to request most reported player!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch (SQLException e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 	}
 	
@@ -166,21 +165,15 @@ public class RequestCommand extends ReporterCommand
 			
 			indexes = Util.indexesToString(result, "ID", ChatColor.GOLD, ChatColor.WHITE);
 		}
-		catch(Exception ex)
+		catch(final Exception e)
 		{
-			ex.printStackTrace();
+			log.log(Level.ERROR, "Failed to request player!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(SQLException e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		String out = null;

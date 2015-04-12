@@ -2,6 +2,8 @@ package net.KabOOm356.Reporter.Metrics;
 
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mcstats.Metrics;
 import org.mcstats.Metrics.Graph;
@@ -18,9 +20,11 @@ import net.KabOOm356.Util.FormattingUtil;
  */
 public class MetricsInitializer implements Runnable
 {
-	JavaPlugin plugin;
-	private Locale locale;
-	private DatabaseType databaseType;
+	private static final Logger log = LogManager.getLogger(MetricsInitializer.class);
+	
+	private final JavaPlugin plugin;
+	private final Locale locale;
+	private final DatabaseType databaseType;
 	
 	private Metrics metrics;
 	
@@ -35,23 +39,19 @@ public class MetricsInitializer implements Runnable
 	public void run()
 	{
 		// If the locale has not been initialized, wait for a notification it has been initialized.
-		synchronized(locale)
-		{
-			try
-			{
-				if(!locale.isInitialized())
-				{
+		synchronized(locale) {
+			try {
+				if(!locale.isInitialized()) {
 					locale.wait();
 				}
-			}
-			catch (InterruptedException e)
-			{
-				e.printStackTrace();
+			} catch (final InterruptedException e) {
+				if (log.isDebugEnabled()) {
+					log.warn("Interrupted while waiting on locale initialization!", e);
+				}
 			}
 		}
 		
-		try
-		{
+		try {
 			// Initialize Metrics.
 			metrics = new Metrics(plugin);
 			
@@ -81,13 +81,11 @@ public class MetricsInitializer implements Runnable
 			databaseEngineGraph.addPlotter(new FeaturePlotter(databaseEngine));
 			
 			metrics.start();
-		}
-		catch (IOException e)
-		{
-			Reporter.getLog().warning(
+		} catch (final IOException e) {
+			log.warn(
 					Reporter.getDefaultConsolePrefix() +
-					"Could not enable statistics tracking with MCStats!");
-			e.printStackTrace();
+					"Could not enable statistics tracking with MCStats!",
+					e);
 		}
 	}
 }

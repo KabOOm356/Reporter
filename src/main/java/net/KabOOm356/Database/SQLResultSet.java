@@ -55,16 +55,16 @@ public class SQLResultSet extends ArrayList<ResultRow>
 	 * 
 	 * @throws SQLException
 	 */
-	public void set(ResultSet resultSet) throws SQLException
+	public void set(final ResultSet resultSet) throws SQLException
 	{
 		clear();
 		
-		try
-		{
+		try {
 			resultSet.beforeFirst();
+		} catch(final SQLException e) {
+			// Don't care if this throws an exception.
+			// The SQLite driver will always throw an exception.
 		}
-		catch(SQLException e)
-		{}
 		
 		while(resultSet.next())
 			add(new ResultRow(resultSet));

@@ -11,6 +11,9 @@ import java.util.Date;
 
 import net.KabOOm356.Reporter.Reporter;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -19,6 +22,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
  */
 public class ReporterConfigurationUtil
 {
+	private static final Logger log = LogManager.getLogger(ReporterConfigurationUtil.class);
+	
 	/**
 	 * Initializes the Reporter configuration file by extracting the file if it does not exist and then attempts to load it.
 	 * 
@@ -30,13 +35,13 @@ public class ReporterConfigurationUtil
 		File configFile = new File(dataFolder, "config.yml");
 		
 		if(!configFile.exists())
-		{	
+		{
 			BufferedReader input = null;
 			BufferedWriter out = null;
 			
 			try
 			{
-				Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Extracting default config file from the jar.");
+				log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Extracting default config file from the jar.");
 
 				configFile.createNewFile();
 
@@ -70,8 +75,7 @@ public class ReporterConfigurationUtil
 			}
 			catch(Exception ex)
 			{
-				ex.printStackTrace();
-				Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Error creating config file.");
+				log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Error creating config file.", ex);
 			}
 			finally
 			{
@@ -99,9 +103,8 @@ public class ReporterConfigurationUtil
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
-			Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Error loading config file.");
-			Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "Using default configuration.");
+			log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Error loading config file.", e);
+			log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Using default configuration.", e);
 		}
 	}
 	
@@ -402,7 +405,7 @@ public class ReporterConfigurationUtil
 					"Config Version: " + Reporter.getConfigurationVersion() + "\n" +
 					Reporter.getDateformat().format(new Date()));
 			
-			Reporter.getLog().info(Reporter.getDefaultConsolePrefix() +
+			log.log(Level.INFO, Reporter.getDefaultConsolePrefix() +
 					"Updating the config file to version " + Reporter.getConfigurationVersion());
 		}
 		

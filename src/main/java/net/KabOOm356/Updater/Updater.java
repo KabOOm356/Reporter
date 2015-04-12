@@ -8,6 +8,9 @@ import java.text.ParseException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import net.KabOOm356.File.AbstractFiles.UpdateSite;
@@ -20,6 +23,8 @@ import net.KabOOm356.Util.UrlIO;
  */
 public abstract class Updater implements Runnable
 {
+	private static final Logger log = LogManager.getLogger(Updater.class);
+	
 	/** The name of the file to parse for. */
 	private String name;
 	/** The local version of the file. */
@@ -109,11 +114,9 @@ public abstract class Updater implements Runnable
 	@Override
 	public void run()
 	{
-		VersionedNetworkFile latestFile;
-		
 		try
 		{
-			latestFile = checkForUpdates();
+			final VersionedNetworkFile latestFile = checkForUpdates();
 			
 			if(latestFile == null)
 				System.out.println(name + " is up to date!");
@@ -125,10 +128,9 @@ public abstract class Updater implements Runnable
 					System.out.println("There is a new update available for " + name + "!");
 			}
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
-			System.out.println(name + " update thread failed!");
-			e.printStackTrace();
+			log.log(Level.FATAL, name + " update thread failed!", e);
 		}
 	}
 	

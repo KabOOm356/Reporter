@@ -15,6 +15,9 @@ import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.UrlIO;
 import net.KabOOm356.Util.Util;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -25,6 +28,10 @@ import org.xml.sax.SAXException;
  */
 public class PluginUpdater extends Updater
 {
+	private static final Logger log = LogManager.getLogger(PluginUpdater.class);
+	
+	public static final String PLUGIN_FILE_EXTENSION = ".jar";
+	
 	/**
 	 * Constructor.
 	 * 
@@ -81,25 +88,24 @@ public class PluginUpdater extends Updater
 				in.close();
 		}
 		
-		JSONArray array = (JSONArray) JSONValue.parse(list);
+		final JSONArray array = (JSONArray) JSONValue.parse(list);
 		
-		VersionedNetworkFile file = null;
 		VersionedNetworkFile latestFile = null;
 		
 		for(int LCV = 0; LCV < array.size(); LCV++)
 		{
-			JSONObject node = (JSONObject) array.get(LCV);
+			final JSONObject node = (JSONObject) array.get(LCV);
 			
-			String currentName = (String) node.get("name");
+			final String currentName = (String) node.get("name");
 			
 			// Check if the current item matches what we are looking for.
 			if(Util.startsWithIgnoreCase(currentName, name))
 			{
 				// Parse the version from the name of the item.
-				String version = UrlIO.getVersion(currentName);
-				String link = (String) node.get("downloadUrl");
+				final String version = UrlIO.getVersion(currentName);
+				final String link = (String) node.get("downloadUrl");
 				
-				file = new VersionedNetworkFile(name + ".jar", version, link);
+				final VersionedNetworkFile file = new VersionedNetworkFile(name + PLUGIN_FILE_EXTENSION, version, link);
 				
 				// The release level must be greater than or equal to the lowest release level specified.
 				if(file.getReleaseLevel().compareToByValue(lowestLevel) >= 0)
@@ -121,26 +127,23 @@ public class PluginUpdater extends Updater
 	@Override
 	public void run()
 	{
-		VersionedNetworkFile latestFile;
-		
 		try
 		{
-			latestFile = checkForUpdates();
+			final VersionedNetworkFile latestFile = checkForUpdates();
 			
 			if(latestFile == null)
-				Reporter.getLog().info(Reporter.getDefaultConsolePrefix() + "Reporter is up to date!");
+				log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Reporter is up to date!");
 			else
 			{
 				if(latestFile.getVersion() != null)
-					Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "There is a new update available on BukkitDev: Version " + latestFile.getVersion());
+					log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "There is a new update available on BukkitDev: Version " + latestFile.getVersion());
 				else
-					Reporter.getLog().warning(Reporter.getDefaultConsolePrefix() + "There is a new update available on BukkitDev!");
+					log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "There is a new update available on BukkitDev!");
 			}
 		}
 		catch (Exception e)
 		{
-			Reporter.getLog().severe(Reporter.getDefaultConsolePrefix() + "Plugin update thread failed!");
-			e.printStackTrace();
+			log.log(Level.FATAL, Reporter.getDefaultConsolePrefix() + "Plugin update thread failed!", e);
 		}
 	}
 }

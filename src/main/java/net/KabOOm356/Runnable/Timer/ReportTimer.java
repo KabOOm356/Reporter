@@ -49,7 +49,6 @@ public class ReportTimer extends Thread implements Comparable<ReportTimer>
 	public ReportTimer()
 	{
 		this.isFinished = true;
-		
 		this.setDaemon(false);
 	}
 	
@@ -60,16 +59,12 @@ public class ReportTimer extends Thread implements Comparable<ReportTimer>
 	 * @param player The {@link Player} that has submitted a report that is being tracked.
 	 * @param executionTime When this thread should *Hopefully* be executed by the thread manager.
 	 */
-	public void init(ReportLimitManager manager, Player player, OfflinePlayer reported, long executionTime)
+	public void init(final ReportLimitManager manager, final Player player, final OfflinePlayer reported, final long executionTime)
 	{
 		this.manager = manager;
-		
 		this.player = player;
-		
 		this.reported = reported;
-		
 		this.executionTime = executionTime;
-		
 		this.isFinished = false;
 	}
 	

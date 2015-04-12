@@ -3,6 +3,9 @@ package net.KabOOm356.Command.Commands;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -24,6 +27,8 @@ import net.KabOOm356.Util.Util;
  */
 public class AssignCommand extends ReporterCommand
 {
+	private final static Logger log = LogManager.getLogger(AssignCommand.class);
+	
 	private final static String name = "Assign";
 	private final static int minimumNumberOfArguments = 2;
 	private final static String permissionNode = "reporter.assign";
@@ -87,19 +92,13 @@ public class AssignCommand extends ReporterCommand
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			log.log(Level.ERROR, "Failed to assign player!", e);
 			sender.sendMessage(getErrorMessage());
 			return;
 		}
 		finally
 		{
-			try
-			{
-				getManager().getDatabaseHandler().closeConnection();
-			}
-			catch(Exception e)
-			{
-			}
+			getManager().getDatabaseHandler().closeConnection();
 		}
 		
 		String playerName;
