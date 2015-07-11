@@ -6,8 +6,10 @@ import java.util.UUID;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
+import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ListPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ViewPhrases;
 import net.KabOOm356.Permission.ModLevel;
@@ -51,104 +53,88 @@ public class ViewCommand extends ReporterCommand
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args)
-	{
-		if(hasPermission(sender))
-		{
-			if(args.get(0).equalsIgnoreCase("all"))
-				viewAll(sender, displayRealName(args, 1));
-			else if(args.get(0).equalsIgnoreCase("completed") || args.get(0).equalsIgnoreCase("finished"))
-				viewCompleted(sender, displayRealName(args, 1));
-			else if(args.get(0).equalsIgnoreCase("incomplete") || args.get(0).equalsIgnoreCase("unfinished"))
-				viewIncomplete(sender, displayRealName(args, 1));
-			else if (args.get(0).equalsIgnoreCase("priority"))
-			{
-				if (args.size() >= 2 && ModLevel.modLevelInBounds(args.get(1))) // /report view priority Priority [name]
-				{
-					ModLevel level = ModLevel.getModLevel(args.get(1));
-					
-					viewPriority(sender, level, displayRealName(args, 2));
-				}
-				else // /report view priority [name]
-					viewPriority(sender, displayRealName(args, 1));
-			}
-			else if (args.get(0).equalsIgnoreCase("claimed"))
-			{
-				if(args.size() >= 2 && args.get(1).equalsIgnoreCase("priority")) // report view claimed priority 
-				{
-					if (args.size() >= 3 && ModLevel.modLevelInBounds(args.get(2))) // /report view claimed priority Priority [name]
-					{
-						ModLevel level = ModLevel.getModLevel(args.get(2));
-						
-						viewClaimedPriority(sender, level, displayRealName(args, 3));
+	public void execute(CommandSender sender, ArrayList<String> args) {
+		try {
+			if(hasPermission(sender)) {
+				if(args.get(0).equalsIgnoreCase("all")) {
+					viewAll(sender, displayRealName(args, 1));
+				} else if(args.get(0).equalsIgnoreCase("completed") || args.get(0).equalsIgnoreCase("finished")) {
+					viewCompleted(sender, displayRealName(args, 1));
+				} else if(args.get(0).equalsIgnoreCase("incomplete") || args.get(0).equalsIgnoreCase("unfinished")) {
+					viewIncomplete(sender, displayRealName(args, 1));
+				} else if (args.get(0).equalsIgnoreCase("priority")) {
+					if (args.size() >= 2 && ModLevel.modLevelInBounds(args.get(1))) { // /report view priority Priority [name]
+						final ModLevel level = ModLevel.getModLevel(args.get(1));
+						viewPriority(sender, level, displayRealName(args, 2));
+					} else { // /report view priority [name]
+						viewPriority(sender, displayRealName(args, 1));
 					}
-					else // /report view claimed priority [name]
-						viewClaimedPriority(sender, displayRealName(args, 2));
+				} else if (args.get(0).equalsIgnoreCase("claimed")) {
+					if(args.size() >= 2 && args.get(1).equalsIgnoreCase("priority")) { // report view claimed priority
+						if (args.size() >= 3 && ModLevel.modLevelInBounds(args.get(2))) { // /report view claimed priority Priority [name]
+							final ModLevel level = ModLevel.getModLevel(args.get(2));
+							viewClaimedPriority(sender, level, displayRealName(args, 3));
+						} else { // /report view claimed priority [name]
+							viewClaimedPriority(sender, displayRealName(args, 2));
+						}
+					} else { // /report view claimed [name]
+						viewClaimed(sender, displayRealName(args, 1));
+					}
+				} else {
+					int index;
+					
+					if(args.get(0).equalsIgnoreCase("last")) {
+						if(!hasRequiredLastViewed(sender)) {
+							return;
+						}
+						index = getLastViewed(sender);
+					} else {
+						index = Util.parseInt(args.get(0));
+						
+						if(!getManager().isReportIndexValid(sender, index)) {
+							return;
+						}
+					}
+					viewReport(sender, index, displayRealName(args, 1));
 				}
-				else // /report view claimed [name]
-					viewClaimed(sender, displayRealName(args, 1));
-			}
-			else
-			{
+			} else if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true)) {
+				ArrayList<Integer> indexes = null;
+				try {
+					indexes = getManager().getViewableReports((Player)sender);
+				} catch (final Exception e) {
+					log.log(Level.ERROR, "Failed to view submitted report!");
+					throw e;
+				}
+				
 				int index;
 				
-				if(args.get(0).equalsIgnoreCase("last"))
-				{
-					if(!hasRequiredLastViewed(sender))
+				if(args.get(0).equalsIgnoreCase("last")) {
+					if(!hasRequiredLastViewed(sender)) {
 						return;
-				
+					}
 					index = getLastViewed(sender);
-				}
-				else
-				{
+				} else {
 					index = Util.parseInt(args.get(0));
-					
-					if(!getManager().isReportIndexValid(sender, index))
+					if(!getManager().isReportIndexValid(sender, index)) {
 						return;
+					}
 				}
 				
-				viewReport(sender, index, displayRealName(args, 1));
+				if(indexes.contains(index)) {
+					viewReport(sender, index, false);
+				} else {
+					displayAvailableReports(sender, indexes);
+				}
+			} else { 
+				sender.sendMessage(getFailedPermissionsMessage());
 			}
+		} catch (final Exception e) {
+			log.error("Failed to view report!", e);
+			sender.sendMessage(getErrorMessage());
 		}
-		else if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true))
-		{
-			ArrayList<Integer> indexes = null;
-			try {
-				indexes = getManager().getViewableReports((Player)sender);
-			} catch (final Exception e) {
-				sender.sendMessage(getErrorMessage());
-				log.log(Level.ERROR, "Failed to view submitted report!", e);
-				return;
-			}
-			
-			int index;
-			
-			if(args.get(0).equalsIgnoreCase("last"))
-			{
-				if(!hasRequiredLastViewed(sender))
-					return;
-			
-				index = getLastViewed(sender);
-			}
-			else
-			{
-				index = Util.parseInt(args.get(0));
-				
-				if(!getManager().isReportIndexValid(sender, index))
-					return;
-			}
-			
-			if(indexes.contains(index))
-				viewReport(sender, index, false);
-			else
-				displayAvailableReports(sender, indexes);
-		}
-		else
-			sender.sendMessage(getFailedPermissionsMessage());
 	}
 
-	private void viewPriority(CommandSender sender, boolean displayRealName)
-	{
+	private void viewPriority(CommandSender sender, boolean displayRealName) throws Exception {
 		viewPriority(sender, ModLevel.NONE, displayRealName);
 		viewPriority(sender, ModLevel.LOW, displayRealName);
 		viewPriority(sender, ModLevel.NORMAL, displayRealName);
@@ -156,45 +142,37 @@ public class ViewCommand extends ReporterCommand
 	}
 
 	private void viewPriority(CommandSender sender, ModLevel level,
-			boolean displayRealName)
-	{
+			boolean displayRealName) throws Exception {
 		String query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details " +
 				"FROM Reports " +
 				"WHERE Priority = " + level.getLevel();
-		
-		try
-		{
-			int count = getManager().getNumberOfPriority(level);
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			final int numberOfReports = getManager().getNumberOfPriority(level);
 			
-			String[][] reports = new String[count][4];
+			String[][] reports = new String[numberOfReports][4];
 			
-			count = 0;
+			int count = 0;
 			
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 			
-			for(ResultRow row : result)
-			{
+			for(ResultRow row : result) {
 				reports[count] = readQuickData(row, displayRealName);
 				count++;
 			}
 			
 			printPriority(sender, level, reports);
-		}
-		catch (final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to view priority!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		} catch (final Exception e) {
+			log.log(Level.ERROR, String.format("Failed to view reports with priority [%s]!", level.getName()));
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 	}
 
 	private void viewClaimedPriority(CommandSender sender,
-			boolean displayRealName)
-	{
+			boolean displayRealName) throws Exception {
 		viewClaimedPriority(sender, ModLevel.NONE, displayRealName);
 		viewClaimedPriority(sender, ModLevel.LOW, displayRealName);
 		viewClaimedPriority(sender, ModLevel.NORMAL, displayRealName);
@@ -202,16 +180,14 @@ public class ViewCommand extends ReporterCommand
 	}
 
 	private void viewClaimedPriority(CommandSender sender, ModLevel level,
-			boolean displayRealName)
-	{
+			boolean displayRealName) throws Exception {
 		String query = "SELECT COUNT(*) AS Count " +
 				"FROM Reports " +
 				"WHERE ClaimStatus = 1 AND ClaimedBy = '" + sender.getName() + "' AND Priority = " + level.getLevel();
 		
 		Player senderPlayer = null;
 		
-		if(BukkitUtil.isPlayer(sender))
-		{
+		if(BukkitUtil.isPlayer(sender)) {
 			senderPlayer = (Player) sender;
 			
 			UUID uuid = senderPlayer.getUniqueId();
@@ -221,141 +197,107 @@ public class ViewCommand extends ReporterCommand
 					"WHERE ClaimStatus = 1 AND ClaimedByUUID = '" + uuid.toString() + "' AND Priority = " + level.getLevel();
 		}
 		
-		try
-		{
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
-			
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			SQLResultSet result = database.sqlQuery(connectionId, query);
 			int count = result.getInt("Count");
-			
-			getManager().getDatabaseHandler().closeConnection();
-			
-			if(senderPlayer != null)
-			{
+			if(senderPlayer != null) {
 				query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details " +
 						"FROM Reports " +
 						"WHERE ClaimStatus = 1 AND ClaimedByUUID = '" + senderPlayer.getUniqueId() + "' AND Priority = " + level.getLevel();
-			}
-			else
-			{
+			} else {
 				query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details " +
 						"FROM Reports " +
 						"WHERE ClaimStatus = 1 AND ClaimedBy = '" + sender.getName() + "' AND Priority = " + level.getLevel();
 			}
-			
-			result = getManager().getDatabaseHandler().sqlQuery(query);
-			
-			String[][] reports = new String[count][4];
-			
+			result = database.sqlQuery(connectionId, query);
+			final String[][] reports = new String[count][4];
 			count = 0;
-			
-			for(ResultRow row : result)
-			{
+			for(final ResultRow row : result) {
 				reports[count] = readQuickData(row, displayRealName);
 				count++;
 			}
 			
 			printPriority(sender, level, reports);
 		}
-		catch (final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to view claimed reports by priority!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to view claimed reports by priority!");
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 	}
 
-	private void viewClaimed(CommandSender sender, boolean displayRealName)
-	{
+	private void viewClaimed(CommandSender sender, boolean displayRealName) throws Exception {
 		String query = "SELECT COUNT(*) AS Count " +
 				"FROM Reports " +
-				"WHERE ClaimStatus = 1 AND ClaimedBy = '" + sender.getName() + "'";
+				"WHERE ClaimStatus = 1 AND ClaimedBy = '" + sender.getName() + '\'';
 		
 		Player senderPlayer = null;
 		
-		if(BukkitUtil.isPlayer(sender))
-		{
+		if(BukkitUtil.isPlayer(sender)) {
 			senderPlayer = (Player) sender;
-			
-			UUID uuid = senderPlayer.getUniqueId();
-			
+			final UUID uuid = senderPlayer.getUniqueId();
 			query = "SELECT COUNT(*) AS Count " +
 					"FROM Reports " +
-					"WHERE ClaimStatus = 1 AND ClaimedByUUID = '" + uuid + "'";
+					"WHERE ClaimStatus = 1 AND ClaimedByUUID = '" + uuid + '\'';
 		}
 		
-		try
-		{
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			SQLResultSet result = database.sqlQuery(connectionId, query);
+			final int claimedCount = result.getInt("Count");
+			final String[][] claimed = new String[claimedCount][4];
 			
-			int claimedCount = result.getInt("Count");
-			
-			String[][] claimed = new String[claimedCount][4];
-			
-			getManager().getDatabaseHandler().closeConnection();
-			
-			if(senderPlayer != null)
-			{
+			if(senderPlayer != null) {
 				query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details " +
 						"FROM Reports " +
 						"WHERE ClaimStatus = 1 AND ClaimedByUUID = '" + senderPlayer.getUniqueId() + "'";
 			}
-			else
-			{
+			else {
 				query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details " +
 						"FROM Reports " +
 						"WHERE ClaimStatus = 1 AND ClaimedBy = '" + sender.getName() + "'";
 			}
 			
 			int count = 0;
+			result = database.sqlQuery(connectionId, query);
 			
-			result = getManager().getDatabaseHandler().sqlQuery(query);
-			
-			for(ResultRow row : result)
-			{
+			for(final ResultRow row : result) {
 				claimed[count] = readQuickData(row, displayRealName);
 				count++;
 			}
 			
-			String header = getManager().getLocale().getString(ViewPhrases.viewYourClaimedReportsHeader);
-			
+			final String header = getManager().getLocale().getString(ViewPhrases.viewYourClaimedReportsHeader);
 			sender.sendMessage(ChatColor.GREEN + "-----" + header + "-----");
 			
 			printQuickView(sender, claimed);
 		}
-		catch (final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to view claimed reports!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to view claimed reports!");
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 	}
 	
-	private void printPriority(CommandSender sender, ModLevel level, String[][] reports)
-	{
+	private void printPriority(final CommandSender sender, final ModLevel level, final String[][] reports) {
 		String header = getManager().getLocale().getString(ViewPhrases.viewPriorityHeader);
-		
 		header = header.replaceAll("%p", level.getColor() + level.getName() + ChatColor.GREEN);
-		
 		sender.sendMessage(ChatColor.GREEN + "-----" + ChatColor.GREEN + header + ChatColor.GREEN + "------");
 		
 		printQuickView(sender, reports);
 	}
 	
-	private void printQuickView(CommandSender sender, String[] report)
-	{
-		String reportHeader = BukkitUtil.colorCodeReplaceAll(
-				getManager().getLocale().getString(ViewPhrases.viewAllReportHeader));
+	private void printQuickView(final CommandSender sender, final String[] report) {
+		final Locale locale = getManager().getLocale();
+		final String reportHeader = BukkitUtil.colorCodeReplaceAll(
+				locale.getString(ViewPhrases.viewAllReportHeader));
 		
-		String reportDetails = BukkitUtil.colorCodeReplaceAll(
-				getManager().getLocale().getString(ViewPhrases.viewAllReportDetails));
+		final String reportDetails = BukkitUtil.colorCodeReplaceAll(
+				locale.getString(ViewPhrases.viewAllReportDetails));
 		
 		String out = reportHeader.replaceAll("%i", ChatColor.GOLD + report[0] + ChatColor.WHITE);
 		out = out.replaceAll("%s", ChatColor.BLUE + report[1] + ChatColor.WHITE);
@@ -369,82 +311,68 @@ public class ViewCommand extends ReporterCommand
 		sender.sendMessage(ChatColor.WHITE + reportDetails.replaceAll("%d", ChatColor.GOLD + report[3] + ChatColor.WHITE));
 	}
 	
-	private void printQuickView(CommandSender sender, String[][] reports)
-	{
-		for(String[] entry : reports)
+	private void printQuickView(CommandSender sender, String[][] reports) {
+		for(final String[] entry : reports) {
 			printQuickView(sender, entry);
+		}
 	}
 	
-	private static String[] readQuickData(ResultRow row, boolean displayRealName) throws SQLException
-	{
-		String[] array = new String[4];
-		
+	private static String[] readQuickData(ResultRow row, boolean displayRealName) throws SQLException {
+		final String[] array = new String[4];
 		array[0] = row.getString("ID");
-		
 		String senderName = row.getString("Sender");
 		
-		if(!row.getString("SenderUUID").isEmpty())
-		{
-			UUID uuid = UUID.fromString(row.getString("SenderUUID"));
-			
-			OfflinePlayer sender = Bukkit.getOfflinePlayer(uuid);
-			
+		if(!row.getString("SenderUUID").isEmpty()) {
+			final UUID uuid = UUID.fromString(row.getString("SenderUUID"));
+			final OfflinePlayer sender = Bukkit.getOfflinePlayer(uuid);
 			senderName = BukkitUtil.formatPlayerName(sender, displayRealName);
 		}
 		
 		array[1] = senderName;
-		
 		String reportedName = row.getString("Reported");
-		
-		if(!row.getString("ReportedUUID").isEmpty())
-		{
-			UUID uuid = UUID.fromString(row.getString("ReportedUUID"));
-			
-			OfflinePlayer reported = Bukkit.getOfflinePlayer(uuid);
-			
+		if(!row.getString("ReportedUUID").isEmpty()) {
+			final UUID uuid = UUID.fromString(row.getString("ReportedUUID"));
+			final OfflinePlayer reported = Bukkit.getOfflinePlayer(uuid);
 			reportedName = BukkitUtil.formatPlayerName(reported, displayRealName);
 		}
 		
 		array[2] = reportedName;
-		
 		array[3] = row.getString("Details");
 		
 		return array;
 	}
 
-	private boolean displayRealName(ArrayList<String> args, int index)
-	{
+	private boolean displayRealName(final ArrayList<String> args, final int index) {
 		boolean displayRealName = getManager().getConfig().getBoolean("general.viewing.displayRealName", false);
 		
-		if(args.size() >= (index+1))
-			if(args.get(index).equalsIgnoreCase("name"))
+		System.out.println("VIEWME " + args.toString());
+		
+		if(args.size() >= (index+1)) {
+			String argument = args.get(index);
+			if(argument != null && argument.equalsIgnoreCase("name")) {
 				displayRealName = true;
+			}
+		}
 		
 		return displayRealName;
 	}
 	
-	private void displayAvailableReports(CommandSender sender, ArrayList<Integer> indexes)
-	{
-		String indexesString = Util.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
+	private void displayAvailableReports(final CommandSender sender, final ArrayList<Integer> indexes) {
+		final String indexesString = Util.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
+		final Locale locale = getManager().getLocale();
 		
-		if(!indexesString.equals(""))
-		{
-			String out = getManager().getLocale().getString(ListPhrases.listReportsAvailable);
-			
+		if(!indexesString.equals("")) {
+			String out = locale.getString(ListPhrases.listReportsAvailable);
 			out = out.replaceAll("%i", ChatColor.GOLD + indexesString + ChatColor.WHITE);
-			
 			sender.sendMessage(ChatColor.WHITE + out);
-		}
-		else
-		{
+		} else {
 			sender.sendMessage(ChatColor.RED + 
-					getManager().getLocale().getString(ListPhrases.listNoReportsAvailable));
+					locale.getString(ListPhrases.listNoReportsAvailable));
 		}
 	}
 
-	private void viewAll(CommandSender sender, boolean displayRealName)
-	{
-		String query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details, CompletionStatus FROM Reports";
+	private void viewAll(final CommandSender sender, final boolean displayRealName) throws Exception {
+		final String query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details, CompletionStatus FROM Reports";
 		
 		String notCompleted[][] = null;
 		String completed[][] = null;
@@ -452,55 +380,44 @@ public class ViewCommand extends ReporterCommand
 			notCompleted = new String[getManager().getIncompleteReports()][4];
 			completed = new String[getManager().getCompletedReports()][4];
 		} catch (final Exception e) {
-			log.log(Level.ERROR, "Failed to initialize report arrays!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
+			log.log(Level.ERROR, "Failed to initialize report arrays!");
+			throw e;
 		}
 		
 		int cIndex = 0;
 		int ncIndex = 0;
 		
-		try
-		{
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 			
-			for(ResultRow row : result)
-			{
-				if(row.getBoolean("CompletionStatus"))
-				{
+			for(final ResultRow row : result) {
+				if(row.getBoolean("CompletionStatus")) {
 					completed[cIndex] = readQuickData(row, displayRealName);
 					cIndex++;
-				}
-				else
-				{
+				} else {
 					notCompleted[ncIndex] = readQuickData(row, displayRealName);
 					ncIndex++;
 				}
 			}
-		}
-		catch (final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to view all reports!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to view all reports!");
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 		
-		if(cIndex != 0 || ncIndex != 0)
+		if(cIndex != 0 || ncIndex != 0) {
 			quickViewAll(sender, completed, notCompleted);
-		else
-		{
+		} else {
 			sender.sendMessage(ChatColor.RED + 
 					getManager().getLocale().getString(ViewPhrases.noReportsToView));
 		}
 	}
 	
-	private void viewCompleted(CommandSender sender, boolean displayRealName)
-	{
-		String query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details, CompletionStatus " +
+	private void viewCompleted(final CommandSender sender, final boolean displayRealName) throws Exception {
+		final String query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details, CompletionStatus " +
 				"FROM Reports " +
 				"WHERE CompletionStatus = 1";
 		
@@ -508,46 +425,37 @@ public class ViewCommand extends ReporterCommand
 		try {
 			reports = new String[getManager().getCompletedReports()][4];
 		} catch (final Exception e) {
-			log.log(Level.ERROR, "Failed to initialize completed report array!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
+			log.log(Level.ERROR, "Failed to initialize completed report array!");
+			throw e;
 		}
 		
 		int index = 0;
-		
-		try
-		{
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 			
-			for(ResultRow row : result)
-			{
+			for(final ResultRow row : result) {
 				reports[index] = readQuickData(row, displayRealName);
 				index++;
 			}
-		}
-		catch (final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to view all completed reports!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to view all completed reports!");
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);;
 		}
 		
-		if(index != 0)
+		if(index != 0) {
 			quickViewCompleted(sender, reports);
-		else
-		{
+		} else {
 			sender.sendMessage(ChatColor.RED + 
 					getManager().getLocale().getString(ListPhrases.listReportNoCompleteIndexes));
 		}
 	}
 	
-	private void viewIncomplete(CommandSender sender, boolean displayRealName)
-	{
-		String query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details, CompletionStatus " +
+	private void viewIncomplete(CommandSender sender, boolean displayRealName) throws Exception {
+		final String query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details, CompletionStatus " +
 				"FROM Reports " +
 				"WHERE CompletionStatus = 0";
 		
@@ -555,46 +463,37 @@ public class ViewCommand extends ReporterCommand
 		try {
 			reports = new String[getManager().getIncompleteReports()][4];
 		} catch (final Exception e) {
-			log.log(Level.ERROR, "Failed to initialize unfinished report array!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
+			log.log(Level.ERROR, "Failed to initialize unfinished report array!");
+			throw e;
 		}
 		
 		int index = 0;
-		
-		try
-		{
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 				
-			for(ResultRow row : result)
-			{
+			for(final ResultRow row : result) {
 				reports[index] = readQuickData(row, displayRealName);
 				index++;
 			}
-		}
-		catch (final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to view all incomplete reports!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		} catch (Exception e) {
+			log.log(Level.ERROR, "Failed to view all incomplete reports!");
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 		
-		if(index != 0)
+		if(index != 0) {
 			quickViewIncomplete(sender, reports);
-		else
-		{
+		} else {
 			sender.sendMessage(ChatColor.RED + 
 					getManager().getLocale().getString(ListPhrases.listReportNoIncompleteIndexes));
 		}
 	}
 	
-	private void viewReport(CommandSender sender, int index, boolean displayRealName)
-	{
-		String query = "SELECT * FROM Reports WHERE ID = " + index;
+	private void viewReport(CommandSender sender, int index, boolean displayRealName) throws Exception {
+		final String query = "SELECT * FROM Reports WHERE ID = " + index;
 		
 		String reporter = null, reportedPlayer = null, reportDetails = null, dateReport = null, priority = null;
 		
@@ -609,18 +508,16 @@ public class ViewCommand extends ReporterCommand
 		
 		OfflinePlayer player = null;
 		
-		try
-		{
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 			
 			reporter = result.getString("Sender");
 			
-			if(!result.getString("SenderUUID").isEmpty())
-			{
-				UUID uuid = UUID.fromString(result.getString("SenderUUID"));
-				
+			if(!result.getString("SenderUUID").isEmpty()) {
+				final UUID uuid = UUID.fromString(result.getString("SenderUUID"));
 				player = Bukkit.getOfflinePlayer(uuid);
-				
 				reporter = BukkitUtil.formatPlayerName(player, displayRealName);
 			}
 			
@@ -631,12 +528,9 @@ public class ViewCommand extends ReporterCommand
 			
 			reportedPlayer = result.getString("Reported");
 			
-			if(!result.getString("ReportedUUID").isEmpty())
-			{
-				UUID uuid = UUID.fromString(result.getString("ReportedUUID"));
-				
+			if(!result.getString("ReportedUUID").isEmpty()) {
+				final UUID uuid = UUID.fromString(result.getString("ReportedUUID"));
 				player = Bukkit.getOfflinePlayer(uuid);
-				
 				reportedPlayer = BukkitUtil.formatPlayerName(player, displayRealName);
 			}
 			
@@ -648,37 +542,25 @@ public class ViewCommand extends ReporterCommand
 			reportDetails = result.getString("Details");
 			dateReport = result.getString("Date");
 			
-			int priorityLevel = result.getInt("Priority");
-			
-			ModLevel priorityModLevel = ModLevel.getByLevel(priorityLevel);
-			
+			final int priorityLevel = result.getInt("Priority");
+			final ModLevel priorityModLevel = ModLevel.getByLevel(priorityLevel);
 			priority = ModLevel.getModLevelColor(priorityModLevel) + priorityModLevel.getName();
 			
 			claimStatus = result.getBoolean("ClaimStatus");
-			
 			claimedBy = result.getString("ClaimedBy");
-			
-			if(!result.getString("ClaimedByUUID").isEmpty())
-			{
-				UUID uuid = UUID.fromString(result.getString("ClaimedByUUID"));
-				
+			if(!result.getString("ClaimedByUUID").isEmpty()) {
+				final UUID uuid = UUID.fromString(result.getString("ClaimedByUUID"));
 				player = Bukkit.getOfflinePlayer(uuid);
-				
 				claimedBy = BukkitUtil.formatPlayerName(player, displayRealName);
 			}
 			
 			claimDate = result.getString("ClaimDate");
-			
 			completionStatus = result.getBoolean("CompletionStatus");
-			
 			completedBy = result.getString("CompletedBy");
 			
-			if(!result.getString("CompletedByUUID").isEmpty())
-			{
-				UUID uuid = UUID.fromString(result.getString("CompletedByUUID"));
-				
+			if(!result.getString("CompletedByUUID").isEmpty()) {
+				final UUID uuid = UUID.fromString(result.getString("CompletedByUUID"));
 				player = Bukkit.getOfflinePlayer(uuid);
-				
 				completedBy = BukkitUtil.formatPlayerName(player, displayRealName);
 			}
 			
@@ -686,16 +568,11 @@ public class ViewCommand extends ReporterCommand
 			
 			completionDate = result.getString("CompletionDate");
 			summaryDetails = result.getString("CompletionSummary");
-		}
-		catch (final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to view report!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to display report view!");
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 		
 		printReport(sender, 
@@ -711,20 +588,17 @@ public class ViewCommand extends ReporterCommand
 		getManager().getLastViewed().put(sender, index);
 	}
 
-	private void quickViewCompleted(CommandSender sender, String[][] reports)
-	{
-		String header = getManager().getLocale().getString(ViewPhrases.viewAllCompleteHeader);
-		
-		String out;
+	private void quickViewCompleted(final CommandSender sender, final String[][] reports) {
+		final Locale locale = getManager().getLocale();
+		final String header = locale.getString(ViewPhrases.viewAllCompleteHeader);
 		
 		sender.sendMessage(ChatColor.GREEN + "-----" + ChatColor.GREEN + header + ChatColor.GREEN + "------");
 		
-		String reportHeader = getManager().getLocale().getString(ViewPhrases.viewAllReportHeader);
-		String reportDetails = getManager().getLocale().getString(ViewPhrases.viewAllReportDetails);
+		final String reportHeader = locale.getString(ViewPhrases.viewAllReportHeader);
+		final String reportDetails = locale.getString(ViewPhrases.viewAllReportDetails);
 		
-		for(int LCV = 0; LCV < reports.length; LCV++)
-		{
-			out = reportHeader.replaceAll("%i", ChatColor.GOLD + reports[LCV][0] + ChatColor.WHITE);
+		for(int LCV = 0; LCV < reports.length; LCV++) {
+			String out = reportHeader.replaceAll("%i", ChatColor.GOLD + reports[LCV][0] + ChatColor.WHITE);
 			out = out.replaceAll("%s", ChatColor.BLUE + reports[LCV][1] + ChatColor.WHITE);
 			out = out.replaceAll("%r", ChatColor.RED + reports[LCV][2] + ChatColor.WHITE);
 			
@@ -737,22 +611,19 @@ public class ViewCommand extends ReporterCommand
 		}
 	}
 	
-	private void quickViewIncomplete(CommandSender sender, String[][] reports)
-	{
-		String header = getManager().getLocale().getString(ViewPhrases.viewAllUnfinishedHeader);
-		
-		String out;
+	private void quickViewIncomplete(final CommandSender sender, final String[][] reports) {
+		final Locale locale = getManager().getLocale();
+		final String header = locale.getString(ViewPhrases.viewAllUnfinishedHeader);
 		
 		sender.sendMessage(ChatColor.GREEN + "-----" + ChatColor.GREEN + header + ChatColor.GREEN + "------");
 		
-		String reportHeader = BukkitUtil.colorCodeReplaceAll(
-				getManager().getLocale().getString(ViewPhrases.viewAllReportHeader));
-		String reportDetails = BukkitUtil.colorCodeReplaceAll(
-				getManager().getLocale().getString(ViewPhrases.viewAllReportDetails));
+		final String reportHeader = BukkitUtil.colorCodeReplaceAll(
+				locale.getString(ViewPhrases.viewAllReportHeader));
+		final String reportDetails = BukkitUtil.colorCodeReplaceAll(
+				locale.getString(ViewPhrases.viewAllReportDetails));
 		
-		for(int LCV = 0; LCV < reports.length; LCV++)
-		{
-			out = reportHeader.replaceAll("%i", ChatColor.GOLD + reports[LCV][0] + ChatColor.WHITE);
+		for(int LCV = 0; LCV < reports.length; LCV++) {
+			String out = reportHeader.replaceAll("%i", ChatColor.GOLD + reports[LCV][0] + ChatColor.WHITE);
 			out = out.replaceAll("%s", ChatColor.BLUE + reports[LCV][1] + ChatColor.WHITE);
 			out = out.replaceAll("%r", ChatColor.RED + reports[LCV][2] + ChatColor.WHITE);
 			
@@ -765,15 +636,13 @@ public class ViewCommand extends ReporterCommand
 		}
 	}
 	
-	private void quickViewAll(CommandSender sender, String[][] complete, String[][] notComplete)
-	{
-		String viewAllBegin = BukkitUtil.colorCodeReplaceAll(
+	private void quickViewAll(final CommandSender sender, final String[][] complete, final String[][] notComplete) {
+		final String viewAllBegin = BukkitUtil.colorCodeReplaceAll(
 				getManager().getLocale().getString(ViewPhrases.viewAllBeginHeader));
 		
 		sender.sendMessage(ChatColor.GOLD + "-----" + ChatColor.GOLD + viewAllBegin + ChatColor.GOLD + "------");
 		
 		quickViewCompleted(sender, complete);
-		
 		quickViewIncomplete(sender, notComplete);
 	}
 	
@@ -785,87 +654,90 @@ public class ViewCommand extends ReporterCommand
 			boolean claimStatus,
 			String claimedBy, String claimDate, 
 			boolean completionStatus,
-			String completedBy, String completionDate, String summaryDetails)
-	{
-		boolean displayLocation = getManager().getConfig().getBoolean("general.viewing.displayLocation", true);
+			String completedBy, String completionDate, String summaryDetails) {
+		final Locale locale = getManager().getLocale();
+		final boolean displayLocation = getManager().getConfig().getBoolean("general.viewing.displayLocation", true);
+		StringBuilder output;
 		
-		String begin = BukkitUtil.colorCodeReplaceAll(getManager().getLocale().getString(ViewPhrases.viewBegin));
-		
+		String begin = BukkitUtil.colorCodeReplaceAll(locale.getString(ViewPhrases.viewBegin));
 		begin = begin.replaceAll("%i", ChatColor.GOLD + Integer.toString(id));
-		
 		sender.sendMessage(ChatColor.WHITE + "-----" + ChatColor.BLUE + begin + ChatColor.WHITE + "------");
 		
-		if(!displayLocation || senderWorld.equals("") && senderX == 0 && senderY == 0 && senderZ == 0)
+		if(!displayLocation || senderWorld.equals("") && senderX == 0 && senderY == 0 && senderZ == 0) {
 			sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-					getManager().getLocale().getString(ViewPhrases.viewSender)) + " " + ChatColor.BLUE + reporter);
-		else
-			sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-					getManager().getLocale().getString(ViewPhrases.viewSender)) + " " +
-					ChatColor.BLUE + reporter + ChatColor.GOLD + " (" + senderWorld + ": " + senderX + ", " + senderY + ", " + senderZ + ")");
+					locale.getString(ViewPhrases.viewSender)) + ' ' + ChatColor.BLUE + reporter);
+		} else {
+			output = new StringBuilder();
+			output.append(locale.getString(ViewPhrases.viewSender)).append(' ');
+			output.append(ChatColor.BLUE).append(reporter).append(ChatColor.GOLD).append(' ');
+			output.append('(').append(senderWorld).append(": ");
+			output.append(senderX).append(", ").append(senderY).append(", ").append(senderZ).append(')');
+			sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(output.toString()));
+		}
 		
-		if(!displayLocation || reportedWorld.equals("") && reportedX == 0 && reportedY == 0 && reportedZ == 0)
+		if(!displayLocation || reportedWorld.equals("") && reportedX == 0 && reportedY == 0 && reportedZ == 0) {
 			sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-					getManager().getLocale().getString(ViewPhrases.viewReported)) + " " + ChatColor.RED + reportedPlayer);
-		else
-			sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-					getManager().getLocale().getString(ViewPhrases.viewReported)) + " " +
-					ChatColor.RED + reportedPlayer + ChatColor.GOLD + " (" + reportedWorld + ": " + reportedX + ", " + reportedY + ", " + reportedZ + ")");
+					getManager().getLocale().getString(ViewPhrases.viewReported)) + ' ' + ChatColor.RED + reportedPlayer);
+		} else {
+			output = new StringBuilder();
+			output.append(locale.getString(ViewPhrases.viewReported)).append(' ');
+			output.append(ChatColor.BLUE).append(reportedPlayer).append(ChatColor.GOLD).append(' ');
+			output.append('(').append(reportedWorld).append(": ");
+			output.append(reportedX).append(", ").append(reportedY).append(", ").append(reportedZ).append(')');
+			sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(output.toString()));
+		}
 		
 		sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-				getManager().getLocale().getString(ViewPhrases.viewDetails)) + " " + ChatColor.GOLD + reportDetails);
+				locale.getString(ViewPhrases.viewDetails)) + ' ' + ChatColor.GOLD + reportDetails);
 		sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-				getManager().getLocale().getString(ViewPhrases.viewPriority)) + " " + priority);
+				locale.getString(ViewPhrases.viewPriority)) + ' ' + priority);
 		sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-				getManager().getLocale().getString(ViewPhrases.viewDate)) + " " + ChatColor.GREEN + dateReport);
+				locale.getString(ViewPhrases.viewDate)) + ' ' + ChatColor.GREEN + dateReport);
 		
 		sender.sendMessage(ChatColor.WHITE + "------" + ChatColor.BLUE + BukkitUtil.colorCodeReplaceAll(
-				getManager().getLocale().getString(ViewPhrases.viewSummaryTitle)) + ChatColor.WHITE + "------");
+				locale.getString(ViewPhrases.viewSummaryTitle)) + ChatColor.WHITE + "------");
 		
-		if(!completionStatus)
-		{
-			if(claimStatus)
-			{
+		if(!completionStatus) {
+			if(claimStatus) {
 				sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-						getManager().getLocale().getString(ViewPhrases.viewClaimHeader) + " " +
-						ChatColor.GREEN + getManager().getLocale().getString(ViewPhrases.viewStatusClaimed)));
+						locale.getString(ViewPhrases.viewClaimHeader) + ' ' +
+						ChatColor.GREEN + locale.getString(ViewPhrases.viewStatusClaimed)));
 				
 				sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-						getManager().getLocale().getString(ViewPhrases.viewClaimedBy) + " " + ChatColor.BLUE + claimedBy));
+						locale.getString(ViewPhrases.viewClaimedBy) + ' ' + ChatColor.BLUE + claimedBy));
 				
 				sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-						getManager().getLocale().getString(ViewPhrases.viewClaimedOn) + " " + ChatColor.GREEN + claimDate));
-			}
-			else
-			{
+						locale.getString(ViewPhrases.viewClaimedOn) + ' ' + ChatColor.GREEN + claimDate));
+			} else {
 				sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-						getManager().getLocale().getString(ViewPhrases.viewClaimHeader) + " " +
-						ChatColor.RED + getManager().getLocale().getString(ViewPhrases.viewStatusUnclaimed)));
+						locale.getString(ViewPhrases.viewClaimHeader) + ' ' +
+						ChatColor.RED + locale.getString(ViewPhrases.viewStatusUnclaimed)));
 			}
 		}
 		
-		if(!completionStatus)
+		if(!completionStatus) {
 			sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-					getManager().getLocale().getString(ViewPhrases.viewCompletionStatus)) + " " +
+					locale.getString(ViewPhrases.viewCompletionStatus)) + ' ' +
 					ChatColor.RED + BukkitUtil.colorCodeReplaceAll(
-							getManager().getLocale().getString(ViewPhrases.viewUnfinished)));
-		else
-		{
+							locale.getString(ViewPhrases.viewUnfinished)));
+		} else {
 			sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-					getManager().getLocale().getString(ViewPhrases.viewCompletionStatus)) + " " +
+					locale.getString(ViewPhrases.viewCompletionStatus)) + ' ' +
 					ChatColor.GREEN + BukkitUtil.colorCodeReplaceAll(
-							getManager().getLocale().getString(ViewPhrases.viewFinished)));
+							locale.getString(ViewPhrases.viewFinished)));
 			sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-					getManager().getLocale().getString(ViewPhrases.viewCompletedBy)) + " " + ChatColor.BLUE + completedBy);
+					locale.getString(ViewPhrases.viewCompletedBy)) + ' ' + ChatColor.BLUE + completedBy);
 			sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-					getManager().getLocale().getString(ViewPhrases.viewCompletedOn)) + " " + ChatColor.GREEN + completionDate);
-			if(!summaryDetails.equals(""))
+					locale.getString(ViewPhrases.viewCompletedOn)) + ' ' + ChatColor.GREEN + completionDate);
+			if(!summaryDetails.equals("")) {
 				sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-						getManager().getLocale().getString(ViewPhrases.viewCompletedSummary)) + " " + ChatColor.GOLD + summaryDetails);
-			else
+						locale.getString(ViewPhrases.viewCompletedSummary)) + ' ' + ChatColor.GOLD + summaryDetails);
+			} else {
 				sender.sendMessage(ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
-						getManager().getLocale().getString(ViewPhrases.viewCompletedSummary)) + " " +
+						locale.getString(ViewPhrases.viewCompletedSummary)) + ' ' +
 						ChatColor.GOLD + BukkitUtil.colorCodeReplaceAll(
-								getManager().getLocale().getString(ViewPhrases.viewNoSummary)));
+								locale.getString(ViewPhrases.viewNoSummary)));
+			}
 		}
 	}
 	
@@ -875,59 +747,60 @@ public class ViewCommand extends ReporterCommand
 	@Override
 	public void updateDocumentation()
 	{
-		ArrayList<ObjectPair<String, String>> usages = super.getUsages();
+		final Locale locale = getManager().getLocale();
+		final ArrayList<ObjectPair<String, String>> usages = super.getUsages();
 		usages.clear();
 		
-		String usage = getManager().getLocale().getString(ViewPhrases.viewHelp);
-		String description = getManager().getLocale().getString(ViewPhrases.viewHelpDetails);
+		String usage = locale.getString(ViewPhrases.viewHelp);
+		String description = locale.getString(ViewPhrases.viewHelpDetails);
 		
 		ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);
 		
 		usage = "/report view all [name]";
-		description = getManager().getLocale().getString(ViewPhrases.viewHelpAllDetails);
+		description = locale.getString(ViewPhrases.viewHelpAllDetails);
 		
 		entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);
 		
 		usage = "/report view completed|finished [name]";
-		description = getManager().getLocale().getString(ViewPhrases.viewHelpCompletedDetails);
+		description = locale.getString(ViewPhrases.viewHelpCompletedDetails);
 		
 		entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);
 		
 		usage = "/report view incomplete|unfinished [name]";
-		description = getManager().getLocale().getString(ViewPhrases.viewHelpIncompleteDetails);
+		description = locale.getString(ViewPhrases.viewHelpIncompleteDetails);
 		
 		entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);
 		
 		usage = "/report view priority [name]";
-		description = getManager().getLocale().getString(ViewPhrases.viewHelpPriorityDetails);
+		description = locale.getString(ViewPhrases.viewHelpPriorityDetails);
 		
 		entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);
 		
-		usage = getManager().getLocale().getString(ViewPhrases.viewHelpGivenPriority);
-		description = getManager().getLocale().getString(ViewPhrases.viewHelpGivenPriorityDetails);
+		usage = locale.getString(ViewPhrases.viewHelpGivenPriority);
+		description = locale.getString(ViewPhrases.viewHelpGivenPriorityDetails);
 		
 		entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);
 		
 		usage = "/report view claimed [name]";
-		description = getManager().getLocale().getString(ViewPhrases.viewHelpClaimedDetails);
+		description = locale.getString(ViewPhrases.viewHelpClaimedDetails);
 		
 		entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);
 		
 		usage = "/report view claimed priority [name]";
-		description = getManager().getLocale().getString(ViewPhrases.viewHelpClaimedPriorityDetails);
+		description = locale.getString(ViewPhrases.viewHelpClaimedPriorityDetails);
 		
 		entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);
 		
-		usage = getManager().getLocale().getString(ViewPhrases.viewHelpClaimedGivenPriority);
-		description = getManager().getLocale().getString(ViewPhrases.viewHelpClaimedPriorityDetails);
+		usage = locale.getString(ViewPhrases.viewHelpClaimedGivenPriority);
+		description = locale.getString(ViewPhrases.viewHelpClaimedPriorityDetails);
 		
 		entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);

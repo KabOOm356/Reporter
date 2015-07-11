@@ -41,12 +41,12 @@ public class Reporter extends JavaPlugin
 	private static final Logger log = LogManager.getLogger(Reporter.class);
 	private static final String logPrefix = "[Reporter] ";
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private static UpdateSite localeXMLUpdateSite = new UpdateSite("https://dl.dropbox.com/u/21577960/Reporter/Locale%20Files/latest.xml", UpdateSite.Type.XML);
+	private static final UpdateSite localeXMLUpdateSite = new UpdateSite("https://dl.dropbox.com/u/21577960/Reporter/Locale%20Files/latest.xml", UpdateSite.Type.XML);
 	
-	private static String pluginUpdateAPI = "https://api.curseforge.com/servermods/files?projectIds=31347";
+	private static final String pluginUpdateAPI = "https://api.curseforge.com/servermods/files?projectIds=31347";
 	
 	public static final String localeVersion = "10";
-	public static final String configVersion = "14";
+	public static final String configVersion = "15";
 	public static final String databaseVersion = "10";
 	
 	private static String version;
@@ -58,17 +58,18 @@ public class Reporter extends JavaPlugin
 	private ReporterPlayerListener playerListener;
 	private ReporterCommandManager commandManager;
 	
+	public Reporter() {
+		version = getDescription().getVersion();
+		versionString = "v" + version + " - ";
+		defaultConsolePrefix = logPrefix + versionString;
+	}
+	
 	@Override
 	public void onEnable()
 	{
-		version = getDescription().getVersion();
-		
-		versionString = "v" + version + " - ";
-		
-		defaultConsolePrefix = logPrefix + versionString;
-		
-		if(!getDataFolder().exists())
+		if(!getDataFolder().exists()) {
 			getDataFolder().mkdir();
+		}
 
 		ReporterConfigurationUtil.initConfiguration(getDataFolder(), getConfig());
 		
@@ -106,9 +107,9 @@ public class Reporter extends JavaPlugin
 		
 		getServer().getScheduler().cancelTasks(this);
 		
-		log.info(defaultConsolePrefix + "Closing " + databaseHandler.getDatabaseType() + " connection...");
+		log.info(defaultConsolePrefix + "Closing " + databaseHandler.getDatabaseType() + " connections...");
 		
-		databaseHandler.closeConnection();
+		databaseHandler.closeConnections();
 		
 		log.info(defaultConsolePrefix + "Reporter disabled.");
 	}
@@ -208,7 +209,11 @@ public class Reporter extends JavaPlugin
 	
 	private void initializeDatabase()
 	{
-		databaseHandler = ReporterDatabaseUtil.initDB(getConfig(), getDataFolder());
+		try {
+			databaseHandler = ReporterDatabaseUtil.initDB(getConfig(), getDataFolder());
+		} catch (final Exception e) {
+			log.fatal(Reporter.getDefaultConsolePrefix() + "Failed to initialize the database!", e);
+		}
 
 		if(databaseHandler == null)
 		{

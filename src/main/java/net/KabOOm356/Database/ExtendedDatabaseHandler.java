@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,70 +14,66 @@ import org.apache.logging.log4j.Logger;
 /**
  * An class that extends the functionality of {@link DatabaseHandler}.
  */
-public class ExtendedDatabaseHandler extends DatabaseHandler
-{
+public class ExtendedDatabaseHandler extends DatabaseHandler {
 	private static final Logger log = LogManager.getLogger(ExtendedDatabaseHandler.class);
-	
+
 	/**
 	 * Constructor.
 	 * 
-	 * @see DatabaseHandler#DatabaseHandler(String, String, String, String)
+	 * @see DatabaseHandler#DatabaseHandler(String, String, String, String, ConnectionPoolConfig)
 	 */
-	public ExtendedDatabaseHandler(String host, String database, String username, String password)
-	{
-		super(host, database, username, password);
+	public ExtendedDatabaseHandler(String host, String database, String username, String password, final ConnectionPoolConfig connectionPoolConfig) {
+		super(host, database, username, password, connectionPoolConfig);
 	}
-	
+
 	/**
 	 * Constructor.
 	 * 
-	 * @see DatabaseHandler#DatabaseHandler(DatabaseType, String, String)
+	 * @see DatabaseHandler#DatabaseHandler(DatabaseType, String, String, ConnectionPoolConfig)
 	 */
-	public ExtendedDatabaseHandler(DatabaseType type, String path, String name) throws IOException
-	{
-		super(type, path, name);
+	public ExtendedDatabaseHandler(DatabaseType type, String path, String name, final ConnectionPoolConfig connectionPoolConfig) throws IOException {
+		super(type, path, name, connectionPoolConfig);
 	}
-	
+
 	/**
 	 * Constructor.
 	 * 
 	 * @see DatabaseHandler#DatabaseHandler(Database)
 	 */
-	public ExtendedDatabaseHandler(Database database)
-	{
+	public ExtendedDatabaseHandler(Database database) {
 		super(database);
 	}
-	
+
 	/**
-	 * Performs an SQL query on the database that returns a {@link SQLResultSet} containing the results.
+	 * Performs an SQL query on the database that returns a {@link SQLResultSet}
+	 * containing the results.
 	 * 
-	 * @param query The query to send to the database.
+	 * @param query
+	 *            The query to send to the database.
 	 * 
 	 * @return A {@link SQLResultSet} containing the results
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
+	 * @throws InterruptedException 
 	 * 
 	 * @see net.KabOOm356.Database.DatabaseHandler#query(java.lang.String)
 	 */
-	public SQLResultSet sqlQuery(String query) throws ClassNotFoundException, SQLException
-	{
+	public SQLResultSet sqlQuery(final String query) throws ClassNotFoundException, SQLException, InterruptedException {
 		ResultSet resultSet = null;
-		
-		try
-		{
+
+		try {
 			resultSet = super.query(query);
-			
-			if(!usingSQLite() && !resultSet.isBeforeFirst())
+
+			if (!usingSQLite() && !resultSet.isBeforeFirst()) {
 				resultSet.beforeFirst();
-			
+			}
+
 			return new SQLResultSet(resultSet);
-		}
-		finally
-		{
+		} finally {
 			try {
 				resultSet.close();
-			} catch(final Exception e) {
+			} catch (final Exception e) {
 				if (log.isDebugEnabled()) {
 					log.log(Level.WARN, "Failed to close result set!", e);
 				}
@@ -83,38 +81,40 @@ public class ExtendedDatabaseHandler extends DatabaseHandler
 			closeConnection();
 		}
 	}
-	
+
 	/**
-	 * Performs an SQL query on the database that returns a {@link SQLResultSet} containing the results.
+	 * Performs an SQL query on the database that returns a {@link SQLResultSet}
+	 * containing the results.
 	 * 
-	 * @param query The query to send to the database.
-	 * @param params The parameters of the query.
+	 * @param query
+	 *            The query to send to the database.
+	 * @param params
+	 *            The parameters of the query.
 	 * 
 	 * @return A {@link SQLResultSet} containing the results
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
+	 * @throws InterruptedException 
 	 * 
-	 * @see net.KabOOm356.Database.DatabaseHandler#preparedQuery(String, ArrayList)
+	 * @see net.KabOOm356.Database.DatabaseHandler#preparedQuery(String,
+	 *      ArrayList)
 	 */
-	public SQLResultSet preparedSQLQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException
-	{
+	public SQLResultSet preparedSQLQuery(final String query, final ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
 		ResultSet resultSet = null;
-		
-		try
-		{
+
+		try {
 			resultSet = super.preparedQuery(query, params);
-			
-			if(!usingSQLite() && !resultSet.isBeforeFirst())
+
+			if (!usingSQLite() && !resultSet.isBeforeFirst()) {
 				resultSet.beforeFirst();
-			
+			}
+
 			return new SQLResultSet(resultSet);
-		}
-		finally
-		{
+		} finally {
 			try {
 				resultSet.close();
-			} catch(final Exception e) {
+			} catch (final Exception e) {
 				if (log.isDebugEnabled()) {
 					log.log(Level.WARN, "Failed to close result set!", e);
 				}
@@ -122,40 +122,149 @@ public class ExtendedDatabaseHandler extends DatabaseHandler
 			closeConnection();
 		}
 	}
-	
+
 	/**
 	 * Returns the {@link Database}'s column meta data.
 	 * 
-	 * @param table The name of the table to get the meta data for.
+	 * @param table
+	 *            The name of the table to get the meta data for.
 	 * 
-	 * @return An {@link SQLResultSet} containing the database's column meta data.
+	 * @return An {@link SQLResultSet} containing the database's column meta
+	 *         data.
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
+	 * @throws InterruptedException 
 	 */
-	public SQLResultSet getSQLColumnMetaData(String table) throws ClassNotFoundException, SQLException
-	{
+	public SQLResultSet getSQLColumnMetaData(final String table) throws ClassNotFoundException, SQLException, InterruptedException {
 		ResultSet resultSet = null;
-		
-		try
-		{
+
+		try {
 			resultSet = super.getColumnMetaData(table);
-			
-			if(!usingSQLite() && !resultSet.isBeforeFirst())
+
+			if (!usingSQLite() && !resultSet.isBeforeFirst()) {
 				resultSet.beforeFirst();
-			
+			}
+
 			return new SQLResultSet(resultSet);
-		}
-		finally
-		{
+		} finally {
 			try {
 				resultSet.close();
-			} catch(final Exception e) {
+			} catch (final Exception e) {
 				if (log.isDebugEnabled()) {
 					log.log(Level.WARN, "Failed to close result set!", e);
 				}
 			}
 			closeConnection();
+		}
+	}
+
+	/**
+	 * Performs an SQL query on the database that returns a {@link SQLResultSet}
+	 * containing the results.
+	 * 
+	 * @param connectionId
+	 *            The id of the connection to execute on.
+	 * @param query
+	 *            The query to send to the database.
+	 * 
+	 * @return A {@link SQLResultSet} containing the results
+	 * 
+	 * @throws SQLException
+	 * 
+	 * @see net.KabOOm356.Database.DatabaseHandler#query(Integer, String)
+	 */
+	public SQLResultSet sqlQuery(final int connectionId, final String query) throws SQLException {
+		ResultSet resultSet = null;
+		try {
+			resultSet = super.query(connectionId, query);
+
+			if (!usingSQLite() && !resultSet.isBeforeFirst()) {
+				resultSet.beforeFirst();
+			}
+
+			return new SQLResultSet(resultSet);
+		} finally {
+			try {
+				resultSet.close();
+			} catch (final Exception e) {
+				if (log.isDebugEnabled()) {
+					log.log(Level.WARN, "Failed to close result set!", e);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Performs an SQL query on the database that returns a {@link SQLResultSet}
+	 * containing the results.
+	 * 
+	 * @param connectionId
+	 *            The id of the connection to execute on.
+	 * @param query
+	 *            The query to send to the database.
+	 * @param params
+	 *            The parameters of the query.
+	 * 
+	 * @return A {@link SQLResultSet} containing the results
+	 * 
+	 * @throws SQLException
+	 * 
+	 * @see net.KabOOm356.Database.DatabaseHandler#preparedQuery(Integer, String,
+	 *      ArrayList)
+	 */
+	public SQLResultSet preparedSQLQuery(final int connectionId, final String query, final ArrayList<String> params) throws SQLException {
+		ResultSet resultSet = null;
+		try {
+			resultSet = super.preparedQuery(connectionId, query, params);
+
+			if (!usingSQLite() && !resultSet.isBeforeFirst()) {
+				resultSet.beforeFirst();
+			}
+
+			return new SQLResultSet(resultSet);
+		} finally {
+			try {
+				resultSet.close();
+			} catch (final Exception e) {
+				if (log.isDebugEnabled()) {
+					log.log(Level.WARN, "Failed to close result set!", e);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Returns the {@link Database}'s column meta data.
+	 * 
+	 * @param connectionId
+	 *            The id of the connection to execute on.
+	 * @param table
+	 *            The name of the table to get the meta data for.
+	 * 
+	 * @return An {@link SQLResultSet} containing the database's column meta
+	 *         data.
+	 * 
+	 * @throws SQLException
+	 */
+	public SQLResultSet getSQLColumnMetaData(final int connectionId, final String table) throws SQLException {
+		ResultSet resultSet = null;
+		try {
+			resultSet = super.getColumnMetaData(connectionId, table);
+
+			if (!usingSQLite() && !resultSet.isBeforeFirst()) {
+				resultSet.beforeFirst();
+			}
+
+			return new SQLResultSet(resultSet);
+		} finally {
+			try {
+				resultSet.close();
+			} catch (final Exception e) {
+				if (log.isDebugEnabled()) {
+					log.log(Level.WARN, "Failed to close result set!", e);
+				}
+			}
 		}
 	}
 }

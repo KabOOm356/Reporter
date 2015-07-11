@@ -1,8 +1,8 @@
 package net.KabOOm356.Command.Commands;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.UpgradePhrases;
 import net.KabOOm356.Permission.ModLevel;
@@ -41,68 +42,69 @@ public class UpgradeCommand extends ReporterCommand
 	@Override
 	public void execute(CommandSender sender, ArrayList<String> args)
 	{
-		if(!hasRequiredPermission(sender))
-			return;
-		
-		int index = Util.parseInt(args.get(0));
-		
-		if(args.get(0).equalsIgnoreCase("last"))
-		{
-			if(!hasRequiredLastViewed(sender))
+		try {
+			if(!hasRequiredPermission(sender))
 				return;
 			
-			index = getLastViewed(sender);
+			int index = Util.parseInt(args.get(0));
+			
+			if(args.get(0).equalsIgnoreCase("last"))
+			{
+				if(!hasRequiredLastViewed(sender))
+					return;
+				
+				index = getLastViewed(sender);
+			}
+			
+			if(!getManager().isReportIndexValid(sender, index))
+				return;
+			
+			if(!getManager().canAlterReport(sender, index))
+				return;
+			
+			final ModLevel newPriority = getNextPriorityLevel(index);
+			if(newPriority == ModLevel.UNKNOWN)
+			{
+				String output = getManager().getLocale().getString(UpgradePhrases.reportIsAtHighestPriority);
+				output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.RED);
+				sender.sendMessage(ChatColor.RED + output);
+				return;
+			}
+			
+			// Get MoveCommand and let it take care of moving the report to the new priority.
+			final MoveCommand move = (MoveCommand) getManager().getCommand("Move");
+			move.moveReport(sender, index, newPriority);
+		} catch (final Exception e) {
+			log.error("Failed to upgrade report priority!", e);
+			sender.sendMessage(getErrorMessage());
 		}
-		
-		if(!getManager().isReportIndexValid(sender, index))
-			return;
-		
-		if(!getManager().canAlterReport(sender, index))
-			return;
-		
-		ModLevel newPriority = getNextPriorityLevel(index);
-		
-		if(newPriority == ModLevel.UNKNOWN)
-		{
-			String output = getManager().getLocale().getString(UpgradePhrases.reportIsAtHighestPriority);
-			
-			output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.RED);
-			
-			sender.sendMessage(ChatColor.RED + output);
-			
-			return;
-		}
-		
-		// Get MoveCommand and let it take care of moving the report to the new priority.
-		MoveCommand move = (MoveCommand) getManager().getCommand("Move");
-		
-		move.moveReport(sender, index, newPriority);
 	}
 	
-	private ModLevel getNextPriorityLevel(int index)
+	private ModLevel getNextPriorityLevel(int index) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		String query = "SELECT Priority FROM Reports WHERE ID=" + index;
 		
-		try
-		{
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
-			
-			int currentPriorityLevel = result.getInt("Priority");
-			
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId;
+		try {
+			connectionId = database.openPooledConnection();
+		} catch (final ClassNotFoundException e) {
+			log.error("Failed to open pooled connection to get next highest priority!");
+			throw e;
+		} catch (final SQLException e) {
+			log.error("Failed to open pooled connection to get next highest priority!");
+			throw e;
+		}
+		try {
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
+			final int currentPriorityLevel = result.getInt("Priority");
 			return ModLevel.getByLevel(currentPriorityLevel+1);
+		} catch (final SQLException e) {
+			log.error(String.format("Failed to execute query to get next highest priority on connection [%s]!", connectionId));
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
-		catch (final Exception e)
-		{
-			if (log.isDebugEnabled()) { 
-				log.log(Level.WARN, "Failed to get the next highest priority!", e);
-			}
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
-		}
-		
-		return ModLevel.UNKNOWN;
 	}
 
 	@Override

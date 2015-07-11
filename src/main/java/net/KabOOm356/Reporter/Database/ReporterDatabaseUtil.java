@@ -1,6 +1,7 @@
 package net.KabOOm356.Reporter.Database;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import net.KabOOm356.Database.Database;
 import net.KabOOm356.Database.DatabaseType;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
+import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
 import net.KabOOm356.Reporter.Reporter;
 
 import org.apache.logging.log4j.Level;
@@ -29,10 +31,30 @@ public class ReporterDatabaseUtil
 	 * @param dataFolder A {@link File} to the directory where the data should be stored.
 	 * 
 	 * @return An initialized {@link ExtendedDatabaseHandler}.
+	 * 
+	 * @throws IllegalArgumentException Thrown if the connection pool configuration is invalid.
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
+	 * @throws InterruptedException 
 	 */
-	public static ExtendedDatabaseHandler initDB(FileConfiguration configuration, File dataFolder)
+	public static ExtendedDatabaseHandler initDB(FileConfiguration configuration, File dataFolder) throws IllegalArgumentException, IOException, ClassNotFoundException, SQLException, InterruptedException
 	{
 		ExtendedDatabaseHandler databaseHandler = null;
+		
+		final boolean connectionPoolLimit = configuration.getBoolean("database.connectionPool.enableLimiting", ConnectionPoolConfig.defaultInstance.isConnectionPoolLimited());
+		final int maxNumberOfConnections = configuration.getInt("database.connectionPool.maxNumberOfConnections", ConnectionPoolConfig.defaultInstance.getMaxConnections());
+		final int maxNumberOfAttemptsForConnection = configuration.getInt("database.connectionPool.maxNumberOfAttemptsForConnection", ConnectionPoolConfig.defaultInstance.getMaxAttemptsForConnection());
+		final long waitTimeBeforeUpdate = configuration.getLong("database.connectionPool.waitTimeBeforeUpdate", ConnectionPoolConfig.defaultInstance.getWaitTimeBeforeUpdate());
+		
+		final ConnectionPoolConfig connectionPoolConfig;
+		
+		try {
+			connectionPoolConfig = new ConnectionPoolConfig(connectionPoolLimit, maxNumberOfConnections, waitTimeBeforeUpdate, maxNumberOfAttemptsForConnection);
+		} catch (final IllegalArgumentException e) {
+			log.warn("Failed to configure connection pool!");
+			throw e;
+		}
 		
 		/* If an error occurs attempting to initialize a database
 		 * the plugin will attempt to use the next less "complicated" database
@@ -43,7 +65,7 @@ public class ReporterDatabaseUtil
 		boolean fallbackToNextDB = false;
 		
 		// Attempt to initialize a MySQL database
-		if(configuration.getString("database.type", "sqlite").equalsIgnoreCase("mysql"))
+		if(configuration.getString("database.type", DatabaseType.SQLITE.toString()).equalsIgnoreCase(DatabaseType.MYSQL.toString()))
 		{
 			try
 			{
@@ -54,7 +76,7 @@ public class ReporterDatabaseUtil
 				String username = configuration.getString("database.username", "root");
 				String password = configuration.getString("database.password", "root");
 				
-				databaseHandler = new ExtendedDatabaseHandler(host, database, username, password);
+				databaseHandler = new ExtendedDatabaseHandler(host, database, username, password, connectionPoolConfig);
 				
 				databaseHandler.openConnection();
 				
@@ -79,19 +101,28 @@ public class ReporterDatabaseUtil
 		// Attempt to initialize a SQLite database
 		if(fallbackToNextDB)
 		{
-			try
-			{
-				String databaseName = configuration.getString("database.dbName", "reports.db");
-				
-				databaseHandler = new ExtendedDatabaseHandler(DatabaseType.SQLITE, dataFolder.getPath(), databaseName);
-				
+			String databaseName = configuration.getString("database.dbName", "reports.db");
+			
+			try {
+				databaseHandler = new ExtendedDatabaseHandler(DatabaseType.SQLITE, dataFolder.getPath(), databaseName, connectionPoolConfig);
 				initDatabaseTables(databaseHandler.getDatabase());
-			}
-			catch(final Exception e)
-			{
+			} catch (final IOException e) {
 				databaseHandler = null;
-				log.fatal(Reporter.getDefaultConsolePrefix() + "A severe error occurred connecting to the database file!", e);
-			}
+				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to initialize an SQLite database!");
+				throw e;
+			} catch (ClassNotFoundException e) {
+				databaseHandler = null;
+				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to initialize an SQLite database!");
+				throw e;
+			} catch (SQLException e) {
+				databaseHandler = null;
+				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to initialize an SQLite database!");
+				throw e;
+			} catch (InterruptedException e) {
+				databaseHandler = null;
+				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to initialize an SQLite database!");
+				throw e;
+			}	
 		}
 		
 		return databaseHandler;
@@ -104,8 +135,9 @@ public class ReporterDatabaseUtil
 	 * 
 	 * @throws SQLException 
 	 * @throws ClassNotFoundException 
+	 * @throws InterruptedException 
 	 */
-	private static void initDatabaseTables(Database database) throws ClassNotFoundException, SQLException
+	private static void initDatabaseTables(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		log.info(Reporter.getDefaultConsolePrefix() + "Checking " + database.getDatabaseType() + " tables...");
 		
@@ -150,8 +182,9 @@ public class ReporterDatabaseUtil
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
+	 * @throws InterruptedException 
 	 */
-	protected static void createTables(Database database) throws ClassNotFoundException, SQLException
+	protected static void createTables(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		String query = "CREATE TABLE IF NOT EXISTS Reports (" +
 				"ID INTEGER PRIMARY KEY, " +
@@ -234,8 +267,9 @@ public class ReporterDatabaseUtil
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
+	 * @throws InterruptedException 
 	 */
-	public static boolean needsToCreateTables(Database database) throws ClassNotFoundException, SQLException
+	public static boolean needsToCreateTables(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		boolean createReportsTable = !database.checkTable("Reports");
 		boolean createModStatsTable = !database.checkTable("ModStats");
@@ -282,8 +316,9 @@ public class ReporterDatabaseUtil
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
+	 * @throws InterruptedException 
 	 */
-	public static boolean updateReportsTable(Database database) throws ClassNotFoundException, SQLException
+	public static boolean updateReportsTable(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		Statement statement = null;
 		boolean updated = false;
@@ -469,8 +504,9 @@ public class ReporterDatabaseUtil
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
+	 * @throws InterruptedException 
 	 */
-	public static boolean updateModStatsTable(Database database) throws ClassNotFoundException, SQLException
+	public static boolean updateModStatsTable(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		Statement statement = null;
 		boolean updated = false;
@@ -572,8 +608,9 @@ public class ReporterDatabaseUtil
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
+	 * @throws InterruptedException 
 	 */
-	public static boolean updatePlayerStatsTable(Database database) throws ClassNotFoundException, SQLException
+	public static boolean updatePlayerStatsTable(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		Statement statement = null;
 		boolean updated = false;
@@ -663,8 +700,9 @@ public class ReporterDatabaseUtil
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
+	 * @throws InterruptedException 
 	 */
-	protected static void dropTables(Database database) throws ClassNotFoundException, SQLException
+	protected static void dropTables(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		database.updateQuery("DROP TABLE IF EXISTS reports");
 		database.updateQuery("DROP TABLE IF EXISTS Reports");

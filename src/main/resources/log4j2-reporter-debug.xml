@@ -3,10 +3,10 @@
     <Appenders>
         <Console name="WINDOWS_COMPAT" target="SYSTEM_OUT"></Console>
         <Queue name="TerminalConsole">
-            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %msg%n" />
+            <PatternLayout pattern="[%d] [%t/%level] :: %msg%n" />
         </Queue>
         <RollingRandomAccessFile name="File" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz">
-            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %msg%n" />
+            <PatternLayout pattern="[%d] [%t/%location] %level :: %msg%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
                 <OnStartupTriggeringPolicy />
@@ -24,4 +24,3 @@
         </Root>
     </Loggers>
 </Configuration>
-

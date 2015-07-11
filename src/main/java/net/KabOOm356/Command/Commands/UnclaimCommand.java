@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.UnclaimPhrases;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
@@ -47,33 +49,40 @@ public class UnclaimCommand extends ReporterCommand
 	@Override
 	public void execute(CommandSender sender, ArrayList<String> args)
 	{
-		if(!hasRequiredPermission(sender))
-			return;
-		
-		int index = Util.parseInt(args.get(0));
-		
-		if(args.get(0).equalsIgnoreCase("last"))
-		{
-			if(!hasRequiredLastViewed(sender))
+		try {
+			if(!hasRequiredPermission(sender))
 				return;
 			
-			index = getLastViewed(sender);
+			int index = Util.parseInt(args.get(0));
+			
+			if(args.get(0).equalsIgnoreCase("last"))
+			{
+				if(!hasRequiredLastViewed(sender))
+					return;
+				
+				index = getLastViewed(sender);
+			}
+			
+			if(!getManager().isReportIndexValid(sender, index))
+				return;
+			
+			if(canUnclaimReport(sender, index)) {
+				unclaimReport(sender, index);
+			}
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to unclaim report!", e);
+			sender.sendMessage(getErrorMessage());
 		}
-		
-		if(!getManager().isReportIndexValid(sender, index))
-			return;
-		
-		if(canUnclaimReport(sender, index))
-			unclaimReport(sender, index);
 	}
 	
-	private boolean canUnclaimReport(CommandSender sender, int index)
+	private boolean canUnclaimReport(CommandSender sender, int index) throws ClassNotFoundException, SQLException, InterruptedException
 	{
-		String query = "SELECT ClaimStatus, ClaimedByUUID, ClaimedBy FROM Reports WHERE ID=" + index;
+		final String query = "SELECT ClaimStatus, ClaimedByUUID, ClaimedBy FROM Reports WHERE ID=" + index;
 		
-		try
-		{
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			SQLResultSet result = database.sqlQuery(connectionId, query);
 			
 			if(result.getBoolean("ClaimStatus"))
 			{
@@ -134,37 +143,32 @@ public class UnclaimCommand extends ReporterCommand
 				
 				return false;
 			}
-		}
-		catch(final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to unclaim report!", e);
-			sender.sendMessage(getErrorMessage());
-			return false;
+		} catch (final SQLException e) {
+			log.error(String.format("Failed to determine if player can unclaim report on connection [%s]!", connectionId));
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 		
 		return true;
 	}
 	
-	private void unclaimReport(CommandSender sender, int index)
+	private void unclaimReport(CommandSender sender, int index) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		String query = "UPDATE Reports " +
 				"SET " +
 				"ClaimStatus=0, ClaimedByUUID='', ClaimedBy='', ClaimPriority=0, ClaimDate='' " +
 				"WHERE ID=" + index;
 		
-		try
-		{
-			getManager().getDatabaseHandler().updateQuery(query);
-		}
-		catch(final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to unclaim report!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			database.updateQuery(connectionId, query);
+		} catch (final SQLException e) {
+			log.error(String.format("Failed to execute unclaim query on connection [%s]!", connectionId));
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 		
 		String output = getManager().getLocale().getString(UnclaimPhrases.reportUnclaimSuccess);

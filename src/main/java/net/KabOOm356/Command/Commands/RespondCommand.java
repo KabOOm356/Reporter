@@ -1,10 +1,12 @@
 package net.KabOOm356.Command.Commands;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.UUID;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.RespondPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ViewPhrases;
@@ -52,42 +54,47 @@ public class RespondCommand extends ReporterCommand
 	@Override
 	public void execute(CommandSender sender, ArrayList<String> args)
 	{
-		if(!hasRequiredPermission(sender))
-			return;
-		
-		// Cast the sender to type Player or tell the sender they must be a player
-		Player player = null;
-		if(BukkitUtil.isPlayer(sender))
-			player = (Player)sender;
-		else
-		{
-			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.RED + "You must be a player to use this command!");
-			return;
-		}
-		
-		int index;
-		
-		// Get the report index
-		if(args.get(0).equalsIgnoreCase("last"))
-		{
-			if(!hasRequiredLastViewed(sender))
+		try {
+			if(!hasRequiredPermission(sender))
 				return;
 			
-			index = getLastViewed(sender);
+			// Cast the sender to type Player or tell the sender they must be a player
+			Player player = null;
+			if(BukkitUtil.isPlayer(sender))
+				player = (Player)sender;
+			else
+			{
+				sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.RED + "You must be a player to use this command!");
+				return;
+			}
+			
+			int index;
+			
+			// Get the report index
+			if(args.get(0).equalsIgnoreCase("last"))
+			{
+				if(!hasRequiredLastViewed(sender))
+					return;
+				
+				index = getLastViewed(sender);
+			}
+			else
+				index = Util.parseInt(args.get(0));
+			
+			if(!getManager().isReportIndexValid(sender, index))
+				return;
+			
+			if(args.size() == 1)
+				teleportToReport(player, index, "reported");
+			else if(args.size() >= 2)
+				teleportToReport(player, index, args.get(1));
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to respond to report!", e);
+			sender.sendMessage(getErrorMessage());
 		}
-		else
-			index = Util.parseInt(args.get(0));
-		
-		if(!getManager().isReportIndexValid(sender, index))
-			return;
-		
-		if(args.size() == 1)
-			teleportToReport(player, index, "reported");
-		else if(args.size() >= 2)
-			teleportToReport(player, index, args.get(1));
 	}
 	
-	private void teleportToReport(Player player, int index, String playerLoc)
+	private void teleportToReport(Player player, int index, String playerLoc) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		if(!playerLoc.equalsIgnoreCase("sender") && !playerLoc.equalsIgnoreCase("reported"))
 			player.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.RED + BukkitUtil.colorCodeReplaceAll(getUsage()));
@@ -100,13 +107,15 @@ public class RespondCommand extends ReporterCommand
 			double X = 0.0, Y = 0.0, Z = 0.0;
 			String World = null, reported = null, sender = null, details = null;
 			
+			final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+			final int connectionId = database.openPooledConnection();
 			try
 			{
 				String query = "SELECT ID, ReportedUUID, Reported, SenderUUID, Sender, Details, SenderX, SenderY, SenderZ, SenderWorld, ReportedX, ReportedY, ReportedZ, ReportedWorld " +
 						"FROM Reports " +
 						"WHERE ID=" + index;
 
-				SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
+				SQLResultSet result = database.sqlQuery(connectionId, query);
 				
 				for(int LCV = 0; LCV < 2; LCV++)
 				{
@@ -168,16 +177,11 @@ public class RespondCommand extends ReporterCommand
 				}
 				
 				details = result.getString("Details");
-			}
-			catch (final Exception e)
-			{
-				log.log(Level.ERROR, "Failed to respond to report!", e);
-				player.sendMessage(getErrorMessage());
-				return;
-			}
-			finally
-			{
-				getManager().getDatabaseHandler().closeConnection();
+			} catch (final SQLException e) {
+				log.log(Level.ERROR, String.format("Failed to respond to report on connection [%s]!", connectionId));
+				throw e;
+			} finally {
+				database.closeConnection(connectionId);
 			}
 			
 			if(requestedToReported)

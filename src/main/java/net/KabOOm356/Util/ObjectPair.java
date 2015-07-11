@@ -49,4 +49,11 @@ public class ObjectPair<K,V> implements Entry<K,V>
 		
 		return oldValue;
 	}
+	
+	@Override
+	public String toString() {
+		final StringBuilder string = new StringBuilder();
+		string.append("[").append(key).append("=").append(value).append("]");
+		return string.toString();
+	}
 }

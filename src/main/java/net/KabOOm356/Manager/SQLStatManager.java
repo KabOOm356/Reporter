@@ -171,7 +171,7 @@ public class SQLStatManager
 	 * 
 	 * @throws IllegalArgumentException Thrown if any of the parameters are null.
 	 */
-	public SQLStatManager(ExtendedDatabaseHandler database, String tableName, String indexColumn, String secondaryIndexColumn)
+	public SQLStatManager(final ExtendedDatabaseHandler database, final String tableName, final String indexColumn, final String secondaryIndexColumn)
 	{
 		if(database == null)
 		{
@@ -205,7 +205,7 @@ public class SQLStatManager
 	 * @param player The player to increment the statistic for.
 	 * @param stat The SQLStat to increment.
 	 */
-	public void incrementStat(OfflinePlayer player, SQLStat stat)
+	public void incrementStat(final OfflinePlayer player, final SQLStat stat)
 	{
 		incrementStat(player, stat, 1);
 	}
@@ -219,32 +219,38 @@ public class SQLStatManager
 	 * 
 	 * @throws IllegalArgumentException If the increment value is less than one (1).
 	 */
-	public void incrementStat(OfflinePlayer player, SQLStat stat, int increment)
-	{
-		if(increment < 1)
-		{
+	public void incrementStat(final OfflinePlayer player, final SQLStat stat, final int increment) {
+		if(increment < 1) {
 			throw new IllegalArgumentException("'increment' cannot be less than one (1)!");
 		}
 		
-		addRow(player);
+		final String statColumn = stat.getColumnName();
 		
-		String statColumn = stat.getColumnName();
+		final StringBuilder query = new StringBuilder();
+		query.append("UPDATE ").append(tableName).append(' ');
+		query.append("SET ").append(statColumn).append(" = ").append(statColumn).append(" + ").append(increment).append(' ');
+		query.append("WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 		
-		String query = "UPDATE " + tableName + " "
-				+ "SET " + statColumn + " = " + statColumn + " + " + Integer.toString(increment) + " "
-				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ?";
-		
-		ArrayList<String> params = new ArrayList<String>();
-		
+		final ArrayList<String> params = new ArrayList<String>();
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 		
 		try {
-			getDatabase().preparedUpdateQuery(query, params);
+			addRow(player);
+			try {
+				final int connectionId = getDatabase().openPooledConnection();
+				try {
+					getDatabase().preparedUpdateQuery(connectionId, query.toString(), params);
+				} catch (final Exception e) {
+					log.error(String.format("Failed to increment statistic [%s] by %d for player [%s]!", stat.getName(), increment, BukkitUtil.formatPlayerName(player)), e);
+				} finally {
+					getDatabase().closeConnection(connectionId);
+				}
+			} catch(final Exception e) {
+				log.error(String.format("Failed to open connection to increment statistic [%s] by %d for player [%s]!", stat.getName(), increment, BukkitUtil.formatPlayerName(player)), e);
+			}
 		} catch (final Exception e) {
-			log.log(Level.ERROR, "Could not execute prepared update query!", e);
-		} finally {
-			getDatabase().closeConnection();
+			log.error(String.format("Failed to add row to increment statistic [%s] by %d for player [%s]!", stat.getName(), increment, BukkitUtil.formatPlayerName(player)), e);
 		}
 	}
 	
@@ -254,7 +260,7 @@ public class SQLStatManager
 	 * @param player The player to decrement the statistic for.
 	 * @param stat The SQLStat to decrement.
 	 */
-	public void decrementStat(OfflinePlayer player, SQLStat stat)
+	public void decrementStat(final OfflinePlayer player, final SQLStat stat)
 	{
 		decrementStat(player, stat, 1);
 	}
@@ -268,32 +274,40 @@ public class SQLStatManager
 	 * 
 	 * @throws IllegalArgumentException If the decrement value is less than one (1).
 	 */
-	public void decrementStat(OfflinePlayer player, SQLStat stat, int decrement)
+	public void decrementStat(final OfflinePlayer player, final SQLStat stat, int decrement)
 	{
 		if(decrement < 1)
 		{
 			throw new IllegalArgumentException("'decrement' cannot be less than one (1)!");
 		}
 		
-		addRow(player);
+		final String statColumn = stat.getColumnName();
 		
-		String statColumn = stat.getColumnName();
+		final StringBuilder query = new StringBuilder();
+		query.append("UPDATE ").append(tableName).append(' ');
+		query.append("SET ").append(statColumn).append(" = ").append(statColumn).append(" - ").append(decrement).append(' ');
+		query.append("WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 		
-		String query = "UPDATE " + tableName + " "
-				+ "SET " + statColumn + " = " + statColumn + " - " + Integer.toString(decrement) + " "
-				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ?";
-		
-		ArrayList<String> params = new ArrayList<String>();
-		
+		final ArrayList<String> params = new ArrayList<String>();
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 		
 		try {
-			getDatabase().preparedUpdateQuery(query, params);
-		} catch (final Exception e) {
-			log.log(Level.ERROR, "Failed to execute prepared update query!", e);
-		} finally {
-			getDatabase().closeConnection();
+			addRow(player);
+			try {
+				final int connectionId = getDatabase().openPooledConnection();
+				try {
+					getDatabase().preparedUpdateQuery(connectionId, query.toString(), params);
+				} catch (final Exception e) {
+					log.error(String.format("Failed to decrement statistic [%s] by %d for player [%s]!", stat.getName(), decrement, BukkitUtil.formatPlayerName(player)), e);
+				} finally {
+					getDatabase().closeConnection(connectionId);
+				}
+			} catch(final Exception e) {
+				log.error(String.format("Failed to open connection to decrement statistic [%s] by %d for player [%s]!", stat.getName(), decrement, BukkitUtil.formatPlayerName(player)), e);
+			}
+		} catch(final Exception e) {
+			log.error(String.format("Failed to add row to decrement statistic [%s] by %d for player [%s]!", stat.getName(), decrement, BukkitUtil.formatPlayerName(player)), e);
 		}
 	}
 	
@@ -306,28 +320,36 @@ public class SQLStatManager
 	 * @param stat The statistic to set.
 	 * @param value The value to set the statistic to.
 	 */
-	public void setStat(OfflinePlayer player, SQLStat stat, String value)
+	public void setStat(final OfflinePlayer player, final SQLStat stat, final String value)
 	{
-		addRow(player);
+		final String statColumn = stat.getColumnName();
 		
-		String statColumn = stat.getColumnName();
+		final StringBuilder query = new StringBuilder();
+		query.append("UPDATE ").append(tableName).append(' ');
+		query.append("SET ").append(statColumn).append(" = ? ");
+		query.append("WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 		
-		String query = "UPDATE " + tableName + " "
-				+ "SET " + statColumn + " = ? "
-				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ?";
-		
-		ArrayList<String> params = new ArrayList<String>();
-		
+		final ArrayList<String> params = new ArrayList<String>();
 		params.add(value);
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 		
 		try {
-			getDatabase().preparedUpdateQuery(query, params);
-		} catch (final Exception e) {
-			log.log(Level.ERROR, "Failed to execute prepared update query!", e);
-		} finally {
-			getDatabase().closeConnection();
+			addRow(player);
+			try {
+				final int connectionId = getDatabase().openPooledConnection();
+				try {
+					getDatabase().preparedUpdateQuery(connectionId, query.toString(), params);
+				} catch (final Exception e) {
+					log.error(String.format("Failed to set statistic [%s] to %s for player [%s]!", stat.getName(), value, BukkitUtil.formatPlayerName(player)), e);
+				} finally {
+					getDatabase().closeConnection(connectionId);
+				}
+			} catch(final Exception e) {
+				log.error(String.format("Failed to open connection to set statistic [%s] to %s for player [%s]!", stat.getName(), value, BukkitUtil.formatPlayerName(player)), e);
+			}
+		} catch(final Exception e) {
+			log.error(String.format("Failed to add row to set statistic [%s] to %s for player [%s]!", stat.getName(), value, BukkitUtil.formatPlayerName(player)), e);
 		}
 	}
 	
@@ -343,30 +365,35 @@ public class SQLStatManager
 	 */
 	public ResultRow getStat(OfflinePlayer player, SQLStat stat)
 	{
-		String statColumn = stat.getColumnName();
+		final String statColumn = stat.getColumnName();
 		
-		String query = "SELECT " + statColumn
-				+ " FROM " + tableName
-				+ " WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ?";
+		final StringBuilder query = new StringBuilder();
+		query.append("SELECT ").append(statColumn);
+		query.append(" FROM ").append(tableName);
+		query.append(" WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 		
-		ArrayList<String> params = new ArrayList<String>();
-		
+		final ArrayList<String> params = new ArrayList<String>();
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 		
 		ResultRow resultRow = new ResultRow();
 		
 		try {
-			SQLResultSet result = getDatabase().preparedSQLQuery(query, params);
-			
-			if(result != null && !result.isEmpty()) {
-				resultRow = result.get(SQLResultSet.FIRSTROW);
+			final int connectionId = getDatabase().openPooledConnection();
+			try {
+				final SQLResultSet result = getDatabase().preparedSQLQuery(connectionId, query.toString(), params);
+				
+				if(result != null && !result.isEmpty()) {
+					resultRow = result.get(SQLResultSet.FIRSTROW);
+				}
+			} catch(final Exception e) {
+				log.error(String.format("Failed to get SQL stat [%s] for player [%s]!", stat.getName(), BukkitUtil.formatPlayerName(player)), e);
+				return null;
+			} finally {
+				getDatabase().closeConnection(connectionId);
 			}
 		} catch(final Exception e) {
-			log.log(Level.ERROR, "Failed to get SQL stat!", e);
-			return null;
-		} finally {
-			getDatabase().closeConnection();
+			log.error(String.format("Failed to open connection to get SQL stat [%s] for player [%s]!", stat.getName(), BukkitUtil.formatPlayerName(player)), e);
 		}
 		
 		return resultRow;
@@ -381,13 +408,13 @@ public class SQLStatManager
 	 * @return A {@link ResultRow} containing the values for the statistics passed.
 	 * If an exception occurs while getting a statistic it is omitted from the returned {@link ResultRow}.
 	 */
-	public ResultRow getStat(OfflinePlayer player, Iterable<SQLStat> stats)
+	public ResultRow getStat(final OfflinePlayer player, final Iterable<SQLStat> stats)
 	{
-		ResultRow returnedRow = new ResultRow();
+		final ResultRow returnedRow = new ResultRow();
 		
-		for(SQLStat s : stats)
+		for(final SQLStat stat : stats)
 		{
-			ResultRow result = getStat(player, s);
+			final ResultRow result = getStat(player, stat);
 			
 			if(result != null)
 			{
@@ -402,18 +429,34 @@ public class SQLStatManager
 	 * Creates a new row for the player, if one does not exist.
 	 * 
 	 * @param player The player to create a new row for, if one does not already exist.
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws InterruptedException
 	 */
-	protected void addRow(OfflinePlayer player)
-	{
+	protected void addRow(final OfflinePlayer player) throws ClassNotFoundException, SQLException, InterruptedException {
+		final SQLResultSet rs = getIndex(player);
+		final int connectionId;
 		try {
-			SQLResultSet rs = getIndex(player);
-			
+			connectionId = getDatabase().openPooledConnection();
+		} catch (final ClassNotFoundException e) {
+			log.warn(String.format("Failed to open connection to insert new SQL stat row for player [%s]!", BukkitUtil.formatPlayerName(player)));
+			throw e;
+		} catch (final SQLException e) {
+			log.warn(String.format("Failed to open connection to insert new SQL stat row for player [%s]!", BukkitUtil.formatPlayerName(player)));
+			throw e;
+		} catch (final InterruptedException e) {
+			log.warn(String.format("Failed to open connection to insert new SQL stat row for player [%s]!", BukkitUtil.formatPlayerName(player)));
+			throw e;
+		}
+		try {
 			if(rs.isEmpty()) {
-				String query = "INSERT INTO " + tableName + " "
-						+ "(" + indexColumn + "," + secondaryIndexColumn + ") "
-						+ "VALUES (?,?)";
+				final StringBuilder query = new StringBuilder();
+				query.append("INSERT INTO ").append(tableName).append(' ');
+				query.append('(').append(indexColumn).append(',').append(secondaryIndexColumn).append(')');
+				query.append("VALUES (?,?)");
 				
-				ArrayList<String> params = new ArrayList<String>();
+				final ArrayList<String> params = new ArrayList<String>();
 				
 				if(BukkitUtil.isPlayerValid(player)) {
 					params.add(player.getUniqueId().toString());
@@ -424,12 +467,13 @@ public class SQLStatManager
 				
 				params.add(player.getName());
 				
-				getDatabase().preparedUpdateQuery(query, params);
+				getDatabase().preparedUpdateQuery(connectionId, query.toString(), params);
 			}
-		} catch(final Exception e) {
-			log.log(Level.ERROR, "Failed to insert new SQL stat row!", e);
+		} catch (final SQLException e) {
+			log.warn(String.format("Failed to insert new SQL stat row for player [%s]!", BukkitUtil.formatPlayerName(player)));
+			throw e;
 		} finally {
-			getDatabase().closeConnection();
+			getDatabase().closeConnection(connectionId);
 		}
 	}
 	
@@ -442,19 +486,42 @@ public class SQLStatManager
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
+	 * @throws InterruptedException
 	 */
-	private SQLResultSet getIndex(OfflinePlayer player) throws ClassNotFoundException, SQLException
-	{
-		String query = "SELECT ID "
-				+ "FROM " + tableName + " "
-				+ "WHERE " + indexColumn + " = ? OR " + secondaryIndexColumn + " = ?";
-		
-		ArrayList<String> params = new ArrayList<String>();
-		
-		params.add(player.getUniqueId().toString());
-		params.add(player.getName());
-		
-		return database.preparedSQLQuery(query, params);
+	protected SQLResultSet getIndex(final OfflinePlayer player) throws ClassNotFoundException, SQLException, InterruptedException {
+		final int connectionId;
+		try {
+			connectionId = getDatabase().openPooledConnection();
+		} catch (final ClassNotFoundException e) {
+			log.warn(String.format("Failed to open connection to get SQL stat index for player [%s]!", BukkitUtil.formatPlayerName(player)));
+			throw e;
+		} catch (final SQLException e) {
+			log.warn(String.format("Failed to open connection to get SQL stat index for player [%s]!", BukkitUtil.formatPlayerName(player)));
+			throw e;
+		} catch (final InterruptedException e) {
+			log.warn(String.format("Failed to open connection to get SQL stat index for player [%s]!", BukkitUtil.formatPlayerName(player)));
+			throw e;
+		}
+		try {
+			final StringBuilder query = new StringBuilder();
+			query.append("SELECT ID ");
+			query.append("FROM ").append(tableName).append(' ');
+			query.append("WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
+			
+			final ArrayList<String> params = new ArrayList<String>();
+			
+			params.add(player.getUniqueId().toString());
+			params.add(player.getName());
+			
+			try {
+				return getDatabase().preparedSQLQuery(connectionId, query.toString(), params);
+			} catch (final SQLException e) {
+				log.warn(String.format("Failed to get SQL stat index for player [%s]!", BukkitUtil.formatPlayerName(player)));
+				throw e;
+			}
+		} finally {
+			getDatabase().closeConnection(connectionId);
+		}
 	}
 	
 	/**

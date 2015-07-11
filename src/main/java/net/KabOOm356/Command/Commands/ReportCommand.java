@@ -1,10 +1,12 @@
 package net.KabOOm356.Command.Commands;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ReportPhrases;
@@ -12,6 +14,7 @@ import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager;
 import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager.PlayerStat;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
+import net.KabOOm356.Util.FormattingUtil;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -66,7 +69,12 @@ public class ReportCommand extends ReporterCommand
 		if(!canReport(sender, reported))
 			return;
 		
-		reportCommand(sender, reported, getDetails(args));
+		try {
+			reportCommand(sender, reported, getDetails(args));
+		} catch (final Exception e) {
+			log.error("Failed to report!", e);
+			sender.sendMessage(getErrorMessage());
+		}
 	}
 	
 	private boolean playerExists(CommandSender sender, OfflinePlayer player)
@@ -81,7 +89,7 @@ public class ReportCommand extends ReporterCommand
 		return true;
 	}
 	
-	private void reportCommand(CommandSender sender, OfflinePlayer reported, String details)
+	private void reportCommand(CommandSender sender, OfflinePlayer reported, String details) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		ArrayList<String> params = new ArrayList<String>();
 		int count = getManager().getCount();
@@ -143,23 +151,20 @@ public class ReportCommand extends ReporterCommand
 			params.add(15, "0");
 			params.add(16, "0");
 			
-			try
-			{
+			final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+			final int connectionId = database.openPooledConnection();
+			try {
 				String query = 
 						"INSERT INTO Reports " +
 						"(ID, SenderUUID, Sender, ReportedUUID, Reported, Details, Date, SenderWorld, SenderX, SenderY, SenderZ, ReportedWorld, ReportedX, ReportedY, ReportedZ, CompletionStatus, ClaimStatus) " +
 						"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-				getManager().getDatabaseHandler().preparedUpdateQuery(query, params);
+				database.preparedUpdateQuery(connectionId, query, params);
 			}
-			catch (final Exception e)
-			{
-				log.log(Level.ERROR, "Failed to report!", e);
-				sender.sendMessage(getErrorMessage());
-				return;
-			}
-			finally
-			{
-				getManager().getDatabaseHandler().closeConnection();
+			catch (final SQLException e) {
+				log.log(Level.ERROR, String.format("Failed to execute report query on connection [%d]!", connectionId));
+				throw e;
+			} finally {
+				database.closeConnection(connectionId);
 			}
 			
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
@@ -258,7 +263,7 @@ public class ReportCommand extends ReporterCommand
 		
 		int seconds = getManager().getReportLimitManager().getRemainingTime(sender, reported);
 		
-		return formatTimeRemaining(timeRemaining, seconds);
+		return FormattingUtil.formatTimeRemaining(timeRemaining, seconds);
 	}
 	
 	private String getTimeRemaining(CommandSender sender)
@@ -268,25 +273,7 @@ public class ReportCommand extends ReporterCommand
 		
 		int seconds = getManager().getReportLimitManager().getRemainingTime(sender);
 		
-		return formatTimeRemaining(timeRemaining, seconds);
-	}
-	
-	// TODO Move this to a utility class
-	private static String formatTimeRemaining(String line, int seconds)
-	{
-		// Convert the seconds to hours and drop the remainder.
-		int hours = (int) Math.ceil(seconds / 3600);
-		seconds = seconds % 3600;
-		
-		// Convert the seconds to minutes and drop the remainder.
-		int minutes = (int) Math.ceil(seconds / 60);
-		seconds = seconds % 60;
-		
-		line = line.replaceAll("%h", ChatColor.GOLD + Integer.toString(hours) + ChatColor.WHITE);
-		line = line.replaceAll("%m", ChatColor.GOLD + Integer.toString(minutes) + ChatColor.WHITE);
-		line = line.replaceAll("%s", ChatColor.GOLD + Integer.toString(seconds) + ChatColor.WHITE);
-		
-		return line;
+		return FormattingUtil.formatTimeRemaining(timeRemaining, seconds);
 	}
 	
 	private String getDetails(ArrayList<String> args)

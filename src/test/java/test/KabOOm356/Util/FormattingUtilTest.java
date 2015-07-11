@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import net.KabOOm356.Util.FormattingUtil;
 import net.KabOOm356.Util.Util;
 
+import org.bukkit.ChatColor;
 import org.junit.Test;
 
 public class FormattingUtilTest
@@ -169,5 +170,50 @@ public class FormattingUtilTest
 		assertEquals("Hello", FormattingUtil.capitalizeFirstCharacter("Hello"));
 		assertEquals("Ok", FormattingUtil.capitalizeFirstCharacter("ok"));
 		assertEquals("*", FormattingUtil.capitalizeFirstCharacter("*"));
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testFormatTimeRemainingNull() {
+		FormattingUtil.formatTimeRemaining(null, 1);
+	}
+	
+	@Test
+	public void testFormatTimeRemaining() {
+		assertEquals("", FormattingUtil.formatTimeRemaining("", 1));
+		assertEquals("x", FormattingUtil.formatTimeRemaining("x", 1));
+		
+		assertEquals(ChatColor.GOLD + "0" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%h", 1));
+		assertEquals(ChatColor.GOLD + "0" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%m", 1));
+		assertEquals(ChatColor.GOLD + "1" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%s", 1));
+		
+		assertEquals(ChatColor.GOLD + "0" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%h", 60));
+		assertEquals(ChatColor.GOLD + "1" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%m", 60));
+		assertEquals(ChatColor.GOLD + "0" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%s", 60));
+		
+		assertEquals(ChatColor.GOLD + "0" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%h", 61));
+		assertEquals(ChatColor.GOLD + "1" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%m", 61));
+		assertEquals(ChatColor.GOLD + "1" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%s", 61));
+		
+		assertEquals(ChatColor.GOLD + "1" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%h", 3600));
+		assertEquals(ChatColor.GOLD + "0" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%m", 3600));
+		assertEquals(ChatColor.GOLD + "0" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%s", 3600));
+		
+		assertEquals(ChatColor.GOLD + "1" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%h", 3601));
+		assertEquals(ChatColor.GOLD + "0" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%m", 3601));
+		assertEquals(ChatColor.GOLD + "1" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%s", 3601));
+		
+		assertEquals(ChatColor.GOLD + "1" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%h", 3660));
+		assertEquals(ChatColor.GOLD + "1" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%m", 3660));
+		assertEquals(ChatColor.GOLD + "0" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%s", 3660));
+		
+		assertEquals(ChatColor.GOLD + "1" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%h", 3661));
+		assertEquals(ChatColor.GOLD + "1" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%m", 3661));
+		assertEquals(ChatColor.GOLD + "1" + ChatColor.WHITE, FormattingUtil.formatTimeRemaining("%s", 3661));
+		
+		String line = "%hh %mm %ss";
+		String returnedLine = ChatColor.GOLD + "3" + ChatColor.WHITE + "h ";
+		returnedLine += ChatColor.GOLD + "2" + ChatColor.WHITE + "m ";
+		returnedLine += ChatColor.GOLD + "1" + ChatColor.WHITE + "s";
+		assertEquals(returnedLine, FormattingUtil.formatTimeRemaining(line, 10921));
 	}
 }

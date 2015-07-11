@@ -40,7 +40,6 @@ import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.FormattingUtil;
 import net.KabOOm356.Util.Util;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -191,7 +190,7 @@ public class ReporterCommandManager implements CommandExecutor
 		}
 		
 		ArrayList<String> arguments = Util.arrayToArrayList(args);
-		ReporterCommand command = null;
+		net.KabOOm356.Command.Command command;
 		
 		// Begin Respond Command
 		if(label.equalsIgnoreCase("respond") || label.equalsIgnoreCase("resp") || label.equalsIgnoreCase("rrespond"))
@@ -217,8 +216,13 @@ public class ReporterCommandManager implements CommandExecutor
 			// Respond to report
 			if(arguments.size() >= command.getMinimumNumberOfArguments())
 			{
-				command.execute(sender, arguments);
-				return true;
+				try {
+					final net.KabOOm356.Command.Command commandToRun = command.getRunnableClone(sender, arguments);
+					Bukkit.getScheduler().runTaskAsynchronously(plugin, commandToRun);
+					return true;
+				} catch (Exception e) {
+					log.error("Failed to run Respond command!", e);
+				}
 			}
 			else
 				sender.sendMessage(ChatColor.RED + command.getUsage());
@@ -254,8 +258,14 @@ public class ReporterCommandManager implements CommandExecutor
 			{
 				if(arguments.size() >= command.getMinimumNumberOfArguments())
 				{
-					command.execute(sender, arguments);
-					return true;
+					try {
+						final net.KabOOm356.Command.Command commandToRun = command.getRunnableClone(sender, arguments);
+						Bukkit.getScheduler().runTaskAsynchronously(plugin, commandToRun);
+						return true;
+					} catch (Exception e) {
+						log.error("Failed to run Report command!", e);
+					}
+					
 				}
 				else
 					sender.sendMessage(ChatColor.RED + BukkitUtil.colorCodeReplaceAll(command.getUsage()));
@@ -268,8 +278,13 @@ public class ReporterCommandManager implements CommandExecutor
 				
 				if(arguments.size() >= command.getMinimumNumberOfArguments())
 				{
-					command.execute(sender, arguments);
-					return true;
+					try {
+						final net.KabOOm356.Command.Command commandToRun = command.getRunnableClone(sender, arguments);
+						Bukkit.getScheduler().runTaskAsynchronously(plugin, commandToRun);
+						return true;
+					} catch (Exception e) {
+						log.error("Failed to Report!", e);
+					}
 				}
 				else
 					sender.sendMessage(ChatColor.RED + BukkitUtil.colorCodeReplaceAll(command.getUsage()));
@@ -459,22 +474,24 @@ public class ReporterCommandManager implements CommandExecutor
 		}
 		
 		ArrayList<Integer> indexes = new ArrayList<Integer>();
+		final ExtendedDatabaseHandler database = getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
 		
 		try
 		{
-			SQLResultSet result = plugin.getDatabaseHandler().preparedSQLQuery(query, params);
+			SQLResultSet result = database.preparedSQLQuery(connectionId, query, params);
 			
 			for(ResultRow row : result)
 				indexes.add(row.getInt("ID"));
 		}
 		catch(final Exception e)
 		{
-			log.log(Level.WARN, "Failed to get viewable reports!");
+			log.warn("Failed to get viewable reports!");
 			throw e;
 		}
 		finally
 		{	
-			plugin.getDatabaseHandler().closeConnection();
+			database.closeConnection(connectionId);
 		}
 		
 		return indexes;
@@ -488,41 +505,53 @@ public class ReporterCommandManager implements CommandExecutor
 	 * @param repIndex The report index to check if it is valid.
 	 * 
 	 * @return True if the report index is valid, otherwise false.
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
+	 * @throws InterruptedException 
 	 */
-	public boolean isReportIndexValid(CommandSender sender, int repIndex)
-	{
-		int count = getCount();
-		
-		if(repIndex == -1)
-		{
-			sender.sendMessage(ChatColor.RED + plugin.getLocale().getString(GeneralPhrases.indexInt));
-			return false;
+	public boolean isReportIndexValid(final CommandSender sender, final Integer repIndex) throws ClassNotFoundException, SQLException, InterruptedException {
+		final Locale locale = getLocale();
+		try {
+			final int count = getCount();
+			if(repIndex == null) {
+				sender.sendMessage(ChatColor.RED + locale.getString(GeneralPhrases.indexInt));
+				return false;
+			} else if(repIndex < 1 || repIndex > count) {
+				sender.sendMessage(ChatColor.RED + locale.getString(GeneralPhrases.indexRange));
+				return false;
+			}
+			return true;
+		} catch(final ClassNotFoundException e) {
+			log.error("Failed to check if report index is valid!");
+			throw e;
+		} catch(final SQLException e) {
+			log.error("Failed to check if report index is valid!");
+			throw e;
+		} catch(final InterruptedException e) {
+			log.error("Failed to check if report index is valid!");
+			throw e;
 		}
-		else if(count == -1)
-		{
-			sender.sendMessage(ChatColor.RED + Reporter.getLogPrefix() + plugin.getLocale().getString(GeneralPhrases.error));
-			return false;
-		}
-		else if(repIndex < 1 || repIndex > count)
-		{
-			sender.sendMessage(ChatColor.RED + plugin.getLocale().getString(GeneralPhrases.indexRange));
-			return false;
-		}
-		return true;
 	}
 	
 	/**
 	 * Returns the current number of incomplete reports in the database.
 	 * 
-	 * @return The current number of incomplete reports in the database.
-	 * @throws Exception 
+	 * @return The current number of incomplete reports in the database. 
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
+	 * @throws InterruptedException 
 	 */
-	public int getIncompleteReports() throws Exception
-	{
+	public int getIncompleteReports() throws ClassNotFoundException, SQLException, InterruptedException {
 		try {
 			return getIncompleteReportIndexes().size();
-		} catch (final Exception e) {
-			log.log(Level.WARN, "Failed to get the number of incomplete reports!");
+		} catch (ClassNotFoundException e) {
+			log.warn("Failed to get the number of incomplete reports!");
+			throw e;
+		} catch (SQLException e) {
+			log.warn("Failed to get the number of incomplete reports!");
+			throw e;
+		} catch(final InterruptedException e) {
+			log.warn("Failed to get the number of incomplete reports!");
 			throw e;
 		}
 	}
@@ -531,14 +560,21 @@ public class ReporterCommandManager implements CommandExecutor
 	 * Returns the current number of complete reports in the database.
 	 * 
 	 * @return The current number of complete reports in the database.
-	 * @throws Exception 
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
+	 * @throws InterruptedException 
 	 */
-	public int getCompletedReports() throws Exception
-	{
+	public int getCompletedReports() throws ClassNotFoundException, SQLException, InterruptedException {
 		try {
 			return getCompletedReportIndexes().size();
-		} catch (final Exception e) {
-			log.log(Level.WARN, "Failed to get number of completed reports!");
+		} catch (final ClassNotFoundException e) {
+			log.warn("Failed to get number of completed reports!");
+			throw e;
+		} catch (final SQLException e) {
+			log.warn("Failed to get number of completed reports!");
+			throw e;
+		} catch (final InterruptedException e) {
+			log.warn("Failed to get number of completed reports!");
 			throw e;
 		}
 	}
@@ -547,29 +583,26 @@ public class ReporterCommandManager implements CommandExecutor
 	 * Returns the indexes of the completed reports in the database.
 	 * 
 	 * @return An {@link ArrayList} of integers containing the indexes to all the completed reports in the database.
-	 * @throws Exception 
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
+	 * @throws InterruptedException 
 	 */
-	public ArrayList<Integer> getCompletedReportIndexes() throws Exception
-	{
-		ArrayList<Integer> indexes = new ArrayList<Integer>();
-		
-		try
-		{
-			String query = "SELECT ID FROM Reports WHERE CompletionStatus=1";
+	public ArrayList<Integer> getCompletedReportIndexes() throws SQLException, ClassNotFoundException, InterruptedException {
+		final ArrayList<Integer> indexes = new ArrayList<Integer>();
+		final ExtendedDatabaseHandler database = getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			final String query = "SELECT ID FROM Reports WHERE CompletionStatus=1";
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 			
-			SQLResultSet result = plugin.getDatabaseHandler().sqlQuery(query);
-			
-			for(ResultRow row : result)
+			for(final ResultRow row : result) {
 				indexes.add(row.getInt("ID"));
-		}
-		catch (final Exception e)
-		{
-			log.log(Level.WARN, "Failed to get completed report indexes!");
+			}
+		} catch (final SQLException e) {
+			log.warn("Failed to get completed report indexes!");
 			throw e;
-		}
-		finally
-		{
-			plugin.getDatabaseHandler().closeConnection();
+		} finally {
+			database.closeConnection(connectionId);
 		}
 		
 		return indexes;
@@ -579,29 +612,27 @@ public class ReporterCommandManager implements CommandExecutor
 	 * Returns the indexes of the incomplete reports in the database.
 	 * 
 	 * @return An {@link ArrayList} of integers containing the indexes to all the incomplete reports in the database.
-	 * @throws Exception 
+	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
+	 * @throws InterruptedException 
 	 */
-	public ArrayList<Integer> getIncompleteReportIndexes() throws Exception
-	{
-		ArrayList<Integer> indexes = new ArrayList<Integer>();
-		
-		try
-		{
-			String query = "SELECT ID FROM Reports WHERE CompletionStatus=0";
+	public ArrayList<Integer> getIncompleteReportIndexes() throws ClassNotFoundException, SQLException, InterruptedException {
+		final ArrayList<Integer> indexes = new ArrayList<Integer>();
+		final ExtendedDatabaseHandler database = getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			final String query = "SELECT ID FROM Reports WHERE CompletionStatus=0";
 
-			SQLResultSet result = plugin.getDatabaseHandler().sqlQuery(query);
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 			
-			for(ResultRow row : result)
+			for(final ResultRow row : result) {
 				indexes.add(row.getInt("ID"));
-		}
-		catch (final Exception e)
-		{
-			log.log(Level.WARN, "Failed to get incomplete report indexes!");
+			}
+		} catch (final SQLException e) {
+			log.warn("Failed to get incomplete report indexes!");
 			throw e;
-		}
-		finally
-		{
-			plugin.getDatabaseHandler().closeConnection();
+		} finally {
+			database.closeConnection(connectionId);
 		}
 		
 		return indexes;
@@ -610,30 +641,25 @@ public class ReporterCommandManager implements CommandExecutor
 	/**
 	 * Returns the current number of reports in the database.
 	 * 
-	 * @return The current number of reports in the database.  If an exception occurs -1 is returned.
+	 * @return The current number of reports in the database.
+	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
+	 * @throws InterruptedException 
 	 */
-	public int getCount()
-	{
-		int count = -1;
-		
-		try
-		{
-			String query = "SELECT COUNT(*) AS Count FROM Reports";
+	public int getCount() throws ClassNotFoundException, SQLException, InterruptedException {
+		final ExtendedDatabaseHandler database = getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			final String query = "SELECT COUNT(*) AS Count FROM Reports";
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 			
-			SQLResultSet result = plugin.getDatabaseHandler().sqlQuery(query);
-			
-			count = result.getInt("Count");
+			return result.getInt("Count");
+		} catch (SQLException e) {
+			log.warn("Failed to get total report count!");
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
-		catch (final Exception e)
-		{
-			log.log(Level.WARN, "Failed to get total report count!", e);
-		}
-		finally
-		{
-			plugin.getDatabaseHandler().closeConnection();
-		}
-		
-		return count;
 	}
 	
 	/**
@@ -778,9 +804,19 @@ public class ReporterCommandManager implements CommandExecutor
 			playerObject = (Player) player;
 		}
 		
+		final ExtendedDatabaseHandler database = getDatabaseHandler();
+		final int connectionId;
+		try {
+			connectionId = database.openPooledConnection();
+		} catch (final Exception e) {
+			log.error("Failed to check if report can be altered by player!", e);
+			sender.sendMessage(ChatColor.RED + Reporter.getLogPrefix() + getLocale().getString(GeneralPhrases.error));
+			return false;
+		}
+		
 		try
 		{
-			SQLResultSet result = getDatabaseHandler().sqlQuery(query);
+			SQLResultSet result = database.sqlQuery(connectionId, query);
 			
 			if(!result.getString("ClaimedByUUID").isEmpty())
 			{
@@ -847,13 +883,13 @@ public class ReporterCommandManager implements CommandExecutor
 		}
 		catch(final Exception e)
 		{
-			log.log(Level.ERROR, "Failed to check if report can be altered by player!", e);
+			log.error("Failed to check if report can be altered by player!", e);
 			sender.sendMessage(ChatColor.RED + Reporter.getLogPrefix() + getLocale().getString(GeneralPhrases.error));
 			return false;
 		}
 		finally
 		{
-			getDatabaseHandler().closeConnection();
+			database.closeConnection(connectionId);
 		}
 		
 		return true;
@@ -869,8 +905,9 @@ public class ReporterCommandManager implements CommandExecutor
 	 * 
 	 * @throws SQLException 
 	 * @throws ClassNotFoundException 
+	 * @throws InterruptedException 
 	 */
-	public boolean checkPriority(CommandSender player, int index) throws ClassNotFoundException, SQLException
+	public boolean checkPriority(CommandSender player, int index) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		if(player instanceof ConsoleCommandSender)
 			return true;
@@ -935,7 +972,7 @@ public class ReporterCommandManager implements CommandExecutor
 		}
 		catch (final Exception e)
 		{
-			log.log(Level.ERROR, "Failed to check priority!", e);
+			log.error("Failed to check priority!", e);
 			sender.sendMessage(ChatColor.RED + Reporter.getLogPrefix() + getLocale().getString(GeneralPhrases.error));
 			return false;
 		}
@@ -943,13 +980,14 @@ public class ReporterCommandManager implements CommandExecutor
 		return true;
 	}
 	
-	private ModLevel getReportPriority(int index) throws SQLException, ClassNotFoundException
+	private ModLevel getReportPriority(int index) throws SQLException, ClassNotFoundException, InterruptedException
 	{
 		String query = "SELECT Priority FROM Reports WHERE ID=" + index;
-		
+		final ExtendedDatabaseHandler database = getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
 		try
 		{
-			SQLResultSet result = getDatabaseHandler().sqlQuery(query);
+			SQLResultSet result = database.sqlQuery(connectionId, query);
 			
 			int level = result.getInt("Priority");
 			
@@ -957,7 +995,7 @@ public class ReporterCommandManager implements CommandExecutor
 		}
 		finally
 		{
-			getDatabaseHandler().closeConnection();
+			database.closeConnection(connectionId);
 		}
 	}
 	
@@ -970,21 +1008,24 @@ public class ReporterCommandManager implements CommandExecutor
 	 * 
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
+	 * @throws InterruptedException 
 	 */
-	public int getNumberOfPriority(ModLevel level) throws SQLException, ClassNotFoundException
+	public int getNumberOfPriority(ModLevel level) throws SQLException, ClassNotFoundException, InterruptedException
 	{
 		String query = "SELECT COUNT(*) AS Count FROM Reports WHERE Priority = " + level.getLevel();
 		int count = 0;
 		
+		final ExtendedDatabaseHandler database = getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
 		try
 		{
-			SQLResultSet result = getDatabaseHandler().sqlQuery(query);
+			SQLResultSet result = database.sqlQuery(connectionId, query);
 			
 			count = result.getInt("Count");
 		}
 		finally
 		{
-			getDatabaseHandler().closeConnection();
+			database.closeConnection(connectionId);
 		}
 		
 		return count;
@@ -999,22 +1040,25 @@ public class ReporterCommandManager implements CommandExecutor
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
+	 * @throws InterruptedException 
 	 */
-	public ArrayList<Integer> getIndexesOfPriority(ModLevel level) throws ClassNotFoundException, SQLException
+	public ArrayList<Integer> getIndexesOfPriority(ModLevel level) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		ArrayList<Integer> indexes = new ArrayList<Integer>();
 		String query = "SELECT ID FROM Reports WHERE Priority = " + level.getLevel();
 		
+		final ExtendedDatabaseHandler database = getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
 		try
 		{
-			SQLResultSet result = getDatabaseHandler().sqlQuery(query);
+			SQLResultSet result = database.sqlQuery(connectionId, query);
 			
 			for(ResultRow row : result)
 				indexes.add(row.getInt("ID"));
 		}
 		finally
 		{
-			getDatabaseHandler().closeConnection();
+			database.closeConnection(connectionId);
 		}
 		
 		return indexes;

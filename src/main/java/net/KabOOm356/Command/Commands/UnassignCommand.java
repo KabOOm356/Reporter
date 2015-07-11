@@ -1,9 +1,9 @@
 package net.KabOOm356.Command.Commands;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -13,6 +13,7 @@ import org.bukkit.command.CommandSender;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.UnassignPhrases;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
@@ -46,57 +47,60 @@ public class UnassignCommand extends ReporterCommand
 	@Override
 	public void execute(CommandSender sender, ArrayList<String> args)
 	{
-		if(!hasRequiredPermission(sender))
-			return;
-		
-		int index = Util.parseInt(args.get(0));
-		
-		if(args.get(0).equalsIgnoreCase("last"))
-		{
-			if(!hasRequiredLastViewed(sender))
+		try {
+			if(!hasRequiredPermission(sender))
 				return;
 			
-			index = getLastViewed(sender);
+			int index = Util.parseInt(args.get(0));
+			
+			if(args.get(0).equalsIgnoreCase("last"))
+			{
+				if(!hasRequiredLastViewed(sender))
+					return;
+				
+				index = getLastViewed(sender);
+			}
+			
+			if(!getManager().isReportIndexValid(sender, index))
+				return;
+			
+			if(!getManager().canAlterReport(sender, index))
+				return;
+			
+			unassignReport(sender, index);
+		} catch (final Exception e) {
+			log.error("Failed to unassign report!", e);
+			sender.sendMessage(getErrorMessage());
 		}
-		
-		if(!getManager().isReportIndexValid(sender, index))
-			return;
-		
-		if(!getManager().canAlterReport(sender, index))
-			return;
-		
-		unassignReport(sender, index);
 	}
 
-	private void unassignReport(CommandSender sender, int index)
+	private void unassignReport(final CommandSender sender, final int index) throws ClassNotFoundException, SQLException, InterruptedException
 	{
-		// LOW Long String concatenation.
-		String query = "SELECT ClaimedByUUID, ClaimedBy FROM Reports WHERE ID=" + index;
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT ClaimedByUUID, ClaimedBy FROM Reports WHERE ID=").append(index);
 		String claimedByUUID, claimedBy;
 		
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
 		try
 		{
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
+			final SQLResultSet result = database.sqlQuery(connectionId, query.toString());
 			
 			claimedByUUID = result.getString("ClaimedByUUID");
 			claimedBy = result.getString("ClaimedBy");
 			
-			query = "UPDATE Reports " +
-					"SET " +
-					"ClaimStatus=0, ClaimedByUUID='', ClaimedBy='', ClaimPriority=0, ClaimDate='' " +
-					"WHERE ID=" + index;
+			query = new StringBuilder();
+			query.append("UPDATE Reports ");
+			query.append("SET ");
+			query.append("ClaimStatus=0, ClaimedByUUID='', ClaimedBy='', ClaimPriority=0, ClaimDate='' ");
+			query.append("WHERE ID=").append(index);
 			
-			getManager().getDatabaseHandler().updateQuery(query);
-		}
-		catch(final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to unassign report!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+			database.updateQuery(connectionId, query.toString());
+		} catch (final SQLException e) {
+			log.error(String.format("Failed to execute unassign query on connection [%s]!", connectionId));
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 		
 		String playerName = claimedBy;

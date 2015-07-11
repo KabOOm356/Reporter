@@ -1,9 +1,11 @@
 package net.KabOOm356.Command.Commands;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ListPhrases;
 import net.KabOOm356.Permission.ModLevel;
@@ -50,30 +52,35 @@ public class ListCommand extends ReporterCommand
 	{
 		if(hasPermission(sender))
 		{
-			if (args == null || args.isEmpty())
-				listCommand(sender);
-			else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("indexes"))
-				listIndexes(sender);
-			else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("priority"))
-			{
-				if (args.size() >= 2 && args.get(1).equalsIgnoreCase("indexes"))
-					listPriorityIndexes(sender);
+			try {
+				if (args == null || args.isEmpty())
+					listCommand(sender);
+				else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("indexes"))
+					listIndexes(sender);
+				else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("priority"))
+				{
+					if (args.size() >= 2 && args.get(1).equalsIgnoreCase("indexes"))
+						listPriorityIndexes(sender);
+					else
+						listPriority(sender);
+				}
+				else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("claimed"))
+				{
+					if (args.size() >= 3 && args.get(1).equalsIgnoreCase("priority") && args.get(2).equalsIgnoreCase("indexes"))
+						listClaimedPriorityIndexes(sender);
+					else if (args.size() >= 2 && args.get(1).equalsIgnoreCase("indexes"))
+						listClaimedIndexes(sender);
+					else if (args.size() >= 2 && args.get(1).equalsIgnoreCase("priority"))
+						listClaimedPriority(sender);
+					else
+						listClaimed(sender);
+				}
 				else
-					listPriority(sender);
+					sender.sendMessage(ChatColor.RED + BukkitUtil.colorCodeReplaceAll(getUsage()));
+			} catch (final Exception e) {
+				log.error("Failed to execute list command!", e);
+				sender.sendMessage(getErrorMessage());
 			}
-			else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("claimed"))
-			{
-				if (args.size() >= 3 && args.get(1).equalsIgnoreCase("priority") && args.get(2).equalsIgnoreCase("indexes"))
-					listClaimedPriorityIndexes(sender);
-				else if (args.size() >= 2 && args.get(1).equalsIgnoreCase("indexes"))
-					listClaimedIndexes(sender);
-				else if (args.size() >= 2 && args.get(1).equalsIgnoreCase("priority"))
-					listClaimedPriority(sender);
-				else
-					listClaimed(sender);
-			}
-			else
-				sender.sendMessage(ChatColor.RED + BukkitUtil.colorCodeReplaceAll(getUsage()));
 		}
 		else if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true))
 		{
@@ -104,7 +111,7 @@ public class ListCommand extends ReporterCommand
 			sender.sendMessage(getFailedPermissionsMessage());
 	}
 	
-	private void listClaimed(CommandSender sender)
+	private void listClaimed(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		// LOW Long String concatenation.
 		String query = "SELECT COUNT(*) AS Count " +
@@ -121,31 +128,23 @@ public class ListCommand extends ReporterCommand
 			query += "ClaimedBy = '" + sender.getName() + "'";
 		}
 		
-		try
-		{
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
-			
-			int count = result.getInt("Count");
-			
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
+			final int count = result.getInt("Count");
 			String message = getManager().getLocale().getString(ListPhrases.listClaimed);
-			
 			message = message.replaceAll("%n", ChatColor.GOLD + Integer.toString(count) + ChatColor.WHITE);
-			
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + message);
-		}
-		catch (final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to list claimed reports!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		} catch (SQLException e) {
+			log.log(Level.ERROR, String.format("Failed to list claimed reports on connection [%d]!", connectionId));
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 	}
 
-	private void listClaimedPriority(CommandSender sender)
+	private void listClaimedPriority(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		String queryFormat = null;
 		
@@ -174,35 +173,27 @@ public class ListCommand extends ReporterCommand
 		int normalPriorityCount = 0;
 		int highPriorityCount = 0;
 		
-		SQLResultSet result;
-		
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
 		try
 		{
-			result = getManager().getDatabaseHandler().sqlQuery(queryFormat + ModLevel.NONE.getLevel());
-			
+			SQLResultSet result = database.sqlQuery(connectionId, queryFormat + ModLevel.NONE.getLevel());
 			noPriorityCount = result.getInt("Count");
 			
-			result = getManager().getDatabaseHandler().sqlQuery(queryFormat + ModLevel.LOW.getLevel());
-			
+			result = database.sqlQuery(connectionId, queryFormat + ModLevel.LOW.getLevel());
 			lowPriorityCount = result.getInt("Count");
 			
-			result = getManager().getDatabaseHandler().sqlQuery(queryFormat + ModLevel.NORMAL.getLevel());
-			
+			result = database.sqlQuery(connectionId, queryFormat + ModLevel.NORMAL.getLevel());
 			normalPriorityCount = result.getInt("Count");
 			
-			result = getManager().getDatabaseHandler().sqlQuery(queryFormat + ModLevel.HIGH.getLevel());
-			
+			result = database.sqlQuery(connectionId, queryFormat + ModLevel.HIGH.getLevel());
 			highPriorityCount = result.getInt("Count");
 		}
-		catch (final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to list claimed reports by priority!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		catch (final SQLException e) {
+			log.log(Level.ERROR, String.format("Failed to list claimed reports by priority on connection [%d]!", connectionId));
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 		
 		printClaimedPriorityCount(sender, ModLevel.NONE, noPriorityCount);
@@ -223,7 +214,7 @@ public class ListCommand extends ReporterCommand
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 	}
 
-	private void listClaimedIndexes(CommandSender sender)
+	private void listClaimedIndexes(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		// LOW Long String concatenation.
 		String query = "SELECT ID " +
@@ -240,33 +231,26 @@ public class ListCommand extends ReporterCommand
 			query += "ClaimedBy = '" + sender.getName() + "'";
 		}
 		
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
 		try
 		{
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
-			
-			String indexes = Util.indexesToString(
-					result,
-					"ID", ChatColor.GOLD, ChatColor.WHITE);
-			
+			SQLResultSet result = database.sqlQuery(connectionId, query);
+			String indexes = Util.indexesToString(result, "ID", ChatColor.GOLD, ChatColor.WHITE);
 			String message = getManager().getLocale().getString(ListPhrases.listClaimedIndexes);
-			
 			message = message.replaceAll("%i", indexes);
 			
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + message);
+		} catch (final SQLException e) {
+			log.log(Level.ERROR, String.format("Failed to list claimed report indexes on connection [%d]!", connectionId));
+			throw e;
 		}
-		catch (final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to list claimed report indexes!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		finally {
+			database.closeConnection(connectionId);
 		}
 	}
 
-	private void listClaimedPriorityIndexes(CommandSender sender)
+	private void listClaimedPriorityIndexes(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		String queryFormat = null;
 		
@@ -299,29 +283,26 @@ public class ListCommand extends ReporterCommand
 		
 		SQLResultSet result;
 		
-		try
-		{
-			result = getManager().getDatabaseHandler().sqlQuery(queryFormat + ModLevel.NONE.getLevel());
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			result = database.sqlQuery(connectionId, queryFormat + ModLevel.NONE.getLevel());
 			noPriorityIndexes = Util.indexesToString(result, "ID", ModLevel.NONE.getColor(), ChatColor.WHITE);
 			
-			result = getManager().getDatabaseHandler().sqlQuery(queryFormat + ModLevel.LOW.getLevel());
+			result = database.sqlQuery(connectionId, queryFormat + ModLevel.LOW.getLevel());
 			lowPriorityIndexes = Util.indexesToString(result, "ID", ModLevel.LOW.getColor(), ChatColor.WHITE);
 			
-			result = getManager().getDatabaseHandler().sqlQuery(queryFormat + ModLevel.NORMAL.getLevel());
+			result = database.sqlQuery(connectionId, queryFormat + ModLevel.NORMAL.getLevel());
 			normalPriorityIndexes = Util.indexesToString(result, "ID", ModLevel.NORMAL.getColor(), ChatColor.WHITE);
 			
-			result = getManager().getDatabaseHandler().sqlQuery(queryFormat + ModLevel.HIGH.getLevel());
+			result = database.sqlQuery(connectionId, queryFormat + ModLevel.HIGH.getLevel());
 			highPriorityIndexes = Util.indexesToString(result, "ID", ModLevel.HIGH.getColor(), ChatColor.WHITE);
+		} catch (final SQLException e) {
+			log.log(Level.ERROR, String.format("Failed to list claimed report indexes by priority on connection [%d]!", connectionId));
+			throw e;
 		}
-		catch (final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to list claimed report indexes by priority!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		finally {
+			database.closeConnection(connectionId);
 		}
 		
 		printClaimedPriorityIndexes(sender, ModLevel.NONE, noPriorityIndexes);

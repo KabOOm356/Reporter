@@ -1,10 +1,12 @@
 package net.KabOOm356.Command.Commands;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.UUID;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
@@ -51,6 +53,7 @@ public class RequestCommand extends ReporterCommand
 	@Override
 	public void execute(CommandSender sender, ArrayList<String> args)
 	{
+		try {
 		if(hasRequiredPermission(sender))
 		{
 			if(args.get(0).equalsIgnoreCase("most"))
@@ -58,9 +61,13 @@ public class RequestCommand extends ReporterCommand
 			else
 				requestPlayer(sender, args.get(0));
 		}
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to request!", e);
+			sender.sendMessage(getErrorMessage());
+		}
 	}
 	
-	private void requestMostReported(CommandSender sender)
+	private void requestMostReported(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		// Return the most reported players and the number of reports against them.
 		// LOW Long String concatenation.
@@ -74,13 +81,14 @@ public class RequestCommand extends ReporterCommand
 				"LIMIT 1" +
 				")";
 		
-		try
-		{
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
 			ArrayList<String> players = new ArrayList<String>();
 			SQLResultSet result;
 			int numberOfReports = -1;
 			
-			result = getManager().getDatabaseHandler().sqlQuery(query);
+			result = database.sqlQuery(connectionId, query);
 			
 			for(ResultRow row : result)
 			{
@@ -117,20 +125,15 @@ public class RequestCommand extends ReporterCommand
 				sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + 
 						ChatColor.WHITE + getManager().getLocale().getString(GeneralPhrases.noReports));
 			}
-		}
-		catch (final Exception e)
-		{
+		} catch (final SQLException e) {
 			log.log(Level.ERROR, "Failed to request most reported player!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 	}
 	
-	private void requestPlayer(CommandSender sender, String playerName)
+	private void requestPlayer(CommandSender sender, String playerName) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		OfflinePlayer player = getManager().getPlayer(playerName);
 		
@@ -143,8 +146,9 @@ public class RequestCommand extends ReporterCommand
 		
 		String indexes = "";
 		
-		try
-		{
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
 			ArrayList<String> params = new ArrayList<String>();
 			String query = "SELECT ID FROM Reports WHERE ReportedUUID=?";
 			
@@ -161,19 +165,16 @@ public class RequestCommand extends ReporterCommand
 			if(getManager().getDatabaseHandler().usingSQLite())
 				query += " COLLATE NOCASE";
 			
-			SQLResultSet result = getManager().getDatabaseHandler().preparedSQLQuery(query, params);
+			SQLResultSet result = getManager().getDatabaseHandler().preparedSQLQuery(connectionId, query, params);
 			
 			indexes = Util.indexesToString(result, "ID", ChatColor.GOLD, ChatColor.WHITE);
-		}
-		catch(final Exception e)
-		{
+		} catch (final SQLException e) {
 			log.log(Level.ERROR, "Failed to request player!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
+			throw e;
 		}
 		finally
 		{
-			getManager().getDatabaseHandler().closeConnection();
+			database.closeConnection(connectionId);
 		}
 		
 		String out = null;

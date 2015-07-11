@@ -8,84 +8,187 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
+import net.KabOOm356.Database.Connection.AlertingPooledConnection;
+import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
+import net.KabOOm356.Database.Connection.ConnectionPoolManager;
+import net.KabOOm356.Database.Connection.ConnectionPooledDatabaseInterface;
+import net.KabOOm356.Database.Connection.ConnectionWrapper;
+import net.KabOOm356.Util.FormattingUtil;
+import net.KabOOm356.Util.Util;
+
+import org.apache.commons.lang.Validate;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.KabOOm356.Util.FormattingUtil;
-import net.KabOOm356.Util.Util;
-
-
 /**
  * A simple class to handle connections and queries to a database.
  */
-public abstract class Database implements DatabaseInterface
-{
+public class Database implements DatabaseInterface, ConnectionPooledDatabaseInterface, ConnectionPoolManager {
 	private static final Logger log = LogManager.getLogger(Database.class);
-	
+	/** A random number generator for generating connection ids. */
+	private static final Random idGenerator = new Random();
+
 	/** The {@link DatabaseType} representation of the type of this database. */
-	private DatabaseType databaseType;
-	/** The connection to the database. */
-	private Connection connection;
+	private final DatabaseType databaseType;
+	/** The id of a connection that is being accessed in a non-pooled manner. */
+	private Integer localConnectionId;
 	/** The database driver represented as a String. */
-	private String databaseDriver;
+	private final String databaseDriver;
 	/** The URL to the database as a String. */
-	private String connectionURL;
+	private final String connectionURL;
 	
+	/** The pool of connections. */
+	private final HashMap<Integer, ConnectionWrapper> connectionPool;
+	private final ConnectionPoolConfig connectionPoolConfig;
+
 	/**
 	 * Database Constructor.
 	 * 
-	 * @param databaseType The {@link DatabaseType} that is being constructed.
-	 * @param databaseDriver The driver to use for the connection to the database.
-	 * @param connectionURL	The URL of the database to connect to.
+	 * @param databaseType
+	 *            The {@link DatabaseType} that is being constructed.
+	 * @param databaseDriver
+	 *            The driver to use for the connection to the database.
+	 * @param connectionURL
+	 *            The URL of the database to connect to.
 	 */
-	public Database(DatabaseType databaseType, String databaseDriver, String connectionURL)
-	{
+	public Database(final DatabaseType databaseType, final String databaseDriver, final String connectionURL, final ConnectionPoolConfig connectionPoolConfig) {
+		Validate.notNull(connectionPoolConfig, "Parameter 'connectionPoolConfig' cannot be null!");
 		this.databaseType = databaseType;
 		this.databaseDriver = databaseDriver;
 		this.connectionURL = connectionURL;
-		connection = null;
+		this.connectionPoolConfig = connectionPoolConfig;
+		localConnectionId = null;
+		connectionPool = new HashMap<Integer, ConnectionWrapper>();
 	}
-	
-	public void openConnection() throws ClassNotFoundException, SQLException
-	{
-		if(connection != null)
-			return;
-		
-		try {
-			Class.forName(databaseDriver);
-			connection = DriverManager.getConnection(connectionURL);
-		} catch (final ClassNotFoundException e) {
-			if (log.isDebugEnabled()) {
-				log.log(Level.WARN, "Failed to open connection to database!");
-			}
-			throw e;
-		} catch (final SQLException e) {
-			if (log.isDebugEnabled()) {
-				log.log(Level.WARN, "Failed to open connection to database!");
-			}
-			throw e;
+
+	@Override
+	public void openConnection() throws ClassNotFoundException, SQLException, InterruptedException {
+		if (localConnectionId != null) {
+			throw new IllegalStateException("There is already an open non-pooled connection in use!");
+		}
+		localConnectionId = openPooledConnection();
+		if (log.isDebugEnabled()) {
+			log.debug("New non-pooled connection created with id [" + localConnectionId + "]");
 		}
 	}
+
+	@Override
+	public synchronized int openPooledConnection() throws ClassNotFoundException, SQLException, InterruptedException {
+		return openPooledConnection(null, null);
+	}
 	
+	private boolean isConnectionSlotAvailable() {
+		// A connection slot is available if the size of the pool is less than the max number of connections allowed
+		boolean isConnectionSlotAvailable = connectionPool.size() < connectionPoolConfig.getMaxConnections();
+		if (log.isDebugEnabled()) {
+			if (isConnectionSlotAvailable) {
+				log.debug("New connection slot is available in the connection pool");
+			} else {
+				log.debug("No connection slot available in the connection pool");
+			}
+		}
+		return isConnectionSlotAvailable;
+	}
+
 	/**
-	 * Attempts to open a connection to the database using a username and password.
+	 * Attempts to open a connection to the database using a username and
+	 * password.
 	 * 
-	 * @param username	The username to login to the database with.
-	 * @param password	The password for the user associated with the username.
+	 * @param username
+	 *            The username to login to the database with.
+	 * @param password
+	 *            The password for the user associated with the username.
 	 * 
-	 * @throws SQLException 
-	 * @throws ClassNotFoundException 
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 * @throws InterruptedException 
+	 * @throws IllegalStateExcpetion
+	 *             Thrown if there is already a non-pooled connection open.
 	 */
-	public void openConnection(String username, String password) throws SQLException, ClassNotFoundException
-	{
-		if(connection != null)
-			return;
-		
+	protected void openConnection(final String username, final String password) throws SQLException, ClassNotFoundException, InterruptedException {
+		if (localConnectionId != null) {
+			throw new IllegalStateException("There is already an open connection in use!");
+		}
+		localConnectionId = openPooledConnection(username, password);
+		if (log.isDebugEnabled()) {
+			log.debug("New non-pooled connection created with id [" + localConnectionId + "]");
+		}
+	}
+
+	/**
+	 * Attempts to open a pooled connection to the database using a username and
+	 * password.
+	 * 
+	 * @param username
+	 *            The username to login to the database with.
+	 * @param password
+	 *            The password for the user associated with the username.
+	 * 
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 * @throws InterruptedException 
+	 */
+	protected synchronized int openPooledConnection(final String username, final String password) throws ClassNotFoundException, SQLException, InterruptedException {
+		try {
+			synchronized(connectionPool) {
+				long startWaitTime = System.currentTimeMillis();
+				boolean isWaiting = false;
+				int updateCount = 0;
+				long currentWaitTime = 0;
+				// While a connection slot is unavailable
+				while(!isConnectionSlotAvailable()) {
+					if (!isWaiting) {
+						if (log.isDebugEnabled()) {
+							log.warn("Thread has begun waiting on new connection to become available");
+						}
+					} else {
+						currentWaitTime = System.currentTimeMillis() - startWaitTime;
+						if (log.isDebugEnabled()) {
+							log.warn(String.format("Thread has been waiting for a new connection for [%dms] this is update [%d]; possible bottleneck!", currentWaitTime, updateCount));
+						}
+						if (connectionPoolConfig.isConnectionPoolLimited() && updateCount >= connectionPoolConfig.getMaxAttemptsForConnection()) {
+							log.warn("Thread has reached the max number of updates! Cancelling operation!");
+							throw new InterruptedException(String.format("Thead has reached the cycle limit [%d] after waiting for [%dms] for a new connection!", connectionPoolConfig.getMaxAttemptsForConnection(), currentWaitTime));
+						}
+					}
+					connectionPool.wait(connectionPoolConfig.getWaitTimeBeforeUpdate());
+					isWaiting = true;
+					updateCount++;
+				}
+				currentWaitTime = System.currentTimeMillis() - startWaitTime;
+				if (isWaiting && log.isDebugEnabled()) {
+					log.debug(String.format("A connection is now available in the connection pool after waiting [%dms]... proceeding!", currentWaitTime));
+				}
+			}
+		} catch(final InterruptedException e) {
+			if (log.isDebugEnabled()) {
+				log.warn("Waiting for available connection was interrupted!");
+			}
+			throw e;
+		}
 		try {
 			Class.forName(databaseDriver);
-			connection = DriverManager.getConnection(connectionURL, username, password);
+			final Connection connection;
+			if (username == null || password == null) {
+				connection = DriverManager.getConnection(connectionURL);
+			} else {
+				connection = DriverManager.getConnection(connectionURL, username, password);
+			}
+			int connectionId;
+			do {
+				connectionId = idGenerator.nextInt();
+			} while (connectionPool.containsKey(connectionId));
+			final ConnectionWrapper ConnectionWrapper = new AlertingPooledConnection(this, connectionId, connection);
+			connectionPool.put(connectionId, ConnectionWrapper);
+			if (log.isDebugEnabled()) {
+				log.debug("New pooled connection created with id [" + connectionId +"]");
+				log.debug("Connection pool size [" + connectionPool.size() + "]");
+			}
+			return connectionId;
 		} catch (final ClassNotFoundException e) {
 			if (log.isDebugEnabled()) {
 				log.log(Level.WARN, "Failed to open connection to database!");
@@ -98,13 +201,135 @@ public abstract class Database implements DatabaseInterface
 			throw e;
 		}
 	}
+
+	@Override
+	public ResultSet query(final String query) throws ClassNotFoundException, SQLException, InterruptedException {
+		openNonPooledConnection();
+		return query(localConnectionId, query);
+	}
+
+	@Override
+	public void updateQuery(final String query) throws ClassNotFoundException, SQLException, InterruptedException {
+		openNonPooledConnection();
+		updateQuery(localConnectionId, query);
+	}
+
+	@Override
+	public ResultSet preparedQuery(final String query, final ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
+		openNonPooledConnection();
+		return preparedQuery(localConnectionId, query, params);
+	}
+
+	@Override
+	public void preparedUpdateQuery(final String query, final ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
+		openNonPooledConnection();
+		preparedUpdateQuery(localConnectionId, query, params);
+	}
+
+	@Override
+	public boolean checkTable(final String table) throws ClassNotFoundException, SQLException, InterruptedException {
+		openNonPooledConnection();
+		return checkTable(localConnectionId, table);
+	}
+
+	@Override
+	public ArrayList<String> getColumnNames(final String table) throws SQLException, ClassNotFoundException, InterruptedException {
+		openNonPooledConnection();
+		return getColumnNames(localConnectionId, table);
+	}
+
+	@Override
+	public DatabaseMetaData getMetaData() throws ClassNotFoundException, SQLException, InterruptedException {
+		openNonPooledConnection();
+		return getMetaData(localConnectionId);
+	}
+
+	@Override
+	public ResultSet getColumnMetaData(final String table) throws ClassNotFoundException, SQLException, InterruptedException {
+		openNonPooledConnection();
+		return getColumnMetaData(localConnectionId, table);
+	}
+
+	@Override
+	public void closeConnection() {
+		if (localConnectionId != null) {
+			if (log.isDebugEnabled()) {
+				log.debug("Closing non-pooled connection with id [" + localConnectionId + "]");
+			}
+			closeConnection(localConnectionId);
+			localConnectionId = null;
+		}
+	}
+
+	@Override
+	public void closeConnection(final Integer connectionId) {
+		if (doesConnectionExist(connectionId)) {
+			final ConnectionWrapper connection = getConnection(connectionId);
+			try {
+				if (!connection.isClosed()) {
+					if (log.isDebugEnabled()) {
+						log.debug("Closing pooled connection with id [" + connectionId + "]");
+					}
+					connection.close();
+				}
+			} catch (final SQLException e) {
+				if (log.isDebugEnabled()) {
+					log.log(Level.WARN, "Failed to close connection with id [" + connectionId + "]!", e);
+				}
+			}
+		} else {
+			if (log.isDebugEnabled()) {
+				log.warn("Connection with id [" + connectionId + "] is not in the connection pool!");
+			}
+		}
+	}
 	
-	public ResultSet query(String query) throws ClassNotFoundException, SQLException
-	{
-		openConnection();
-		
+	@Override
+	public void closeConnections() {
+		if(log.isDebugEnabled()) {
+			log.info("Closing all connections!");
+			log.info("Current connection pool size: " + connectionPool.size());
+		}
+		// Close the local connection
+		closeConnection();
+		// Start closing all connections in the pool
+		for(final Integer connectionId : connectionPool.keySet()) {
+			closeConnection(connectionId);
+		}
+		if(log.isDebugEnabled()) {
+			log.info("All connections closed!");
+		}
+	}
+
+	@Override
+	public Statement createStatement() throws SQLException, ClassNotFoundException, InterruptedException {
+		openNonPooledConnection();
+		return createStatement(localConnectionId);
+	}
+
+	@Override
+	public PreparedStatement prepareStatement(final String query) throws SQLException, ClassNotFoundException, InterruptedException {
+		openNonPooledConnection();
+		return prepareStatement(localConnectionId, query);
+	}
+
+	@Override
+	public DatabaseType getDatabaseType() {
+		return databaseType;
+	}
+
+	@Override
+	public void connectionClosed(final Integer connectionId) {
+		if (log.isDebugEnabled()) {
+			log.debug("Connection close detected for connection with id [" + connectionId + "]");
+		}
+		removeConnectionFromPool(connectionId);
+	}
+
+	@Override
+	public ResultSet query(final Integer connectionId, final String query) throws SQLException {
 		try {
-			return createStatement().executeQuery(query);
+			return createStatement(connectionId).executeQuery(query);
 		} catch (final SQLException e) {
 			if (log.isDebugEnabled()) {
 				log.log(Level.WARN, "Failed to execute query!");
@@ -112,16 +337,12 @@ public abstract class Database implements DatabaseInterface
 			throw e;
 		}
 	}
-	
-	public void updateQuery(String query) throws ClassNotFoundException, SQLException
-	{
-		openConnection();
-		
+
+	@Override
+	public void updateQuery(final Integer connectionId, final String query) throws SQLException {
 		Statement statement = null;
-		
-		try
-		{
-			statement = createStatement();
+		try {
+			statement = createStatement(connectionId);
 			try {
 				statement.executeUpdate(query);
 			} catch (final SQLException e) {
@@ -130,29 +351,27 @@ public abstract class Database implements DatabaseInterface
 				}
 				throw e;
 			}
-		}
-		finally
-		{
+		} finally {
 			try {
 				statement.close();
-			} catch(final Exception e) {
+			} catch (final Exception e) {
 				if (log.isDebugEnabled()) {
 					log.log(Level.WARN, "Failed to close statement!", e);
 				}
 			}
-			
+
 			try {
-				closeConnection();
-			} catch(final Exception e) {}
+				closeConnection(connectionId);
+			} catch (final Exception e) {
+			}
 		}
 	}
-	
-	public ResultSet preparedQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException
-	{
-		int numberOfOccurences = Util.countOccurrences(query, '?');
-		
-		if(params.size() != numberOfOccurences)
-		{
+
+	@Override
+	public ResultSet preparedQuery(final Integer connectionId, final String query, final ArrayList<String> params) throws SQLException {
+		final int numberOfOccurences = Util.countOccurrences(query, '?');
+
+		if (params.size() != numberOfOccurences) {
 			final StringBuilder builder = new StringBuilder();
 			builder.append("Required number of parameters: ");
 			builder.append(params.size());
@@ -163,16 +382,11 @@ public abstract class Database implements DatabaseInterface
 				log.throwing(Level.WARN, e);
 			}
 			throw e;
-		}
-		else
-		{
-			openConnection();
-			
-			PreparedStatement preparedStatement = prepareStatement(query);
-				
+		} else {
+			final PreparedStatement preparedStatement = prepareStatement(connectionId, query);
 			try {
-				for(int LCV = 0; LCV < params.size(); LCV++) {
-					preparedStatement.setString(LCV+1, params.get(LCV));
+				for (int LCV = 0; LCV < params.size(); LCV++) {
+					preparedStatement.setString(LCV + 1, params.get(LCV));
 				}
 			} catch (final SQLException e) {
 				if (log.isDebugEnabled()) {
@@ -180,7 +394,7 @@ public abstract class Database implements DatabaseInterface
 				}
 				throw e;
 			}
-			
+
 			try {
 				return preparedStatement.executeQuery();
 			} catch (final SQLException e) {
@@ -191,24 +405,17 @@ public abstract class Database implements DatabaseInterface
 			}
 		}
 	}
-	
-	public void preparedUpdateQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException
-	{
-		int numberOfOccurences = Util.countOccurrences(query, '?');
-		
-		if(params.size() == numberOfOccurences)
-		{
+
+	@Override
+	public void preparedUpdateQuery(final Integer connectionId, final String query, final ArrayList<String> params) throws SQLException {
+		final int numberOfOccurences = Util.countOccurrences(query, '?');
+		if (params.size() == numberOfOccurences) {
 			PreparedStatement preparedStatement = null;
-			
-			try
-			{
-				openConnection();
-				
-				preparedStatement = prepareStatement(query);
-				
+			try {
+				preparedStatement = prepareStatement(connectionId, query);
 				try {
-					for(int LCV = 0; LCV < params.size(); LCV++) {
-						preparedStatement.setString(LCV+1, params.get(LCV));
+					for (int LCV = 0; LCV < params.size(); LCV++) {
+						preparedStatement.setString(LCV + 1, params.get(LCV));
 					}
 				} catch (final SQLException e) {
 					if (log.isDebugEnabled()) {
@@ -216,7 +423,7 @@ public abstract class Database implements DatabaseInterface
 					}
 					throw e;
 				}
-				
+
 				try {
 					preparedStatement.executeUpdate();
 				} catch (final SQLException e) {
@@ -228,16 +435,14 @@ public abstract class Database implements DatabaseInterface
 			} finally {
 				try {
 					preparedStatement.close();
-				} catch(final Exception e) {
+				} catch (final Exception e) {
 					if (log.isDebugEnabled()) {
 						log.log(Level.WARN, "Failed to close prepared statement!", e);
 					}
 				}
-				closeConnection();
+				closeConnection(connectionId);
 			}
-		}
-		else 
-		{
+		} else {
 			final StringBuilder builder = new StringBuilder();
 			builder.append("Required number of parameters: ");
 			builder.append(params.size());
@@ -250,17 +455,14 @@ public abstract class Database implements DatabaseInterface
 			throw e;
 		}
 	}
-	
-	public boolean checkTable(String table) throws ClassNotFoundException, SQLException
-	{
+
+	@Override
+	public boolean checkTable(final Integer connectionId, final String table) throws SQLException {
 		ResultSet tables = null;
-		
-		try
-		{
-			openConnection();
-			
+
+		try {
 			final DatabaseMetaData dbm;
-			
+			final ConnectionWrapper connection = getConnection(connectionId);
 			try {
 				dbm = connection.getMetaData();
 			} catch (final SQLException e) {
@@ -269,7 +471,7 @@ public abstract class Database implements DatabaseInterface
 				}
 				throw e;
 			}
-			
+
 			try {
 				tables = dbm.getTables(null, null, table, null);
 			} catch (final SQLException e) {
@@ -279,22 +481,17 @@ public abstract class Database implements DatabaseInterface
 				throw e;
 			}
 
-			if (tables.next())
+			if (tables.next()) {
 				return true;
-			else
+			} else {
 				return false;
-		} catch (final ClassNotFoundException e) {
-			if (log.isDebugEnabled()) {
-				log.log(Level.WARN, "Failed to check table!");
 			}
-			throw e;
 		} catch (final SQLException e) {
 			if (log.isDebugEnabled()) {
 				log.log(Level.WARN, "Failed to check table!");
 			}
 			throw e;
-		}
-		finally {
+		} finally {
 			try {
 				tables.close();
 			} catch (final Exception e) {
@@ -302,28 +499,21 @@ public abstract class Database implements DatabaseInterface
 					log.log(Level.DEBUG, "Failed to close ResultSet!");
 				}
 			}
-			closeConnection();
+			closeConnection(connectionId);
 		}
 	}
-	
-	public ArrayList<String> getColumnNames(String table) throws SQLException, ClassNotFoundException
-	{
-		openConnection();
-		
-		ArrayList<String> col = new ArrayList<String>();
-		
+
+	@Override
+	public ArrayList<String> getColumnNames(final Integer connectionId, final String table) throws SQLException {
+		final ArrayList<String> col = new ArrayList<String>();
 		ResultSet rs = null;
-		
-		try
-		{
-			rs = getColumnMetaData(table);
-
-			while(rs.next())
+		try {
+			rs = getColumnMetaData(connectionId, table);
+			while (rs.next()) {
 				col.add(rs.getString("COLUMN_NAME"));
-
+			}
 			return col;
-		}
-		finally {
+		} finally {
 			try {
 				rs.close();
 			} catch (final Exception e) {
@@ -331,14 +521,13 @@ public abstract class Database implements DatabaseInterface
 					log.log(Level.DEBUG, "Failed to close ResultSet!", e);
 				}
 			}
-			closeConnection();
+			closeConnection(connectionId);
 		}
 	}
-	
-	public DatabaseMetaData getMetaData() throws ClassNotFoundException, SQLException
-	{
-		openConnection();
-		
+
+	@Override
+	public DatabaseMetaData getMetaData(final Integer connectionId) throws SQLException {
+		final Connection connection = getConnection(connectionId);
 		try {
 			return connection.getMetaData();
 		} catch (final SQLException e) {
@@ -348,13 +537,11 @@ public abstract class Database implements DatabaseInterface
 			throw e;
 		}
 	}
-	
-	public ResultSet getColumnMetaData(String table) throws ClassNotFoundException, SQLException
-	{
-		openConnection();
-		
+
+	@Override
+	public ResultSet getColumnMetaData(final Integer connectionId, final String table) throws SQLException {
 		try {
-			return getMetaData().getColumns(null, null, table, null);
+			return getMetaData(connectionId).getColumns(null, null, table, null);
 		} catch (final SQLException e) {
 			if (log.isDebugEnabled()) {
 				log.log(Level.DEBUG, "Failed to get table columns!");
@@ -362,46 +549,10 @@ public abstract class Database implements DatabaseInterface
 			throw e;
 		}
 	}
-	
-	/**
-	 * Checks if the connection is open.
-	 * 
-	 * @return If the connection is open returns true, otherwise false.
-	 */
-	public boolean isConnectionOpen()
-	{
-		return connection != null;
-	}
-	
-	public void closeConnection()
-	{
-		if(connection != null)
-		{
-			try {
-				connection.close();
-			} catch (final SQLException e) {
-				if (log.isDebugEnabled()) {
-					log.log(Level.WARN, "Failed to close database connection!", e);
-				}
-			}
-			connection = null;
-		}
-	}
-	
-	/**
-	 * Returns the connection to the database.
-	 * 
-	 * @return The connection to the database.
-	 */
-	public Connection getConnection()
-	{
-		return connection;
-	}
-	
-	public Statement createStatement() throws SQLException, ClassNotFoundException
-	{
-		openConnection();
-		
+
+	@Override
+	public Statement createStatement(Integer connectionId) throws SQLException {
+		final Connection connection = getConnection(connectionId);
 		try {
 			return connection.createStatement();
 		} catch (final SQLException e) {
@@ -411,11 +562,10 @@ public abstract class Database implements DatabaseInterface
 			throw e;
 		}
 	}
-	
-	public PreparedStatement prepareStatement(String query) throws SQLException, ClassNotFoundException
-	{
-		openConnection();
-		
+
+	@Override
+	public PreparedStatement prepareStatement(Integer connectionId, String query) throws SQLException {
+		final Connection connection = getConnection(connectionId);
 		try {
 			return connection.prepareStatement(query);
 		} catch (final SQLException e) {
@@ -426,25 +576,50 @@ public abstract class Database implements DatabaseInterface
 		}
 	}
 	
-	public DatabaseType getDatabaseType()
-	{
-		return databaseType;
+	private boolean doesConnectionExist(final Integer connectionId) {
+		return connectionPool.containsKey(connectionId);
+	}
+
+	private ConnectionWrapper getConnection(final Integer connectionId) {
+		Validate.notNull(connectionId, "Connection id cannot be null!");
+		if (doesConnectionExist(connectionId)) {
+			return connectionPool.get(connectionId);
+		}
+		throw new IllegalArgumentException("Connection with connection id [" + connectionId + "] does not exist!");
 	}
 	
+	private void removeConnectionFromPool(final int connectionId) {
+		if (log.isDebugEnabled()) {
+			log.debug("Removing connection with id [" + connectionId + "] from connection pool");
+		}
+		if (localConnectionId != null && connectionId == localConnectionId) {
+			localConnectionId = null;
+		}
+		synchronized(connectionPool) {
+			connectionPool.remove(connectionId);
+			// Notify any threads waiting to open a new connection.
+			connectionPool.notify();
+		}
+		if (log.isDebugEnabled()) {
+			log.debug("Current connection pool size [" + connectionPool.size() + "]");
+		}
+	}
+	
+	private void openNonPooledConnection() throws ClassNotFoundException, SQLException, InterruptedException {
+		if (localConnectionId == null) {
+			openConnection();
+		}
+	}
+
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		final StringBuilder toString = new StringBuilder();
 		toString.append("Database Type: ").append(databaseType.toString());
 		toString.append("\nDatabase Driver: ").append(databaseDriver);
 		toString.append("\nConnection URL: ").append(connectionURL);
-		toString.append("\nConnection Status: ");
-		if(isConnectionOpen()) {
-			toString.append("Open\n");
-		} else {
-			toString.append("Closed\n");
-		}
-		
+		toString.append("\nConnection Pool Size: ").append(connectionPool.size());
+		toString.append("\nConnection Pool: ");
+		toString.append("\n").append(Util.indexesToString(connectionPool.keySet()));
 		return FormattingUtil.addTabsToNewLines(toString.toString(), 1);
 	}
 }

@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -12,6 +13,7 @@ import org.bukkit.command.CommandSender;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ClaimPhrases;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
@@ -44,29 +46,33 @@ public class ClaimCommand extends ReporterCommand
 	@Override
 	public void execute(CommandSender sender, ArrayList<String> args)
 	{
-		if(!hasRequiredPermission(sender))
-			return;
-		
-		int index = Util.parseInt(args.get(0));
-		
-		if(args.get(0).equalsIgnoreCase("last"))
-		{
-			if(!hasRequiredLastViewed(sender))
+		try {
+			if(!hasRequiredPermission(sender))
 				return;
 			
-			index = getLastViewed(sender);
+			int index = Util.parseInt(args.get(0));
+			if(args.get(0).equalsIgnoreCase("last"))
+			{
+				if(!hasRequiredLastViewed(sender))
+					return;
+				
+				index = getLastViewed(sender);
+			}
+			
+			if(!getManager().isReportIndexValid(sender, index))
+				return;
+			
+			if(!getManager().canAlterReport(sender, index))
+				return;
+			
+			claimReport(sender, index);
+		} catch(final Exception e) {
+			log.log(Level.ERROR, "Failed to claim report!", e);
+			sender.sendMessage(getErrorMessage());
 		}
-		
-		if(!getManager().isReportIndexValid(sender, index))
-			return;
-		
-		if(!getManager().canAlterReport(sender, index))
-			return;
-		
-		claimReport(sender, index);
 	}
 	
-	private void claimReport(CommandSender sender, int index)
+	private void claimReport(CommandSender sender, int index) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		ArrayList<String> params = new ArrayList<String>();
 		
@@ -81,19 +87,14 @@ public class ClaimCommand extends ReporterCommand
 				"SET ClaimStatus=?, ClaimedByUUID=?, ClaimedBy=?, ClaimPriority=?, ClaimDate=? " +
 				"WHERE ID=?";
 		
-		try
-		{
-			getManager().getDatabaseHandler().preparedUpdateQuery(query, params);
-		}
-		catch(Exception e)
-		{
-			log.log(Level.ERROR, "Failed to claim report!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			database.preparedUpdateQuery(connectionId, query, params);
+		} catch (final SQLException e) {
+			log.error(String.format("Failed to execute claim query on connection [%d]!", connectionId));
+		} finally {
+			database.closeConnection(connectionId);
 		}
 		
 		String output = getManager().getLocale().getString(ClaimPhrases.reportClaimSuccess);

@@ -1,12 +1,19 @@
 package net.KabOOm356.Command;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Runnable.RunnableWithState;
+import net.KabOOm356.Runnable.TimedRunnable;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
 
+import org.apache.commons.lang.Validate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,9 +21,18 @@ import org.bukkit.entity.Player;
 /**
  * Abstract Command class.
  */
-public abstract class Command
+public abstract class Command extends TimedRunnable implements RunnableWithState
 {
+	private static final Logger log = LogManager.getLogger(Command.class);
+	
 	private ReporterCommandManager manager;
+	
+	private boolean isRunning = false;
+	private boolean isPendingToRun = false;
+	private boolean hasRun = false;
+	
+	private CommandSender sender = null;
+	private ArrayList<String> arguments = null;
 	
 	private String name;
 	private String permissionNode;
@@ -236,5 +252,81 @@ public abstract class Command
 	public int getMinimumNumberOfArguments()
 	{
 		return minimumNumberOfArguments;
+	}
+	
+	public void setSender(final CommandSender sender) {
+		if (isRunning || isPendingToRun) {
+			throw new IllegalArgumentException("The current command is in-flight and should not be modified!");
+		}
+		this.sender = sender;
+	}
+	
+	public void setArguments(final ArrayList<String> arguments) {
+		if (isRunning || isPendingToRun) {
+			throw new IllegalArgumentException("The current command is in-flight and should not be modified!");
+		}
+		this.arguments = arguments;
+	}
+	
+	public Command getRunnableClone(final CommandSender sender, final ArrayList<String> arguments) throws Exception {
+		try {
+			final Class<? extends Command> clazz = this.getClass();
+			final Constructor<? extends Command> constructor = clazz.getDeclaredConstructor(ReporterCommandManager.class);
+			final Command command = constructor.newInstance(manager);
+			command.setSender(sender);
+			command.setArguments(arguments);
+			command.isPendingToRun = true;
+			return command;
+		} catch (final Exception e) {
+			log.warn(String.format("Failed to clone command [%s]!", getClass().getName()));
+			throw e;
+		}
+	}
+	
+	@Override
+	public void run() {
+		Validate.notNull(sender);
+		Validate.notNull(arguments);
+		try {
+			start();
+			isRunning = true;
+			execute(sender, arguments);
+		} finally {
+			isRunning = false;
+			isPendingToRun = false;
+			hasRun = true;
+			end();
+		}
+	}
+	
+	@Override
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+	@Override
+	public boolean isPendingToRun() {
+		return isPendingToRun;
+	}
+
+	@Override
+	public boolean isStopped() {
+		return !isRunning;
+	}
+
+	@Override
+	public boolean hasRun() {
+		return hasRun;
+	}
+	
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("Command Name: ").append(name).append("\n");
+		builder.append("Aliases: ").append(aliases).append("\n");
+		builder.append("Permission Node: ").append(permissionNode).append("\n");
+		builder.append("Minimum Number of Arguments: ").append(minimumNumberOfArguments).append("\n");
+		builder.append("Usages: ").append(usages);
+		return builder.toString();
 	}
 }

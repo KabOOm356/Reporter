@@ -3,6 +3,7 @@ package net.KabOOm356.Listeners;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import net.KabOOm356.Command.Command;
 import net.KabOOm356.Command.Commands.ListCommand;
 import net.KabOOm356.Command.Commands.ViewCommand;
 import net.KabOOm356.Database.ResultRow;
@@ -11,7 +12,6 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.AlertPhrases;
 import net.KabOOm356.Manager.MessageManager;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Runnable.DelayedMessage;
-import net.KabOOm356.Runnable.ListOnLoginThread;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 
@@ -34,6 +34,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class ReporterPlayerListener implements Listener
 {
 	private static final Logger log = LogManager.getLogger(ReporterPlayerListener.class);
+	private static final long serverTicksPerSecond = 20L;
 	
 	private final Reporter plugin;
 
@@ -84,15 +85,19 @@ public class ReporterPlayerListener implements Listener
 	
 	private void listOnLogin(Player player)
 	{
-		if(plugin.getCommandManager().getCommand(ListCommand.getCommandName()).hasPermission(player))
+		final Command listCommand = plugin.getCommandManager().getCommand(ListCommand.getCommandName());
+		if(listCommand.hasPermission(player))
 		{
+			listCommand.setSender(player);
+			listCommand.setArguments(new ArrayList<String>());
 			if(plugin.getConfig().getBoolean("general.messaging.listOnLogin.useDelay", true))
 			{
 				int delay = plugin.getConfig().getInt("general.messaging.listOnLogin.delay", 5);
-				plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, new ListOnLoginThread(plugin.getCommandManager(), player), 20 * delay);
+				Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, listCommand, serverTicksPerSecond * delay);
 			}
-			else
-				plugin.getCommandManager().getCommand(ListCommand.getCommandName()).execute(player, new ArrayList<String>());
+			else {
+				Bukkit.getScheduler().runTaskAsynchronously(plugin, listCommand);
+			}
 		}
 	}
 	

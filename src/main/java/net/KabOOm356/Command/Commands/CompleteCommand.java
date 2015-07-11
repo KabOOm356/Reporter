@@ -1,11 +1,13 @@
 package net.KabOOm356.Command.Commands;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.CompletePhrases;
 import net.KabOOm356.Manager.Messager.Group;
@@ -60,39 +62,45 @@ public class CompleteCommand extends ReporterCommand
 	@Override
 	public void execute(CommandSender sender, ArrayList<String> args)
 	{
-		if(!hasRequiredPermission(sender))
-			return;
-		
-		int index = Util.parseInt(args.get(0));
-		
-		if(args.get(0).equalsIgnoreCase("last"))
-		{
-			if(!hasRequiredLastViewed(sender))
+		try {
+			if(!hasRequiredPermission(sender))
 				return;
 			
-			index = getLastViewed(sender);
+			int index = Util.parseInt(args.get(0));
+			
+			if(args.get(0).equalsIgnoreCase("last"))
+			{
+				if(!hasRequiredLastViewed(sender))
+					return;
+				
+				index = getLastViewed(sender);
+			}
+			
+			if(!getManager().isReportIndexValid(sender, index))
+				return;
+			
+			if(!getManager().canAlterReport(sender, index))
+				return;
+			
+			String summary = "";
+			
+			for(int LCV = 1; LCV < args.size(); LCV++)
+				summary = summary + " " + args.get(LCV);
+			
+			summary = summary.trim();
+			
+			if(!isSummaryValid(sender, summary))
+				return;
+			
+			completeReport(sender, index, summary);
+			broadcastCompletedMessage(index);
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to complete report!", e);
+			sender.sendMessage(getErrorMessage());
 		}
-		
-		if(!getManager().isReportIndexValid(sender, index))
-			return;
-		
-		if(!getManager().canAlterReport(sender, index))
-			return;
-		
-		String summary = "";
-		
-		for(int LCV = 1; LCV < args.size(); LCV++)
-			summary = summary + " " + args.get(LCV);
-		
-		summary = summary.trim();
-		
-		if(!isSummaryValid(sender, summary))
-			return;
-		
-		completeReport(sender, index, summary);
 	}
 	
-	private void completeReport(CommandSender sender, int index, String summary)
+	private void completeReport(CommandSender sender, int index, String summary) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		ArrayList<String> params = new ArrayList<String>(5);
 		params.add(0, "1");
@@ -110,21 +118,15 @@ public class CompleteCommand extends ReporterCommand
 				"CompletionSummary=? " +
 				"WHERE id=?";
 		
-		try
-		{
-			getManager().getDatabaseHandler().preparedUpdateQuery(query, params);
-			
-			broadcastCompletedMessage(index);
-		}
-		catch(final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to complete report!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			database.preparedUpdateQuery(connectionId, query, params);
+		} catch (final SQLException e) {
+			log.error(String.format("Failed to execute complete query on connection [%d]!", connectionId));
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 		
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
@@ -166,11 +168,15 @@ public class CompleteCommand extends ReporterCommand
 		
 		if(getManager().getConfig().getBoolean("general.canViewSubmittedReports", true))
 		{
+			final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+			Integer connectionId = null;
 			try
 			{
+				connectionId = database.openPooledConnection();
+				
 				String query = "SELECT SenderUUID, Sender FROM Reports WHERE ID=" + Integer.toString(index);
 				
-				SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
+				SQLResultSet result = database.sqlQuery(connectionId, query);
 				
 				String uuidString = result.getString("SenderUUID");
 				
@@ -184,14 +190,12 @@ public class CompleteCommand extends ReporterCommand
 				{
 					playerName = result.getString("Sender");
 				}
-			}
-			catch(final Exception e)
-			{
-				log.log(Level.WARN, "Failed to broadcast report completion message!", e);
-			}
-			finally
-			{
-				getManager().getDatabaseHandler().closeConnection();
+			} catch (final Exception e) {
+				log.warn(String.format("Failed to broadcast report completion message on connection [%d]!", connectionId), e);
+			} finally {
+				if (connectionId != null) {
+					database.closeConnection(connectionId);
+				}
 			}
 			
 			yourReportCompleted = BukkitUtil.colorCodeReplaceAll(

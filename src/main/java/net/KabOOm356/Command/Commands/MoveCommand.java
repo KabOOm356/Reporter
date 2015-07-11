@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.MovePhrases;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
@@ -48,45 +50,49 @@ public class MoveCommand extends ReporterCommand
 	@Override
 	public void execute(CommandSender sender, ArrayList<String> args)
 	{
-		if(!hasRequiredPermission(sender))
-			return;
-		
-		int index = Util.parseInt(args.get(0));
-		
-		if(args.get(0).equalsIgnoreCase("last"))
-		{
-			if(!hasRequiredLastViewed(sender))
+		try {
+			if(!hasRequiredPermission(sender))
 				return;
 			
-			index = getLastViewed(sender);
+			int index = Util.parseInt(args.get(0));
+			
+			if(args.get(0).equalsIgnoreCase("last"))
+			{
+				if(!hasRequiredLastViewed(sender))
+					return;
+				
+				index = getLastViewed(sender);
+			}
+			
+			if(!getManager().isReportIndexValid(sender, index))
+				return;
+			
+			if(!getManager().canAlterReport(sender, index))
+				return;
+			
+			if(!getManager().requireModLevelInBounds(sender, args.get(1)))
+				return;
+			
+			final ModLevel priority = ModLevel.getModLevel(args.get(1));
+			moveReport(sender, index, priority);
+		} catch (final Exception e) {
+			log.error("Failed to execute move command!", e);
+			sender.sendMessage(getErrorMessage());
 		}
-		
-		if(!getManager().isReportIndexValid(sender, index))
-			return;
-		
-		if(!getManager().canAlterReport(sender, index))
-			return;
-		
-		if(!getManager().requireModLevelInBounds(sender, args.get(1)))
-			return;
-		
-		ModLevel priority = ModLevel.getModLevel(args.get(1));
-		
-		moveReport(sender, index, priority);
 	}
 	
-	protected void moveReport(CommandSender sender, int index, ModLevel level)
+	protected void moveReport(CommandSender sender, int index, ModLevel level) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		// LOW Long String concatenation.
 		String query = "SELECT ClaimStatus, ClaimedByUUID, ClaimPriority "
 				+ "FROM Reports "
 				+ "WHERE ID=" + index;
 		
-		SQLResultSet result;
-		
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
 		try
 		{
-			result = getManager().getDatabaseHandler().sqlQuery(query);
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 			
 			boolean isClaimed = result.getBoolean("ClaimStatus");
 			int currentPriority = result.getInt("ClaimPriority");
@@ -141,17 +147,13 @@ public class MoveCommand extends ReporterCommand
 						"WHERE ID=" + index;
 			}
 			
-			getManager().getDatabaseHandler().updateQuery(query);
+			database.updateQuery(connectionId, query);
+		} catch (final SQLException e) {
+			log.log(Level.ERROR, String.format("Failed to move report priority on connection [%d]!", connectionId));
+			throw e;
 		}
-		catch(final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to move report priority!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		finally {
+			database.closeConnection(connectionId);
 		}
 		
 		String output = getManager().getLocale().getString(MovePhrases.moveReportSuccess);

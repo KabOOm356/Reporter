@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Date;
 
+import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
 import net.KabOOm356.Reporter.Reporter;
 
 import org.apache.logging.log4j.Level;
@@ -395,6 +396,24 @@ public class ReporterConfigurationUtil
 		if(!configuration.isSet("plugin.statistics.opt-out"))
 		{
 			configuration.set("plugin.statistics.opt-out", false);
+			updated = true;
+		}
+		
+		// Version 15 (Database Connection Pooling)
+		if (!configuration.isSet("database.connectionPool.enableLimiting")) {
+			configuration.set("database.connectionPool.enableLimiting", ConnectionPoolConfig.defaultInstance.isConnectionPoolLimited());
+			updated = true;
+		}
+		if (!configuration.isSet("database.connectionPool.maxNumberOfConnections")) {
+			configuration.set("database.connectionPool.maxNumberOfConnections", ConnectionPoolConfig.defaultInstance.getMaxConnections());
+			updated = true;
+		}
+		if (!configuration.isSet("database.connectionPool.maxNumberOfAttemptsForConnection")) {
+			configuration.set("database.connectionPool.maxNumberOfAttemptsForConnection", ConnectionPoolConfig.defaultInstance.getMaxAttemptsForConnection());
+			updated = true;
+		}
+		if (!configuration.isSet("database.connectionPool.waitTimeBeforeUpdate")) {
+			configuration.set("database.connectionPool.waitTimeBeforeUpdate", ConnectionPoolConfig.defaultInstance.getWaitTimeBeforeUpdate());
 			updated = true;
 		}
 		

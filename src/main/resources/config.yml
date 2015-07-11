@@ -1,5 +1,5 @@
 # Reporter Configuration File
-# Config Version: 14
+# Config Version: 15
 
 # General plugin settings
 general:
@@ -223,3 +223,26 @@ database:
   database: Reporter
   username: root
   password: root
+  
+  # Settings for the connection pool.
+  connectionPool:
+    
+    # If limits should be placed on the connection pool.
+    # Default: true
+    enableLimiting: true
+    
+    # The maximum number of connections to allow in the connection pool at a single time.
+    # Default: 10
+    maxNumberOfConnections: 10
+    
+    # The maximum number of attempts to make before canceling the operation that requested the connection.
+    # NOTE: The total time before the connection attempt times out is: maxNumberOfAttemptsForConnection X waitTimeBeforeUpdate
+    # in the default case maxNumberOfAttemptsForConnection = 200 and waitTimeBeforeUpdate = 10 ms
+    # so the total timeout = 200 X 10 ms = 2000 ms = 2 seconds.
+    # Once the timeout (2 seconds) is reached, the command will cancel and log that it failed due to a connection timeout.
+    # Default: 200
+    maxNumberOfAttemptsForConnection: 200
+    
+    # The time, in milliseconds, for a thread waiting on an available connection to wait before making an update.
+    # Default: 10
+    waitTimeBeforeUpdate: 10

@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Locale.Entry.LocalePhrases.AssignPhrases;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
@@ -48,32 +50,38 @@ public class AssignCommand extends ReporterCommand
 	@Override
 	public void execute(CommandSender sender, ArrayList<String> args)
 	{
-		if(!hasRequiredPermission(sender))
-			return;
-		
-		int index = Util.parseInt(args.get(0));
-		
-		if(args.get(0).equalsIgnoreCase("last"))
-		{
-			if(!hasRequiredLastViewed(sender))
+		try {
+			if(!hasRequiredPermission(sender))
 				return;
 			
-			index = getLastViewed(sender);
+			int index = Util.parseInt(args.get(0));
+			
+			if(args.get(0).equalsIgnoreCase("last"))
+			{
+				if(!hasRequiredLastViewed(sender))
+					return;
+				
+				index = getLastViewed(sender);
+			}
+			
+			if(!getManager().isReportIndexValid(sender, index))
+				return;
+			
+			if(!getManager().canAlterReport(sender, index))
+				return;
+			
+			Player player = Bukkit.getPlayer(args.get(1));
+			
+			if(canAssignReport(sender, index, player)) {
+				assignReport(sender, index, player);
+			}
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to assign player!", e);
+			sender.sendMessage(getErrorMessage());
 		}
-		
-		if(!getManager().isReportIndexValid(sender, index))
-			return;
-		
-		if(!getManager().canAlterReport(sender, index))
-			return;
-		
-		Player player = Bukkit.getPlayer(args.get(1));
-		
-		if(canAssignReport(sender, index, player))
-			assignReport(sender, index, player);
 	}
 	
-	private void assignReport(CommandSender sender, int index, Player player)
+	private void assignReport(CommandSender sender, int index, Player player) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		String query = "UPDATE Reports SET ClaimStatus=?, ClaimDate=?, ClaimedBy=?, ClaimedByUUID=?, ClaimPriority=? WHERE ID=?";
 		
@@ -86,19 +94,15 @@ public class AssignCommand extends ReporterCommand
 		params.add(4, Integer.toString(getManager().getModLevel(player).getLevel()));
 		params.add(5, Integer.toString(index));
 		
-		try
-		{
-			getManager().getDatabaseHandler().preparedUpdateQuery(query, params);
-		}
-		catch(Exception e)
-		{
-			log.log(Level.ERROR, "Failed to assign player!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			database.preparedUpdateQuery(connectionId, query, params);
+		} catch(final SQLException e) {
+			log.error(String.format("Failed to execute assign query on connection [%d]!", connectionId));
+			throw e;
+		} finally {
+			database.closeConnection(connectionId);
 		}
 		
 		String playerName;

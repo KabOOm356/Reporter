@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import net.KabOOm356.Database.Database;
 import net.KabOOm356.Database.DatabaseType;
+import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
 import net.KabOOm356.Util.FormattingUtil;
 
 
@@ -24,10 +25,11 @@ public class MySQL extends Database
 	 * @param database The name of the table to connect to.
 	 * @param username The username to connect to the database with.
 	 * @param password The password to connect to the database with.
+	 * @param connectionPoolConfig The configuration for the connection pool.
 	 */
-	public MySQL(String host, String database, String username, String password)
+	public MySQL(final String host, final String database, final String username, final String password, final ConnectionPoolConfig connectionPoolConfig)
 	{
-		super(DatabaseType.MYSQL, "com.mysql.jdbc.Driver", "jdbc:mysql://" + host + "/" + database);
+		super(DatabaseType.MYSQL, "com.mysql.jdbc.Driver", "jdbc:mysql://" + host + "/" + database, connectionPoolConfig);
 		
 		this.username = username;
 		this.password = password;
@@ -38,11 +40,17 @@ public class MySQL extends Database
 	 * 
 	 * @throws SQLException 
 	 * @throws ClassNotFoundException 
+	 * @throws InterruptedException 
 	 */
 	@Override
-	public void openConnection() throws ClassNotFoundException, SQLException
+	public void openConnection() throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		super.openConnection(username, password);
+	}
+	
+	@Override
+	public int openPooledConnection() throws ClassNotFoundException, SQLException, InterruptedException {
+		return super.openPooledConnection(username, password);
 	}
 	
 	/**

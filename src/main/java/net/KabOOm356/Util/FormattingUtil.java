@@ -1,5 +1,8 @@
 package net.KabOOm356.Util;
 
+import org.apache.commons.lang.Validate;
+import org.bukkit.ChatColor;
+
 /**
  * Utility class to help with formatting.
  */
@@ -157,5 +160,30 @@ public class FormattingUtil
 		sb.append(str.substring(1));
 		
 		return sb.toString();
+	}
+	
+	/**
+	 * Formats the given line with the amount of time given in seconds.
+	 * 
+	 * @param formatLine The line to place the formatted time into.
+	 * @param seconds The amount of seconds to format to the line.
+	 * 
+	 * @return The line with the seconds formatted into.
+	 */
+	public static String formatTimeRemaining(final String formatLine, final int seconds) {
+		Validate.notNull(formatLine, "The format line cannot be null!");
+		// Convert the seconds to hours and drop the remainder.
+		int hours = TimeUtil.getHours(seconds);
+		int remainingSeconds = seconds % TimeUtil.secondsPerHour;
+		
+		// Convert the seconds to minutes and drop the remainder.
+		int minutes = TimeUtil.getMinutes(remainingSeconds);
+		remainingSeconds = remainingSeconds % TimeUtil.secondsPerMinute;
+		
+		String line = formatLine.replaceAll("%h", ChatColor.GOLD + Integer.toString(hours) + ChatColor.WHITE);
+		line = line.replaceAll("%m", ChatColor.GOLD + Integer.toString(minutes) + ChatColor.WHITE);
+		line = line.replaceAll("%s", ChatColor.GOLD + Integer.toString(remainingSeconds) + ChatColor.WHITE);
+		
+		return line;
 	}
 }

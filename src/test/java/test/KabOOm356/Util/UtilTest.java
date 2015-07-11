@@ -32,22 +32,6 @@ public class UtilTest
 	}
 	
 	@Test
-	public void testParseIntIllegalArgumentException()
-	{
-		try
-		{
-			Util.parseInt(null);
-			
-			// Fail if the expected exception is not thrown.
-			fail("Expected IllegalArgumentException was not thrown!");
-		}
-		catch(IllegalArgumentException e)
-		{
-			// Catch the exception that should be thrown.
-		}
-	}
-	
-	@Test
 	public void testParseInt()
 	{
 		String stringValue;
@@ -83,22 +67,6 @@ public class UtilTest
 				assertFalse(Util.isInteger(stringValue));
 			else // If the ASCII value is a numeric (0-9).
 				assertTrue(Util.isInteger(stringValue));
-		}
-	}
-	
-	@Test
-	public void testIsIntegerIllegalArgumentException()
-	{
-		try
-		{
-			Util.isInteger(null);
-			
-			// Fail if the expected exception is not thrown.
-			fail("Expected IllegalArgumentException was not thrown!");
-		}
-		catch(IllegalArgumentException e)
-		{
-			// Catch the exception that should be thrown.
 		}
 	}
 	

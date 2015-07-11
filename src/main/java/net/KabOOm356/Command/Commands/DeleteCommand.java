@@ -7,9 +7,11 @@ import java.util.Map.Entry;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Database.SQL.QueryType;
+import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Locale.Entry.LocalePhrases.DeletePhrases;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
@@ -37,14 +39,15 @@ public class DeleteCommand extends ReporterCommand
 	
 	private static final String name = "Delete";
 	private static final int minimumNumberOfArguments = 1;
-	private final static String permissionNode = "reporter.delete";
+	private static final String permissionNode = "reporter.delete";
+	private static final ModeratorStat statistic = ModeratorStat.DELETED;
 	
 	/**
 	 * Constructor.
 	 * 
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public DeleteCommand(ReporterCommandManager manager)
+	public DeleteCommand(final ReporterCommandManager manager)
 	{
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 		
@@ -67,116 +70,117 @@ public class DeleteCommand extends ReporterCommand
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args)
-	{
-		if(!hasRequiredPermission(sender))
-			return;
-		
-		if(args.get(0).equalsIgnoreCase("all"))
-			deleteReportBatch(sender, BatchDeletionType.ALL);
-		else if(args.get(0).equalsIgnoreCase("completed") || args.get(0).equalsIgnoreCase("finished"))
-			deleteReportBatch(sender, BatchDeletionType.COMPLETE);
-		else if(args.get(0).equalsIgnoreCase("incomplete") || args.get(0).equalsIgnoreCase("unfinished"))
-			deleteReportBatch(sender, BatchDeletionType.INCOMPLETE);
-		else
-		{
-			if(Util.isInteger(args.get(0)) || args.get(0).equalsIgnoreCase("last"))
-			{
-				int index = Util.parseInt(args.get(0));
-				
-				if(args.get(0).equalsIgnoreCase("last"))
-				{
-					if(!hasRequiredLastViewed(sender))
-						return;
+	public void execute(final CommandSender sender, final ArrayList<String> args) {
+		try {
+			if(!hasRequiredPermission(sender)) {
+				return;
+			}
+			
+			int deletionCount = 0;
+			if(args.get(0).equalsIgnoreCase("all")) {
+				deletionCount = deleteReportBatch(sender, BatchDeletionType.ALL);
+			} else if(args.get(0).equalsIgnoreCase("completed") || args.get(0).equalsIgnoreCase("finished")) {
+				deletionCount = deleteReportBatch(sender, BatchDeletionType.COMPLETE);
+			} else if(args.get(0).equalsIgnoreCase("incomplete") || args.get(0).equalsIgnoreCase("unfinished")) {
+				deletionCount = deleteReportBatch(sender, BatchDeletionType.INCOMPLETE);
+			} else {
+				if(Util.isInteger(args.get(0)) || args.get(0).equalsIgnoreCase("last")) {
+					final int index;
 					
-					index = getLastViewed(sender);
+					if(args.get(0).equalsIgnoreCase("last")) {
+						if(!hasRequiredLastViewed(sender)) {
+							return;
+						}
+						index = getLastViewed(sender);
+					} else {
+						index = Util.parseInt(args.get(0));
+					}
+					
+					if(!getManager().isReportIndexValid(sender, index)) {
+						return;
+					}
+					
+					if(!getManager().canAlterReport(sender, index)) {
+						return;
+					}
+					
+					deleteReport(sender, index);
+					deletionCount = 1;
+				} else { // /report delete <Player Name> [reported/sender]
+					final OfflinePlayer player = getManager().getPlayer(args.get(0));
+					
+					if(player != null) {
+						if(args.size() >= 2 && args.get(1).equalsIgnoreCase("sender")) {
+							deletionCount = deletePlayer(sender, PlayerDeletionType.SENDER, player);
+						} else {
+							deletionCount = deletePlayer(sender, PlayerDeletionType.REPORTED, player);
+						}
+					}
 				}
-				
-				if(!getManager().isReportIndexValid(sender, index))
-					return;
-				
-				if(!getManager().canAlterReport(sender, index))
-					return;
-				
-				deleteReport(sender, index);
 			}
-			else // /report delete <Player Name> [reported/sender]
-			{
-				OfflinePlayer player = getManager().getPlayer(args.get(0));
-				
-				if(player != null)
-				{
-					if(args.size() >= 2 && args.get(1).equalsIgnoreCase("sender"))
-						deletePlayer(sender, PlayerDeletionType.SENDER, player);
-					else
-						deletePlayer(sender, PlayerDeletionType.REPORTED, player);
-				}
+			// Log the statistic
+			if(deletionCount > 0) {
+				incrementStatistic(sender, deletionCount);
 			}
+		} catch (final Exception e) {
+			log.error("Failed to execute delete command!", e);
+			sender.sendMessage(getErrorMessage());
 		}
 	}
 	
-	private void deleteReport(CommandSender sender, int index)
-	{
-		try
-		{
+	private void incrementStatistic(final CommandSender sender, final int count) {
+		if(BukkitUtil.isOfflinePlayer(sender)) {
+			final OfflinePlayer player = (OfflinePlayer)sender;
+			getManager().getModStatsManager().incrementStat(player, statistic, count);
+		}
+	}
+	
+	private void deleteReport(final CommandSender sender, final int index) throws Exception {
+		try {
 			deleteReport(index);
 			
 			String out = getManager().getLocale().getString(DeletePhrases.deleteReport);
-			
 			out = out.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.WHITE);
-			
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + out);
 			
 			reformatTables(sender, index);
-			
 			updateLastViewed(index);
 			
 			getManager().getMessageManager().removeMessage(index);
-		}
-		catch (final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to delete report!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
-		}
-		
-		if(BukkitUtil.isOfflinePlayer(sender))
-		{
-			OfflinePlayer senderPlayer = (OfflinePlayer) sender;
-		
-			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.DELETED);
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to delete single report!");
+			throw e;
 		}
 	}
 	
-	private void deleteReport(int index) throws ClassNotFoundException, SQLException
-	{
-		String query = "Delete FROM Reports WHERE ID = " + index;
-		
-		getManager().getDatabaseHandler().updateQuery(query);
+	private void deleteReport(final int index) throws ClassNotFoundException, SQLException, InterruptedException {
+		final String query = "Delete FROM Reports WHERE ID = " + index;
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			database.updateQuery(connectionId, query);
+		} finally {
+			database.closeConnection(connectionId);
+		}
 	}
 	
-	private void deletePlayer(CommandSender sender, PlayerDeletionType deletion, OfflinePlayer player)
-	{
+	private int deletePlayer(final CommandSender sender, final PlayerDeletionType deletion, final OfflinePlayer player) throws Exception {
 		String query = getQuery(sender, player, QueryType.SELECT, deletion);
 		
-		try
-		{
-			int count = getManager().getCount();
+		final int count = getManager().getCount();
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			final ArrayList<Integer> remainingIndexes = new ArrayList<Integer>();
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 			
-			ArrayList<Integer> remainingIndexes = new ArrayList<Integer>();
-			
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
-			
-			for(ResultRow row : result)
+			for(final ResultRow row : result) {
 				remainingIndexes.add(row.getInt("ID"));
+			}
 			
 			query = getQuery(sender, player, QueryType.DELETE, deletion);
 			
-			getManager().getDatabaseHandler().updateQuery(query);
+			database.updateQuery(connectionId, query);
 			
 			String message;
 			
@@ -207,28 +211,16 @@ public class DeleteCommand extends ReporterCommand
 			updateLastViewed(remainingIndexes);
 			
 			getManager().getMessageManager().reindexMessages(remainingIndexes);
-			
-			// Log the statistic.
-			if(BukkitUtil.isPlayer(sender))
-			{
-				Player senderPlayer = (Player) sender;
-				
-				getManager().getModStatsManager().incrementStat(
-						senderPlayer,
-						ModeratorStat.DELETED,
-						totalDeleted);
-			}
-			
+			return totalDeleted;
 		}
 		catch (final Exception e)
 		{
-			log.log(Level.ERROR, "Failed to delete reports for a player!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
+			log.log(Level.ERROR, "Failed to delete reports for a player!");
+			throw e;
 		}
 	}
 	
-	private String getQuery(CommandSender sender, OfflinePlayer player, QueryType queryType, PlayerDeletionType deletion)
+	private String getQuery(final CommandSender sender, final OfflinePlayer player, final QueryType queryType, final PlayerDeletionType deletion)
 	{
 		if(queryType == QueryType.DELETE)
 			return getDeleteQuery(sender, player, deletion);
@@ -236,27 +228,27 @@ public class DeleteCommand extends ReporterCommand
 			return getSelectQuery(sender, player, deletion);
 	}
 	
-	private String getSelectQuery(CommandSender sender, OfflinePlayer player, PlayerDeletionType deletion)
+	private String getSelectQuery(final CommandSender sender, final OfflinePlayer player, final PlayerDeletionType deletion)
 	{
 		final StringBuilder query = new StringBuilder();
 		query.append("SELECT ID FROM Reports WHERE ");
-		ModLevel level = getManager().getModLevel(sender);
+		final ModLevel level = getManager().getModLevel(sender);
 		
 		if(sender.isOp() || sender instanceof ConsoleCommandSender)
 		{
 			if(player.getName().equalsIgnoreCase("* (Anonymous)"))
 			{
 				if(deletion == PlayerDeletionType.REPORTED)
-					query.append("Reported != '").append(player.getName()).append("'");
+					query.append("Reported != '").append(player.getName()).append('\'');
 				else if(deletion == PlayerDeletionType.SENDER)
-					query.append("Sender != '").append(player.getName()).append("'");
+					query.append("Sender != '").append(player.getName()).append('\'');
 			}
 			else
 			{
 				if(deletion == PlayerDeletionType.REPORTED)
-					query.append("ReportedUUID != '").append(player.getUniqueId()).append("'");
+					query.append("ReportedUUID != '").append(player.getUniqueId()).append('\'');
 				else if(deletion == PlayerDeletionType.SENDER)
-					query.append("SenderUUID != '").append(player.getUniqueId()).append("'");
+					query.append("SenderUUID != '").append(player.getUniqueId()).append('\'');
 			}
 		}
 		else
@@ -267,7 +259,7 @@ public class DeleteCommand extends ReporterCommand
 			
 			if(BukkitUtil.isPlayer(sender))
 			{
-				Player senderPlayer = (Player) sender;
+				final Player senderPlayer = (Player) sender;
 				
 				query.append("ClaimedByUUID = '").append(senderPlayer.getUniqueId()).append("') ");
 			}
@@ -295,27 +287,27 @@ public class DeleteCommand extends ReporterCommand
 		return query.toString();
 	}
 	
-	private String getDeleteQuery(CommandSender sender, OfflinePlayer player, PlayerDeletionType deletion)
+	private String getDeleteQuery(final CommandSender sender, final OfflinePlayer player, final PlayerDeletionType deletion)
 	{
 		final StringBuilder query = new StringBuilder();
 		query.append("DELETE FROM Reports WHERE ");
-		ModLevel level = getManager().getModLevel(sender);
+		final ModLevel level = getManager().getModLevel(sender);
 		
 		if(sender.isOp() || sender instanceof ConsoleCommandSender)
 		{
 			if(player.getName().equals("* (Anonymous)"))
 			{
 				if(deletion == PlayerDeletionType.REPORTED)
-					query.append("Reported = '").append(player.getName()).append("'");
+					query.append("Reported = '").append(player.getName()).append('\'');
 				else if(deletion == PlayerDeletionType.SENDER)
-					query.append("Sender = '").append(player.getName()).append("'");
+					query.append("Sender = '").append(player.getName()).append('\'');
 			}
 			else
 			{
 				if(deletion == PlayerDeletionType.REPORTED)
-					query.append("ReportedUUID = '").append(player.getUniqueId()).append("'");
+					query.append("ReportedUUID = '").append(player.getUniqueId()).append('\'');
 				else if(deletion == PlayerDeletionType.SENDER)
-					query.append("SenderUUID = '").append(player.getUniqueId()).append("'");
+					query.append("SenderUUID = '").append(player.getUniqueId()).append('\'');
 			}
 		}
 		else
@@ -355,80 +347,54 @@ public class DeleteCommand extends ReporterCommand
 		return query.toString();
 	}
 	
-	private void deleteReportBatch(CommandSender sender, BatchDeletionType deletion)
-	{
-		try
-		{
-			int beforeDeletion = getManager().getCount();
-			
-			ArrayList<Integer> remainingIndexes = getRemainingIndexes(sender, deletion);
-			
-			int afterDeletion = remainingIndexes.size();
-			
-			int totalDeleted = beforeDeletion - afterDeletion;
+	private int deleteReportBatch(final CommandSender sender, final BatchDeletionType deletion) throws Exception {
+		try {
+			final int beforeDeletion = getManager().getCount();
+			final ArrayList<Integer> remainingIndexes = getRemainingIndexes(sender, deletion);
+			final int afterDeletion = remainingIndexes.size();
+			final int totalDeleted = beforeDeletion - afterDeletion;
 			
 			deleteBatch(sender, deletion);
-			
 			reformatTables(sender, remainingIndexes);
-			
 			updateLastViewed(remainingIndexes);
-			
 			getManager().getMessageManager().reindexMessages(remainingIndexes);
 			
+			final Locale locale = getManager().getLocale();
 			String message = "";
 			
 			if (deletion == BatchDeletionType.ALL)
-				message = getManager().getLocale().getString(DeletePhrases.deleteAll);
+				message = locale.getString(DeletePhrases.deleteAll);
 			else if (deletion == BatchDeletionType.COMPLETE)
-				message = getManager().getLocale().getString(DeletePhrases.deleteComplete);
+				message = locale.getString(DeletePhrases.deleteComplete);
 			else if (deletion == BatchDeletionType.INCOMPLETE)
-				message = getManager().getLocale().getString(DeletePhrases.deleteIncomplete);
+				message = locale.getString(DeletePhrases.deleteIncomplete);
 			
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + message);
-			
 			displayTotalReportsDeleted(sender, totalDeleted);
-			
-			// Log the statistic.
-			if(BukkitUtil.isPlayer(sender))
-			{
-				Player senderPlayer = (Player) sender;
-				
-				getManager().getModStatsManager().incrementStat(
-						senderPlayer,
-						ModeratorStat.DELETED,
-						totalDeleted);
-			}
-		}
-		catch (final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to delete batch of reports!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+			return totalDeleted;
+		} catch (final Exception e) {
+			log.log(Level.ERROR, "Failed to delete batch of reports!");
+			throw e;
 		}
 	}
 	
-	private void deleteBatch(CommandSender sender, BatchDeletionType deletion) throws ClassNotFoundException, SQLException
+	private void deleteBatch(final CommandSender sender, final BatchDeletionType deletion) throws ClassNotFoundException, SQLException, InterruptedException
 	{
-		String query = getQuery(sender, QueryType.DELETE, deletion);
+		final String query = getQuery(sender, QueryType.DELETE, deletion);
 		
-		try
-		{
-			getManager().getDatabaseHandler().updateQuery(query);
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			database.updateQuery(connectionId, query);
+		} finally{
+			database.closeConnection(connectionId);
 		}
 	}
 	
 	/*
 	 * Will create the SQL query to perform the wanted query type and deletion type.
 	 */
-	private String getQuery(CommandSender sender, QueryType type, BatchDeletionType deletion)
+	private String getQuery(final CommandSender sender, final QueryType type, final BatchDeletionType deletion)
 	{
 		if (type == QueryType.DELETE)
 			return getDeleteQuery(sender, deletion);
@@ -436,7 +402,7 @@ public class DeleteCommand extends ReporterCommand
 			return getSelectQuery(sender, deletion);
 	}
 	
-	private String getSelectQuery(CommandSender sender, BatchDeletionType deletion)
+	private String getSelectQuery(final CommandSender sender, final BatchDeletionType deletion)
 	{
 		final StringBuilder query = new StringBuilder();
 		query.append("SELECT ID FROM Reports WHERE ");
@@ -452,7 +418,7 @@ public class DeleteCommand extends ReporterCommand
 		}
 		else
 		{
-			ModLevel level = getManager().getModLevel(sender);
+			final ModLevel level = getManager().getModLevel(sender);
 			
 			/*
 			 * Reports will be deleted (not remain) if:
@@ -501,7 +467,7 @@ public class DeleteCommand extends ReporterCommand
 		return query.toString();
 	}
 	
-	private String getDeleteQuery(CommandSender sender, BatchDeletionType deletion)
+	private String getDeleteQuery(final CommandSender sender, final BatchDeletionType deletion)
 	{
 		final StringBuilder query = new StringBuilder();
 		query.append("DELETE FROM Reports WHERE ");
@@ -517,7 +483,7 @@ public class DeleteCommand extends ReporterCommand
 		}
 		else
 		{
-			ModLevel level = getManager().getModLevel(sender);
+			final ModLevel level = getManager().getModLevel(sender);
 			
 			/*
 			 * Reports will be deleted (not remain) if:
@@ -566,30 +532,28 @@ public class DeleteCommand extends ReporterCommand
 		return query.toString();
 	}
 	
-	private ArrayList<Integer> getRemainingIndexes(CommandSender sender, BatchDeletionType deletion) throws ClassNotFoundException, SQLException
+	private ArrayList<Integer> getRemainingIndexes(final CommandSender sender, final BatchDeletionType deletion) throws ClassNotFoundException, SQLException, InterruptedException
 	{
-		ArrayList<Integer> remainingIDs = new ArrayList<Integer>();
-		
-		try
-		{
-			String query = getQuery(sender, QueryType.SELECT, deletion);
+		final ArrayList<Integer> remainingIDs = new ArrayList<Integer>();
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		try {
+			final String query = getQuery(sender, QueryType.SELECT, deletion);
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 			
-			SQLResultSet result = getManager().getDatabaseHandler().sqlQuery(query);
-			
-			for(ResultRow row : result)
+			for(final ResultRow row : result) {
 				remainingIDs.add(row.getInt("ID"));
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
+			}
+		} finally {
+			database.closeConnection(connectionId);
 		}
 		
 		return remainingIDs;
 	}
 	
-	private void updateLastViewed(int removedIndex)
+	private void updateLastViewed(final int removedIndex)
 	{
-		for(Entry<CommandSender, Integer> e : getManager().getLastViewed().entrySet())
+		for(final Entry<CommandSender, Integer> e : getManager().getLastViewed().entrySet())
 		{
 			if(e.getValue() == removedIndex)
 				e.setValue(-1);
@@ -598,9 +562,9 @@ public class DeleteCommand extends ReporterCommand
 		}
 	}
 	
-	private void updateLastViewed(ArrayList<Integer> remainingIndexes)
+	private void updateLastViewed(final ArrayList<Integer> remainingIndexes)
 	{
-		for(Entry<CommandSender, Integer> e : getManager().getLastViewed().entrySet())
+		for(final Entry<CommandSender, Integer> e : getManager().getLastViewed().entrySet())
 		{
 			if(remainingIndexes.contains(e.getValue()))
 				e.setValue(remainingIndexes.indexOf(e.getValue())+1);
@@ -609,14 +573,16 @@ public class DeleteCommand extends ReporterCommand
 		}
 	}
 	
-	private void reformatTables(CommandSender sender, ArrayList<Integer> remainingIndexes)
+	private void reformatTables(final CommandSender sender, final ArrayList<Integer> remainingIndexes) throws Exception
 	{
 		StringBuilder query;
 		Statement stmt = null;
 		
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
 		try
 		{
-			stmt = getManager().getDatabaseHandler().createStatement();
+			stmt = database.createStatement(connectionId);
 			
 			for(int LCV = 0; LCV < remainingIndexes.size(); LCV++)
 			{
@@ -627,25 +593,18 @@ public class DeleteCommand extends ReporterCommand
 			}
 			
 			stmt.executeBatch();
-		}
-		catch(final Exception e)
-		{
-			log.log(Level.ERROR, "Failed reformatting tables after batch delete!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			try
-			{
-				if(stmt != null)
+		} catch(final Exception e) {
+			log.log(Level.ERROR, "Failed reformatting tables after batch delete!");
+			throw e;
+		} finally {
+			try {
+				if(stmt != null) {
 					stmt.close();
-			}
-			catch (Exception e)
-			{
+				}
+			} catch (Exception e) {
 			}
 			
-			getManager().getDatabaseHandler().closeConnection();
+			database.closeConnection(connectionId);
 		}
 		
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
@@ -653,45 +612,49 @@ public class DeleteCommand extends ReporterCommand
 				getManager().getLocale().getString(DeletePhrases.SQLTablesReformat)));
 	}
 	
-	private void reformatTables(CommandSender sender, int removedIndex)
+	private void reformatTables(final CommandSender sender, final int removedIndex) throws Exception
 	{
-		int count = getManager().getCount();
-		
+		final int count = getManager().getCount();
+		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
+		final int connectionId = database.openPooledConnection();
+		Statement statement = null;
 		try
 		{
+			statement = database.createStatement(connectionId);
 			StringBuilder formatQuery;
 			
-			for (int LCV = removedIndex; LCV <= count; LCV++)
-			{
+			for (int LCV = removedIndex; LCV <= count; LCV++) {
 				formatQuery = new StringBuilder();
 				formatQuery.append("UPDATE Reports SET ID=").append(LCV).append(" WHERE ID=").append((LCV+1));
 				
-				getManager().getDatabaseHandler().updateQuery(formatQuery.toString());
+				statement.addBatch(formatQuery.toString());
 			}
-		}
-		catch(final Exception e)
-		{
-			log.log(Level.ERROR, "Failed to reformat table after delete!", e);
-			sender.sendMessage(getErrorMessage());
-			return;
-		}
-		finally
-		{
-			getManager().getDatabaseHandler().closeConnection();
-		}
-		
-		if(count != -1)
+			statement.executeBatch();
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
 					ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(DeletePhrases.SQLTablesReformat)));
+		}
+		catch(final Exception e)
+		{
+			log.log(Level.ERROR, "Failed to reformat table after single delete!");
+			throw e;
+		}
+		finally
+		{
+			try {
+				if(statement != null) {
+					statement.close();
+				}
+			} catch (Exception e) {
+			}
+			database.closeConnection(connectionId);
+		}
 	}
 	
-	private void displayTotalReportsDeleted(CommandSender sender, int totalDeleted)
+	private void displayTotalReportsDeleted(final CommandSender sender, final int totalDeleted)
 	{
 		String message = getManager().getLocale().getString(DeletePhrases.deletedReportsTotal);
-		
 		message = message.replaceAll("%r", ChatColor.RED + Integer.toString(totalDeleted) + ChatColor.WHITE);
-		
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + message);
 	}
 	
@@ -701,36 +664,37 @@ public class DeleteCommand extends ReporterCommand
 	@Override
 	public void updateDocumentation()
 	{
-		ArrayList<ObjectPair<String, String>> usages = super.getUsages();
+		final Locale locale = getManager().getLocale();
+		final ArrayList<ObjectPair<String, String>> usages = super.getUsages();
 		
 		usages.clear();
 		
-		String usage = getManager().getLocale().getString(DeletePhrases.deleteHelp);
-		String description = getManager().getLocale().getString(DeletePhrases.deleteHelpDetails);
+		String usage = locale.getString(DeletePhrases.deleteHelp);
+		String description = locale.getString(DeletePhrases.deleteHelpDetails);
 		
 		ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);
 		
 		usage = "/report delete/remove all";
-		description = getManager().getLocale().getString(DeletePhrases.deleteHelpAllDetails);
+		description = locale.getString(DeletePhrases.deleteHelpAllDetails);
 		
 		entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);
 		
 		usage = "/report delete/remove completed|finished";
-		description = getManager().getLocale().getString(DeletePhrases.deleteHelpCompletedDetails);
+		description = locale.getString(DeletePhrases.deleteHelpCompletedDetails);
 		
 		entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);
 		
 		usage = "/report delete/remove incomplete|unfinished";
-		description = getManager().getLocale().getString(DeletePhrases.deleteHelpIncompleteDetails);
+		description = locale.getString(DeletePhrases.deleteHelpIncompleteDetails);
 		
 		entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);
 		
-		usage = getManager().getLocale().getString(DeletePhrases.deleteHelpPlayer);
-		description = getManager().getLocale().getString(DeletePhrases.deleteHelpPlayerDetails);
+		usage = locale.getString(DeletePhrases.deleteHelpPlayer);
+		description = locale.getString(DeletePhrases.deleteHelpPlayerDetails);
 		
 		entry = new ObjectPair<String, String>(usage, description);
 		usages.add(entry);

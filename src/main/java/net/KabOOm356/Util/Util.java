@@ -6,13 +6,17 @@ import java.util.ArrayList;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
 
 /**
  * General utility helper class.
  */
 public class Util
-{	
+{
+	private static final Logger log = LogManager.getLogger(Util.class);
+	
 	/**
 	 * Counts the number of times a character occurs in a string.
 	 * 
@@ -86,41 +90,25 @@ public class Util
 	 * 
 	 * @return True if the String can be parsed to an Integer, otherwise false.
 	 */
-	public static boolean isInteger(String s)
-	{
-		if(parseInt(s) != -1)
-			return true;
-		else if(s.equals("-1"))
-			return true;
-		return false;
+	public static boolean isInteger(final String s) {
+		return (parseInt(s) != null) ? true : false;
 	}
 	
 	/**
 	 * Parses a String into an int.
-	 * <br /><br />
-	 * <b>NOTE:</b> This will return -1 if the given String cannot be parsed.
 	 * 
 	 * @param str The String to parse into an int.
 	 * 
-	 * @return The int that was parsed from the String.
+	 * @return If an integer can be parsed from the string that integer is returned, otherwise null.
 	 */
-	public static int parseInt(String str)
-	{
-		if(str == null)
-			throw new IllegalArgumentException("Parameter 'str' cannot be null!");
-		
-		int i = -1;
-		
-		try
-		{
-			i = Integer.parseInt(str);
+	public static Integer parseInt(final String str) {
+		try {
+			return Integer.parseInt(str);
 		}
-		catch(Exception ex)
-		{
-			return -1;
+		catch(final Exception e) {
+			log.debug(String.format("Failed to parse integer from string [%s]!", str), e);
+			return null;
 		}
-		
-		return i;
 	}
 	
 	/**

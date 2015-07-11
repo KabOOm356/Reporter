@@ -51,12 +51,12 @@ public class MigrateToVersion7
 		return updated;
 	}
 	
-	private static void deleteTemporaryTable(Database database) throws ClassNotFoundException, SQLException
+	private static void deleteTemporaryTable(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		database.updateQuery("DROP TABLE IF EXISTS Version7Temporary");
 	}
 
-	private static void createTemporaryTable(Database database) throws ClassNotFoundException, SQLException
+	private static void createTemporaryTable(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		String query = "CREATE TABLE IF NOT EXISTS Version7Temporary (" +
 				"ID INTEGER PRIMARY KEY, " +
@@ -95,7 +95,7 @@ public class MigrateToVersion7
 				"FROM reports");
 	}
 
-	protected static boolean needsMigration(Database database) throws ClassNotFoundException, SQLException
+	protected static boolean needsMigration(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		if(database.checkTable("reports"))
 		{
@@ -114,7 +114,7 @@ public class MigrateToVersion7
 		return false;
 	}
 	
-	private static void migrateTable(Database database) throws ClassNotFoundException, SQLException
+	private static void migrateTable(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		database.updateQuery("INSERT INTO Reports " +
 				"(ID, Date, Sender, SenderRaw, Reported, ReportedRaw, Details, SenderWorld, SenderX, SenderY, SenderZ, ReportedWorld, ReportedX, ReportedY, ReportedZ, CompletionStatus, CompletedBy, CompletedByRaw, CompletionDate, CompletionSummary) " +
