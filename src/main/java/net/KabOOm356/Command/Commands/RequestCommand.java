@@ -70,16 +70,16 @@ public class RequestCommand extends ReporterCommand
 	private void requestMostReported(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException
 	{
 		// Return the most reported players and the number of reports against them.
-		// LOW Long String concatenation.
-		String query = "SELECT COUNT(*) AS Count, ReportedUUID, Reported " +
-				"FROM Reports " +
-				"GROUP BY ReportedUUID HAVING COUNT(*) = " +
-				"(" +
-				"SELECT COUNT(*) " +
-				"FROM Reports " +
-				"GROUP BY ReportedUUID ORDER BY COUNT(*) DESC " +
-				"LIMIT 1" +
-				")";
+		final StringBuilder query = new StringBuilder();
+		query.append("SELECT COUNT(*) AS Count, ReportedUUID, Reported ");
+		query.append("FROM Reports ");
+		query.append("GROUP BY ReportedUUID HAVING COUNT(*) = ")
+			.append('(')
+				.append("SELECT COUNT(*) ")
+				.append("FROM Reports ")
+				.append("GROUP BY ReportedUUID ORDER BY COUNT(*) DESC ")
+				.append("LIMIT 1")
+			.append(')');
 		
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
@@ -88,7 +88,7 @@ public class RequestCommand extends ReporterCommand
 			SQLResultSet result;
 			int numberOfReports = -1;
 			
-			result = database.sqlQuery(connectionId, query);
+			result = database.sqlQuery(connectionId, query.toString());
 			
 			for(ResultRow row : result)
 			{

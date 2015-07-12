@@ -113,25 +113,25 @@ public class ListCommand extends ReporterCommand
 	
 	private void listClaimed(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException
 	{
-		// LOW Long String concatenation.
-		String query = "SELECT COUNT(*) AS Count " +
-				"FROM Reports " +
-				"WHERE ClaimStatus = 1 AND ";
+		final StringBuilder query = new StringBuilder();
+		query.append("SELECT COUNT(*) AS Count ");
+		query.append("FROM Reports ");
+		query.append("WHERE ClaimStatus = 1 AND ");
 		
 		if(BukkitUtil.isPlayer(sender))
 		{
 			Player p = (Player) sender;
-			query += "ClaimedByUUID = '" + p.getUniqueId() + "'";
+			query.append("ClaimedByUUID = '").append(p.getUniqueId()).append('\'');
 		}
 		else
 		{
-			query += "ClaimedBy = '" + sender.getName() + "'";
+			query.append("ClaimedBy = '").append(sender.getName()).append('\'');
 		}
 		
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			final SQLResultSet result = database.sqlQuery(connectionId, query);
+			final SQLResultSet result = database.sqlQuery(connectionId, query.toString());
 			final int count = result.getInt("Count");
 			String message = getManager().getLocale().getString(ListPhrases.listClaimed);
 			message = message.replaceAll("%n", ChatColor.GOLD + Integer.toString(count) + ChatColor.WHITE);
@@ -146,27 +146,19 @@ public class ListCommand extends ReporterCommand
 
 	private void listClaimedPriority(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException
 	{
-		String queryFormat = null;
-		
-		if(BukkitUtil.isPlayer(sender))
-		{
+		final StringBuilder queryFormat = new StringBuilder();
+		queryFormat.append("SELECT COUNT(*) AS Count ");
+		queryFormat.append("FROM Reports ");
+		queryFormat.append("WHERE ClaimStatus = 1 ");
+		if(BukkitUtil.isPlayer(sender)) {
 			Player p = (Player) sender;
-			// LOW Long String concatenation.
-			queryFormat = "SELECT COUNT(*) AS Count " +
-					"FROM Reports " +
-					"WHERE ClaimStatus = 1 " +
-					"AND ClaimedByUUID = '" + p.getUniqueId() + "' " +
-					"AND Priority = ";
+			queryFormat.append("AND ClaimedByUUID = '").append(p.getUniqueId()).append("' ");
+		} else {
+			queryFormat.append("AND ClaimedBy = '").append(sender.getName()).append("' ");
 		}
-		else
-		{
-			// LOW Long String concatenation.
-			queryFormat = "SELECT COUNT(*) AS Count " +
-					"FROM Reports " +
-					"WHERE ClaimStatus = 1 " +
-					"AND ClaimedBy = '" + sender.getName() + "' " +
-					"AND Priority = ";
-		}
+		queryFormat.append("AND Priority = ");
+		
+		final String query = queryFormat.toString();
 		
 		int noPriorityCount = 0;
 		int lowPriorityCount = 0;
@@ -177,16 +169,16 @@ public class ListCommand extends ReporterCommand
 		final int connectionId = database.openPooledConnection();
 		try
 		{
-			SQLResultSet result = database.sqlQuery(connectionId, queryFormat + ModLevel.NONE.getLevel());
+			SQLResultSet result = database.sqlQuery(connectionId, query + ModLevel.NONE.getLevel());
 			noPriorityCount = result.getInt("Count");
 			
-			result = database.sqlQuery(connectionId, queryFormat + ModLevel.LOW.getLevel());
+			result = database.sqlQuery(connectionId, query + ModLevel.LOW.getLevel());
 			lowPriorityCount = result.getInt("Count");
 			
-			result = database.sqlQuery(connectionId, queryFormat + ModLevel.NORMAL.getLevel());
+			result = database.sqlQuery(connectionId, query + ModLevel.NORMAL.getLevel());
 			normalPriorityCount = result.getInt("Count");
 			
-			result = database.sqlQuery(connectionId, queryFormat + ModLevel.HIGH.getLevel());
+			result = database.sqlQuery(connectionId, query + ModLevel.HIGH.getLevel());
 			highPriorityCount = result.getInt("Count");
 		}
 		catch (final SQLException e) {
@@ -216,26 +208,23 @@ public class ListCommand extends ReporterCommand
 
 	private void listClaimedIndexes(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException
 	{
-		// LOW Long String concatenation.
-		String query = "SELECT ID " +
-				"FROM Reports " +
-				"WHERE ClaimStatus = 1 AND ";
+		final StringBuilder query = new StringBuilder();
+		query.append("SELECT ID ");
+		query.append("FROM Reports ");
+		query.append("WHERE ClaimStatus = 1 AND ");
 		
-		if(BukkitUtil.isPlayer(sender))
-		{
+		if(BukkitUtil.isPlayer(sender)) {
 			Player p = (Player) sender;
-			query += "ClaimedByUUID = '" + p.getUniqueId() + "'";
-		}
-		else
-		{
-			query += "ClaimedBy = '" + sender.getName() + "'";
+			query.append("ClaimedByUUID = '").append(p.getUniqueId()).append('\'');
+		} else {
+			query.append("ClaimedBy = '").append(sender.getName()).append('\'');
 		}
 		
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try
 		{
-			SQLResultSet result = database.sqlQuery(connectionId, query);
+			SQLResultSet result = database.sqlQuery(connectionId, query.toString());
 			String indexes = Util.indexesToString(result, "ID", ChatColor.GOLD, ChatColor.WHITE);
 			String message = getManager().getLocale().getString(ListPhrases.listClaimedIndexes);
 			message = message.replaceAll("%i", indexes);
@@ -252,50 +241,45 @@ public class ListCommand extends ReporterCommand
 
 	private void listClaimedPriorityIndexes(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException
 	{
-		String queryFormat = null;
+		final StringBuilder queryFormat = new StringBuilder();
 		
+		queryFormat.append("SELECT ID ");
+		queryFormat.append("FROM Reports ");
+		queryFormat.append("WHERE ");
+		queryFormat.append("ClaimStatus = 1 ");
 		if(BukkitUtil.isPlayer(sender))
 		{
 			Player p = (Player) sender;
-			// LOW Long String concatenation.
-			queryFormat += "SELECT ID " +
-					"FROM Reports " +
-					"WHERE " +
-					"ClaimStatus = 1 " +
-					"AND ClaimedByUUID = '" + p.getUniqueId() + "' " +
-					"AND Priority = ";
+			queryFormat.append("AND ClaimedByUUID = '").append(p.getUniqueId()).append("' ");
 		}
 		else
 		{
-			// LOW Long String concatenation.
-			queryFormat += "SELECT ID " +
-					"FROM Reports " +
-					"WHERE " +
-					"ClaimStatus = 1 " +
-					"AND ClaimedBy = '" + sender.getName() + "' " +
-					"AND Priority = ";
+			queryFormat.append("AND ClaimedBy = '").append(sender.getName()).append("' ");
 		}
+		queryFormat.append("AND Priority = ");
 		
 		String noPriorityIndexes;
 		String lowPriorityIndexes;
 		String normalPriorityIndexes;
 		String highPriorityIndexes;
 		
+		final String query = queryFormat.toString();
+		
 		SQLResultSet result;
 		
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			result = database.sqlQuery(connectionId, queryFormat + ModLevel.NONE.getLevel());
+			result = database.sqlQuery(connectionId, query + ModLevel.NONE.getLevel());
 			noPriorityIndexes = Util.indexesToString(result, "ID", ModLevel.NONE.getColor(), ChatColor.WHITE);
 			
-			result = database.sqlQuery(connectionId, queryFormat + ModLevel.LOW.getLevel());
+			result = database.sqlQuery(connectionId, query + ModLevel.LOW.getLevel());
 			lowPriorityIndexes = Util.indexesToString(result, "ID", ModLevel.LOW.getColor(), ChatColor.WHITE);
 			
-			result = database.sqlQuery(connectionId, queryFormat + ModLevel.NORMAL.getLevel());
+			result = database.sqlQuery(connectionId, query + ModLevel.NORMAL.getLevel());
 			normalPriorityIndexes = Util.indexesToString(result, "ID", ModLevel.NORMAL.getColor(), ChatColor.WHITE);
 			
-			result = database.sqlQuery(connectionId, queryFormat + ModLevel.HIGH.getLevel());
+			result = database.sqlQuery(connectionId, query + ModLevel.HIGH.getLevel());
 			highPriorityIndexes = Util.indexesToString(result, "ID", ModLevel.HIGH.getColor(), ChatColor.WHITE);
 		} catch (final SQLException e) {
 			log.log(Level.ERROR, String.format("Failed to list claimed report indexes by priority on connection [%d]!", connectionId));

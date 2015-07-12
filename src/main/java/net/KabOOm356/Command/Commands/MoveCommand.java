@@ -83,16 +83,16 @@ public class MoveCommand extends ReporterCommand
 	
 	protected void moveReport(CommandSender sender, int index, ModLevel level) throws ClassNotFoundException, SQLException, InterruptedException
 	{
-		// LOW Long String concatenation.
-		String query = "SELECT ClaimStatus, ClaimedByUUID, ClaimPriority "
-				+ "FROM Reports "
-				+ "WHERE ID=" + index;
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT ClaimStatus, ClaimedByUUID, ClaimPriority ");
+		query.append("FROM Reports ");
+		query.append("WHERE ID=").append(index);
 		
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try
 		{
-			final SQLResultSet result = database.sqlQuery(connectionId, query);
+			final SQLResultSet result = database.sqlQuery(connectionId, query.toString());
 			
 			boolean isClaimed = result.getBoolean("ClaimStatus");
 			int currentPriority = result.getInt("ClaimPriority");
@@ -107,16 +107,16 @@ public class MoveCommand extends ReporterCommand
 			if(isClaimed && level.getLevel() > currentPriority)
 			{
 				// Clear the claim and upgrade the priority
-				// LOW Long String concatenation.
-				query = "UPDATE Reports " +
-						"SET " +
-						"ClaimStatus='0', " +
-						"ClaimedByUUID='', " +
-						"ClaimedBy='', " +
-						"ClaimDate='', " +
-						"ClaimPriority=0, " +
-						"Priority=" + level.getLevel() + " " +
-						"WHERE ID=" + index;
+				query = new StringBuilder();
+				query.append("UPDATE Reports ");
+				query.append("SET ")
+					.append("ClaimStatus='0', ")
+					.append("ClaimedByUUID='', ")
+					.append("ClaimedBy='', ")
+					.append("ClaimDate='', ")
+					.append("ClaimPriority=0, ")
+					.append("Priority=").append(level.getLevel()).append(' ');
+				query.append("WHERE ID=").append(index);
 				
 				Player claimingPlayer = null;
 				
@@ -140,14 +140,14 @@ public class MoveCommand extends ReporterCommand
 			}
 			else
 			{
-				// LOW Long String concatenation.
-				query = "UPDATE Reports " +
-						"SET " +
-						"Priority = " + level.getLevel() + " " +
-						"WHERE ID=" + index;
+				query = new StringBuilder();
+				query.append("UPDATE Reports ");
+				query.append("SET ");
+				query.append("Priority = ").append(level.getLevel()).append(' ');
+				query.append("WHERE ID=").append(index);
 			}
 			
-			database.updateQuery(connectionId, query);
+			database.updateQuery(connectionId, query.toString());
 		} catch (final SQLException e) {
 			log.log(Level.ERROR, String.format("Failed to move report priority on connection [%d]!", connectionId));
 			throw e;
