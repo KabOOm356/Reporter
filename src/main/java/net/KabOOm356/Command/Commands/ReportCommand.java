@@ -2,6 +2,7 @@ package net.KabOOm356.Command.Commands;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 
 import net.KabOOm356.Command.ReporterCommand;
@@ -288,17 +289,17 @@ public class ReportCommand extends ReporterCommand
 
 	private void broadcastSubmittedMessage(int index)
 	{
-		Player[] p = Bukkit.getOnlinePlayers();
+		final Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
 		
 		String reportSubmitted = BukkitUtil.colorCodeReplaceAll(
 				getManager().getLocale().getString(ReportPhrases.broadcastSubmitted));
 		
 		reportSubmitted = reportSubmitted.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.WHITE);
 		
-		for(int LCV = 0; LCV < p.length; LCV++)
-		{
-			if(hasPermission(p[LCV], "reporter.list"))
-				p[LCV].sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + reportSubmitted);
+		for(final Player player : onlinePlayers) {
+			if(hasPermission(player, "reporter.list")) {
+				player.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + reportSubmitted);
+			}
 		}
 	}
 	

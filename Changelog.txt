@@ -372,3 +372,6 @@ Changelog:
 				Fixed a Spigot specific error when trying to respond to a report where an anonymous player was reported.
 	3.2.6	12/31/2014
 				Fixed a NullPointerException when trying to respond to a report where the sender or reported player is offline.
+	3.2.6.1	10/24/2015
+				Changed from Bukkit's Maven repository to Spigot's Maven repository.
+				Updated Bukkit API to 1.8.8-R0.1-SNAPSHOT.
