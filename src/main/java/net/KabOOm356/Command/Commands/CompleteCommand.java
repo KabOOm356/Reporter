@@ -1,6 +1,7 @@
 package net.KabOOm356.Command.Commands;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
@@ -153,7 +154,7 @@ public class CompleteCommand extends ReporterCommand
 	
 	private void broadcastCompletedMessage(int index)
 	{
-		Player[] p = Bukkit.getOnlinePlayers();
+		final Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
 		
 		String reportCompleted = BukkitUtil.colorCodeReplaceAll(
 				getManager().getLocale().getString(CompletePhrases.broadcastCompleted));	
@@ -209,14 +210,12 @@ public class CompleteCommand extends ReporterCommand
 		
 		boolean isReporterOnline = false;
 		
-		for(int LCV = 0; LCV < p.length; LCV++)
-		{
-			if(hasPermission(p[LCV], "reporter.list"))
-				p[LCV].sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + reportCompleted);
-			else if(playerName != null && !playerName.equals("") && playerName.equals(p[LCV].getName()))
-			{
+		for(final Player player : onlinePlayers) {
+			if(hasPermission(player, "reporter.list")) {
+				player.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + reportCompleted);
+			} else if(playerName != null && !playerName.isEmpty() && playerName.equals(player.getName())) {
 				isReporterOnline = true;
-				p[LCV].sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + yourReportCompleted);
+				player.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + yourReportCompleted);
 			}
 		}
 		

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.KabOOm356</groupId>
   <artifactId>Reporter</artifactId>
-  <version>1.0.7</version>
+  <version>1.0.8</version>
   <properties>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   	<project.mainClass>net.KabOOm356.Reporter.Reporter</project.mainClass>
@@ -55,13 +55,13 @@
     <dependency>
       <groupId>ru.tehkode</groupId>
       <artifactId>PermissionsEx</artifactId>
-      <version>1.22</version>
+      <version>1.23</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
     	<groupId>org.bukkit</groupId>
     	<artifactId>bukkit</artifactId>
-    	<version>1.7.9-R0.2</version>
+    	<version>1.8.8-R0.1-SNAPSHOT</version>
     	<scope>provided</scope>
     </dependency>
     <dependency>
@@ -72,9 +72,9 @@
     </dependency>
   </dependencies>
   <repositories>
-	<repository>
-      <id>bukkit-repo</id>
-      <url>http://repo.bukkit.org/content/groups/public</url>
+    <repository>
+      <id>spigot-repo</id>
+      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
     <repository>
       <id>pex-repo</id>
