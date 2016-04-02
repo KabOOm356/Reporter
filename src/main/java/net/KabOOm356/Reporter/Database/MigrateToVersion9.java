@@ -1,64 +1,27 @@
 package net.KabOOm356.Reporter.Database;
 
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
+import net.KabOOm356.Database.Database;
+import net.KabOOm356.Database.DatabaseType;
+import net.KabOOm356.Database.SQLResultSet;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.KabOOm356.Database.Database;
-import net.KabOOm356.Database.DatabaseType;
-import net.KabOOm356.Database.SQLResultSet;
-import net.KabOOm356.Reporter.Reporter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class MigrateToVersion9
-{
+public class MigrateToVersion9 extends DatabaseVersionMigrator {
 	private static final Logger log = LogManager.getLogger(MigrateToVersion9.class);
-	
-	protected static boolean migrateToVersion9(Database database)
-	{
-		boolean updated = false;
-		
-		try
-		{
-			if(needsMigration(database))
-			{
-				createTemporaryTable(database);
-				
-				database.updateQuery("DROP TABLE IF EXISTS Reports");
-				
-				ReporterDatabaseUtil.createTables(database);
-				
-				migrateTable(database);
-				
-				deleteTemporaryTable(database);
-				
-				updated = true;
-			}
-		}
-		catch(Exception ex)
-		{
-			log.log(Level.FATAL, Reporter.getDefaultConsolePrefix() + "An error occured while upgrading database data to version 9!", ex);
-			log.log(Level.FATAL, Reporter.getDefaultConsolePrefix() + "If you receive more errors, you may have to delete your database!");
-		}
-		finally
-		{
-			database.closeConnection();
-		}
-		
-		return updated;
-	}
-	
-	private static void deleteTemporaryTable(Database database) throws ClassNotFoundException, SQLException, InterruptedException
-	{
-		database.updateQuery("DROP TABLE IF EXISTS Version9Temporary");
+	private static final String upgradeVersion = "9";
+
+	protected MigrateToVersion9(final Database database) {
+		super(database, upgradeVersion);
 	}
 
-	private static void createTemporaryTable(Database database) throws ClassNotFoundException, SQLException, InterruptedException
-	{
-		String query = "CREATE TABLE IF NOT EXISTS Version9Temporary (" +
+	@Override
+	protected void createTemporaryTable() throws ClassNotFoundException, SQLException, InterruptedException {
+		// @formatter:off
+		final String query = "CREATE TABLE IF NOT EXISTS Version9Temporary (" +
 				"ID INTEGER PRIMARY KEY, " +
 				"Date CHAR(19) NOT NULL DEFAULT 'N/A', " +
 				"SenderUUID CHAR(36) DEFAULT '', " +
@@ -85,34 +48,47 @@ public class MigrateToVersion9
 				"ClaimedByUUID CHAR(36) DEFAULT '', " +
 				"ClaimedBy VARCHAR(32) DEFAULT '', " +
 				"ClaimPriority TINYINT DEFAULT '0');";
-		
-		database.updateQuery(query);
-		
-		database.updateQuery("INSERT INTO Version9Temporary " +
-				"SELECT * FROM Reports");
+		// @formatter:on
+
+		getDatabase().updateQuery(query);
+
+		getDatabase().updateQuery("INSERT INTO Version9Temporary SELECT * FROM Reports");
 	}
 
-	protected static boolean needsMigration(Database database) throws ClassNotFoundException, SQLException, InterruptedException
-	{
-		if(database.checkTable("Reports"))
-		{
+	@Override
+	protected void dropTemporaryTable() throws ClassNotFoundException, SQLException, InterruptedException {
+		getDatabase().updateQuery("DROP TABLE IF EXISTS Version9Temporary");
+	}
+
+	@Override
+	protected void dropTable() {
+	}
+
+	@Override
+	protected void migrateTable() throws ClassNotFoundException, SQLException, InterruptedException {
+		final String query = "INSERT INTO Reports SELECT * FROM Version9Temporary";
+		getDatabase().updateQuery(query);
+	}
+
+	@Override
+	protected boolean needsMigration() throws ClassNotFoundException, SQLException, InterruptedException {
+		final Database database = getDatabase();
+		if (database.checkTable("Reports")) {
 			String columnName = "COLUMN_NAME";
 			String columnSize = "COLUMN_SIZE";
-			
-			if(database.getDatabaseType() == DatabaseType.SQLITE)
+
+			if (database.getDatabaseType() == DatabaseType.SQLITE) {
 				columnSize = "TYPE_NAME";
-			
+			}
+
 			SQLResultSet cols = new SQLResultSet();
 			ResultSet rs = null;
-			
-			try
-			{
+
+			try {
 				rs = database.getColumnMetaData("Reports");
-				
+
 				cols.set(rs);
-			}
-			finally
-			{
+			} finally {
 				try {
 					rs.close();
 				} catch (final SQLException e) {
@@ -120,28 +96,20 @@ public class MigrateToVersion9
 						log.log(Level.WARN, "Failed to close ResultSet!", e);
 					}
 				}
-				
+
 				database.closeConnection();
 			}
-			
+
 			boolean sender = cols.get(columnName, "Sender").getString(columnSize).contains("32");
 			boolean reported = cols.get(columnName, "Reported").getString(columnSize).contains("32");
 			boolean claimedBy = cols.get(columnName, "ClaimedBy").getString(columnSize).contains("32");
 			boolean completedBy = cols.get(columnName, "CompletedBy").getString(columnSize).contains("32");
-			
-			if(!sender && !reported && !claimedBy && !completedBy)
-			{
+
+			if (!sender && !reported && !claimedBy && !completedBy) {
 				return true;
 			}
 		}
-		
+
 		return false;
-	}
-	
-	private static void migrateTable(Database database) throws ClassNotFoundException, SQLException, InterruptedException
-	{
-		String query = "INSERT INTO Reports SELECT * FROM Version9Temporary";
-		
-		database.updateQuery(query);
 	}
 }

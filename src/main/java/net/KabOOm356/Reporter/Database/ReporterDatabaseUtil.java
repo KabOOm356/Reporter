@@ -1,21 +1,20 @@
 package net.KabOOm356.Reporter.Database;
 
+import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
+import net.KabOOm356.Database.Database;
+import net.KabOOm356.Database.DatabaseType;
+import net.KabOOm356.Database.ExtendedDatabaseHandler;
+import net.KabOOm356.Reporter.Reporter;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bukkit.configuration.file.FileConfiguration;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
-import net.KabOOm356.Database.Database;
-import net.KabOOm356.Database.DatabaseType;
-import net.KabOOm356.Database.ExtendedDatabaseHandler;
-import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
-import net.KabOOm356.Reporter.Reporter;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.bukkit.configuration.file.FileConfiguration;
 
 /**
  * A class to help initialize and update Reporter's database.
@@ -23,7 +22,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class ReporterDatabaseUtil
 {
 	private static final Logger log = LogManager.getLogger(ReporterDatabaseUtil.class);
-	
+
 	/**
 	 * Initializes the database.
 	 * 
@@ -31,12 +30,12 @@ public class ReporterDatabaseUtil
 	 * @param dataFolder A {@link File} to the directory where the data should be stored.
 	 * 
 	 * @return An initialized {@link ExtendedDatabaseHandler}.
-	 * 
+	 *
 	 * @throws IllegalArgumentException Thrown if the connection pool configuration is invalid.
-	 * @throws IOException 
-	 * @throws ClassNotFoundException 
-	 * @throws SQLException 
-	 * @throws InterruptedException 
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws InterruptedException
 	 */
 	public static ExtendedDatabaseHandler initDB(FileConfiguration configuration, File dataFolder) throws IllegalArgumentException, IOException, ClassNotFoundException, SQLException, InterruptedException
 	{
@@ -46,16 +45,16 @@ public class ReporterDatabaseUtil
 		final int maxNumberOfConnections = configuration.getInt("database.connectionPool.maxNumberOfConnections", ConnectionPoolConfig.defaultInstance.getMaxConnections());
 		final int maxNumberOfAttemptsForConnection = configuration.getInt("database.connectionPool.maxNumberOfAttemptsForConnection", ConnectionPoolConfig.defaultInstance.getMaxAttemptsForConnection());
 		final long waitTimeBeforeUpdate = configuration.getLong("database.connectionPool.waitTimeBeforeUpdate", ConnectionPoolConfig.defaultInstance.getWaitTimeBeforeUpdate());
-		
+
 		final ConnectionPoolConfig connectionPoolConfig;
-		
+
 		try {
 			connectionPoolConfig = new ConnectionPoolConfig(connectionPoolLimit, maxNumberOfConnections, waitTimeBeforeUpdate, maxNumberOfAttemptsForConnection);
 		} catch (final IllegalArgumentException e) {
 			log.warn("Failed to configure connection pool!");
 			throw e;
 		}
-		
+
 		/* If an error occurs attempting to initialize a database
 		 * the plugin will attempt to use the next less "complicated" database
 		 * 
@@ -102,27 +101,23 @@ public class ReporterDatabaseUtil
 		if(fallbackToNextDB)
 		{
 			String databaseName = configuration.getString("database.dbName", "reports.db");
-			
+
 			try {
 				databaseHandler = new ExtendedDatabaseHandler(DatabaseType.SQLITE, dataFolder.getPath(), databaseName, connectionPoolConfig);
 				initDatabaseTables(databaseHandler.getDatabase());
 			} catch (final IOException e) {
-				databaseHandler = null;
 				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to initialize an SQLite database!");
 				throw e;
 			} catch (ClassNotFoundException e) {
-				databaseHandler = null;
 				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to initialize an SQLite database!");
 				throw e;
 			} catch (SQLException e) {
-				databaseHandler = null;
 				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to initialize an SQLite database!");
 				throw e;
 			} catch (InterruptedException e) {
-				databaseHandler = null;
 				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to initialize an SQLite database!");
 				throw e;
-			}	
+			}
 		}
 		
 		return databaseHandler;
@@ -134,8 +129,8 @@ public class ReporterDatabaseUtil
 	 * @param database The {@link Database} to create the tables in.
 	 * 
 	 * @throws SQLException 
-	 * @throws ClassNotFoundException 
-	 * @throws InterruptedException 
+	 * @throws ClassNotFoundException
+	 * @throws InterruptedException
 	 */
 	private static void initDatabaseTables(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
@@ -167,10 +162,10 @@ public class ReporterDatabaseUtil
 	private static boolean migrateData(Database database)
 	{
 		boolean migrated = false;
-		
-		migrated = MigrateToVersion7.migrateToVersion7(database);
-		migrated = migrated || MigrateToVersion8.migrateToVersion8(database);
-		migrated = migrated || MigrateToVersion9.migrateToVersion9(database);
+
+		migrated = new MigrateToVersion7(database).migrate();
+		migrated = migrated || new MigrateToVersion8(database).migrate();
+		migrated = migrated || new MigrateToVersion9(database).migrate();
 		
 		return migrated;
 	}
@@ -182,80 +177,90 @@ public class ReporterDatabaseUtil
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	protected static void createTables(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
-		String query = "CREATE TABLE IF NOT EXISTS Reports (" +
-				"ID INTEGER PRIMARY KEY, " +
-				"Date CHAR(19) NOT NULL DEFAULT 'N/A', " +
-				"SenderUUID CHAR(36) DEFAULT '', " +
-				"Sender VARCHAR(32), " +
-				"ReportedUUID CHAR(36) DEFAULT '', " +
-				"Reported VARCHAR(32) NOT NULL DEFAULT '* (Anonymous)', " +
-				"Details VARCHAR(200) NOT NULL, " +
-				"Priority TINYINT NOT NULL DEFAULT '0', " +
-				"SenderWorld VARCHAR(100) DEFAULT '', " +
-				"SenderX DOUBLE NOT NULL DEFAULT '0.0', " +
-				"SenderY DOUBLE NOT NULL DEFAULT '0.0', " +
-				"SenderZ DOUBLE NOT NULL DEFAULT '0.0', " +
-				"ReportedWorld VARCHAR(100) DEFAULT '', " +
-				"ReportedX DOUBLE DEFAULT '0.0', " +
-				"ReportedY DOUBLE DEFAULT '0.0', " +
-				"ReportedZ DOUBLE DEFAULT '0.0', " +
-				"CompletionStatus BOOLEAN NOT NULL DEFAULT '0', " +
-				"CompletedByUUID CHAR(36) DEFAULT '', " +
-				"CompletedBy VARCHAR(32) DEFAULT '', " +
-				"CompletionDate CHAR(19) DEFAULT '', " +
-				"CompletionSummary VARCHAR(200) DEFAULT '', " +
-				"ClaimStatus BOOLEAN NOT NULL DEFAULT '0', " +
-				"ClaimDate CHAR(19) DEFAULT '', " +
-				"ClaimedByUUID CHAR(36) DEFAULT '', " +
-				"ClaimedBy VARCHAR(32) DEFAULT '', " +
-				"ClaimPriority TINYINT DEFAULT '0');";
-		
-		database.updateQuery(query);
-		
 		String primaryKey = "ID INTEGER PRIMARY KEY";
 		
 		// If the database is using MySQL, set the primary key to auto increment.
 		// SQLite does this automatically for primary keys.
-		if(database.getDatabaseType() == DatabaseType.MYSQL)
-		{
+		if (database.getDatabaseType() == DatabaseType.MYSQL) {
 			primaryKey += " AUTO_INCREMENT, ";
-		}
-		else
-		{
+		} else {
 			primaryKey += ", ";
 		}
-		
-		query = "CREATE TABLE IF NOT EXISTS ModStats ("
-				+ primaryKey
-				+ "ModName VARCHAR(16) NOT NULL, "
-				+ "ModUUID VARCHAR(36) NOT NULL, "
-				+ "AssignCount INTEGER NOT NULL DEFAULT '0', "
-				+ "ClaimedCount INTEGER NOT NULL DEFAULT '0', "
-				+ "CompletionCount INTEGER NOT NULL DEFAULT '0', "
-				+ "DeletionCount INTEGER NOT NULL DEFAULT '0', "
-				+ "MoveCount INTEGER NOT NULL DEFAULT '0', "
-				+ "RespondCount INTEGER NOT NULL DEFAULT '0', "
-				+ "UnassignCount INTEGER NOT NULL DEFAULT '0', "
-				+ "UnclaimCount INTEGER NOT NULL DEFAULT '0');";
-		
-		database.updateQuery(query);
-		
-		query = "CREATE TABLE IF NOT EXISTS PlayerStats ("
-				+ primaryKey
-				+ "Name VARCHAR(16) NOT NULL, "
-				+ "UUID VARCHAR(36) NOT NULL, "
-				+ "FirstReportDate VARCHAR(19) NOT NULL DEFAULT '', "
-				+ "LastReportDate VARCHAR(19) NOT NULL DEFAULT '', "
-				+ "ReportCount INTEGER NOT NULL DEFAULT '0', "
-				+ "FirstReportedDate VARCHAR(19) NOT NULL DEFAULT '', "
-				+ "LastReportedDate VARCHAR(19) NOT NULL DEFAULT '', "
-				+ "ReportedCount INTEGER NOT NULL DEFAULT '0');";
-		
-		database.updateQuery(query);
+
+		createReportsTable(database);
+		createModStatsTable(database, primaryKey);
+		createPlayerStatsTable(database, primaryKey);
+	}
+
+	private static void createPlayerStatsTable(final Database database, final String primaryKey) throws SQLException, ClassNotFoundException, InterruptedException {
+		final StringBuilder query = new StringBuilder();
+		query.append("CREATE TABLE IF NOT EXISTS PlayerStats (")
+				.append(primaryKey)
+				.append("Name VARCHAR(16) NOT NULL, ")
+				.append("UUID VARCHAR(36) NOT NULL, ")
+				.append("FirstReportDate VARCHAR(19) NOT NULL DEFAULT '', ")
+				.append("LastReportDate VARCHAR(19) NOT NULL DEFAULT '', ")
+				.append("ReportCount INTEGER NOT NULL DEFAULT '0', ")
+				.append("FirstReportedDate VARCHAR(19) NOT NULL DEFAULT '', ")
+				.append("LastReportedDate VARCHAR(19) NOT NULL DEFAULT '', ")
+				.append("ReportedCount INTEGER NOT NULL DEFAULT '0');");
+
+		database.updateQuery(query.toString());
+	}
+
+	private static void createReportsTable(final Database database) throws SQLException, ClassNotFoundException, InterruptedException {
+		final StringBuilder query = new StringBuilder();
+		query.append("CREATE TABLE IF NOT EXISTS Reports (")
+				.append("ID INTEGER PRIMARY KEY, ")
+				.append("Date CHAR(19) NOT NULL DEFAULT 'N/A', ")
+				.append("SenderUUID CHAR(36) DEFAULT '', ")
+				.append("Sender VARCHAR(32), ")
+				.append("ReportedUUID CHAR(36) DEFAULT '', ")
+				.append("Reported VARCHAR(32) NOT NULL DEFAULT '* (Anonymous)', ")
+				.append("Details VARCHAR(200) NOT NULL, ")
+				.append("Priority TINYINT NOT NULL DEFAULT '0', ")
+				.append("SenderWorld VARCHAR(100) DEFAULT '', ")
+				.append("SenderX DOUBLE NOT NULL DEFAULT '0.0', ")
+				.append("SenderY DOUBLE NOT NULL DEFAULT '0.0', ")
+				.append("SenderZ DOUBLE NOT NULL DEFAULT '0.0', ")
+				.append("ReportedWorld VARCHAR(100) DEFAULT '', ")
+				.append("ReportedX DOUBLE DEFAULT '0.0', ")
+				.append("ReportedY DOUBLE DEFAULT '0.0', ")
+				.append("ReportedZ DOUBLE DEFAULT '0.0', ")
+				.append("CompletionStatus BOOLEAN NOT NULL DEFAULT '0', ")
+				.append("CompletedByUUID CHAR(36) DEFAULT '', ")
+				.append("CompletedBy VARCHAR(32) DEFAULT '', ")
+				.append("CompletionDate CHAR(19) DEFAULT '', ")
+				.append("CompletionSummary VARCHAR(200) DEFAULT '', ")
+				.append("ClaimStatus BOOLEAN NOT NULL DEFAULT '0', ")
+				.append("ClaimDate CHAR(19) DEFAULT '', ")
+				.append("ClaimedByUUID CHAR(36) DEFAULT '', ")
+				.append("ClaimedBy VARCHAR(32) DEFAULT '', ")
+				.append("ClaimPriority TINYINT DEFAULT '0');");
+
+		database.updateQuery(query.toString());
+	}
+
+	private static void createModStatsTable(final Database database, final String primaryKey) throws SQLException, ClassNotFoundException, InterruptedException {
+		final StringBuilder query = new StringBuilder();
+		query.append("CREATE TABLE IF NOT EXISTS ModStats (")
+				.append(primaryKey)
+				.append("ModName VARCHAR(16) NOT NULL, ")
+				.append("ModUUID VARCHAR(36) NOT NULL, ")
+				.append("AssignCount INTEGER NOT NULL DEFAULT '0', ")
+				.append("ClaimedCount INTEGER NOT NULL DEFAULT '0', ")
+				.append("CompletionCount INTEGER NOT NULL DEFAULT '0', ")
+				.append("DeletionCount INTEGER NOT NULL DEFAULT '0', ")
+				.append("MoveCount INTEGER NOT NULL DEFAULT '0', ")
+				.append("RespondCount INTEGER NOT NULL DEFAULT '0', ")
+				.append("UnassignCount INTEGER NOT NULL DEFAULT '0', ")
+				.append("UnclaimCount INTEGER NOT NULL DEFAULT '0');");
+
+		database.updateQuery(query.toString());
 	}
 
 	/**
@@ -267,7 +272,7 @@ public class ReporterDatabaseUtil
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public static boolean needsToCreateTables(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
@@ -316,7 +321,7 @@ public class ReporterDatabaseUtil
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public static boolean updateReportsTable(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
@@ -477,8 +482,6 @@ public class ReporterDatabaseUtil
 				updated = true;
 			}
 			
-			// Version 9
-			
 			if(updated)
 			{
 				statement.executeBatch();
@@ -504,7 +507,7 @@ public class ReporterDatabaseUtil
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public static boolean updateModStatsTable(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
@@ -608,7 +611,7 @@ public class ReporterDatabaseUtil
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public static boolean updatePlayerStatsTable(Database database) throws ClassNotFoundException, SQLException, InterruptedException
 	{
@@ -691,22 +694,5 @@ public class ReporterDatabaseUtil
 		}
 		
 		return updated;
-	}
-	
-	/**
-	 * Drops the reports, Reports, ModStats and PlayerStats tables, if they exist.
-	 * 
-	 * @param database The database to drop the tables from.
-	 * 
-	 * @throws ClassNotFoundException
-	 * @throws SQLException
-	 * @throws InterruptedException 
-	 */
-	protected static void dropTables(Database database) throws ClassNotFoundException, SQLException, InterruptedException
-	{
-		database.updateQuery("DROP TABLE IF EXISTS reports");
-		database.updateQuery("DROP TABLE IF EXISTS Reports");
-		database.updateQuery("DROP TABLE IF EXISTS ModStats");
-		database.updateQuery("DROP TABLE IF EXISTS PlayerStats");
 	}
 }
