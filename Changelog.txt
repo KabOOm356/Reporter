@@ -375,3 +375,6 @@ Changelog:
 	3.2.6.1	10/24/2015
 				Changed from Bukkit's Maven repository to Spigot's Maven repository.
 				Updated Bukkit API to 1.8.8-R0.1-SNAPSHOT.
+	3.2.6.2	3/30/2016
+				Updated Bukkit API to 1.9.2-R0.1-SNAPSHOT.
+				Updated metrics to R8-SNAPSHOT.
