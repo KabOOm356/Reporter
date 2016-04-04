@@ -8,14 +8,12 @@ import net.KabOOm356.Database.Connection.AlertingPooledConnection;
 import net.KabOOm356.Database.Connection.ConnectionPoolManager;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import test.KabOOm356.PowerMockitoTest;
 
-@RunWith(PowerMockRunner.class)
 @PrepareForTest(AlertingPooledConnection.class)
-public class AlertingPooledConnectionTest {
+public class AlertingPooledConnectionTest extends PowerMockitoTest {
 
 	@Test
 	public void test() throws Exception {

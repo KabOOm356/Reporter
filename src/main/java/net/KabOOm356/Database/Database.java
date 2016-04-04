@@ -16,6 +16,7 @@ import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
 import net.KabOOm356.Database.Connection.ConnectionPoolManager;
 import net.KabOOm356.Database.Connection.ConnectionPooledDatabaseInterface;
 import net.KabOOm356.Database.Connection.ConnectionWrapper;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.FormattingUtil;
 import net.KabOOm356.Util.Util;
 
@@ -619,7 +620,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 		toString.append("\nConnection URL: ").append(connectionURL);
 		toString.append("\nConnection Pool Size: ").append(connectionPool.size());
 		toString.append("\nConnection Pool: ");
-		toString.append("\n").append(Util.indexesToString(connectionPool.keySet()));
+		toString.append("\n").append(ArrayUtil.indexesToString(connectionPool.keySet()));
 		return FormattingUtil.addTabsToNewLines(toString.toString(), 1);
 	}
 }

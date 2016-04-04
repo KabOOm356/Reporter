@@ -36,6 +36,7 @@ import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Permission.ReporterPermissionManager;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.FormattingUtil;
 import net.KabOOm356.Util.Util;
@@ -189,7 +190,7 @@ public class ReporterCommandManager implements CommandExecutor
 			return true;
 		}
 		
-		ArrayList<String> arguments = Util.arrayToArrayList(args);
+		ArrayList<String> arguments = ArrayUtil.arrayToArrayList(args);
 		net.KabOOm356.Command.Command command;
 		
 		// Begin Respond Command
@@ -831,7 +832,7 @@ public class ReporterCommandManager implements CommandExecutor
 			// UUID based check.
 			if(claimedBy != null && senderObject != null)
 			{
-				if(BukkitUtil.equals(senderObject, claimedBy))
+				if(BukkitUtil.playersEqual(senderObject, claimedBy))
 				{
 					isClaimedBySender = true;
 				}
@@ -848,7 +849,7 @@ public class ReporterCommandManager implements CommandExecutor
 			// UUID based check.
 			if(claimedBy != null && playerObject != null)
 			{
-				if(BukkitUtil.equals(playerObject, claimedBy))
+				if(BukkitUtil.playersEqual(playerObject, claimedBy))
 				{
 					isClaimedByPlayer = true;
 				}

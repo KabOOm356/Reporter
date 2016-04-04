@@ -1,14 +1,10 @@
 package test.KabOOm356.Util;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.KabOOm356.Util.Util;
-
 import org.bukkit.ChatColor;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class UtilTest
 {
@@ -97,55 +93,5 @@ public class UtilTest
 		assertFalse(Util.startsWithIgnoreCase("TESTING", "no"));
 		assertFalse(Util.startsWithIgnoreCase("more testing", "no More"));
 		assertFalse(Util.startsWithIgnoreCase("", "testing"));
-	}
-	
-	@Test
-	public void testIndexesToString()
-	{
-		ArrayList<Integer> list = new ArrayList<Integer>();
-		
-		String value = Util.indexesToString(list);
-		assertEquals("", value);
-		
-		value = Util.indexesToString(list, indexColor, separatorColor);
-		assertEquals("", value);
-		
-		list.add(1);
-		
-		value = Util.indexesToString(list);
-		assertEquals("1", value);
-		
-		value = Util.indexesToString(list, indexColor, separatorColor);
-		assertEquals(getIndexString(list, indexColor.toString(), separatorColor.toString()), value);
-		
-		for(int LCV = 2; LCV < 10; LCV++)
-		{
-			list.add(LCV);
-		}
-		
-		value = Util.indexesToString(list);
-		assertEquals("1, 2, 3, 4, 5, 6, 7, 8, 9", value);
-		
-		value = Util.indexesToString(list, indexColor, separatorColor);
-		assertEquals(getIndexString(list, indexColor.toString(), separatorColor.toString()), value);
-	}
-	
-	public static <T extends List<V>, V> String getIndexString(T array, String indexPrefix, String separatorPrefix)
-	{
-		StringBuilder builder = new StringBuilder();
-		
-		for(int LCV = 0; LCV < array.size(); LCV++)
-		{
-			builder.append(indexPrefix);
-			builder.append(array.get(LCV));
-			builder.append(separatorPrefix);
-			
-			if(LCV != array.size()-1)
-			{
-				builder.append(", ");
-			}
-		}
-		
-		return builder.toString();
 	}
 }

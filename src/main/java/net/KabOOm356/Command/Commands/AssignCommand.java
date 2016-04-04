@@ -158,7 +158,7 @@ public class AssignCommand extends ReporterCommand
 		if(!getManager().canAlterReport(sender, index, player))
 			return false;
 		
-		if(BukkitUtil.equals(sender, player))
+		if(BukkitUtil.playersEqual(sender, player))
 		{
 			output = getManager().getLocale().getString(AssignPhrases.useClaimToAssignSelf);
 			

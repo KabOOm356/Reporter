@@ -9,9 +9,8 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.AlertPhrases;
 import net.KabOOm356.Manager.MessageManager;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Runnable.DelayedMessage;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
-import net.KabOOm356.Util.Util;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -213,7 +212,7 @@ public class ReporterPlayerListener implements Listener {
 				ChatColor.WHITE + plugin.getLocale().getString(AlertPhrases.alertUnclaimedPlayerLogin);
 
 		playerLoginMessage = playerLoginMessage.replaceAll("%r", ChatColor.RED + BukkitUtil.formatPlayerName(reportedPlayer) + ChatColor.WHITE);
-		playerLoginMessage = playerLoginMessage.replaceAll("%i", Util.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE));
+		playerLoginMessage = playerLoginMessage.replaceAll("%i", ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE));
 
 		for (final Player player : Bukkit.getOnlinePlayers()) {
 			// Send the message to players with the permission to get it.

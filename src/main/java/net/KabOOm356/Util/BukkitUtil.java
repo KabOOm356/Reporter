@@ -1,15 +1,15 @@
 package net.KabOOm356.Util;
 
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.google.common.base.Charsets;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.google.common.base.Charsets;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A class to help with Bukkit related activities.
@@ -193,6 +193,17 @@ public class BukkitUtil
 	{
 		return !player.getUniqueId().equals(invalidUserUUID);
 	}
+
+	/**
+	 * Returns if the given UUID is valid for a user.
+	 *
+	 * @param uuid The UUID.
+	 *
+	 * @return True if the UUID is a valid player, otherwise false.
+	 */
+	public static boolean isPlayerValid(final UUID uuid) {
+		return !invalidUserUUID.equals(uuid);
+	}
 	
 	/**
 	 * Returns if the given Minecraft username is valid or not.
@@ -238,27 +249,29 @@ public class BukkitUtil
 	 * If UUID comparison is possible, it is used.
 	 * If UUID comparison is not possible, name based comparison is used.
 	 * 
-	 * @param cs A {@link CommandSender} to compare.
-	 * @param cs2 The other {@link CommandSender} to compare.
+	 * @param commandSender A {@link CommandSender} to compare.
+	 * @param commandSender2 The other {@link CommandSender} to compare.
 	 * 
 	 * @return True if the {@link CommandSender}'s are equal, otherwise false.
 	 */
-	public static boolean equals(CommandSender cs, CommandSender cs2)
-	{
-		// If both CommandSenders are players cast them and compare by UUIDs.
-		if(BukkitUtil.isOfflinePlayer(cs) && BukkitUtil.isOfflinePlayer(cs2))
-		{
-			OfflinePlayer p = (Player) cs;
-			OfflinePlayer p2 = (Player) cs2;
-			
-			return p.getUniqueId().equals(p2.getUniqueId());
+	public static boolean playersEqual(CommandSender commandSender, CommandSender commandSender2) {
+		if (commandSender == null || commandSender2 == null) {
+			return false;
 		}
-		// If one or both CommandSenders cannot be cast to Players, do name based comparison.
-		else if(cs.getName().equals(cs2.getName())) 
-		{
+		if (isOfflinePlayer(commandSender) && isOfflinePlayer(commandSender2)) {
+			final OfflinePlayer player = (OfflinePlayer) commandSender;
+			final OfflinePlayer player2 = (OfflinePlayer) commandSender2;
+			final UUID senderUUID = player.getUniqueId();
+			final UUID senderUUID2 = player2.getUniqueId();
+			if (senderUUID != null && senderUUID2 != null && senderUUID.equals(senderUUID2)) {
+				return true;
+			}
+		}
+		final String senderName = commandSender.getName();
+		final String senderName2 = commandSender2.getName();
+		if (senderName != null && commandSender2 != null && senderName.equals(senderName2)) {
 			return true;
 		}
-		
 		return false;
 	}
 	
@@ -270,7 +283,7 @@ public class BukkitUtil
 	 * 
 	 * @return True if the {@link OfflinePlayer} has the given {@link UUID}.
 	 */
-	public static boolean equals(OfflinePlayer player, UUID uuid)
+	public static boolean playersEqual(OfflinePlayer player, UUID uuid)
 	{
 		return player.getUniqueId().equals(uuid);
 	}
@@ -323,5 +336,39 @@ public class BukkitUtil
 		}
 		
 		return "";
+	}
+	
+	/**
+	 * Returns the UUID of the given {@link CommandSender}.
+	 * 
+	 * @param sender The {@link CommandSender} to get the UUID of.
+	 * 
+	 * @return The UUID of the sender if the sender has a UUID, otherwise null.
+	 */
+	public static UUID getUUID(final CommandSender sender) {
+		if(isOfflinePlayer(sender)) {
+			OfflinePlayer player = (OfflinePlayer) sender;
+			return player.getUniqueId();
+		}
+		return null;
+	}
+
+    /**
+     * Gets an offline player by UUID or name if the UUID is not valid or null.
+     *
+     * @param uuid The UUID.
+     * @param name The name of the player.
+     *
+     * @return An {@link OfflinePlayer} by UUID or by name if the UUID is not valid or null.  If the UUID is not valid and the name is null or empty, null is returned.
+     */
+	public static OfflinePlayer getOfflinePlayer(final UUID uuid, final String name) {
+		if (uuid != null && isPlayerValid(uuid)) {
+			return Bukkit.getOfflinePlayer(uuid);
+		}
+        // Getting the player by UUID failed, try getting by name
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
+		return Bukkit.getOfflinePlayer(name);
 	}
 }

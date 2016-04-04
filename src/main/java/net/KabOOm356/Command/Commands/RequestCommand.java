@@ -12,6 +12,7 @@ import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.RequestPhrases;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
@@ -115,7 +116,7 @@ public class RequestCommand extends ReporterCommand
 				String out = getManager().getLocale().getString(RequestPhrases.numberOfReportsAgainst);
 				
 				out = out.replaceAll("%n", ChatColor.GOLD + Integer.toString(numberOfReports) + ChatColor.WHITE);
-				out = out.replaceAll("%p", Util.indexesToString(players, ChatColor.GOLD, ChatColor.WHITE) + ChatColor.WHITE);
+				out = out.replaceAll("%p", ArrayUtil.indexesToString(players, ChatColor.GOLD, ChatColor.WHITE) + ChatColor.WHITE);
 				
 				sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
 						ChatColor.WHITE + out);
@@ -167,7 +168,7 @@ public class RequestCommand extends ReporterCommand
 			
 			SQLResultSet result = getManager().getDatabaseHandler().preparedSQLQuery(connectionId, query, params);
 			
-			indexes = Util.indexesToString(result, "ID", ChatColor.GOLD, ChatColor.WHITE);
+			indexes = ArrayUtil.indexesToString(result, "ID", ChatColor.GOLD, ChatColor.WHITE);
 		} catch (final SQLException e) {
 			log.log(Level.ERROR, "Failed to request player!", e);
 			throw e;

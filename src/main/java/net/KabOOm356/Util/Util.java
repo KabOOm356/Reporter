@@ -1,22 +1,18 @@
 package net.KabOOm356.Util;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
-import net.KabOOm356.Database.ResultRow;
-import net.KabOOm356.Database.SQLResultSet;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.ChatColor;
 
 /**
  * General utility helper class.
  */
-public class Util
+public final class Util
 {
+	private Util() {
+	}
+
 	private static final Logger log = LogManager.getLogger(Util.class);
-	
+
 	/**
 	 * Counts the number of times a character occurs in a string.
 	 * 
@@ -62,27 +58,7 @@ public class Util
 		
 		return count;
 	}
-	
-	/**
-	 * Converts a Java array to an {@link ArrayList}.
-	 * 
-	 * @param array The array to convert to an {@link ArrayList}.
-	 * 
-	 * @return An {@link ArrayList} containing all elements of the given array.
-	 */
-	public static <T> ArrayList<T> arrayToArrayList(T[] array)
-	{
-		if(array == null)
-			throw new IllegalArgumentException("Parameter 'array' cannot be null!");
-		
-		ArrayList<T> arrayList = new ArrayList<T>();
-		
-		for(T element : array)
-			arrayList.add(element);
-		
-		return arrayList;
-	}
-	
+
 	/**
 	 * Checks if the given String is an Integer.
 	 * 
@@ -110,103 +86,7 @@ public class Util
 			return null;
 		}
 	}
-	
-	/**
-	 * Converts the given array into a string representation.
-	 * 
-	 * @param array The array to format.
-	 * 
-	 * @return The string representation of the given indexes.
-	 */
-	public static <T extends Iterable<V>, V> String indexesToString(T array)
-	{
-		if(array == null)
-			throw new IllegalArgumentException("Parameter 'array' cannot be null!");
-		
-		StringBuilder builder = new StringBuilder();
-		
-		for(V index : array)
-			builder.append(index.toString()).append(", ");
-		
-		if(builder.length() > 2)
-			return builder.substring(0, builder.length() - 2);
-		
-		return builder.toString();
-	}
-	
-	/**
-	 * Converts the given array into a string representation.
-	 * 
-	 * @param array The array to format.
-	 * @param indexColor The color to make the indexes.
-	 * @param separatorColor The color to make the separator.
-	 * 
-	 * @return The string representation of the given array.
-	 */
-	public static <T extends Iterable<V>, V> String indexesToString(T array, ChatColor indexColor, ChatColor separatorColor)
-	{
-		if(array == null)
-			throw new IllegalArgumentException("Parameter 'array' cannot be null!");
-		if(indexColor == null)
-			throw new IllegalArgumentException("Parameter 'indexColor' cannot be null!");
-		if(separatorColor == null)
-			throw new IllegalArgumentException("Parameter 'separatorColor' cannot be null!");
-		
-		StringBuilder builder = new StringBuilder();
-		
-		for(V index : array)
-		{
-			builder.append(indexColor);
-			builder.append(index.toString());
-			builder.append(separatorColor);
-			builder.append(", ");
-		}
-		
-		if(builder.length() > 2)
-			return builder.substring(0, builder.length() - 2);
-		
-		return builder.toString();
-	}
-	
-	/**
-	 * Converts the given {@link SQLResultSet} of indexes to a string representation.
-	 * 
-	 * @param resultSet The indexes in {@link SQLResultSet} format.
-	 * @param columnName The name of the column in the {@link SQLResultSet}.
-	 * @param indexColor The color to make the indexes.
-	 * @param separatorColor The color to make the separator.
-	 * 
-	 * @return The string representation of the given indexes.
-	 * 
-	 * @throws SQLException
-	 */
-	public static String indexesToString(SQLResultSet resultSet, String columnName, ChatColor indexColor, ChatColor separatorColor)
-	{
-		if(resultSet == null)
-			throw new IllegalArgumentException("Parameter 'resultSet' cannot be null!");
-		if(columnName == null)
-			throw new IllegalArgumentException("Parameter 'columnName' cannot be null!");
-		if(indexColor == null)
-			throw new IllegalArgumentException("Parameter 'indexColor' cannot be null!");
-		if(separatorColor == null)
-			throw new IllegalArgumentException("Parameter 'separatorColor' cannot be null!");
-		
-		StringBuilder indexString = new StringBuilder();
-		
-		for(ResultRow row : resultSet)
-		{
-			indexString.append(indexColor);
-			indexString.append(row.getString(columnName));
-			indexString.append(separatorColor);
-			indexString.append(", ");
-		}
-		
-		if(indexString.length() > 2)
-			return indexString.substring(0, indexString.length() - 2);
-		
-		return indexString.toString();
-	}
-	
+
 	/**
 	 * Checks if the given String ends with the given suffix, ignoring case.
 	 * 

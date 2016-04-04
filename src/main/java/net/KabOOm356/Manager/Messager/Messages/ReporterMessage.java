@@ -2,6 +2,7 @@ package net.KabOOm356.Manager.Messager.Messages;
 
 import java.util.ArrayList;
 
+import net.KabOOm356.Util.ArrayUtil;
 import org.bukkit.ChatColor;
 
 import net.KabOOm356.Util.FormattingUtil;
@@ -73,7 +74,7 @@ public class ReporterMessage extends Message
 	{
 		String message = super.getMessage();
 		
-		String indexString = Util.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
+		String indexString = ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
 		
 		message = message.replaceAll("%i", indexString);
 		
@@ -194,7 +195,7 @@ public class ReporterMessage extends Message
 		
 		sb.append("\nIndexes: ");
 		
-		sb.append(Util.indexesToString(indexes) + "\n");
+		sb.append(ArrayUtil.indexesToString(indexes) + "\n");
 		
 		sb.append("Full Message: " + this.getMessage());
 		

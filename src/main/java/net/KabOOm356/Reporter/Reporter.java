@@ -20,6 +20,7 @@ import net.KabOOm356.Reporter.Database.ReporterDatabaseUtil;
 import net.KabOOm356.Reporter.Locale.ReporterLocaleInitializer;
 import net.KabOOm356.Reporter.Metrics.MetricsInitializer;
 import net.KabOOm356.Updater.PluginUpdater;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.Util;
 
 import org.apache.logging.log4j.Level;
@@ -173,7 +174,7 @@ public class Reporter extends JavaPlugin
 			String name = getDescription().getName();
 			List<String> authors = getDescription().getAuthors();
 			
-			String authorsString = Util.indexesToString(authors);
+			String authorsString = ArrayUtil.indexesToString(authors);
 			
 			// userAgent = "Reporter v3.1.1 (By KabOOm356)"
 			String userAgent = name + " v" + version + " (By " + authorsString + ")";

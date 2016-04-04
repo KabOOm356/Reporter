@@ -10,6 +10,7 @@ import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ListPhrases;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
@@ -93,7 +94,7 @@ public class ListCommand extends ReporterCommand
 				return;
 			}
 			
-			String indexesString = Util.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
+			String indexesString = ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
 			
 			if(!indexesString.equals(""))
 			{
@@ -225,7 +226,7 @@ public class ListCommand extends ReporterCommand
 		try
 		{
 			SQLResultSet result = database.sqlQuery(connectionId, query.toString());
-			String indexes = Util.indexesToString(result, "ID", ChatColor.GOLD, ChatColor.WHITE);
+			String indexes = ArrayUtil.indexesToString(result, "ID", ChatColor.GOLD, ChatColor.WHITE);
 			String message = getManager().getLocale().getString(ListPhrases.listClaimedIndexes);
 			message = message.replaceAll("%i", indexes);
 			
@@ -271,16 +272,16 @@ public class ListCommand extends ReporterCommand
 		final int connectionId = database.openPooledConnection();
 		try {
 			result = database.sqlQuery(connectionId, query + ModLevel.NONE.getLevel());
-			noPriorityIndexes = Util.indexesToString(result, "ID", ModLevel.NONE.getColor(), ChatColor.WHITE);
+			noPriorityIndexes = ArrayUtil.indexesToString(result, "ID", ModLevel.NONE.getColor(), ChatColor.WHITE);
 			
 			result = database.sqlQuery(connectionId, query + ModLevel.LOW.getLevel());
-			lowPriorityIndexes = Util.indexesToString(result, "ID", ModLevel.LOW.getColor(), ChatColor.WHITE);
+			lowPriorityIndexes = ArrayUtil.indexesToString(result, "ID", ModLevel.LOW.getColor(), ChatColor.WHITE);
 			
 			result = database.sqlQuery(connectionId, query + ModLevel.NORMAL.getLevel());
-			normalPriorityIndexes = Util.indexesToString(result, "ID", ModLevel.NORMAL.getColor(), ChatColor.WHITE);
+			normalPriorityIndexes = ArrayUtil.indexesToString(result, "ID", ModLevel.NORMAL.getColor(), ChatColor.WHITE);
 			
 			result = database.sqlQuery(connectionId, query + ModLevel.HIGH.getLevel());
-			highPriorityIndexes = Util.indexesToString(result, "ID", ModLevel.HIGH.getColor(), ChatColor.WHITE);
+			highPriorityIndexes = ArrayUtil.indexesToString(result, "ID", ModLevel.HIGH.getColor(), ChatColor.WHITE);
 		} catch (final SQLException e) {
 			log.log(Level.ERROR, String.format("Failed to list claimed report indexes by priority on connection [%d]!", connectionId));
 			throw e;
@@ -392,7 +393,7 @@ public class ListCommand extends ReporterCommand
 			format = getManager().getLocale().getString(ListPhrases.listPriorityIndexes);
 			
 			output = format.replaceAll("%p", priorityColor + level.getName() + ChatColor.WHITE);
-			output = output.replaceAll("%i", Util.indexesToString(indexes, priorityColor, ChatColor.WHITE));
+			output = output.replaceAll("%i", ArrayUtil.indexesToString(indexes, priorityColor, ChatColor.WHITE));
 		}
 		else
 		{
@@ -450,8 +451,8 @@ public class ListCommand extends ReporterCommand
 			return;
 		}
 		
-		String complete = Util.indexesToString(completeIndexes, ChatColor.GREEN, ChatColor.WHITE);
-		String incomplete = Util.indexesToString(incompleteIndexes, ChatColor.RED, ChatColor.WHITE);
+		String complete = ArrayUtil.indexesToString(completeIndexes, ChatColor.GREEN, ChatColor.WHITE);
+		String incomplete = ArrayUtil.indexesToString(incompleteIndexes, ChatColor.RED, ChatColor.WHITE);
 		
 		String out;
 		

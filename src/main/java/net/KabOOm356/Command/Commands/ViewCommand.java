@@ -13,6 +13,7 @@ import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ListPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ViewPhrases;
 import net.KabOOm356.Permission.ModLevel;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
@@ -358,7 +359,7 @@ public class ViewCommand extends ReporterCommand
 	}
 	
 	private void displayAvailableReports(final CommandSender sender, final ArrayList<Integer> indexes) {
-		final String indexesString = Util.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
+		final String indexesString = ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
 		final Locale locale = getManager().getLocale();
 		
 		if(!indexesString.equals("")) {
