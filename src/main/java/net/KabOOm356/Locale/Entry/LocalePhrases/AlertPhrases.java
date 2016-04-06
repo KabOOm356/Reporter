@@ -17,4 +17,12 @@ public abstract class AlertPhrases
 	public static LocalePhrase alertUnclaimedPlayerLogin = new LocalePhrase(
 			"alertUnclaimedPlayerLogin",
 			"%r from the unclaimed report(s) %i has logged in!");
+
+	/**
+	 * %r from report(s) %i has logged in!
+	 */
+	public static LocalePhrase alertConsoleReportedPlayerLogin = new LocalePhrase(
+			"alertConsoleReportedPlayerLogin",
+			"%r from report(s) %i has logged in!"
+	);
 }

@@ -1,433 +1,244 @@
 package net.KabOOm356.Reporter.Configuration;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Date;
-
 import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
 import net.KabOOm356.Reporter.Reporter;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.*;
+import java.net.URL;
+import java.util.Date;
+
 /**
  * A class to help with initializing and updating the Reporter configuration file.
  */
-public class ReporterConfigurationUtil
-{
+public class ReporterConfigurationUtil {
 	private static final Logger log = LogManager.getLogger(ReporterConfigurationUtil.class);
-	
+
 	/**
 	 * Initializes the Reporter configuration file by extracting the file if it does not exist and then attempts to load it.
-	 * 
-	 * @param dataFolder The parent directory to save the configuration file.
+	 *
+	 * @param defaultConfigurationFile URL pointing to the default configuration file.
+	 * @param dataFolder    The parent directory to save the configuration file.
 	 * @param configuration A {@link FileConfiguration} that will be loaded with the configuration file.
 	 */
-	public static void initConfiguration(File dataFolder, FileConfiguration configuration)
-	{
-		File configFile = new File(dataFolder, "config.yml");
-		
-		if(!configFile.exists())
-		{
+	public static void initConfiguration(final URL defaultConfigurationFile, final File dataFolder, final FileConfiguration configuration) {
+		final File configFile = new File(dataFolder, "config.yml");
+
+		if (!configFile.exists()) {
 			BufferedReader input = null;
 			BufferedWriter out = null;
-			
-			try
-			{
+
+			try {
 				log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Extracting default config file from the jar.");
 
 				configFile.createNewFile();
-
-				URL fileURL = Reporter.class.getClassLoader().getResource(configFile.getName());
-
-				input = new BufferedReader(new InputStreamReader(fileURL.openStream()));
+				final InputStreamReader inputStreamReader = new InputStreamReader(defaultConfigurationFile.openStream());
+				input = new BufferedReader(inputStreamReader);
 
 				String line;
 
-				out = new BufferedWriter(new FileWriter(configFile));
-				
-				while((line = input.readLine()) != null)
-				{
-					if(line.contains("Version"))
-					{
+				final FileWriter fileWriter = new FileWriter(configFile);
+				out = new BufferedWriter(fileWriter);
+
+				while ((line = input.readLine()) != null) {
+					if (line.contains("Version")) {
 						out.write("# Plugin Version: " + Reporter.getVersion());
 						out.newLine();
 						out.write(line);
 						out.newLine();
 						out.write("# " + Reporter.getDateformat().format(new Date()));
 						out.newLine();
-					}
-					else
-					{
+					} else {
 						out.write(line);
 						out.newLine();
 					}
 				}
 
 				out.flush();
-			}
-			catch(Exception ex)
-			{
+			} catch (final Exception ex) {
 				log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Error creating config file.", ex);
-			}
-			finally
-			{
-				try
-				{
-					out.close();
+			} finally {
+				try {
+					if (out != null) {
+						out.close();
+					}
+				} catch (final IOException e) {
+					if (log.isDebugEnabled()) {
+						log.warn("Failed to close configuration writer!", e);
+					}
 				}
-				catch (IOException e)
-				{
-				}
-				
-				try
-				{
-					input.close();
-				}
-				catch(Exception ex)
-				{
+
+				try {
+					if (input != null) {
+						input.close();
+					}
+				} catch (final IOException e) {
+					if (log.isDebugEnabled()) {
+						log.warn("Failed to close configuration reader!", e);
+					}
 				}
 			}
 		}
-		
-		try
-		{
+
+		try {
 			configuration.load(configFile);
-		}
-		catch (Exception e)
-		{
+		} catch (final Exception e) {
 			log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Error loading config file.", e);
 			log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Using default configuration.", e);
 		}
 	}
-	
+
 	/**
 	 * Checks the configuration for updates and then updates if needed.
 	 * <br /><br />
 	 * <b>NOTE:</b> This does not save the {@link FileConfiguration}.
-	 * 
+	 *
 	 * @param configuration The {@link FileConfiguration} to update.
-	 * 
 	 * @return True if the configuration was updated, otherwise false.
 	 */
-	public static boolean updateConfiguration(FileConfiguration configuration)
-	{
+	public static boolean updateConfiguration(final FileConfiguration configuration) {
 		configuration.setDefaults(new YamlConfiguration());
-		
+
 		boolean updated = false;
-		
+
 		// Version 1
-		if(!configuration.isSet("database.type"))
-		{
-			configuration.set("database.type", "sqlite");
-			updated = true;
-		}
-		if(!configuration.isSet("database.host"))
-		{
-			configuration.set("database.host", "localhost:3306");
-			updated = true;
-		}
-		if(!configuration.isSet("database.database"))
-		{
-			configuration.set("database.database", "Reporter");
-			updated = true;
-		}
-		if(!configuration.isSet("database.username"))
-		{
-			configuration.set("database.username", "root");
-			updated = true;
-		}
-		if(!configuration.isSet("database.password"))
-		{
-			configuration.set("database.password", "root");
-			updated = true;
-		}
-		
+		updated = set(configuration, "database.type", "sqlite") || updated;
+		updated = set(configuration, "database.host", "localhost:3306") || updated;
+		updated = set(configuration, "database.database", "Reporter") || updated;
+		updated = set(configuration, "database.username", "root") || updated;
+		updated = set(configuration, "database.password", "root") || updated;
+
 		// Version 2
-		if(!configuration.isSet("database.dbName"))
-		{
-			configuration.set("database.dbName", "reports.db");
-			updated = true;
-		}
-		if(!configuration.isSet("general.messaging.listOnLogin"))
-		{
-			configuration.set("general.messaging.listOnLogin", true);
-			updated = true;
-		}
-		
+		updated = set(configuration, "database.dbName", "reports.db") || updated;
+		updated = set(configuration, "general.messaging.listOnLogin", true) || updated;
+
 		// Version 3
-		if(configuration.isSet("general.messaging.reportList"))
-		{
+		if (configuration.isSet("general.messaging.reportList")) {
 			configuration.set("general.messaging.reportList", null);
 			updated = true;
 		}
-		if(configuration.isSet("general.messaging.broadcast"))
-		{	
+		if (configuration.isSet("general.messaging.broadcast")) {
 			configuration.set("general.messaging.broadcast", null);
 			updated = true;
 		}
-		
+
 		// Version 4
-		if(!configuration.isSet("general.canViewSubmittedReports"))
-		{	
-			configuration.set("general.canViewSubmittedReports", true);
-			updated = true;
-		}
-		
+		updated = set(configuration, "general.canViewSubmittedReports", true) || updated;
+
 		// Version 5
-		if(!configuration.isSet("general.canCompleteWithoutSummary"))
-		{	
-			configuration.set("general.canCompleteWithoutSummary", false);
-			updated = true;
-		}
-		
+		updated = set(configuration, "general.canCompleteWithoutSummary", false) || updated;
+
 		// Version 6
-		if(!configuration.isSet("locale.locale"))
-		{
-			configuration.set("locale.locale", configuration.getString("general.locale", "en_US"));
-			updated = true;
-		}
-		if(configuration.isSet("general.locale"))
-		{
+		updated = set(configuration, "locale.locale", configuration.getString("general.locale", "en_US")) || updated;
+		if (configuration.isSet("general.locale")) {
 			configuration.set("general.locale", null);
 			updated = true;
 		}
-		if(configuration.isSet("general.localeAutoDownload"))
-		{
+		if (configuration.isSet("general.localeAutoDownload")) {
 			configuration.set("general.localeAutoDownload", null);
 			updated = true;
 		}
-		
+
 		// Version 7
-		if(!configuration.isSet("general.messaging.listOnLogin.listOnLogin"))
-		{
-			configuration.set("general.messaging.listOnLogin.listOnLogin", configuration.getBoolean("general.messaging.listOnLogin", true));
-			updated = true;
-		}
-		if(!configuration.isSet("general.messaging.listOnLogin.useDelay"))
-		{
-			configuration.set("general.messaging.listOnLogin.useDelay", true);
-			updated = true;
-		}
-		if(!configuration.isSet("general.messaging.listOnLogin.delay"))
-		{
-			configuration.set("general.messaging.listOnLogin.delay", 5);
-			updated = true;
-		}
-		
+		updated = set(configuration, "general.messaging.listOnLogin.listOnLogin", configuration.getBoolean("general.messaging.listOnLogin", true)) || updated;
+		updated = set(configuration, "eneral.messaging.listOnLogin.useDelay", true) || updated;
+		updated = set(configuration, "general.messaging.listOnLogin.delay", 5) || updated;
+
 		// Version 8
-		if(!configuration.isSet("general.viewing.displayLocation"))
-		{
-			configuration.set("general.viewing.displayLocation", true);
-			updated = true;
-		}
-		if(!configuration.isSet("general.reporting.limitNumberOfReports"))
-		{
-			configuration.set("general.reporting.limitNumberOfReports", true);
-			updated = true;
-		}
-		if(!configuration.isSet("general.reporting.limitNumber"))
-		{
-			configuration.set("general.reporting.limitNumber", 5);
-			updated = true;
-		}
-		if(!configuration.isSet("general.reporting.limitTime"))
-		{
-			configuration.set("general.reporting.limitTime", 600);
-			updated = true;
-		}
-		
+		updated = set(configuration, "general.viewing.displayLocation", true) || updated;
+		updated = set(configuration, "general.reporting.limitNumberOfReports", true) || updated;
+		updated = set(configuration, "general.reporting.limitNumber", 5) || updated;
+		updated = set(configuration, "general.reporting.limitTime", 600) || updated;
+
 		// Version 9
-		if(!configuration.isSet("general.viewing.displayRealName"))
-		{
-			configuration.set("general.viewing.displayRealName", false);
-			updated = true;
-		}
-		if(!configuration.isSet("general.messaging.completedMessageOnLogin.completedMessageOnLogin"))
-		{
-			configuration.set("general.messaging.completedMessageOnLogin.completedMessageOnLogin", true);
-			updated = true;
-		}
-		if(!configuration.isSet("general.messaging.completedMessageOnLogin.useDelay"))
-		{
-			configuration.set("general.messaging.completedMessageOnLogin.useDelay", true);
-			updated = true;
-		}
-		if(!configuration.isSet("general.messaging.completedMessageOnLogin.delay"))
-		{
-			configuration.set("general.messaging.completedMessageOnLogin.delay", 5);
-			updated = true;
-		}
-		
+		updated = set(configuration, "general.viewing.displayRealName", false) || updated;
+		updated = set(configuration, "general.messaging.completedMessageOnLogin.completedMessageOnLogin", true) || updated;
+		updated = set(configuration, "general.messaging.completedMessageOnLogin.useDelay", true) || updated;
+		updated = set(configuration, "general.messaging.completedMessageOnLogin.delay", 5) || updated;
+
 		// Version 10
-		if(!configuration.isSet("plugin.updates.checkForUpdates"))
-		{
-			configuration.set("plugin.updates.checkForUpdates", configuration.getBoolean("general.checkForUpdates", true));
-			updated = true;
-		}
-		if(!configuration.isSet("plugin.updates.releaseLevel"))
-		{
-			configuration.set("plugin.updates.releaseLevel", "RELEASE");
-			updated = true;
-		}
-		if(!configuration.isSet("locale.updates.autoDownload"))
-		{
-			configuration.set("locale.updates.autoDownload", configuration.getBoolean("locale.localeAutoDownload", true));
-			updated = true;
-		}
-		if(!configuration.isSet("locale.updates.keepBackup"))
-		{
-			configuration.set("locale.updates.keepBackup", configuration.getBoolean("locale.keepLocaleBackupFile", false));
-			updated = true;
-		}
-		if(!configuration.isSet("locale.updates.releaseLevel"))
-		{
-			configuration.set("locale.updates.releaseLevel", "RELEASE");
-			updated = true;
-		}
-		if(!configuration.isSet("locale.updates.asynchronousUpdate"))
-		{
-			configuration.set("locale.updates.asynchronousUpdate", true);
-			updated = true;
-		}
-		if(configuration.isSet("general.checkForUpdates"))
-		{
+		updated = set(configuration, "plugin.updates.checkForUpdates", configuration.getBoolean("general.checkForUpdates", true)) || updated;
+		updated = set(configuration, "plugin.updates.releaseLevel", "RELEASE") || updated;
+		updated = set(configuration, "locale.updates.autoDownload", configuration.getBoolean("locale.localeAutoDownload", true)) || updated;
+		updated = set(configuration, "locale.updates.keepBackup", configuration.getBoolean("locale.keepLocaleBackupFile", false)) || updated;
+		updated = set(configuration, "locale.updates.releaseLevel", "RELEASE") || updated;
+		updated = set(configuration, "locale.updates.asynchronousUpdate", true) || updated;
+		if (configuration.isSet("general.checkForUpdates")) {
 			configuration.set("general.checkForUpdates", null);
 			updated = true;
 		}
-		if(configuration.isSet("general.checkForDevUpdates"))
-		{
+		if (configuration.isSet("general.checkForDevUpdates")) {
 			configuration.set("general.checkForDevUpdates", null);
 			updated = true;
 		}
-		if(configuration.isSet("locale.localeAutoDownload"))
-		{
+		if (configuration.isSet("locale.localeAutoDownload")) {
 			configuration.set("locale.localeAutoDownload", null);
 			updated = true;
 		}
-		if(configuration.isSet("locale.keepLocaleBackupFile"))
-		{
+		if (configuration.isSet("locale.keepLocaleBackupFile")) {
 			configuration.set("locale.keepLocaleBackupFile", null);
 			updated = true;
 		}
-		
+
 		// Version 11
-		if(!configuration.isSet("general.permissions.opsHaveAllPermissions"))
-		{
-			configuration.set("general.permissions.opsHaveAllPermissions", true);
-			updated = true;
-		}
-		if(!configuration.isSet("general.reporting.limitReportsAgainstPlayers"))
-		{
-			configuration.set("general.reporting.limitReportsAgainstPlayers", false);
-			updated = true;
-		}
-		if(!configuration.isSet("general.reporting.limitNumberAgainstPlayers"))
-		{
-			configuration.set("general.reporting.limitNumberAgainstPlayers", 2);
-			updated = true;
-		}
-		if(!configuration.isSet("general.reporting.alerts.toConsole.limitAgainstPlayerReached"))
-		{
-			configuration.set("general.reporting.alerts.toConsole.limitAgainstPlayerReached", true);
-			updated = true;
-		}
-		if(!configuration.isSet("general.reporting.alerts.toConsole.allowedToReportPlayerAgain"))
-		{
-			configuration.set("general.reporting.alerts.toConsole.allowedToReportPlayerAgain", true);
-			updated = true;
-		}
-		if(!configuration.isSet("general.reporting.alerts.toPlayer.allowedToReportAgain"))
-		{
-			configuration.set("general.reporting.alerts.toPlayer.allowedToReportAgain", true);
-			updated = true;
-		}
-		if(!configuration.isSet("general.reporting.alerts.toPlayer.allowedToReportPlayerAgain"))
-		{
-			configuration.set("general.reporting.alerts.toPlayer.allowedToReportPlayerAgain", true);
-			updated = true;
-		}
-		if(!configuration.isSet("general.reporting.alerts.toConsole.limitReached"))
-		{
-			boolean oldValue = configuration.getBoolean("general.reporting.alerts.limitReached", true);
-			configuration.set("general.reporting.alerts.toConsole.limitReached", oldValue);
-			updated = true;
-		}
-		if(!configuration.isSet("general.reporting.alerts.toConsole.allowedToReportAgain"))
-		{
-			boolean oldValue = configuration.getBoolean("general.reporting.alerts.allowedToReportAgain", true);
-			configuration.set("general.reporting.alerts.toConsole.allowedToReportAgain", oldValue);
-			updated = true;
-		}
-		if(configuration.isSet("general.reporting.alerts.limitReached"))
-		{
+		updated = set(configuration, "general.permissions.opsHaveAllPermissions", true) || updated;
+		updated = set(configuration, "general.reporting.limitReportsAgainstPlayers", false) || updated;
+		updated = set(configuration, "general.reporting.limitNumberAgainstPlayers", 2) || updated;
+		updated = set(configuration, "general.reporting.alerts.toConsole.limitAgainstPlayerReached", true) || updated;
+		updated = set(configuration, "general.reporting.alerts.toConsole.allowedToReportPlayerAgain", true) || updated;
+		updated = set(configuration, "general.reporting.alerts.toPlayer.allowedToReportAgain", true) || updated;
+		updated = set(configuration, "general.reporting.alerts.toPlayer.allowedToReportPlayerAgain", true) || updated;
+		updated = set(configuration, "general.reporting.alerts.toConsole.limitReached", configuration.getBoolean("general.reporting.alerts.limitReached", true)) || updated;
+		updated = set(configuration, "general.reporting.alerts.toConsole.allowedToReportAgain", configuration.getBoolean("general.reporting.alerts.allowedToReportAgain", true)) || updated;
+		if (configuration.isSet("general.reporting.alerts.limitReached")) {
 			configuration.set("general.reporting.alerts.limitReached", null);
 			updated = true;
 		}
-		if(configuration.isSet("general.reporting.alerts.allowedToReportAgain"))
-		{
+		if (configuration.isSet("general.reporting.alerts.allowedToReportAgain")) {
 			configuration.set("general.reporting.alerts.allowedToReportAgain", null);
 			updated = true;
 		}
-		
+
 		// Version 12
-		if(!configuration.isSet("plugin.updates.api-key"))
-		{
-			configuration.set("plugin.updates.api-key", "NO_KEY");
-			updated = true;
-		}
-		
+		updated = set(configuration, "plugin.updates.api-key", "NO_KEY") || updated;
+
 		// Version 13
-		if(!configuration.isSet("general.matchPartialOfflineUsernames"))
-		{
-			configuration.set("general.matchPartialOfflineUsernames", true);
-			updated = true;
-		}
-		
+		updated = set(configuration, "general.matchPartialOfflineUsernames", true) || updated;
+
 		// Version 14
-		if(!configuration.isSet("plugin.statistics.opt-out"))
-		{
-			configuration.set("plugin.statistics.opt-out", false);
-			updated = true;
-		}
-		
+		updated = set(configuration, "plugin.statistics.opt-out", false) || updated;
+
 		// Version 15 (Database Connection Pooling)
-		if (!configuration.isSet("database.connectionPool.enableLimiting")) {
-			configuration.set("database.connectionPool.enableLimiting", ConnectionPoolConfig.defaultInstance.isConnectionPoolLimited());
-			updated = true;
-		}
-		if (!configuration.isSet("database.connectionPool.maxNumberOfConnections")) {
-			configuration.set("database.connectionPool.maxNumberOfConnections", ConnectionPoolConfig.defaultInstance.getMaxConnections());
-			updated = true;
-		}
-		if (!configuration.isSet("database.connectionPool.maxNumberOfAttemptsForConnection")) {
-			configuration.set("database.connectionPool.maxNumberOfAttemptsForConnection", ConnectionPoolConfig.defaultInstance.getMaxAttemptsForConnection());
-			updated = true;
-		}
-		if (!configuration.isSet("database.connectionPool.waitTimeBeforeUpdate")) {
-			configuration.set("database.connectionPool.waitTimeBeforeUpdate", ConnectionPoolConfig.defaultInstance.getWaitTimeBeforeUpdate());
-			updated = true;
-		}
-		
-		if(updated)
-		{
+		updated = set(configuration, "database.connectionPool.enableLimiting", ConnectionPoolConfig.defaultInstance.isConnectionPoolLimited()) || updated;
+		updated = set(configuration, "database.connectionPool.maxNumberOfConnections", ConnectionPoolConfig.defaultInstance.getMaxConnections()) || updated;
+		updated = set(configuration, "database.connectionPool.maxNumberOfAttemptsForConnection", ConnectionPoolConfig.defaultInstance.getMaxAttemptsForConnection()) || updated;
+		updated = set(configuration, "database.connectionPool.waitTimeBeforeUpdate", ConnectionPoolConfig.defaultInstance.getWaitTimeBeforeUpdate()) || updated;
+		updated = set(configuration, "general.messaging.alerts.reportedPlayerLogin.enabled", true) || updated;
+		updated = set(configuration, "general.messaging.alerts.reportedPlayerLogin.toPlayer", true) || updated;
+		updated = set(configuration, "general.messaging.alerts.reportedPlayerLogin.toConsole", true) || updated;
+
+		if (updated) {
 			configuration.options().header("Reporter Configuration File\n" +
 					"Plugin Version: " + Reporter.getVersion() + "\n" +
 					"Config Version: " + Reporter.getConfigurationVersion() + "\n" +
 					Reporter.getDateformat().format(new Date()));
-			
+
 			log.log(Level.INFO, Reporter.getDefaultConsolePrefix() +
 					"Updating the config file to version " + Reporter.getConfigurationVersion());
 		}
-		
+
 		return updated;
+	}
+
+	private static boolean set(final FileConfiguration configuration, final String key, final Object value) {
+		if (!configuration.isSet(key)) {
+			configuration.set(key, value);
+			return true;
+		}
+		return false;
 	}
 }

@@ -4,7 +4,7 @@ locale:
     # The language name in English
     language: "English"
     # The version of this file should be integers (1,2,3...)
-    version: "10"
+    version: "11"
     # Preferably your screen name used on BukkitDev/Bukkit forums
     author: "KabOOm 356"
   # Your translations go here
@@ -12,6 +12,10 @@ locale:
   # Do not translate the commands, but DO translate the variable parameters.
   # ex. /report help stays the same where as /report respond <Index> [reported/sender] becomes /report respond <TRANSLATED> [reported/sender]
   phrases:
+
+    # Version 11
+
+    alertConsoleReportedPlayerLogin: "%r from report(s) %i has logged in!"
     
     # Version 10
     

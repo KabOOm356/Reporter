@@ -11,7 +11,6 @@ import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Runnable.DelayedMessage;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -66,8 +65,15 @@ public class ReporterPlayerListener implements Listener {
 			listOnLogin(player);
 		}
 
-		if (isPlayerReported(event.getPlayer())) {
-			alertThatReportedPlayerLogin(event.getPlayer());
+		final boolean alertReportedPlayerLogin = plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.enabled", true);
+		if (alertReportedPlayerLogin) {
+			final boolean alertConsoleReportedPlayerLogin = plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.toConsole", true);
+			final boolean alertPlayersReportedPlayerLogin = plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.toPlayer", true);
+			if (alertConsoleReportedPlayerLogin || alertPlayersReportedPlayerLogin) {
+				if (isPlayerReported(player)) {
+					alertThatReportedPlayerLogin(player);
+				}
+			}
 		}
 	}
 
@@ -80,20 +86,16 @@ public class ReporterPlayerListener implements Listener {
 	public void onPlayerQuit(final PlayerQuitEvent event) {
 		plugin.getCommandManager().getLastViewed().remove(event.getPlayer());
 	}
-	
-	private void listOnLogin(Player player)
-	{
+
+	private void listOnLogin(final Player player) {
 		final Command listCommand = plugin.getCommandManager().getCommand(ListCommand.getCommandName());
-		if(listCommand.hasPermission(player))
-		{
+		if (listCommand.hasPermission(player)) {
 			listCommand.setSender(player);
 			listCommand.setArguments(new ArrayList<String>());
-			if(plugin.getConfig().getBoolean("general.messaging.listOnLogin.useDelay", true))
-			{
+			if (plugin.getConfig().getBoolean("general.messaging.listOnLogin.useDelay", true)) {
 				final int delay = plugin.getConfig().getInt("general.messaging.listOnLogin.delay", 5);
 				Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, listCommand, serverTicksPerSecond * delay);
-			}
-			else {
+			} else {
 				Bukkit.getScheduler().runTaskAsynchronously(plugin, listCommand);
 			}
 		}
@@ -149,7 +151,7 @@ public class ReporterPlayerListener implements Listener {
 		messageManager.removePlayerMessages(player.getUniqueId().toString());
 		messageManager.removePlayerMessages(player.getName());
 	}
-	
+
 	private boolean isPlayerReported(final Player player) {
 		final StringBuilder query = new StringBuilder();
 		query.append("SELECT ID ")
@@ -162,12 +164,12 @@ public class ReporterPlayerListener implements Listener {
 			result = plugin.getDatabaseHandler().sqlQuery(query.toString());
 			return !result.isEmpty();
 		} catch (final Exception e) {
-			log.log(Level.ERROR, "Failed to execute sql query!", e);
+			log.error("Failed to execute sql query!", e);
 		}
 		return false;
 	}
-	
-	private void alertThatReportedPlayerLogin( final Player reportedPlayer) {
+
+	private void alertThatReportedPlayerLogin(final Player reportedPlayer) {
 		final StringBuilder query = new StringBuilder();
 		query.append("SELECT ID, ClaimStatus, ClaimedByUUID ")
 				.append("FROM Reports ")
@@ -178,46 +180,67 @@ public class ReporterPlayerListener implements Listener {
 		try {
 			result = plugin.getDatabaseHandler().sqlQuery(query.toString());
 		} catch (final Exception e) {
-			log.log(Level.ERROR, "Failed to execute sql query!", e);
+			log.error("Failed to execute sql query!", e);
 			return;
 		}
 
+		final boolean displayAlertToPlayers = plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.toPlayer", true);
+
+		final ArrayList<Integer> consoleIndexes = new ArrayList<Integer>();
 		final ArrayList<Integer> indexes = new ArrayList<Integer>();
 
-		String playerLoginMessage = ChatColor.BLUE + Reporter.getLogPrefix() +
-				ChatColor.WHITE + plugin.getLocale().getString(AlertPhrases.alertClaimedPlayerLogin);
-
 		for (final ResultRow row : result) {
+			consoleIndexes.add(row.getInt("ID"));
+
 			// If a report is claimed send a message to the claimer, if they are online.
-			if (row.getBoolean("ClaimStatus")) {
+			if (row.getBoolean("ClaimStatus") && displayAlertToPlayers) {
 				final String uuidString = row.getString("ClaimedByUUID");
-
 				final UUID uuid = UUID.fromString(uuidString);
-
 				final OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-
-				if (player.isOnline()) {
-					String output = playerLoginMessage.replaceAll("%r", ChatColor.RED + BukkitUtil.formatPlayerName(reportedPlayer) + ChatColor.WHITE);
-					output = output.replaceAll("%i", ChatColor.GOLD + row.getString("ID") + ChatColor.WHITE);
-
-					player.getPlayer().sendMessage(output);
-				}
+				alertClaimingPlayerReportedPlayerLogin(player, reportedPlayer, row.getString("ID"));
 			} else {
 				// Add the ID to the indexes to be sent to all players that can receive the alert.
 				indexes.add(row.getInt("ID"));
 			}
 		}
 
-		playerLoginMessage = ChatColor.BLUE + Reporter.getLogPrefix() +
+		final String reportedPlayerName = ChatColor.RED + BukkitUtil.formatPlayerName(reportedPlayer) + ChatColor.WHITE;
+
+		if (plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.toConsole", true)) {
+			final String message = plugin.getLocale().getString(AlertPhrases.alertConsoleReportedPlayerLogin)
+					.replaceAll("%r", reportedPlayerName)
+					.replaceAll("%i", ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE));
+			log.info(message);
+		}
+
+		alertOnlinePlayersReportedPlayerLogin(reportedPlayerName, indexes);
+	}
+
+	private void alertClaimingPlayerReportedPlayerLogin(final OfflinePlayer player, final OfflinePlayer reportedPlayer, final String id) {
+		if (player.isOnline()) {
+			String message = ChatColor.BLUE + Reporter.getLogPrefix() +
+					ChatColor.WHITE + plugin.getLocale().getString(AlertPhrases.alertClaimedPlayerLogin);
+
+			message = message
+					.replaceAll("%r", ChatColor.RED + BukkitUtil.formatPlayerName(reportedPlayer) + ChatColor.WHITE)
+					.replaceAll("%i", ChatColor.GOLD + id + ChatColor.WHITE);
+
+			player.getPlayer().sendMessage(message);
+		}
+	}
+
+	private void alertOnlinePlayersReportedPlayerLogin(final String reportedPlayerName, final ArrayList<Integer> indexes) {
+		String message = ChatColor.BLUE + Reporter.getLogPrefix() +
 				ChatColor.WHITE + plugin.getLocale().getString(AlertPhrases.alertUnclaimedPlayerLogin);
 
-		playerLoginMessage = playerLoginMessage.replaceAll("%r", ChatColor.RED + BukkitUtil.formatPlayerName(reportedPlayer) + ChatColor.WHITE);
-		playerLoginMessage = playerLoginMessage.replaceAll("%i", ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE));
+		message = message
+				.replaceAll("%r", reportedPlayerName)
+				.replaceAll("%i", ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE));
 
 		for (final Player player : Bukkit.getOnlinePlayers()) {
 			// Send the message to players with the permission to get it.
 			if (plugin.getCommandManager().hasPermission(player, "reporter.alerts.onlogin.reportedPlayerLogin")) {
-				player.sendMessage(playerLoginMessage);
+				player.sendMessage(message);
 			}
 		}
 	}

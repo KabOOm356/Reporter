@@ -46,7 +46,7 @@ public class Reporter extends JavaPlugin
 	
 	private static final String pluginUpdateAPI = "https://api.curseforge.com/servermods/files?projectIds=31347";
 	
-	public static final String localeVersion = "10";
+	public static final String localeVersion = "11";
 	public static final String configVersion = "15";
 	public static final String databaseVersion = "10";
 	
@@ -72,7 +72,8 @@ public class Reporter extends JavaPlugin
 			getDataFolder().mkdir();
 		}
 
-		ReporterConfigurationUtil.initConfiguration(getDataFolder(), getConfig());
+		final URL defaultConfigurationFile = getDefaultConfigurationFile();
+		ReporterConfigurationUtil.initConfiguration(defaultConfigurationFile, getDataFolder(), getConfig());
 		
 		// If the configuration has been updated save and reload the configuration.
 		// Which will get rid of all the comments/descriptions in the default configuration file.
@@ -338,5 +339,9 @@ public class Reporter extends JavaPlugin
 	public static String getDatabaseVersion()
 	{
 		return databaseVersion;
+	}
+
+	private URL getDefaultConfigurationFile() {
+		return getClassLoader().getResource("config.yml");
 	}
 }

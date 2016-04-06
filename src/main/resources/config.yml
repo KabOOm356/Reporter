@@ -39,6 +39,22 @@ general:
       # that the plugin will list the number of reports.
       # Default: 5
       delay: 5
+
+    # General alert messaging
+    alerts:
+      # Alert when a reported player logs in
+      reportedPlayerLogin:
+        # Display message
+        # Default: true
+        enabled: true
+        # Display the alert to the console
+        # Default: false
+        toConsole: true
+        # Display the alert to players.
+        # This will stil only be displayed if the player is claiming the
+        # report or if the player or has the appropriate permission.
+        # Default: true
+        toPlayer: true
   
   # If the player that submitted the report can view their report
   # Default: true
