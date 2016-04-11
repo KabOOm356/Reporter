@@ -62,8 +62,8 @@ public class ResultRow extends HashMap<String, Object>
 		} catch (final SQLException e) {
 			if (log.isDebugEnabled()) {
 				log.log(Level.WARN, "Failed to set ResultRow contents!");
-				throw e;
 			}
+			throw e;
 		}
 	}
 	
