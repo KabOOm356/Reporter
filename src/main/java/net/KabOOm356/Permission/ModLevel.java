@@ -1,8 +1,7 @@
 package net.KabOOm356.Permission;
 
-import org.bukkit.ChatColor;
-
 import net.KabOOm356.Util.Util;
+import org.bukkit.ChatColor;
 
 /**
  * Enumerated type to represent a moderation level/priority.
@@ -10,20 +9,22 @@ import net.KabOOm356.Util.Util;
 public enum ModLevel
 {
 	/** An unknown or unparseable {@link ModLevel}. */
-	UNKNOWN("UNKNOWN", -1),
+	UNKNOWN("UNKNOWN", -1, ChatColor.GRAY),
 	/** The lowest {@link ModLevel}. */
-	NONE("None", 0),
+	NONE("None", 0, ChatColor.GRAY),
 	/** The low {@link ModLevel}. */
-	LOW("Low", 1),
+	LOW("Low", 1, ChatColor.BLUE),
 	/** The normal {@link ModLevel}. */
-	NORMAL("Normal", 2),
+	NORMAL("Normal", 2, ChatColor.GREEN),
 	/** The high {@link ModLevel}. */
-	HIGH("High", 3);
+	HIGH("High", 3, ChatColor.RED);
 	
 	/** The common name of this ModLevel. */
-	private String name;
+	private final String name;
 	/** The level of this ModLevel. */
-	private int level;
+	private final int level;
+	/** The color of this ModLevel. */
+	private final ChatColor color;
 	
 	/**
 	 * ModLevel Constructor.
@@ -31,10 +32,11 @@ public enum ModLevel
 	 * @param name The common name of this ModLevel.
 	 * @param level The level of this ModLevel.
 	 */
-	ModLevel(String name, int level)
+	ModLevel(final String name, final int level, final ChatColor color)
 	{
 		this.name = name;
 		this.level = level;
+		this.color = color;
 	}
 	
 	/**
@@ -44,7 +46,7 @@ public enum ModLevel
 	 * 
 	 * @return True if the given String can be parsed into a valid ModLevel, otherwise false.
 	 */
-	public static boolean modLevelInBounds(String modLevel)
+	public static boolean modLevelInBounds(final String modLevel)
 	{
 		return modLevelInBounds(getModLevel(modLevel).level);
 	}
@@ -58,7 +60,7 @@ public enum ModLevel
 	 * 
 	 * @return True if the given level is in bounds to be a ModLevel level, otherwise false.
 	 */
-	public static boolean modLevelInBounds(int modLevel)
+	public static boolean modLevelInBounds(final int modLevel)
 	{
 		if(modLevel >= 0 && modLevel < 4)
 			return true;
@@ -75,7 +77,7 @@ public enum ModLevel
 	 * 
 	 * @return The ModLevel associated with the given String, either by name or level.
 	 */
-	public static ModLevel getModLevel(String modLevel)
+	public static ModLevel getModLevel(final String modLevel)
 	{
 		ModLevel level = getByName(modLevel);
 		
@@ -94,7 +96,7 @@ public enum ModLevel
 	 * 
 	 * @return The ModLevel associated with the given level if one exists, otherwise {@link ModLevel#UNKNOWN} is returned.
 	 */
-	public static ModLevel getByLevel(int level)
+	public static ModLevel getByLevel(final int level)
 	{
 		switch(level)
 		{
@@ -118,9 +120,9 @@ public enum ModLevel
 	 * @return The ModLevel associated with the given name if one exists, otherwise {@link ModLevel#UNKNOWN} is returned.
 	 */
 	// Java 1.6 Safe
-	public static ModLevel getByName(String level)
+	public static ModLevel getByName(final String level)
 	{
-		boolean isInteger = Util.isInteger(level);
+		final boolean isInteger = Util.isInteger(level);
 		
 		if(level.equalsIgnoreCase(LOW.name) || isInteger && Integer.parseInt(level) == LOW.level)
 			return LOW;
@@ -140,15 +142,10 @@ public enum ModLevel
 	 * 
 	 * @return A {@link ChatColor} associated with the given ModLevel.
 	 */
-	public static ChatColor getModLevelColor(ModLevel level)
+	@Deprecated
+	public static ChatColor getModLevelColor(final ModLevel level)
 	{
-		if(level.equals(ModLevel.LOW))
-			return ChatColor.BLUE;
-		else if(level.equals(ModLevel.NORMAL))
-			return ChatColor.GREEN;
-		else if(level.equals(ModLevel.HIGH))
-			return ChatColor.RED;
-		return ChatColor.GRAY;
+		return level.getColor();
 	}
 	
 	/**
@@ -158,7 +155,7 @@ public enum ModLevel
 	 */
 	public ChatColor getColor()
 	{
-		return ModLevel.getModLevelColor(this);
+		return this.color;
 	}
 	
 	/**
@@ -173,7 +170,7 @@ public enum ModLevel
 	 * 
 	 * @return The difference between the two ModLevel's values.
 	 */
-	public static int compareToByLevel(ModLevel level1, ModLevel level2)
+	public static int compareToByLevel(final ModLevel level1, final ModLevel level2)
 	{
 		return level1.compareToByLevel(level2);
 	}
@@ -189,7 +186,7 @@ public enum ModLevel
 	 * 
 	 * @return The difference between this and the given ModLevel's values.
 	 */
-	public int compareToByLevel(ModLevel level)
+	public int compareToByLevel(final ModLevel level)
 	{
 		return getLevel() - level.getLevel();
 	}
