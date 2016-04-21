@@ -1,23 +1,18 @@
 package net.KabOOm356.Command.Commands;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.UUID;
-
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
-import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ListPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ViewPhrases;
+import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,6 +21,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * A {@link ReporterCommand} that will handle viewing reports.
@@ -345,9 +344,7 @@ public class ViewCommand extends ReporterCommand
 
 	private boolean displayRealName(final ArrayList<String> args, final int index) {
 		boolean displayRealName = getManager().getConfig().getBoolean("general.viewing.displayRealName", false);
-		
-		System.out.println("VIEWME " + args.toString());
-		
+
 		if(args.size() >= (index+1)) {
 			String argument = args.get(index);
 			if(argument != null && argument.equalsIgnoreCase("name")) {
