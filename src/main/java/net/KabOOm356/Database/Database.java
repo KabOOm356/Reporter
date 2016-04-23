@@ -1,29 +1,18 @@
 package net.KabOOm356.Database;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-
-import net.KabOOm356.Database.Connection.AlertingPooledConnection;
-import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
-import net.KabOOm356.Database.Connection.ConnectionPoolManager;
-import net.KabOOm356.Database.Connection.ConnectionPooledDatabaseInterface;
-import net.KabOOm356.Database.Connection.ConnectionWrapper;
+import net.KabOOm356.Database.Connection.*;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.FormattingUtil;
 import net.KabOOm356.Util.Util;
-
 import org.apache.commons.lang.Validate;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 /**
  * A simple class to handle connections and queries to a database.
@@ -35,16 +24,17 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 
 	/** The {@link DatabaseType} representation of the type of this database. */
 	private final DatabaseType databaseType;
-	/** The id of a connection that is being accessed in a non-pooled manner. */
-	private Integer localConnectionId;
 	/** The database driver represented as a String. */
 	private final String databaseDriver;
 	/** The URL to the database as a String. */
 	private final String connectionURL;
-	
 	/** The pool of connections. */
 	private final HashMap<Integer, ConnectionWrapper> connectionPool;
 	private final ConnectionPoolConfig connectionPoolConfig;
+	/**
+	 * The id of a connection that is being accessed in a non-pooled manner.
+	 */
+	private Integer localConnectionId;
 
 	/**
 	 * Database Constructor.
@@ -106,8 +96,8 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	 * 
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
-	 * @throws InterruptedException 
-	 * @throws IllegalStateExcpetion
+	 * @throws InterruptedException
+	 * @throws IllegalStateException
 	 *             Thrown if there is already a non-pooled connection open.
 	 */
 	protected void openConnection(final String username, final String password) throws SQLException, ClassNotFoundException, InterruptedException {
@@ -294,7 +284,9 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 		// Close the local connection
 		closeConnection();
 		// Start closing all connections in the pool
-		for(final Integer connectionId : connectionPool.keySet()) {
+		Integer[] connectionIds = new Integer[connectionPool.size()];
+		connectionIds = connectionPool.keySet().toArray(connectionIds);
+		for (final Integer connectionId : connectionIds) {
 			closeConnection(connectionId);
 		}
 		if(log.isDebugEnabled()) {
@@ -482,11 +474,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 				throw e;
 			}
 
-			if (tables.next()) {
-				return true;
-			} else {
-				return false;
-			}
+			return tables.next();
 		} catch (final SQLException e) {
 			if (log.isDebugEnabled()) {
 				log.log(Level.WARN, "Failed to check table!");
@@ -494,13 +482,14 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 			throw e;
 		} finally {
 			try {
-				tables.close();
+				if (tables != null) {
+					tables.close();
+				}
 			} catch (final Exception e) {
 				if (log.isDebugEnabled()) {
 					log.log(Level.DEBUG, "Failed to close ResultSet!");
 				}
 			}
-			closeConnection(connectionId);
 		}
 	}
 
@@ -516,13 +505,14 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 			return col;
 		} finally {
 			try {
-				rs.close();
+				if (rs != null) {
+					rs.close();
+				}
 			} catch (final Exception e) {
 				if (log.isDebugEnabled()) {
 					log.log(Level.DEBUG, "Failed to close ResultSet!", e);
 				}
 			}
-			closeConnection(connectionId);
 		}
 	}
 

@@ -1,28 +1,18 @@
 package net.KabOOm356.Reporter;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.List;
-
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.File.AbstractFiles.UpdateSite;
 import net.KabOOm356.File.AbstractFiles.VersionedNetworkFile.ReleaseLevel;
 import net.KabOOm356.Listeners.ReporterPlayerListener;
-import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Locale.Entry.LocaleInfo;
+import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Reporter.Configuration.ReporterConfigurationUtil;
 import net.KabOOm356.Reporter.Database.ReporterDatabaseUtil;
 import net.KabOOm356.Reporter.Locale.ReporterLocaleInitializer;
 import net.KabOOm356.Reporter.Metrics.MetricsInitializer;
 import net.KabOOm356.Updater.PluginUpdater;
 import net.KabOOm356.Util.ArrayUtil;
-import net.KabOOm356.Util.Util;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +22,14 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.List;
+
 /**
  * The main Reporter class.
  * <br /><br />
@@ -39,21 +37,19 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class Reporter extends JavaPlugin
 {
+	public static final String localeVersion = "11";
+	public static final String configVersion = "15";
+	public static final String databaseVersion = "10";
+	public static final String anonymousPlayerName = "* (Anonymous)";
+	public static final String console = "CONSOLE";
 	private static final Logger log = LogManager.getLogger(Reporter.class);
 	private static final String logPrefix = "[Reporter] ";
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static final UpdateSite localeXMLUpdateSite = new UpdateSite("https://dl.dropbox.com/u/21577960/Reporter/Locale%20Files/latest.xml", UpdateSite.Type.XML);
-	
 	private static final String pluginUpdateAPI = "https://api.curseforge.com/servermods/files?projectIds=31347";
-	
-	public static final String localeVersion = "11";
-	public static final String configVersion = "15";
-	public static final String databaseVersion = "10";
-	
 	private static String version;
 	private static String defaultConsolePrefix;
 	private static String versionString;
-	
 	private final Locale locale = new Locale();
 	private ExtendedDatabaseHandler databaseHandler;
 	private ReporterPlayerListener playerListener;
@@ -63,6 +59,42 @@ public class Reporter extends JavaPlugin
 		version = getDescription().getVersion();
 		versionString = "v" + version + " - ";
 		defaultConsolePrefix = logPrefix + versionString;
+	}
+
+	public static String getLogPrefix() {
+		return logPrefix;
+	}
+
+	public static String getVersion() {
+		return version;
+	}
+
+	public static String getVersionString() {
+		return versionString;
+	}
+
+	public static String getDefaultConsolePrefix() {
+		return defaultConsolePrefix;
+	}
+
+	public static boolean isCommandSenderSupported(CommandSender cs) {
+		return (cs instanceof org.bukkit.entity.Player) || (cs instanceof org.bukkit.command.ConsoleCommandSender) || (cs instanceof org.bukkit.command.RemoteConsoleCommandSender);
+	}
+
+	public static DateFormat getDateformat() {
+		return dateFormat;
+	}
+
+	public static UpdateSite getLocaleXMLUpdateSite() {
+		return localeXMLUpdateSite;
+	}
+
+	public static String getConfigurationVersion() {
+		return configVersion;
+	}
+
+	public static String getDatabaseVersion() {
+		return databaseVersion;
 	}
 	
 	@Override
@@ -74,60 +106,60 @@ public class Reporter extends JavaPlugin
 
 		final URL defaultConfigurationFile = getDefaultConfigurationFile();
 		ReporterConfigurationUtil.initConfiguration(defaultConfigurationFile, getDataFolder(), getConfig());
-		
+
 		// If the configuration has been updated save and reload the configuration.
 		// Which will get rid of all the comments/descriptions in the default configuration file.
 		if(ReporterConfigurationUtil.updateConfiguration(getConfig()))
 		{
 			saveConfig();
-			
+
 			reloadConfig();
 		}
-		
+
 		checkForPluginUpdate();
-		
+
 		initializeLocale();
 
 		initializeDatabase();
-		
+
 		initializeStatistics();
-		
+
 		playerListener = new ReporterPlayerListener(this);
 		commandManager = new ReporterCommandManager(this);
-		
+
 		setupCommands();
-		
+
 		getServer().getPluginManager().registerEvents(playerListener, this);
 
 		log.info(defaultConsolePrefix + "Reporter enabled.");
 	}
-	
+
 	@Override
 	public void onDisable()
 	{
 		log.info(defaultConsolePrefix + "Stopping threads...");
-		
+
 		getServer().getScheduler().cancelTasks(this);
-		
-		log.info(defaultConsolePrefix + "Closing " + databaseHandler.getDatabaseType() + " connections...");
-		
-		databaseHandler.closeConnections();
-		
+
+		if (databaseHandler != null) {
+			log.info(defaultConsolePrefix + "Closing " + databaseHandler.getDatabaseType() + " connections...");
+			databaseHandler.closeConnections();
+		}
 		log.info(defaultConsolePrefix + "Reporter disabled.");
 	}
 	
 	private void setupCommands()
 	{
 		String[] cmds = {"report", "rreport", "rep", "respond", "rrespond", "resp"};
-		
+
 		PluginCommand cmd = null;
-		
+
 		boolean error = false;
-		
+
 		for(String currentCmd : cmds)
 		{
 			cmd = getCommand(currentCmd);
-			
+
 			if(cmd != null)
 				cmd.setExecutor(commandManager);
 			else
@@ -136,7 +168,7 @@ public class Reporter extends JavaPlugin
 				error = true;
 			}
 		}
-		
+
 		if(error)
 		{
 			log.log(Level.WARN, defaultConsolePrefix + "plugin.yml may have been altered!");
@@ -149,42 +181,42 @@ public class Reporter extends JavaPlugin
 		if(getConfig().getBoolean("plugin.updates.checkForUpdates", true))
 		{
 			ReleaseLevel pluginLevel = ReleaseLevel.getByName(getConfig().getString("plugin.updates.updateLevel", "RELEASE"));
-			
+
 			URL url = null;
 			URLConnection connection = null;
-			
+
 			try
 			{
 				url = new URL(pluginUpdateAPI);
-			
+
 				connection = url.openConnection();
 			}
 			catch(IOException e)
 			{
-				log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + 
+				log.log(Level.WARN, Reporter.getDefaultConsolePrefix() +
 						"Could not open a connection to the ServerMods API to check for plugin updates!", e);
 				return;
 			}
-			
+
 			String apiKey = getConfig().getString("plugin.updates.api-key", "NO_KEY");
-			
+
 			// Set the X-API-Key if it is set in the configuration.
 			if(apiKey != null && !apiKey.equals("") && !apiKey.equalsIgnoreCase("NO_KEY"))
 				connection.addRequestProperty("X-API-Key", apiKey);
-			
+
 			String name = getDescription().getName();
 			List<String> authors = getDescription().getAuthors();
-			
+
 			String authorsString = ArrayUtil.indexesToString(authors);
-			
+
 			// userAgent = "Reporter v3.1.1 (By KabOOm356)"
 			String userAgent = name + " v" + version + " (By " + authorsString + ")";
-			
+
 			// Set User-Agent field, for connection to ServerMods API.
 			connection.addRequestProperty("User-Agent", userAgent);
-			
+
 			PluginUpdater update = new PluginUpdater(connection, name, version, pluginLevel);
-			
+
 			Bukkit.getScheduler().runTaskAsynchronously(this, update);
 		}
 	}
@@ -196,10 +228,10 @@ public class Reporter extends JavaPlugin
 		boolean autoDownload = getConfig().getBoolean("locale.updates.autoDownload", true);
 		boolean keepBackup = getConfig().getBoolean("locale.updates.keepBackup", false);
 		ReleaseLevel localeLevel = ReleaseLevel.getByName(getConfig().getString("locale.updates.releaseLevel", "RELEASE"));
-		
-		ReporterLocaleInitializer localeInitializer = 
+
+		ReporterLocaleInitializer localeInitializer =
 				new ReporterLocaleInitializer(this, localeName, getDataFolder(), autoDownload, localeLevel, keepBackup);
-		
+
 		if(asynchronousUpdate)
 			this.getServer().getScheduler().runTaskAsynchronously(this, localeInitializer);
 		else
@@ -223,40 +255,15 @@ public class Reporter extends JavaPlugin
 			getServer().getPluginManager().disablePlugin(this);
 		}
 	}
-	
+
 	private void initializeStatistics()
 	{
 		if(!getConfig().getBoolean("plugin.statistics.opt-out", false))
 		{
 			MetricsInitializer metricsInitializer = new MetricsInitializer(this);
-			
+
 			getServer().getScheduler().runTaskAsynchronously(this, metricsInitializer);
 		}
-	}
-
-	public static String getLogPrefix()
-	{
-		return logPrefix;
-	}
-
-	public static String getVersion()
-	{
-		return version;
-	}
-	
-	public static String getVersionString()
-	{
-		return versionString;
-	}
-
-	public static String getDefaultConsolePrefix()
-	{
-		return defaultConsolePrefix;
-	}
-	
-	public static boolean isCommandSenderSupported(CommandSender cs)
-	{
-		return (cs instanceof org.bukkit.entity.Player) || (cs instanceof org.bukkit.command.ConsoleCommandSender) || (cs instanceof org.bukkit.command.RemoteConsoleCommandSender);
 	}
 	
 	public void loadLocale()
@@ -265,22 +272,22 @@ public class Reporter extends JavaPlugin
 		{
 			log.warn(Reporter.getDefaultConsolePrefix() + "Unable to set defaults for the locale!");
 		}
-		
+
 		log.info(Reporter.getDefaultConsolePrefix() + "Language: " + locale.getString(LocaleInfo.language)
-				+ " v" + locale.getString(LocaleInfo.version) 
+				+ " v" + locale.getString(LocaleInfo.version)
 				+ " By " + locale.getString(LocaleInfo.author));
-		
+
 		updateDocumentation();
 	}
-	
+
 	private boolean setLocaleDefaults(Locale locale)
 	{
 		Reader defaultLocaleReader = getTextResource("en_US.yml");
-		
+
 		if(defaultLocaleReader != null)
 		{
 			YamlConfiguration defaultLocale = new YamlConfiguration();
-			
+
 			try
 			{
 				defaultLocale.load(defaultLocaleReader);
@@ -296,10 +303,10 @@ public class Reporter extends JavaPlugin
 		{
 			log.warn(Reporter.getDefaultConsolePrefix() + "Unable to find the default locale file!");
 		}
-		
+
 		return false;
 	}
-	
+
 	private void updateDocumentation()
 	{
 		// Update the documentation for all the commands
@@ -310,35 +317,15 @@ public class Reporter extends JavaPlugin
 	{
 		return locale;
 	}
-	
+
 	public ExtendedDatabaseHandler getDatabaseHandler()
 	{
 		return databaseHandler;
 	}
 
-	public static DateFormat getDateformat()
-	{
-		return dateFormat;
-	}
-
 	public ReporterCommandManager getCommandManager()
 	{
 		return commandManager;
-	}
-	
-	public static UpdateSite getLocaleXMLUpdateSite()
-	{
-		return localeXMLUpdateSite;
-	}
-
-	public static String getConfigurationVersion()
-	{
-		return configVersion;
-	}
-
-	public static String getDatabaseVersion()
-	{
-		return databaseVersion;
 	}
 
 	private URL getDefaultConfigurationFile() {
