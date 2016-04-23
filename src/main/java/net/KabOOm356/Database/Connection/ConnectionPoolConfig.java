@@ -8,6 +8,10 @@ public class ConnectionPoolConfig {
 	 * An instance of a ConnectionPoolConfig containing all the default values for 
 	 */
 	public static final ConnectionPoolConfig defaultInstance = new ConnectionPoolConfig();
+
+	private static final int minimumMaxConnections = 1;
+	private static final int minimumConnectionPoolUpdate = 10;
+	private static final int minimumMaxAttemptsForConnection = 50;
 	
 	/** If the connection pool should be limited. */
 	private boolean connectionPoolLimit = true;
@@ -21,14 +25,14 @@ public class ConnectionPoolConfig {
 	private ConnectionPoolConfig() {}
 	
 	public ConnectionPoolConfig(final boolean connectionPoolLimit, final int maxConnections, final long connectionPoolUpdate, final int maxAttemptsForConnection) {
-		if (maxConnections < 1) {
-			throw new IllegalArgumentException("Parameter 'maxConnections' cannot be less than one (1)!");
+		if (maxConnections < minimumMaxConnections) {
+			throw new IllegalArgumentException(String.format("Parameter 'maxConnections' cannot be less than [%d]!", minimumMaxConnections));
 		}
-		if (connectionPoolUpdate < 1) {
-			throw new IllegalArgumentException("Parameter 'connectionPoolUpdate' cannot be less than one (1)!");
+		if (connectionPoolUpdate < minimumConnectionPoolUpdate) {
+			throw new IllegalArgumentException(String.format("Parameter 'connectionPoolUpdate' cannot be less than [%d]!", minimumConnectionPoolUpdate));
 		}
-		if (maxAttemptsForConnection < 1) {
-			throw new IllegalArgumentException("Parameter 'maxAttemptsForConnection' cannot be less than one (1)!");
+		if (maxAttemptsForConnection < minimumMaxAttemptsForConnection) {
+			throw new IllegalArgumentException(String.format("Parameter 'maxAttemptsForConnection' cannot be less than [%d]!", minimumMaxAttemptsForConnection));
 		}
 		this.connectionPoolLimit = connectionPoolLimit;
 		this.maxConnections = maxConnections;
