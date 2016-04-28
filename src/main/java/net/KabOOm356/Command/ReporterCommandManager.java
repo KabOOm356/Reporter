@@ -1,34 +1,12 @@
 package net.KabOOm356.Command;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
-import java.util.UUID;
-
-import net.KabOOm356.Command.Commands.AssignCommand;
-import net.KabOOm356.Command.Commands.ClaimCommand;
-import net.KabOOm356.Command.Commands.CompleteCommand;
-import net.KabOOm356.Command.Commands.DeleteCommand;
-import net.KabOOm356.Command.Commands.DowngradeCommand;
-import net.KabOOm356.Command.Commands.HelpCommand;
-import net.KabOOm356.Command.Commands.ListCommand;
-import net.KabOOm356.Command.Commands.MoveCommand;
-import net.KabOOm356.Command.Commands.ReportCommand;
-import net.KabOOm356.Command.Commands.RequestCommand;
-import net.KabOOm356.Command.Commands.RespondCommand;
-import net.KabOOm356.Command.Commands.StatisticCommand;
-import net.KabOOm356.Command.Commands.UnassignCommand;
-import net.KabOOm356.Command.Commands.UnclaimCommand;
-import net.KabOOm356.Command.Commands.UpgradeCommand;
-import net.KabOOm356.Command.Commands.ViewCommand;
+import net.KabOOm356.Command.Commands.*;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
-import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ClaimPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
+import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Manager.MessageManager;
 import net.KabOOm356.Manager.ReportLimitManager;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager;
@@ -40,7 +18,6 @@ import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.FormattingUtil;
 import net.KabOOm356.Util.Util;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -52,6 +29,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
+import java.util.UUID;
 
 /**
  * A Command Manager and Command Executor for all the Reporter Commands.
@@ -352,99 +336,12 @@ public class ReporterCommandManager implements CommandExecutor
 		}
 		return true;
 	}
-	
+
 	/**
-	 * Returns a {@link OfflinePlayer} object that has a name that most closely resembles the given player name.
-	 * <br/><br/>
-	 * <b>NOTE:</b> If the given player name is '!' or '*', a {@link OfflinePlayer} is still returned and not null.
-	 * 
-	 * @param playerName The name of the {@link OfflinePlayer}.
-	 * 
-	 * @return An {@link OfflinePlayer} that most with a name that most closely resembles the given player name, if no player matches null.
-	 * 
-	 * @see org.bukkit.Server#getPlayer(String)
-	 * @see org.bukkit.Server#getOfflinePlayer(String)
-	 * 
-	 * @deprecated Deprecated due to dependency deprecation.
+	 * @see BukkitUtil#getPlayer(String, boolean)
 	 */
-	@Deprecated
-	public OfflinePlayer getPlayer(String playerName)
-	{
-		playerName = playerName.replaceAll("\\ ", "");
-		
-		if(playerName.equals(""))
-			return null;
-		
-		if(BukkitUtil.isUsernameValid(playerName))
-		{
-			// Attempt to get an online player.
-			OfflinePlayer player = Bukkit.getServer().getPlayer(playerName);
-			
-			if(player == null)
-			{
-				// Attempt to get an OfflinePlayer with an exact name.
-				player = Bukkit.getServer().getOfflinePlayer(playerName);
-				
-				// If the OfflinePlayer has not played before.
-				if(!player.hasPlayedBefore())
-				{
-					// If the configuration allows for partial username matching, match the player.
-					if(getConfig().getBoolean("general.matchPartialOfflineUsernames", true))
-					{
-						player = matchOfflinePlayer(playerName);
-					}
-					else // The player was not found.
-					{
-						player = null;
-					}
-				}
-			}
-			
-			return player;
-		}
-		else if(playerName.equalsIgnoreCase("!") || playerName.equalsIgnoreCase("*"))
-		{
-			return Bukkit.getServer().getOfflinePlayer("* (Anonymous)");
-		}
-		
-		return null;
-	}
-	
-	/**
-	 * Returns a {@link OfflinePlayer} whose name most closely matches the given player name.
-	 * 
-	 * @param playerName The player name to get
-	 * 
-	 * @return The {@link OfflinePlayer} whose name most closely matches the given player name if one can be matched, otherwise null.
-	 */
-	public OfflinePlayer matchOfflinePlayer(String playerName)
-	{
-		OfflinePlayer player = null;
-		
-		String lowerName = playerName.toLowerCase();
-		int delta = Integer.MAX_VALUE;
-		
-		for (OfflinePlayer op : Bukkit.getServer().getOfflinePlayers())
-		{
-			if (op != null && op.getName() != null)
-			{
-				if (op.getName().toLowerCase().startsWith(lowerName))
-				{
-					int curDelta = op.getName().length() - lowerName.length();
-					
-					if (curDelta < delta)
-					{
-						player = op;
-						delta = curDelta;
-					}
-					
-					if(curDelta == 0)
-						break;
-				}
-			}
-		}
-		
-		return player;
+	public final OfflinePlayer getPlayer(final String playerName) {
+		return BukkitUtil.getPlayer(playerName, getConfig().getBoolean("general.matchPartialOfflineUsernames", true));
 	}
 	
 	/**

@@ -24,9 +24,9 @@ public class BukkitUtil {
 	 * A {@link Pattern} that a valid Minecraft username must match.
 	 */
 	public static final Pattern validUsernamePattern = Pattern.compile("^[a-zA-Z0-9_]{2,32}$");
-
 	public static final String BUKKIT_COLOR_CODE_PATTERN = "(&([a-f0-9]))";
 	public static final String BUKKIT_COLOR_CODE_REPLACEMENT = "\u00A7$2";
+	public static final OfflinePlayer anonymousPlayer = Bukkit.getOfflinePlayer("* (Anonymous)");
 
 	private static final String realPlayerNameFormat = "%s " + ChatColor.GOLD + "(%s)";
 
@@ -328,5 +328,75 @@ public class BukkitUtil {
 			return null;
 		}
 		return Bukkit.getOfflinePlayer(name);
+	}
+
+	/**
+	 * Returns a {@link OfflinePlayer} object that has a name that most closely resembles the given player name.
+	 * <br/><br/>
+	 * <b>NOTE:</b> If the given player name is '!' or '*', a {@link OfflinePlayer} is still returned and not null.
+	 *
+	 * @param playerName The name of the {@link OfflinePlayer}.
+	 * @return An {@link OfflinePlayer} that most with a name that most closely resembles the given player name, if no player matches null.
+	 * @see org.bukkit.Server#getPlayer(String)
+	 * @see org.bukkit.Server#getOfflinePlayer(String)
+	 * @deprecated Deprecated due to dependency deprecation.
+	 */
+	@Deprecated
+	public static OfflinePlayer getPlayer(final String playerName, final boolean matchPartialOfflineUsernames) {
+		if (BukkitUtil.isUsernameValid(playerName)) {
+			// Attempt to get an online player.
+			OfflinePlayer player = Bukkit.getPlayer(playerName);
+
+			if (player == null) {
+				// Attempt to get an OfflinePlayer with an exact name.
+				player = Bukkit.getOfflinePlayer(playerName);
+
+				// If the OfflinePlayer has not played before.
+				if (!player.hasPlayedBefore()) {
+					// If the configuration allows for partial username matching, match the player.
+					if (matchPartialOfflineUsernames) {
+						player = matchOfflinePlayer(playerName);
+					} else {
+						player = null;
+					}
+				}
+			}
+			return player;
+		} else if (playerName.equalsIgnoreCase("!") || playerName.equalsIgnoreCase("*")) {
+			return anonymousPlayer;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns a {@link OfflinePlayer} whose name most closely matches the given player name.
+	 *
+	 * @param playerName The player name to get
+	 * @return The {@link OfflinePlayer} whose name most closely matches the given player name if one can be matched, otherwise null.
+	 */
+	public static OfflinePlayer matchOfflinePlayer(final String playerName) {
+		OfflinePlayer player = null;
+
+		final String lowerName = playerName.toLowerCase();
+		int delta = Integer.MAX_VALUE;
+
+		for (final OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
+			if (offlinePlayer != null && offlinePlayer.getName() != null) {
+				if (offlinePlayer.getName().toLowerCase().startsWith(lowerName)) {
+					final int currentDelta = offlinePlayer.getName().length() - lowerName.length();
+
+					if (currentDelta < delta) {
+						player = offlinePlayer;
+						delta = currentDelta;
+					}
+
+					if (currentDelta == 0) {
+						return player;
+					}
+				}
+			}
+		}
+		return player;
 	}
 }

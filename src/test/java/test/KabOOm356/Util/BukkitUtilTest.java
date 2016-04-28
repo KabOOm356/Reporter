@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import test.KabOOm356.PowerMockitoTest;
@@ -13,10 +14,18 @@ import test.KabOOm356.PowerMockitoTest;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.powermock.api.mockito.PowerMockito.*;
 
+@SuppressWarnings("deprecation")
 @PrepareForTest({BukkitUtil.class, OfflinePlayer.class, Bukkit.class})
 public class BukkitUtilTest extends PowerMockitoTest {
+	@BeforeClass
+	public static void mockBukkit() {
+		mockStatic(Bukkit.class);
+	}
+
 	@Test
 	public void testIsUsernameValid() {
 		String username = "*";
@@ -391,5 +400,127 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		when(Bukkit.getOfflinePlayer(name)).thenReturn(offlinePlayer);
 		assertEquals(offlinePlayer, BukkitUtil.getOfflinePlayer(null, name));
 		verifyStatic();
+	}
+
+	@Test
+	public void testGetPlayerOnline() {
+		final Player player = mock(Player.class);
+		mockStatic(Bukkit.class);
+		when(Bukkit.getPlayer(anyString())).thenReturn(player);
+		mockStatic(BukkitUtil.class);
+		when(BukkitUtil.getPlayer(anyString(), anyBoolean())).thenCallRealMethod();
+		when(BukkitUtil.isUsernameValid(anyString())).thenReturn(true);
+
+		assertEquals(player, BukkitUtil.getPlayer("player", false));
+		assertEquals(player, BukkitUtil.getPlayer("player", true));
+	}
+
+	@Test
+	public void testGetPlayerNotOnlineHasPlayedBefore() {
+		final OfflinePlayer offlinePlayer = mock(OfflinePlayer.class);
+		when(offlinePlayer.hasPlayedBefore()).thenReturn(true);
+		mockStatic(Bukkit.class);
+		when(Bukkit.getPlayer(anyString())).thenReturn(null);
+		when(Bukkit.getOfflinePlayer(anyString())).thenReturn(offlinePlayer);
+		mockStatic(BukkitUtil.class);
+		when(BukkitUtil.getPlayer(anyString(), anyBoolean())).thenCallRealMethod();
+		when(BukkitUtil.isUsernameValid(anyString())).thenReturn(true);
+
+		assertEquals(offlinePlayer, BukkitUtil.getPlayer("player", false));
+		assertEquals(offlinePlayer, BukkitUtil.getPlayer("player", true));
+	}
+
+	@Test
+	public void testGetPlayerNotOnlineHasNotPlayedBeforeNoMatchingAllowed() {
+		final OfflinePlayer offlinePlayer = mock(OfflinePlayer.class);
+		when(offlinePlayer.hasPlayedBefore()).thenReturn(false);
+		mockStatic(Bukkit.class);
+		when(Bukkit.getPlayer(anyString())).thenReturn(null);
+		when(Bukkit.getOfflinePlayer(anyString())).thenReturn(offlinePlayer);
+		mockStatic(BukkitUtil.class);
+		when(BukkitUtil.getPlayer(anyString(), anyBoolean())).thenCallRealMethod();
+		when(BukkitUtil.isUsernameValid(anyString())).thenReturn(true);
+
+		assertEquals(null, BukkitUtil.getPlayer("player", false));
+		verifyStatic();
+	}
+
+	@Test
+	public void testGetPlayerNotOnlineHasNotPlayedBeforeMatchingAllowed() {
+		final OfflinePlayer offlinePlayer = mock(OfflinePlayer.class);
+		final OfflinePlayer matchedOfflinePlayer = mock(OfflinePlayer.class);
+		when(offlinePlayer.hasPlayedBefore()).thenReturn(false);
+		mockStatic(Bukkit.class);
+		when(Bukkit.getPlayer(anyString())).thenReturn(null);
+		when(Bukkit.getOfflinePlayer(anyString())).thenReturn(offlinePlayer);
+		mockStatic(BukkitUtil.class);
+		when(BukkitUtil.getPlayer(anyString(), anyBoolean())).thenCallRealMethod();
+		when(BukkitUtil.matchOfflinePlayer(anyString())).thenReturn(matchedOfflinePlayer);
+		when(BukkitUtil.isUsernameValid(anyString())).thenReturn(true);
+
+		assertEquals(matchedOfflinePlayer, BukkitUtil.getPlayer("player", true));
+		verifyStatic();
+	}
+
+	@Test
+	public void testGetPlayerAnonymous() {
+		mockStatic(BukkitUtil.class);
+		when(BukkitUtil.getPlayer(anyString(), anyBoolean())).thenCallRealMethod();
+		when(BukkitUtil.isUsernameValid(anyString())).thenReturn(false);
+
+		assertEquals(BukkitUtil.anonymousPlayer, BukkitUtil.getPlayer("!", false));
+		assertEquals(BukkitUtil.anonymousPlayer, BukkitUtil.getPlayer("!", true));
+		assertEquals(BukkitUtil.anonymousPlayer, BukkitUtil.getPlayer("*", false));
+		assertEquals(BukkitUtil.anonymousPlayer, BukkitUtil.getPlayer("*", true));
+	}
+
+	@Test
+	public void testGetPlayerInvalidUsername() {
+		mockStatic(BukkitUtil.class);
+		when(BukkitUtil.getPlayer(anyString(), anyBoolean())).thenCallRealMethod();
+		when(BukkitUtil.isUsernameValid(anyString())).thenReturn(false);
+
+		assertNull(BukkitUtil.getPlayer(anyString(), anyBoolean()));
+	}
+
+	@Test
+	public void testMatchOfflinePlayer() {
+		final OfflinePlayer offlinePlayer = mock(OfflinePlayer.class);
+		when(offlinePlayer.getName()).thenReturn("Test");
+		final OfflinePlayer offlinePlayer2 = mock(OfflinePlayer.class);
+		when(offlinePlayer2.getName()).thenReturn("another");
+		final OfflinePlayer offlinePlayer3 = mock(OfflinePlayer.class);
+		when(offlinePlayer3.getName()).thenReturn("Player");
+		final OfflinePlayer offlinePlayer4 = mock(OfflinePlayer.class);
+		when(offlinePlayer4.getName()).thenReturn("another player");
+		final OfflinePlayer[] offlinePlayers = {offlinePlayer, offlinePlayer2, offlinePlayer3, offlinePlayer4};
+		mockStatic(Bukkit.class);
+		when(Bukkit.getOfflinePlayers()).thenReturn(offlinePlayers);
+		assertEquals(offlinePlayer, BukkitUtil.matchOfflinePlayer("Test"));
+		assertEquals(offlinePlayer, BukkitUtil.matchOfflinePlayer("te"));
+		assertEquals(offlinePlayer2, BukkitUtil.matchOfflinePlayer("ANOTHER"));
+		assertEquals(offlinePlayer2, BukkitUtil.matchOfflinePlayer("a"));
+		assertEquals(offlinePlayer3, BukkitUtil.matchOfflinePlayer("player"));
+		assertEquals(offlinePlayer4, BukkitUtil.matchOfflinePlayer("another player"));
+		assertEquals(offlinePlayer4, BukkitUtil.matchOfflinePlayer("another pl"));
+	}
+
+	@Test
+	public void testMatchOfflinePlayerNoMatch() {
+		final OfflinePlayer offlinePlayer = mock(OfflinePlayer.class);
+		when(offlinePlayer.getName()).thenReturn("Test");
+		final OfflinePlayer offlinePlayer2 = mock(OfflinePlayer.class);
+		when(offlinePlayer2.getName()).thenReturn("another");
+		final OfflinePlayer offlinePlayer3 = mock(OfflinePlayer.class);
+		when(offlinePlayer3.getName()).thenReturn("Player");
+		final OfflinePlayer offlinePlayer4 = mock(OfflinePlayer.class);
+		when(offlinePlayer4.getName()).thenReturn("another player");
+		final OfflinePlayer[] offlinePlayers = {offlinePlayer, offlinePlayer2, offlinePlayer3, offlinePlayer4};
+		mockStatic(Bukkit.class);
+		when(Bukkit.getOfflinePlayers()).thenReturn(offlinePlayers);
+		assertNull(BukkitUtil.matchOfflinePlayer("Does not exist"));
+		assertNull(BukkitUtil.matchOfflinePlayer("no player"));
+		assertNull(BukkitUtil.matchOfflinePlayer("test player"));
+		assertNull(BukkitUtil.matchOfflinePlayer("player test"));
 	}
 }
