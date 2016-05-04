@@ -567,22 +567,20 @@ public class ReporterCommandManager implements CommandExecutor
 	 * 
 	 * @return The {@link ModLevel} of the given {@link CommandSender}.
 	 */
-	public ModLevel getModLevel(CommandSender sender)
-	{
-		if(sender.isOp())
+	public ModLevel getModLevel(final CommandSender sender) {
+		if(sender.isOp()) {
 			return ModLevel.HIGH;
-		else if(sender instanceof ConsoleCommandSender)
+		} else if(sender instanceof ConsoleCommandSender) {
 			return ModLevel.HIGH;
-		else
-		{
-			if(BukkitUtil.isPlayer(sender))
-			{
-				if(hasPermission((Player)sender, "reporter.modlevel.high"))
+		} else {
+			if(BukkitUtil.isPlayer(sender)) {
+				if(hasPermission((Player)sender, "reporter.modlevel.high")) {
 					return ModLevel.HIGH;
-				else if(hasPermission((Player)sender, "reporter.modlevel.normal"))
+				} else if(hasPermission((Player)sender, "reporter.modlevel.normal")) {
 					return ModLevel.NORMAL;
-				else if(hasPermission((Player)sender, "reporter.modlevel.low"))
+				} else if(hasPermission((Player)sender, "reporter.modlevel.low")) {
 					return ModLevel.LOW;
+				}
 			}
 		}
 		return ModLevel.NONE;
@@ -596,10 +594,10 @@ public class ReporterCommandManager implements CommandExecutor
 	 * 
 	 * @return True if the String is a {@link ModLevel} and in bounds, otherwise false.
 	 */
-	public boolean requireModLevelInBounds(CommandSender sender, String modLevel)
-	{
-		if(ModLevel.modLevelInBounds(modLevel))
+	public boolean requireModLevelInBounds(final CommandSender sender, final String modLevel) {
+		if(ModLevel.modLevelInBounds(modLevel)) {
 			return true;
+		}
 		sender.sendMessage(ChatColor.RED + 
 				getLocale().getString(GeneralPhrases.priorityLevelNotInBounds));
 		return false;
@@ -614,22 +612,31 @@ public class ReporterCommandManager implements CommandExecutor
 	 * 
 	 * @return True if the player can alter the report, otherwise false.
 	 */
-	public boolean canAlterReport(CommandSender sender, int index, CommandSender player)
-	{
-		if(player == null)
-			return false;
-		
-		if(!requirePriority(sender, index, player))
-			return false;
-		
-		if(!requireUnclaimedOrPriority(sender, index, player))
-		{
-			sender.sendMessage(ChatColor.WHITE + getLocale().getString(GeneralPhrases.contactToAlter));
-			
+	public boolean canAlterReport(final CommandSender sender, final int index, final CommandSender player) throws InterruptedException, SQLException, ClassNotFoundException {
+		if(player == null) {
 			return false;
 		}
-		
-		return true;
+
+		try {
+			if (!requirePriority(sender, index, player)) {
+				return false;
+			}
+
+			if (!requireUnclaimedOrPriority(sender, index, player)) {
+				sender.sendMessage(ChatColor.WHITE + getLocale().getString(GeneralPhrases.contactToAlter));
+				return false;
+			}
+			return true;
+		} catch (final InterruptedException e) {
+			log.error(String.format("Failed to check if player [%s] could alter report [%d]!", BukkitUtil.formatPlayerName(player), index));
+			throw e;
+		} catch (final SQLException e) {
+			log.error(String.format("Failed to check if player [%s] could alter report [%d]!", BukkitUtil.formatPlayerName(player), index));
+			throw e;
+		} catch (final ClassNotFoundException e) {
+			log.error(String.format("Failed to check if player [%s] could alter report [%d]!", BukkitUtil.formatPlayerName(player), index));
+			throw e;
+		}
 	}
 	
 	/**
@@ -644,8 +651,7 @@ public class ReporterCommandManager implements CommandExecutor
 	 * 
 	 * @return True if the {@link CommandSender} can alter the given report, otherwise false.
 	 */
-	public boolean canAlterReport(CommandSender sender, int index)
-	{
+	public boolean canAlterReport(final CommandSender sender, final int index) throws InterruptedException, SQLException, ClassNotFoundException {
 		return canAlterReport(sender, index, sender);
 	}
 	
@@ -658,8 +664,7 @@ public class ReporterCommandManager implements CommandExecutor
 	 * 
 	 * @return True if the report is unclaimed or the sender has high enough priority to supersede the player claiming it.
 	 */
-	public boolean requireUnclaimedOrPriority(CommandSender sender, int index)
-	{
+	public boolean requireUnclaimedOrPriority(final CommandSender sender, final int index) throws ClassNotFoundException, InterruptedException, SQLException {
 		return requireUnclaimedOrPriority(sender, index, sender);
 	}
 	
@@ -673,120 +678,56 @@ public class ReporterCommandManager implements CommandExecutor
 	 * 
 	 * @return True if the report is unclaimed or the player has high enough priority to supersede the player claiming it.
 	 */
-	public boolean requireUnclaimedOrPriority(CommandSender sender, int index, CommandSender player)
-	{
-		if(sender.isOp() || sender instanceof ConsoleCommandSender)
+	public boolean requireUnclaimedOrPriority(final CommandSender sender, final int index, final CommandSender player) throws ClassNotFoundException, InterruptedException, SQLException {
+		if(sender.isOp() || sender instanceof ConsoleCommandSender) {
 			return true;
+		}
 		
-		String query = "SELECT " +
+		final String query = "SELECT " +
 				"ClaimStatus, ClaimedByUUID, ClaimedBy, ClaimPriority " +
 				"FROM Reports " +
 				"WHERE ID=" + index;
-		
-		boolean isClaimed;
-		UUID claimedBy = null;
-		String claimedByName;
-		int claimPriority;
-		Player playerObject = null;
-		Player senderObject = null;
-		boolean isClaimedBySender = false;
-		boolean isClaimedByPlayer = false;
-		
-		if(BukkitUtil.isPlayer(sender))
-		{
-			senderObject = (Player) sender;
-		}
-		
-		if(BukkitUtil.isPlayer(player))
-		{
-			playerObject = (Player) player;
-		}
-		
+
 		final ExtendedDatabaseHandler database = getDatabaseHandler();
-		final int connectionId;
+		Integer connectionId = null;
 		try {
 			connectionId = database.openPooledConnection();
-		} catch (final Exception e) {
-			log.error("Failed to check if report can be altered by player!", e);
-			sender.sendMessage(ChatColor.RED + Reporter.getLogPrefix() + getLocale().getString(GeneralPhrases.error));
-			return false;
-		}
-		
-		try
-		{
-			SQLResultSet result = database.sqlQuery(connectionId, query);
-			
-			if(!result.getString("ClaimedByUUID").isEmpty())
-			{
-				claimedBy = UUID.fromString(result.getString("ClaimedByUUID"));
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
+
+			final String claimedByName = result.getString("ClaimedBy");
+			final boolean isClaimed = result.getBoolean("ClaimStatus");
+			final int claimPriority = result.getInt("ClaimPriority");
+
+			UUID claimedByUUID = null;
+			if(!result.getString("ClaimedByUUID").isEmpty()) {
+				claimedByUUID = UUID.fromString(result.getString("ClaimedByUUID"));
 			}
-			
-			isClaimed = result.getBoolean("ClaimStatus");
-			claimedByName = result.getString("ClaimedBy");
-			claimPriority = result.getInt("ClaimPriority");
-			
+			final CommandSender claimedBy = CommandSender.class.cast(BukkitUtil.getOfflinePlayer(claimedByUUID, claimedByName));
+
 			// Check if the sender is the player claiming the report.
 			// UUID based check.
-			if(claimedBy != null && senderObject != null)
-			{
-				if(BukkitUtil.playersEqual(senderObject, claimedBy))
-				{
-					isClaimedBySender = true;
-				}
-			}
-			else // Name based check.
-			{
-				if(sender.getName().equals(claimedByName))
-				{
-					isClaimedBySender = true;
-				}
-			}
-			
-			// Check if the player is the player claiming the report.
-			// UUID based check.
-			if(claimedBy != null && playerObject != null)
-			{
-				if(BukkitUtil.playersEqual(playerObject, claimedBy))
-				{
-					isClaimedByPlayer = true;
-				}
-			}
-			else // Name based check.
-			{
-				if(player.getName().equals(claimedByName))
-				{
-					isClaimedByPlayer = true;
-				}
-			}
-			
-			if(isClaimed && !isClaimedBySender && !isClaimedByPlayer && claimPriority >= getModLevel(player).getLevel())
-			{
+			final boolean isClaimedBySender = BukkitUtil.playersEqual(sender, claimedBy);
+			final boolean isClaimedByPlayer = BukkitUtil.playersEqual(player, claimedBy);
+
+			if(isClaimed && !isClaimedBySender && !isClaimedByPlayer && claimPriority >= getModLevel(player).getLevel()) {
 				String output = getLocale().getString(ClaimPhrases.reportAlreadyClaimed);
-				
-				if(claimedBy != null)
-				{
-					OfflinePlayer claimingPlayer = Bukkit.getServer().getOfflinePlayer(claimedBy);
-					
-					claimedByName = BukkitUtil.formatPlayerName(claimingPlayer);
-				}
-				
+				final String formattedClaimName = BukkitUtil.formatPlayerName(claimedBy);
 				output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.RED);
-				
-				output = output.replaceAll("%c", ChatColor.BLUE + claimedByName + ChatColor.RED);
-				
+				output = output.replaceAll("%c", ChatColor.BLUE + formattedClaimName + ChatColor.RED);
 				sender.sendMessage(ChatColor.RED + output);
-				
+
 				return false;
 			}
-		}
-		catch(final Exception e)
-		{
-			log.error("Failed to check if report can be altered by player!", e);
-			sender.sendMessage(ChatColor.RED + Reporter.getLogPrefix() + getLocale().getString(GeneralPhrases.error));
-			return false;
-		}
-		finally
-		{
+		} catch (final ClassNotFoundException e) {
+			log.error("Failed to check if report can be altered by player!");
+			throw e;
+		} catch (final InterruptedException e) {
+			log.error("Failed to check if report can be altered by player!");
+			throw e;
+		} catch (final SQLException e) {
+			log.error("Failed to check if report can be altered by player!");
+			throw e;
+		} finally {
 			database.closeConnection(connectionId);
 		}
 		
@@ -805,22 +746,29 @@ public class ReporterCommandManager implements CommandExecutor
 	 * @throws ClassNotFoundException 
 	 * @throws InterruptedException 
 	 */
-	public boolean checkPriority(CommandSender player, int index) throws ClassNotFoundException, SQLException, InterruptedException
-	{
-		if(player instanceof ConsoleCommandSender)
+	public boolean checkPriority(final CommandSender player, final int index) throws ClassNotFoundException, InterruptedException, SQLException {
+		if(player instanceof ConsoleCommandSender) {
 			return true;
+		}
 		
-		if(BukkitUtil.isPlayer(player) && ((Player)player).isOp())
+		if(BukkitUtil.isPlayer(player) && Player.class.cast(player).isOp()) {
 			return true;
+		}
 		
-		ModLevel modLevel = getModLevel(player);
-		
-		ModLevel reportPriority = getReportPriority(index);
-		
-		if(reportPriority.getLevel() <= modLevel.getLevel())
-			return true;
-		
-		return false;
+		final ModLevel modLevel = getModLevel(player);
+		try {
+			final ModLevel reportPriority = getReportPriority(index);
+			return reportPriority.getLevel() <= modLevel.getLevel();
+		} catch (final ClassNotFoundException e) {
+			log.error(String.format("Failed to do a priority check for player [%s] on report [%d]", BukkitUtil.formatPlayerName(player), index));
+			throw e;
+		} catch (final InterruptedException e) {
+			log.error(String.format("Failed to do a priority check for player [%s] on report [%d]", BukkitUtil.formatPlayerName(player), index));
+			throw e;
+		} catch (final SQLException e) {
+			log.error(String.format("Failed to do a priority check for player [%s] on report [%d]", BukkitUtil.formatPlayerName(player), index));
+			throw e;
+		}
 	}
 	
 	/**
@@ -831,8 +779,7 @@ public class ReporterCommandManager implements CommandExecutor
 	 * 
 	 * @return True if the {@link CommandSender} has a high enough priority to alter the given report, otherwise false.
 	 */
-	public boolean requirePriority(CommandSender sender, int index)
-	{
+	public boolean requirePriority(final CommandSender sender, final int index) throws InterruptedException, SQLException, ClassNotFoundException {
 		return requirePriority(sender, index, sender);
 	}
 	
@@ -845,54 +792,58 @@ public class ReporterCommandManager implements CommandExecutor
 	 * 
 	 * @return True if the player has a high enough priority to alter the given report, otherwise false.
 	 */
-	public boolean requirePriority(CommandSender sender, int index, CommandSender player)
-	{
-		try
-		{
-			if(!checkPriority(player, index))
-			{
-				ModLevel reportPriority = getReportPriority(index);
+	public boolean requirePriority(final CommandSender sender, final int index, final CommandSender player) throws InterruptedException, SQLException, ClassNotFoundException {
+		try {
+			if(!checkPriority(player, index)) {
+				final ModLevel reportPriority = getReportPriority(index);
 				
 				String output = getLocale().getString(GeneralPhrases.reportRequiresClearance);
-				
 				output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.RED);
 				output = output.replaceAll("%m", reportPriority.getColor() + reportPriority.getName() + ChatColor.RED);
 				
 				sender.sendMessage(ChatColor.RED + output);
 				
-				if(sender.equals(player))
+				if(sender.equals(player)) {
 					displayModLevel(sender);
-				else
+				} else {
 					displayModLevel(sender, player);
+				}
 				
 				return false;
 			}
+		} catch (final InterruptedException e) {
+			log.error(String.format("Failed to check required priority for report [%d]!", index));
+			throw e;
+		} catch (final SQLException e) {
+			log.error(String.format("Failed to check required priority for report [%d]!", index));
+			throw e;
+		} catch (final ClassNotFoundException e) {
+			log.error(String.format("Failed to check required priority for report [%d]!", index));
+			throw e;
 		}
-		catch (final Exception e)
-		{
-			log.error("Failed to check priority!", e);
-			sender.sendMessage(ChatColor.RED + Reporter.getLogPrefix() + getLocale().getString(GeneralPhrases.error));
-			return false;
-		}
-		
+
 		return true;
 	}
 	
-	private ModLevel getReportPriority(int index) throws SQLException, ClassNotFoundException, InterruptedException
-	{
-		String query = "SELECT Priority FROM Reports WHERE ID=" + index;
+	private ModLevel getReportPriority(final int index) throws ClassNotFoundException, InterruptedException, SQLException {
+		final String query = "SELECT Priority FROM Reports WHERE ID=" + index;
 		final ExtendedDatabaseHandler database = getDatabaseHandler();
-		final int connectionId = database.openPooledConnection();
-		try
-		{
-			SQLResultSet result = database.sqlQuery(connectionId, query);
-			
-			int level = result.getInt("Priority");
-			
+		Integer connectionId = null;
+		try {
+			connectionId = database.openPooledConnection();
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
+			final int level = result.getInt("Priority");
 			return ModLevel.getByLevel(level);
-		}
-		finally
-		{
+		} catch (final InterruptedException e) {
+			log.error(String.format("Failed to get report priority for index [%d]!", index));
+			throw e;
+		} catch (final SQLException e) {
+			log.error(String.format("Failed to get report priority for index [%d]!", index));
+			throw e;
+		} catch (final ClassNotFoundException e) {
+			log.error(String.format("Failed to get report priority for index [%d]!", index));
+			throw e;
+		} finally {
 			database.closeConnection(connectionId);
 		}
 	}
