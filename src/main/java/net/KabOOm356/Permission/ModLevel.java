@@ -136,19 +136,6 @@ public enum ModLevel
 	}
 	
 	/**
-	 * Returns a {@link ChatColor} associated with the given ModLevel.
-	 * 
-	 * @param level The ModLevel to get the ChatColor for.
-	 * 
-	 * @return A {@link ChatColor} associated with the given ModLevel.
-	 */
-	@Deprecated
-	public static ChatColor getModLevelColor(final ModLevel level)
-	{
-		return level.getColor();
-	}
-	
-	/**
 	 * Returns a {@link ChatColor} associated with this ModLevel.
 	 * 
 	 * @return A {@link ChatColor} associated with this ModLevel.

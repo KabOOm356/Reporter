@@ -542,7 +542,7 @@ public class ViewCommand extends ReporterCommand
 			
 			final int priorityLevel = result.getInt("Priority");
 			final ModLevel priorityModLevel = ModLevel.getByLevel(priorityLevel);
-			priority = ModLevel.getModLevelColor(priorityModLevel) + priorityModLevel.getName();
+			priority = priorityModLevel.getColor() + priorityModLevel.getName();
 			
 			claimStatus = result.getBoolean("ClaimStatus");
 			claimedBy = result.getString("ClaimedBy");

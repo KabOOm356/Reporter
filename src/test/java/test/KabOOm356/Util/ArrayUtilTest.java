@@ -143,29 +143,30 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testIndexesToStringMapNull() {
+		final Map<Object, Object> nullMap = null;
 		try {
-			ArrayUtil.indexesToString((Map) null);
+			ArrayUtil.indexesToString(nullMap);
 			fail("Expected exception not thrown!");
 		} catch (final IllegalArgumentException e) {
 			// Expected exception
 		}
 
 		try {
-			ArrayUtil.indexesToString((Map) null, "", "");
+			ArrayUtil.indexesToString(nullMap, "", "");
 			fail("Expected exception not thrown!");
 		} catch (final IllegalArgumentException e) {
 			// Expected exception
 		}
 
 		try {
-			ArrayUtil.indexesToString(new HashMap(), null, "");
+			ArrayUtil.indexesToString(new HashMap<Object, Object>(), null, "");
 			fail("Expected exception not thrown!");
 		} catch (final IllegalArgumentException e) {
 			// Expected exception
 		}
 
 		try {
-			ArrayUtil.indexesToString(new HashMap(), "", null);
+			ArrayUtil.indexesToString(new HashMap<Object, Object>(), "", null);
 			fail("Expected exception not thrown!");
 		} catch (final IllegalArgumentException e) {
 			// Expected exception
@@ -179,7 +180,7 @@ public class ArrayUtilTest {
 		testMap.put("SecondKey", "SecondValue");
 		testMap.put("LastKey", "LastValue");
 
-		String returned = ArrayUtil.indexesToString(new HashMap());
+		String returned = ArrayUtil.indexesToString(new HashMap<Object, Object>());
 		assertEquals("", returned);
 
 		returned = ArrayUtil.indexesToString(testMap);
@@ -196,7 +197,7 @@ public class ArrayUtilTest {
 		testArray.add("SecondElement");
 		testArray.add("LastElement");
 
-		String returned = ArrayUtil.indexesToString(new ArrayList(), ChatColor.RED, ChatColor.WHITE);
+		String returned = ArrayUtil.indexesToString(new ArrayList<Object>(), ChatColor.RED, ChatColor.WHITE);
 		String expected = "";
 		assertEquals(expected, returned);
 

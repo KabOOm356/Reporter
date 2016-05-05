@@ -1,18 +1,5 @@
 package net.KabOOm356.Command.Commands;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.UUID;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -23,6 +10,18 @@ import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * A {@link ReporterCommand} that will handle moving reports to different priorities.
@@ -158,10 +157,8 @@ public class MoveCommand extends ReporterCommand
 		
 		String output = getManager().getLocale().getString(MovePhrases.moveReportSuccess);
 		
-		ChatColor priorityColor = ModLevel.getModLevelColor(level);
-		
 		output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.WHITE);
-		output = output.replaceAll("%p", priorityColor + level.getName() + ChatColor.WHITE);
+		output = output.replaceAll("%p", level.getColor() + level.getName() + ChatColor.WHITE);
 		
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 		

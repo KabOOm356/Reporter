@@ -1,8 +1,5 @@
 package net.KabOOm356.Command.Commands;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -13,14 +10,15 @@ import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
-import net.KabOOm356.Util.Util;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * A {@link ReporterCommand} that will handle listing reports.
@@ -198,11 +196,9 @@ public class ListCommand extends ReporterCommand
 	private void printClaimedPriorityCount(CommandSender sender, ModLevel level, int count)
 	{
 		String format = getManager().getLocale().getString(ListPhrases.listClaimedPriorityCount);
-		
-		ChatColor priorityColor = ModLevel.getModLevelColor(level);
-		
-		String output = format.replaceAll("%n", priorityColor + Integer.toString(count) + ChatColor.WHITE);
-		output = output.replaceAll("%p", priorityColor + level.getName() + ChatColor.WHITE);
+
+		String output = format.replaceAll("%n", level.getColor() + Integer.toString(count) + ChatColor.WHITE);
+		output = output.replaceAll("%p", level.getColor() + level.getName() + ChatColor.WHITE);
 		
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 	}
@@ -348,10 +344,8 @@ public class ListCommand extends ReporterCommand
 	{
 		String format = getManager().getLocale().getString(ListPhrases.listPriorityCount);
 		
-		ChatColor priorityColor = ModLevel.getModLevelColor(level);
-		
-		String output = format.replaceAll("%n", priorityColor + Integer.toString(count) + ChatColor.WHITE);
-		output = output.replaceAll("%p", priorityColor + level.getName() + ChatColor.WHITE);
+		String output = format.replaceAll("%n", level.getColor() + Integer.toString(count) + ChatColor.WHITE);
+		output = output.replaceAll("%p", level.getColor() + level.getName() + ChatColor.WHITE);
 		
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 	}
@@ -385,21 +379,20 @@ public class ListCommand extends ReporterCommand
 	
 	private void printPriorityIndexes(CommandSender sender, ModLevel level, ArrayList<Integer> indexes)
 	{
-		ChatColor priorityColor = ModLevel.getModLevelColor(level);
 		String format, output;
 		
 		if(!indexes.isEmpty())
 		{
 			format = getManager().getLocale().getString(ListPhrases.listPriorityIndexes);
 			
-			output = format.replaceAll("%p", priorityColor + level.getName() + ChatColor.WHITE);
-			output = output.replaceAll("%i", ArrayUtil.indexesToString(indexes, priorityColor, ChatColor.WHITE));
+			output = format.replaceAll("%p", level.getColor() + level.getName() + ChatColor.WHITE);
+			output = output.replaceAll("%i", ArrayUtil.indexesToString(indexes, level.getColor(), ChatColor.WHITE));
 		}
 		else
 		{
 			format = getManager().getLocale().getString(ListPhrases.listNoReportsWithPriority);
 			
-			output = format.replaceAll("%p", priorityColor + level.getName() + ChatColor.WHITE);
+			output = format.replaceAll("%p", level.getColor() + level.getName() + ChatColor.WHITE);
 		}
 		
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);

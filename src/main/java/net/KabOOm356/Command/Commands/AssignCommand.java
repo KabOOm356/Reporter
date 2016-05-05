@@ -12,7 +12,6 @@ import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -69,7 +68,7 @@ public class AssignCommand extends ReporterCommand {
 				return;
 			}
 
-			final Player player = Bukkit.getPlayer(args.get(1));
+			final Player player = BukkitUtil.getOfflinePlayer(args.get(1)).getPlayer();
 
 			if (canAssignReport(sender, index, player)) {
 				assignReport(sender, index, player);
