@@ -18,7 +18,7 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @see DatabaseHandler#DatabaseHandler(String, String, String, String, ConnectionPoolConfig)
 	 */
 	public ExtendedDatabaseHandler(String host, String database, String username, String password, final ConnectionPoolConfig connectionPoolConfig) {
@@ -27,7 +27,7 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @see DatabaseHandler#DatabaseHandler(DatabaseType, String, String, ConnectionPoolConfig)
 	 */
 	public ExtendedDatabaseHandler(DatabaseType type, String path, String name, final ConnectionPoolConfig connectionPoolConfig) throws IOException {
@@ -36,7 +36,7 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @see DatabaseHandler#DatabaseHandler(Database)
 	 */
 	public ExtendedDatabaseHandler(Database database) {
@@ -46,16 +46,12 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 	/**
 	 * Performs an SQL query on the database that returns a {@link SQLResultSet}
 	 * containing the results.
-	 * 
-	 * @param query
-	 *            The query to send to the database.
-	 * 
+	 *
+	 * @param query The query to send to the database.
 	 * @return A {@link SQLResultSet} containing the results
-	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
-	 * @throws InterruptedException 
-	 * 
+	 * @throws InterruptedException
 	 * @see net.KabOOm356.Database.DatabaseHandler#query(java.lang.String)
 	 */
 	public SQLResultSet sqlQuery(final String query) throws ClassNotFoundException, SQLException, InterruptedException {
@@ -84,20 +80,15 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 	/**
 	 * Performs an SQL query on the database that returns a {@link SQLResultSet}
 	 * containing the results.
-	 * 
-	 * @param query
-	 *            The query to send to the database.
-	 * @param params
-	 *            The parameters of the query.
-	 * 
+	 *
+	 * @param query  The query to send to the database.
+	 * @param params The parameters of the query.
 	 * @return A {@link SQLResultSet} containing the results
-	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
-	 * @throws InterruptedException 
-	 * 
+	 * @throws InterruptedException
 	 * @see net.KabOOm356.Database.DatabaseHandler#preparedQuery(String,
-	 *      ArrayList)
+	 * ArrayList)
 	 */
 	public SQLResultSet preparedSQLQuery(final String query, final ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
 		ResultSet resultSet = null;
@@ -124,16 +115,13 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 
 	/**
 	 * Returns the {@link Database}'s column meta data.
-	 * 
-	 * @param table
-	 *            The name of the table to get the meta data for.
-	 * 
+	 *
+	 * @param table The name of the table to get the meta data for.
 	 * @return An {@link SQLResultSet} containing the database's column meta
-	 *         data.
-	 * 
+	 * data.
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public SQLResultSet getSQLColumnMetaData(final String table) throws ClassNotFoundException, SQLException, InterruptedException {
 		ResultSet resultSet = null;
@@ -161,16 +149,11 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 	/**
 	 * Performs an SQL query on the database that returns a {@link SQLResultSet}
 	 * containing the results.
-	 * 
-	 * @param connectionId
-	 *            The id of the connection to execute on.
-	 * @param query
-	 *            The query to send to the database.
-	 * 
+	 *
+	 * @param connectionId The id of the connection to execute on.
+	 * @param query        The query to send to the database.
 	 * @return A {@link SQLResultSet} containing the results
-	 * 
 	 * @throws SQLException
-	 * 
 	 * @see net.KabOOm356.Database.DatabaseHandler#query(Integer, String)
 	 */
 	public SQLResultSet sqlQuery(final int connectionId, final String query) throws SQLException {
@@ -197,20 +180,14 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 	/**
 	 * Performs an SQL query on the database that returns a {@link SQLResultSet}
 	 * containing the results.
-	 * 
-	 * @param connectionId
-	 *            The id of the connection to execute on.
-	 * @param query
-	 *            The query to send to the database.
-	 * @param params
-	 *            The parameters of the query.
-	 * 
+	 *
+	 * @param connectionId The id of the connection to execute on.
+	 * @param query        The query to send to the database.
+	 * @param params       The parameters of the query.
 	 * @return A {@link SQLResultSet} containing the results
-	 * 
 	 * @throws SQLException
-	 * 
 	 * @see net.KabOOm356.Database.DatabaseHandler#preparedQuery(Integer, String,
-	 *      ArrayList)
+	 * ArrayList)
 	 */
 	public SQLResultSet preparedSQLQuery(final int connectionId, final String query, final ArrayList<String> params) throws SQLException {
 		ResultSet resultSet = null;
@@ -235,15 +212,11 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 
 	/**
 	 * Returns the {@link Database}'s column meta data.
-	 * 
-	 * @param connectionId
-	 *            The id of the connection to execute on.
-	 * @param table
-	 *            The name of the table to get the meta data for.
-	 * 
+	 *
+	 * @param connectionId The id of the connection to execute on.
+	 * @param table        The name of the table to get the meta data for.
 	 * @return An {@link SQLResultSet} containing the database's column meta
-	 *         data.
-	 * 
+	 * data.
 	 * @throws SQLException
 	 */
 	public SQLResultSet getSQLColumnMetaData(final int connectionId, final String table) throws SQLException {

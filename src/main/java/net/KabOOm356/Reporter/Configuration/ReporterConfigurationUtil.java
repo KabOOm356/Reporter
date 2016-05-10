@@ -22,8 +22,8 @@ public class ReporterConfigurationUtil {
 	 * Initializes the Reporter configuration file by extracting the file if it does not exist and then attempts to load it.
 	 *
 	 * @param defaultConfigurationFile URL pointing to the default configuration file.
-	 * @param dataFolder    The parent directory to save the configuration file.
-	 * @param configuration A {@link FileConfiguration} that will be loaded with the configuration file.
+	 * @param dataFolder               The parent directory to save the configuration file.
+	 * @param configuration            A {@link FileConfiguration} that will be loaded with the configuration file.
 	 */
 	public static void initConfiguration(final URL defaultConfigurationFile, final File dataFolder, final FileConfiguration configuration) {
 		final File configFile = new File(dataFolder, "config.yml");

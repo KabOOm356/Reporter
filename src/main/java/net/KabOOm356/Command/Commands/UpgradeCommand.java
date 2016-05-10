@@ -18,58 +18,71 @@ import java.util.ArrayList;
 /**
  * A {@link ReporterCommand} that will handle upgrading a report's priority.
  */
-public class UpgradeCommand extends ReporterCommand
-{
+public class UpgradeCommand extends ReporterCommand {
 	private static final Logger log = LogManager.getLogger(UpgradeCommand.class);
-	
+
 	private static final String name = "Upgrade";
-	private static int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.move";
-	
+	private static int minimumNumberOfArguments = 1;
+
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public UpgradeCommand(ReporterCommandManager manager)
-	{
+	public UpgradeCommand(ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-		
+
 		updateDocumentation();
 	}
-	
+
+	/**
+	 * Returns the name of this command.
+	 *
+	 * @return The name of this command.
+	 */
+	public static String getCommandName() {
+		return name;
+	}
+
+	/**
+	 * Returns the permission node of this command.
+	 *
+	 * @return The permission node of this command.
+	 */
+	public static String getCommandPermissionNode() {
+		return permissionNode;
+	}
+
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args)
-	{
+	public void execute(CommandSender sender, ArrayList<String> args) {
 		try {
-			if(!hasRequiredPermission(sender))
+			if (!hasRequiredPermission(sender))
 				return;
-			
+
 			int index = Util.parseInt(args.get(0));
-			
-			if(args.get(0).equalsIgnoreCase("last"))
-			{
-				if(!hasRequiredLastViewed(sender))
+
+			if (args.get(0).equalsIgnoreCase("last")) {
+				if (!hasRequiredLastViewed(sender))
 					return;
-				
+
 				index = getLastViewed(sender);
 			}
-			
-			if(!getManager().isReportIndexValid(sender, index))
+
+			if (!getManager().isReportIndexValid(sender, index))
 				return;
-			
-			if(!getManager().canAlterReport(sender, index))
+
+			if (!getManager().canAlterReport(sender, index))
 				return;
-			
+
 			final ModLevel newPriority = getNextPriorityLevel(index);
-			if(newPriority == ModLevel.UNKNOWN)
-			{
+			if (newPriority == ModLevel.UNKNOWN) {
 				String output = getManager().getLocale().getString(UpgradePhrases.reportIsAtHighestPriority);
 				output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.RED);
 				sender.sendMessage(ChatColor.RED + output);
 				return;
 			}
-			
+
 			// Get MoveCommand and let it take care of moving the report to the new priority.
 			final MoveCommand move = (MoveCommand) getManager().getCommand("Move");
 			move.moveReport(sender, index, newPriority);
@@ -78,11 +91,10 @@ public class UpgradeCommand extends ReporterCommand
 			sender.sendMessage(getErrorMessage());
 		}
 	}
-	
-	private ModLevel getNextPriorityLevel(int index) throws ClassNotFoundException, SQLException, InterruptedException
-	{
+
+	private ModLevel getNextPriorityLevel(int index) throws ClassNotFoundException, SQLException, InterruptedException {
 		String query = "SELECT Priority FROM Reports WHERE ID=" + index;
-		
+
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId;
 		try {
@@ -97,7 +109,7 @@ public class UpgradeCommand extends ReporterCommand
 		try {
 			final SQLResultSet result = database.sqlQuery(connectionId, query);
 			final int currentPriorityLevel = result.getInt("Priority");
-			return ModLevel.getByLevel(currentPriorityLevel+1);
+			return ModLevel.getByLevel(currentPriorityLevel + 1);
 		} catch (final SQLException e) {
 			log.error(String.format("Failed to execute query to get next highest priority on connection [%s]!", connectionId));
 			throw e;
@@ -107,30 +119,9 @@ public class UpgradeCommand extends ReporterCommand
 	}
 
 	@Override
-	public void updateDocumentation()
-	{
+	public void updateDocumentation() {
 		super.updateDocumentation(
 				getManager().getLocale().getString(UpgradePhrases.upgradeHelp),
 				getManager().getLocale().getString(UpgradePhrases.upgradeHelpDetails));
-	}
-	
-	/**
-	 * Returns the name of this command.
-	 * 
-	 * @return The name of this command.
-	 */
-	public static String getCommandName()
-	{
-		return name;
-	}
-	
-	/**
-	 * Returns the permission node of this command.
-	 * 
-	 * @return The permission node of this command.
-	 */
-	public static String getCommandPermissionNode()
-	{
-		return permissionNode;
 	}
 }

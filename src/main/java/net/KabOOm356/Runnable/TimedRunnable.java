@@ -10,10 +10,10 @@ import org.apache.logging.log4j.Logger;
  */
 public abstract class TimedRunnable implements Runnable {
 	private static final Logger log = LogManager.getLogger(TimedRunnable.class);
-	
+
 	private Long startTime = null;
 	private Long endTime = null;
-	
+
 	/**
 	 * This method should be called when the thread begins executing.
 	 */
@@ -23,7 +23,7 @@ public abstract class TimedRunnable implements Runnable {
 			log.log(Level.INFO, "Starting execution of " + getClass().getName());
 		}
 	}
-	
+
 	/**
 	 * This method should be called when the thread finishes executing.
 	 */
@@ -35,30 +35,29 @@ public abstract class TimedRunnable implements Runnable {
 			log.log(Level.INFO, message.toString());
 		}
 	}
-	
+
 	/**
 	 * Returns the time this thread began executing.
-	 * 
+	 *
 	 * @return The time this thread began executing if {@link #start()} was called, otherwise null.
 	 */
 	public Long getStartTime() {
 		return startTime;
 	}
-	
+
 	/**
 	 * Returns the time this thread finished executing.
-	 * 
+	 *
 	 * @return The time this thread finished execution if {@link #end()} was called, otherwise null.
 	 */
 	public Long getEndTime() {
 		return endTime;
 	}
-	
+
 	/**
 	 * Returns the amount of time this thread took to execute.
-	 * 
+	 *
 	 * @return The amount of time this thread took to execute.
-	 * 
 	 * @throws IllegalArgumentException If {@link #start()} or {@link #end()} was not called.
 	 */
 	public Long getExecutionTime() {

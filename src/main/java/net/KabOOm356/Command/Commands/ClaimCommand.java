@@ -22,70 +22,83 @@ import java.util.Date;
 /**
  * A {@link ReporterCommand} to handle players claiming reports.
  */
-public class ClaimCommand extends ReporterCommand
-{
+public class ClaimCommand extends ReporterCommand {
 	private static final Logger log = LogManager.getLogger(ClaimCommand.class);
-	
+
 	private static final String name = "Claim";
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.claim";
-	
+
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public ClaimCommand(ReporterCommandManager manager)
-	{
+	public ClaimCommand(ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-		
+
 		updateDocumentation();
 	}
 
+	/**
+	 * Returns the name of this command.
+	 *
+	 * @return The name of this command.
+	 */
+	public static String getCommandName() {
+		return name;
+	}
+
+	/**
+	 * Returns the permission node of this command.
+	 *
+	 * @return The permission node of this command.
+	 */
+	public static String getCommandPermissionNode() {
+		return permissionNode;
+	}
+
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args)
-	{
+	public void execute(CommandSender sender, ArrayList<String> args) {
 		try {
-			if(!hasRequiredPermission(sender))
+			if (!hasRequiredPermission(sender))
 				return;
-			
+
 			int index = Util.parseInt(args.get(0));
-			if(args.get(0).equalsIgnoreCase("last"))
-			{
-				if(!hasRequiredLastViewed(sender))
+			if (args.get(0).equalsIgnoreCase("last")) {
+				if (!hasRequiredLastViewed(sender))
 					return;
-				
+
 				index = getLastViewed(sender);
 			}
-			
-			if(!getManager().isReportIndexValid(sender, index))
+
+			if (!getManager().isReportIndexValid(sender, index))
 				return;
-			
-			if(!getManager().canAlterReport(sender, index))
+
+			if (!getManager().canAlterReport(sender, index))
 				return;
-			
+
 			claimReport(sender, index);
-		} catch(final Exception e) {
+		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to claim report!", e);
 			sender.sendMessage(getErrorMessage());
 		}
 	}
-	
-	private void claimReport(CommandSender sender, int index) throws ClassNotFoundException, SQLException, InterruptedException
-	{
+
+	private void claimReport(CommandSender sender, int index) throws ClassNotFoundException, SQLException, InterruptedException {
 		ArrayList<String> params = new ArrayList<String>();
-		
+
 		params.add("1");
 		params.add(BukkitUtil.getUUIDString(sender));
 		params.add(sender.getName());
 		params.add(Integer.toString(getManager().getModLevel(sender).getLevel()));
 		params.add(Reporter.getDateformat().format(new Date()));
 		params.add(Integer.toString(index));
-		
+
 		String query = "UPDATE Reports " +
 				"SET ClaimStatus=?, ClaimedByUUID=?, ClaimedBy=?, ClaimPriority=?, ClaimDate=? " +
 				"WHERE ID=?";
-		
+
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
@@ -95,17 +108,16 @@ public class ClaimCommand extends ReporterCommand
 		} finally {
 			database.closeConnection(connectionId);
 		}
-		
+
 		String output = getManager().getLocale().getString(ClaimPhrases.reportClaimSuccess);
-		
+
 		output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.WHITE);
-		 
+
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
-		
-		if(BukkitUtil.isOfflinePlayer(sender))
-		{
+
+		if (BukkitUtil.isOfflinePlayer(sender)) {
 			OfflinePlayer senderPlayer = (OfflinePlayer) sender;
-		
+
 			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.CLAIMED);
 		}
 	}
@@ -115,30 +127,9 @@ public class ClaimCommand extends ReporterCommand
 	 * <br/>
 	 * This should be called after the locale has changed.
 	 */
-	public void updateDocumentation()
-	{
+	public void updateDocumentation() {
 		super.updateDocumentation(
 				getManager().getLocale().getString(ClaimPhrases.claimHelp),
 				getManager().getLocale().getString(ClaimPhrases.claimHelpDetails));
-	}
-	
-	/**
-	 * Returns the name of this command.
-	 * 
-	 * @return The name of this command.
-	 */
-	public static String getCommandName()
-	{
-		return name;
-	}
-	
-	/**
-	 * Returns the permission node of this command.
-	 * 
-	 * @return The permission node of this command.
-	 */
-	public static String getCommandPermissionNode()
-	{
-		return permissionNode;
 	}
 }

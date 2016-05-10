@@ -81,7 +81,7 @@ public class UrlIO {
 		if (!isResponseValid(connection)) {
 			throw new IOException(String.format("Connection response [%d] is not valid!", connection.getResponseCode()));
 		}
-		
+
 		BufferedReader in = null;
 		BufferedWriter out = null;
 

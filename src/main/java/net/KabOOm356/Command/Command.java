@@ -19,36 +19,35 @@ import java.util.ArrayList;
 /**
  * Abstract Command class.
  */
-public abstract class Command extends TimedRunnable implements RunnableWithState
-{
+public abstract class Command extends TimedRunnable implements RunnableWithState {
 	private static final Logger log = LogManager.getLogger(Command.class);
-	
+
 	private ReporterCommandManager manager;
-	
+
 	private boolean isRunning = false;
 	private boolean isPendingToRun = false;
 	private boolean hasRun = false;
-	
+
 	private CommandSender sender = null;
 	private ArrayList<String> arguments = null;
-	
+
 	private String name;
 	private String permissionNode;
-	
+
 	private ArrayList<String> aliases;
-	
+
 	private ArrayList<ObjectPair<String, String>> usages;
-	
+
 	private int minimumNumberOfArguments;
-	
+
 	/**
 	 * Constructor.
-	 * 
-	 * @param manager The {@link ReporterCommandManager} that is managing this command.
-	 * @param commandName The name of the command.
-	 * @param commandUsage The usage of the command.
-	 * @param commandDescription A description of the command.
-	 * @param commandPermissionNode The permission node required to run this command.
+	 *
+	 * @param manager                  The {@link ReporterCommandManager} that is managing this command.
+	 * @param commandName              The name of the command.
+	 * @param commandUsage             The usage of the command.
+	 * @param commandDescription       A description of the command.
+	 * @param commandPermissionNode    The permission node required to run this command.
 	 * @param minimumNumberOfArguments The minimum number of required arguments to run this command.
 	 */
 	protected Command(
@@ -57,215 +56,191 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 			String commandUsage,
 			String commandDescription,
 			String commandPermissionNode,
-			int minimumNumberOfArguments)
-	{
+			int minimumNumberOfArguments) {
 		this.manager = manager;
-		
+
 		this.name = commandName;
 		this.permissionNode = commandPermissionNode;
-		
+
 		this.minimumNumberOfArguments = minimumNumberOfArguments;
-		
+
 		this.aliases = new ArrayList<String>();
-		
+
 		this.usages = new ArrayList<ObjectPair<String, String>>();
-		
+
 		ObjectPair<String, String> entry = new ObjectPair<String, String>(commandUsage, commandDescription);
-		
+
 		updateDocumentation(entry);
 	}
-	
+
 	/**
 	 * Constructor.
-	 * 
-	 * @param manager The {@link ReporterCommandManager} that is managing this command.
-	 * @param commandName The name of the command.
-	 * @param commandPermissionNode The permission node required to run this command.
+	 *
+	 * @param manager                  The {@link ReporterCommandManager} that is managing this command.
+	 * @param commandName              The name of the command.
+	 * @param commandPermissionNode    The permission node required to run this command.
 	 * @param minimumNumberOfArguments The minimum number of required arguments to run this command.
 	 */
 	protected Command(
 			ReporterCommandManager manager,
 			String commandName,
 			String commandPermissionNode,
-			int minimumNumberOfArguments)
-	{
+			int minimumNumberOfArguments) {
 		this.manager = manager;
-		
+
 		this.name = commandName;
 		this.permissionNode = commandPermissionNode;
-		
+
 		this.minimumNumberOfArguments = minimumNumberOfArguments;
-		
+
 		this.aliases = new ArrayList<String>();
-		
+
 		this.usages = new ArrayList<ObjectPair<String, String>>();
 	}
-	
+
 	/**
 	 * Executes this command.
-	 * 
+	 *
 	 * @param sender The {@link CommandSender} whom is executing this command.
-	 * @param args The given arguments from the {@link CommandSender}.
+	 * @param args   The given arguments from the {@link CommandSender}.
 	 */
 	public abstract void execute(CommandSender sender, ArrayList<String> args);
-	
+
 	/**
 	 * Updates the documentation for the command.
 	 * <br/>
 	 * This should be called after the locale has changed.
-	 * 
-	 * @param usage The usage of the command.
+	 *
+	 * @param usage       The usage of the command.
 	 * @param description A description of the command.
 	 */
-	protected void updateDocumentation(String usage, String description)
-	{
+	protected void updateDocumentation(String usage, String description) {
 		this.usages.clear();
-		
+
 		ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
-		
+
 		this.usages.add(entry);
 	}
-	
+
 	/**
 	 * Updates the documentation for the command.
 	 * <br/>
 	 * This should be called after the locale has changed.
-	 * 
+	 *
 	 * @param usage The usage and description for the command.
 	 */
-	protected void updateDocumentation(ObjectPair<String, String> usage)
-	{
+	protected void updateDocumentation(ObjectPair<String, String> usage) {
 		this.usages.clear();
-		
+
 		this.usages.add(usage);
 	}
-	
+
 	/**
 	 * Checks if the given {@link Player} has permission to run this command, or is OP.
-	 * 
+	 *
 	 * @param player The {@link Player} to check.
-	 * 
 	 * @return True if the {@link Player} has permission or is OP, otherwise false.
 	 */
-	public boolean hasPermission(Player player)
-	{
+	public boolean hasPermission(Player player) {
 		return this.hasPermission(player, permissionNode);
 	}
-	
+
 	/**
 	 * Checks if the given {@link Player} has the given permission node, or is OP.
-	 * 
+	 *
 	 * @param player The {@link Player} to check.
-	 * @param perm The permission node to check.
-	 * 
+	 * @param perm   The permission node to check.
 	 * @return True if the {@link Player} has the permission node or is OP, otherwise false.
 	 */
-	public boolean hasPermission(Player player, String perm)
-	{
+	public boolean hasPermission(Player player, String perm) {
 		return manager.hasPermission(player, perm);
 	}
-	
+
 	/**
 	 * Checks if the given {@link CommandSender} has permission to run this command, or is OP.
-	 * 
+	 *
 	 * @param sender The {@link CommandSender} to check.
-	 * 
 	 * @return True if the {@link CommandSender} has permission or is OP, otherwise false.
 	 */
-	public boolean hasPermission(CommandSender sender)
-	{
-		if(BukkitUtil.isPlayer(sender))
-		{
-			Player player = (Player)sender;
-			if(!hasPermission(player))
+	public boolean hasPermission(CommandSender sender) {
+		if (BukkitUtil.isPlayer(sender)) {
+			Player player = (Player) sender;
+			if (!hasPermission(player))
 				return false;
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Checks if the given {@link CommandSender} has permission to run this command and alerts them if they do not.
-	 * 
+	 *
 	 * @param sender The {@link CommandSender} to check.
-	 * 
 	 * @return True if the {@link CommandSender} has permission or is OP, otherwise false.
 	 */
-	public boolean hasRequiredPermission(CommandSender sender)
-	{
-		if(!hasPermission(sender))
-		{
+	public boolean hasRequiredPermission(CommandSender sender) {
+		if (!hasPermission(sender)) {
 			sender.sendMessage(getFailedPermissionsMessage());
 			return false;
 		}
 		return true;
 	}
-	
-	protected ReporterCommandManager getManager()
-	{
+
+	protected ReporterCommandManager getManager() {
 		return manager;
 	}
 
-	public String getName()
-	{
+	public String getName() {
 		return name;
 	}
 
-	public String getPermissionNode()
-	{
+	public String getPermissionNode() {
 		return permissionNode;
 	}
-	
-	public ArrayList<String> getAliases()
-	{
+
+	public ArrayList<String> getAliases() {
 		return aliases;
 	}
-	
-	public ArrayList<ObjectPair<String,String>> getUsages()
-	{
+
+	public ArrayList<ObjectPair<String, String>> getUsages() {
 		return usages;
 	}
-	
-	public String getUsage()
-	{
+
+	public String getUsage() {
 		return usages.get(0).getKey();
 	}
-	
-	public String getDescription()
-	{
+
+	public String getDescription() {
 		return usages.get(0).getValue();
 	}
-	
-	public String getErrorMessage()
-	{
+
+	public String getErrorMessage() {
 		return ChatColor.BLUE + Reporter.getLogPrefix() +
 				ChatColor.RED + manager.getLocale().getString(GeneralPhrases.error);
 	}
-	
-	public String getFailedPermissionsMessage()
-	{
+
+	public String getFailedPermissionsMessage() {
 		return ChatColor.RED + BukkitUtil.colorCodeReplaceAll(
 				manager.getLocale().getString(GeneralPhrases.failedPermissions));
 	}
-	
-	public int getMinimumNumberOfArguments()
-	{
+
+	public int getMinimumNumberOfArguments() {
 		return minimumNumberOfArguments;
 	}
-	
+
 	public void setSender(final CommandSender sender) {
 		if (isRunning || isPendingToRun) {
 			throw new IllegalArgumentException("The current command is in-flight and should not be modified!");
 		}
 		this.sender = sender;
 	}
-	
+
 	public void setArguments(final ArrayList<String> arguments) {
 		if (isRunning || isPendingToRun) {
 			throw new IllegalArgumentException("The current command is in-flight and should not be modified!");
 		}
 		this.arguments = arguments;
 	}
-	
+
 	public Command getRunnableClone(final CommandSender sender, final ArrayList<String> arguments) throws Exception {
 		try {
 			final Class<? extends Command> clazz = this.getClass();
@@ -280,7 +255,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 			throw e;
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		Validate.notNull(sender);
@@ -296,7 +271,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 			end();
 		}
 	}
-	
+
 	@Override
 	public boolean isRunning() {
 		return isRunning;
@@ -316,7 +291,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	public boolean hasRun() {
 		return hasRun;
 	}
-	
+
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();

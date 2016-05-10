@@ -3,65 +3,58 @@ package net.KabOOm356.Manager.Messager.Messages;
 /**
  * A class that represents a message.
  */
-public abstract class Message
-{
+public abstract class Message {
 	/**
 	 * The message.
 	 */
 	private String message;
-	
+
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param message The message.
 	 */
-	public Message(String message)
-	{
+	public Message(String message) {
 		this.message = message;
 	}
-	
+
 	/**
 	 * Returns the message.
-	 * 
+	 *
 	 * @return The message.
 	 */
-	public String getMessage()
-	{
+	public String getMessage() {
 		return message;
 	}
-	
+
 	/**
 	 * Sets the message to the given message.
-	 * 
+	 *
 	 * @param message The message to be set to.
 	 */
-	public void setMessage(String message)
-	{
+	public void setMessage(String message) {
 		this.message = message;
 	}
-	
+
 	/**
 	 * Checks if this message and the given messages are equal.
-	 * 
+	 *
 	 * @param message The message to compare to.
-	 * 
 	 * @return True if both messages are equal.
 	 */
-	public boolean messagesEqual(Message message)
-	{
+	public boolean messagesEqual(Message message) {
 		return getMessage().equalsIgnoreCase(message.getMessage());
 	}
-	
+
 	/**
 	 * Checks if this message is empty.
-	 * 
+	 *
 	 * @return True if this message is empty, otherwise false.
 	 */
 	public abstract boolean isEmpty();
-	
+
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return "Message: " + message;
 	}
 }

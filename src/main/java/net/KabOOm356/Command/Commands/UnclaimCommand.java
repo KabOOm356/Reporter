@@ -25,47 +25,61 @@ import java.util.UUID;
 /**
  * A {@link ReporterCommand} that will handle unclaiming reports.
  */
-public class UnclaimCommand extends ReporterCommand
-{
+public class UnclaimCommand extends ReporterCommand {
 	private static final Logger log = LogManager.getLogger(UnclaimCommand.class);
-	
+
 	private static final String name = "Unclaim";
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.claim";
-	
+
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public UnclaimCommand(ReporterCommandManager manager)
-	{
+	public UnclaimCommand(ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-		
+
 		updateDocumentation();
 	}
 
+	/**
+	 * Returns the name of this command.
+	 *
+	 * @return The name of this command.
+	 */
+	public static String getCommandName() {
+		return name;
+	}
+
+	/**
+	 * Returns the permission node of this command.
+	 *
+	 * @return The permission node of this command.
+	 */
+	public static String getCommandPermissionNode() {
+		return permissionNode;
+	}
+
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args)
-	{
+	public void execute(CommandSender sender, ArrayList<String> args) {
 		try {
-			if(!hasRequiredPermission(sender))
+			if (!hasRequiredPermission(sender))
 				return;
-			
+
 			int index = Util.parseInt(args.get(0));
-			
-			if(args.get(0).equalsIgnoreCase("last"))
-			{
-				if(!hasRequiredLastViewed(sender))
+
+			if (args.get(0).equalsIgnoreCase("last")) {
+				if (!hasRequiredLastViewed(sender))
 					return;
-				
+
 				index = getLastViewed(sender);
 			}
-			
-			if(!getManager().isReportIndexValid(sender, index))
+
+			if (!getManager().isReportIndexValid(sender, index))
 				return;
-			
-			if(canUnclaimReport(sender, index)) {
+
+			if (canUnclaimReport(sender, index)) {
 				unclaimReport(sender, index);
 			}
 		} catch (final Exception e) {
@@ -73,73 +87,62 @@ public class UnclaimCommand extends ReporterCommand
 			sender.sendMessage(getErrorMessage());
 		}
 	}
-	
-	private boolean canUnclaimReport(CommandSender sender, int index) throws ClassNotFoundException, SQLException, InterruptedException
-	{
+
+	private boolean canUnclaimReport(CommandSender sender, int index) throws ClassNotFoundException, SQLException, InterruptedException {
 		final String query = "SELECT ClaimStatus, ClaimedByUUID, ClaimedBy FROM Reports WHERE ID=" + index;
-		
+
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
 			SQLResultSet result = database.sqlQuery(connectionId, query);
-			
-			if(result.getBoolean("ClaimStatus"))
-			{
+
+			if (result.getBoolean("ClaimStatus")) {
 				boolean senderIsClaimingPlayer = false;
 				OfflinePlayer claimingPlayer = null;
-				
+
 				// Do UUID player comparison.
-				if(!result.getString("ClaimedByUUID").isEmpty())
-				{
+				if (!result.getString("ClaimedByUUID").isEmpty()) {
 					UUID uuid = UUID.fromString(result.getString("ClaimedByUUID"));
-					
+
 					claimingPlayer = Bukkit.getPlayer(uuid);
-					
-					if(BukkitUtil.isPlayer(sender))
-					{
+
+					if (BukkitUtil.isPlayer(sender)) {
 						Player senderPlayer = (Player) sender;
-						
-						if(senderPlayer.getUniqueId().equals(claimingPlayer.getUniqueId()))
-						{
+
+						if (senderPlayer.getUniqueId().equals(claimingPlayer.getUniqueId())) {
 							senderIsClaimingPlayer = true;
 						}
 					}
-				}
-				else // Do name based player comparison.
+				} else // Do name based player comparison.
 				{
-					if(sender.getName().equals(result.getString("ClaimedBy")))
-					{
+					if (sender.getName().equals(result.getString("ClaimedBy"))) {
 						senderIsClaimingPlayer = true;
 					}
 				}
-				
-				if(!senderIsClaimingPlayer)
-				{
+
+				if (!senderIsClaimingPlayer) {
 					String output = getManager().getLocale().getString(UnclaimPhrases.reportAlreadyClaimed);
-					
+
 					String claimedBy = result.getString("ClaimedBy");
-					
-					if(claimingPlayer != null)
-					{
+
+					if (claimingPlayer != null) {
 						claimedBy = BukkitUtil.formatPlayerName(claimingPlayer);
 					}
-					
+
 					output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.RED);
 					output = output.replaceAll("%c", ChatColor.BLUE + claimedBy + ChatColor.RED);
-					
+
 					sender.sendMessage(ChatColor.RED + output);
-					
+
 					return false;
 				}
-			}
-			else
-			{
+			} else {
 				String output = getManager().getLocale().getString(UnclaimPhrases.reportIsNotClaimed);
-				
+
 				output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.RED);
-				
+
 				sender.sendMessage(ChatColor.RED + output);
-				
+
 				return false;
 			}
 		} catch (final SQLException e) {
@@ -148,17 +151,16 @@ public class UnclaimCommand extends ReporterCommand
 		} finally {
 			database.closeConnection(connectionId);
 		}
-		
+
 		return true;
 	}
-	
-	private void unclaimReport(CommandSender sender, int index) throws ClassNotFoundException, SQLException, InterruptedException
-	{
+
+	private void unclaimReport(CommandSender sender, int index) throws ClassNotFoundException, SQLException, InterruptedException {
 		String query = "UPDATE Reports " +
 				"SET " +
 				"ClaimStatus=0, ClaimedByUUID='', ClaimedBy='', ClaimPriority=0, ClaimDate='' " +
 				"WHERE ID=" + index;
-		
+
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
@@ -169,50 +171,28 @@ public class UnclaimCommand extends ReporterCommand
 		} finally {
 			database.closeConnection(connectionId);
 		}
-		
+
 		String output = getManager().getLocale().getString(UnclaimPhrases.reportUnclaimSuccess);
-		
+
 		output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.WHITE);
-		
+
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
-		
-		if(BukkitUtil.isOfflinePlayer(sender))
-		{
+
+		if (BukkitUtil.isOfflinePlayer(sender)) {
 			OfflinePlayer senderPlayer = (OfflinePlayer) sender;
-		
+
 			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.UNCLAIMED);
 		}
 	}
-	
+
 	/**
 	 * Updates the documentation for the command.
 	 * <br/>
 	 * This should be called after the locale has changed.
 	 */
-	public void updateDocumentation()
-	{
+	public void updateDocumentation() {
 		super.updateDocumentation(
 				getManager().getLocale().getString(UnclaimPhrases.unclaimHelp),
 				getManager().getLocale().getString(UnclaimPhrases.unclaimHelpDetails));
-	}
-	
-	/**
-	 * Returns the name of this command.
-	 * 
-	 * @return The name of this command.
-	 */
-	public static String getCommandName()
-	{
-		return name;
-	}
-	
-	/**
-	 * Returns the permission node of this command.
-	 * 
-	 * @return The permission node of this command.
-	 */
-	public static String getCommandPermissionNode()
-	{
-		return permissionNode;
 	}
 }

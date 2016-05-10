@@ -43,6 +43,24 @@ public class AssignCommand extends ReporterCommand {
 		updateDocumentation();
 	}
 
+	/**
+	 * Returns the name of this command.
+	 *
+	 * @return The name of this command.
+	 */
+	public static String getCommandName() {
+		return name;
+	}
+
+	/**
+	 * Returns the permission node of this command.
+	 *
+	 * @return The permission node of this command.
+	 */
+	public static String getCommandPermissionNode() {
+		return permissionNode;
+	}
+
 	@Override
 	public void execute(final CommandSender sender, final ArrayList<String> args) {
 		try {
@@ -184,23 +202,5 @@ public class AssignCommand extends ReporterCommand {
 		super.updateDocumentation(
 				getManager().getLocale().getString(AssignPhrases.assignHelp),
 				getManager().getLocale().getString(AssignPhrases.assignHelpDetails));
-	}
-
-	/**
-	 * Returns the name of this command.
-	 *
-	 * @return The name of this command.
-	 */
-	public static String getCommandName() {
-		return name;
-	}
-
-	/**
-	 * Returns the permission node of this command.
-	 *
-	 * @return The permission node of this command.
-	 */
-	public static String getCommandPermissionNode() {
-		return permissionNode;
 	}
 }

@@ -15,20 +15,18 @@ import java.util.ArrayList;
  * Handler for a {@link Database}.
  */
 public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatabaseInterface {
-	/** The {@link Database} the Handler will use. */
+	/**
+	 * The {@link Database} the Handler will use.
+	 */
 	private Database database;
 
 	/**
 	 * Connection-based database.
-	 * 
-	 * @param host
-	 *            The host where the database is located.
-	 * @param database
-	 *            The database name.
-	 * @param username
-	 *            The user to connect with.
-	 * @param password
-	 *            The password for the user.
+	 *
+	 * @param host                 The host where the database is located.
+	 * @param database             The database name.
+	 * @param username             The user to connect with.
+	 * @param password             The password for the user.
 	 * @param connectionPoolConfig The configuration for the connection pool.
 	 */
 	public DatabaseHandler(final String host, final String database, final String username, final String password, final ConnectionPoolConfig connectionPoolConfig) {
@@ -37,15 +35,11 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 
 	/**
 	 * File-based database.
-	 * 
-	 * @param type
-	 *            The type of database.
-	 * @param path
-	 *            The path to the file.
-	 * @param name
-	 *            The name of the file.
+	 *
+	 * @param type                 The type of database.
+	 * @param path                 The path to the file.
+	 * @param name                 The name of the file.
 	 * @param connectionPoolConfig The configuration for the connection pool.
-	 * 
 	 * @throws IOException
 	 */
 	public DatabaseHandler(DatabaseType type, String path, String name, final ConnectionPoolConfig connectionPoolConfig) throws IOException {
@@ -65,9 +59,8 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 
 	/**
 	 * Constructor.
-	 * 
-	 * @param database
-	 *            The {@link Database} to be used.
+	 *
+	 * @param database The {@link Database} to be used.
 	 */
 	public DatabaseHandler(Database database) {
 		this.database = database;
@@ -89,7 +82,7 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 	public void closeConnection() {
 		database.closeConnection();
 	}
-	
+
 	@Override
 	public void closeConnections() {
 		database.closeConnections();
@@ -97,7 +90,7 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 
 	/**
 	 * Returns if the current database type is SQLite.
-	 * 
+	 *
 	 * @return True if the current database type is SQLite, otherwise false.
 	 */
 	public boolean usingSQLite() {
@@ -106,7 +99,7 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 
 	/**
 	 * Returns if the current database type is MySQL.
-	 * 
+	 *
 	 * @return True if the current database type is MySQL, otherwise false.
 	 */
 	public boolean usingMySQL() {

@@ -19,16 +19,26 @@ import java.util.Random;
  */
 public class Database implements DatabaseInterface, ConnectionPooledDatabaseInterface, ConnectionPoolManager {
 	private static final Logger log = LogManager.getLogger(Database.class);
-	/** A random number generator for generating connection ids. */
+	/**
+	 * A random number generator for generating connection ids.
+	 */
 	private static final Random idGenerator = new Random();
 
-	/** The {@link DatabaseType} representation of the type of this database. */
+	/**
+	 * The {@link DatabaseType} representation of the type of this database.
+	 */
 	private final DatabaseType databaseType;
-	/** The database driver represented as a String. */
+	/**
+	 * The database driver represented as a String.
+	 */
 	private final String databaseDriver;
-	/** The URL to the database as a String. */
+	/**
+	 * The URL to the database as a String.
+	 */
 	private final String connectionURL;
-	/** The pool of connections. */
+	/**
+	 * The pool of connections.
+	 */
 	private final HashMap<Integer, ConnectionWrapper> connectionPool;
 	private final ConnectionPoolConfig connectionPoolConfig;
 	/**
@@ -38,13 +48,10 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 
 	/**
 	 * Database Constructor.
-	 * 
-	 * @param databaseType
-	 *            The {@link DatabaseType} that is being constructed.
-	 * @param databaseDriver
-	 *            The driver to use for the connection to the database.
-	 * @param connectionURL
-	 *            The URL of the database to connect to.
+	 *
+	 * @param databaseType   The {@link DatabaseType} that is being constructed.
+	 * @param databaseDriver The driver to use for the connection to the database.
+	 * @param connectionURL  The URL of the database to connect to.
 	 */
 	public Database(final DatabaseType databaseType, final String databaseDriver, final String connectionURL, final ConnectionPoolConfig connectionPoolConfig) {
 		Validate.notNull(connectionPoolConfig, "Parameter 'connectionPoolConfig' cannot be null!");
@@ -71,7 +78,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	public synchronized int openPooledConnection() throws ClassNotFoundException, SQLException, InterruptedException {
 		return openPooledConnection(null, null);
 	}
-	
+
 	private boolean isConnectionSlotAvailable() {
 		// A connection slot is available if the size of the pool is less than the max number of connections allowed
 		boolean isConnectionSlotAvailable = connectionPool.size() < connectionPoolConfig.getMaxConnections();
@@ -88,17 +95,13 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	/**
 	 * Attempts to open a connection to the database using a username and
 	 * password.
-	 * 
-	 * @param username
-	 *            The username to login to the database with.
-	 * @param password
-	 *            The password for the user associated with the username.
-	 * 
+	 *
+	 * @param username The username to login to the database with.
+	 * @param password The password for the user associated with the username.
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
 	 * @throws InterruptedException
-	 * @throws IllegalStateException
-	 *             Thrown if there is already a non-pooled connection open.
+	 * @throws IllegalStateException  Thrown if there is already a non-pooled connection open.
 	 */
 	protected void openConnection(final String username, final String password) throws SQLException, ClassNotFoundException, InterruptedException {
 		if (localConnectionId != null) {
@@ -113,25 +116,22 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	/**
 	 * Attempts to open a pooled connection to the database using a username and
 	 * password.
-	 * 
-	 * @param username
-	 *            The username to login to the database with.
-	 * @param password
-	 *            The password for the user associated with the username.
-	 * 
+	 *
+	 * @param username The username to login to the database with.
+	 * @param password The password for the user associated with the username.
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	protected synchronized int openPooledConnection(final String username, final String password) throws ClassNotFoundException, SQLException, InterruptedException {
 		try {
-			synchronized(connectionPool) {
+			synchronized (connectionPool) {
 				long startWaitTime = System.currentTimeMillis();
 				boolean isWaiting = false;
 				int updateCount = 0;
 				long currentWaitTime = 0;
 				// While a connection slot is unavailable
-				while(!isConnectionSlotAvailable()) {
+				while (!isConnectionSlotAvailable()) {
 					if (!isWaiting) {
 						if (log.isDebugEnabled()) {
 							log.warn("Thread has begun waiting on new connection to become available");
@@ -155,7 +155,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 					log.debug(String.format("A connection is now available in the connection pool after waiting [%dms]... proceeding!", currentWaitTime));
 				}
 			}
-		} catch(final InterruptedException e) {
+		} catch (final InterruptedException e) {
 			if (log.isDebugEnabled()) {
 				log.warn("Waiting for available connection was interrupted!");
 			}
@@ -176,7 +176,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 			final ConnectionWrapper ConnectionWrapper = new AlertingPooledConnection(this, connectionId, connection);
 			connectionPool.put(connectionId, ConnectionWrapper);
 			if (log.isDebugEnabled()) {
-				log.debug("New pooled connection created with id [" + connectionId +"]");
+				log.debug("New pooled connection created with id [" + connectionId + "]");
 				log.debug("Connection pool size [" + connectionPool.size() + "]");
 			}
 			return connectionId;
@@ -274,10 +274,10 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 			}
 		}
 	}
-	
+
 	@Override
 	public void closeConnections() {
-		if(log.isDebugEnabled()) {
+		if (log.isDebugEnabled()) {
 			log.info("Closing all connections!");
 			log.info("Current connection pool size: " + connectionPool.size());
 		}
@@ -289,7 +289,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 		for (final Integer connectionId : connectionIds) {
 			closeConnection(connectionId);
 		}
-		if(log.isDebugEnabled()) {
+		if (log.isDebugEnabled()) {
 			log.info("All connections closed!");
 		}
 	}
@@ -566,7 +566,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 			throw e;
 		}
 	}
-	
+
 	private boolean doesConnectionExist(final Integer connectionId) {
 		return connectionPool.containsKey(connectionId);
 	}
@@ -578,7 +578,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 		}
 		throw new IllegalArgumentException("Connection with connection id [" + connectionId + "] does not exist!");
 	}
-	
+
 	private void removeConnectionFromPool(final int connectionId) {
 		if (log.isDebugEnabled()) {
 			log.debug("Removing connection with id [" + connectionId + "] from connection pool");
@@ -586,7 +586,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 		if (localConnectionId != null && connectionId == localConnectionId) {
 			localConnectionId = null;
 		}
-		synchronized(connectionPool) {
+		synchronized (connectionPool) {
 			connectionPool.remove(connectionId);
 			// Notify any threads waiting to open a new connection.
 			connectionPool.notify();
@@ -595,7 +595,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 			log.debug("Current connection pool size [" + connectionPool.size() + "]");
 		}
 	}
-	
+
 	private void openNonPooledConnection() throws ClassNotFoundException, SQLException, InterruptedException {
 		if (localConnectionId == null) {
 			openConnection();

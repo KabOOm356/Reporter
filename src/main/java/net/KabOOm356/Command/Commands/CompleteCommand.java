@@ -28,70 +28,82 @@ import java.util.UUID;
 /**
  * A {@link ReporterCommand} that will handle completing reports.
  */
-public class CompleteCommand extends ReporterCommand
-{
+public class CompleteCommand extends ReporterCommand {
+	public final static Group messageGroup = new Group("Completion");
 	private static final Logger log = LogManager.getLogger(CompleteCommand.class);
-	
 	private static final String name = "Complete";
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.complete";
-	
 	private boolean sendMessage;
-	public final static Group messageGroup = new Group("Completion");
-	
+
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public CompleteCommand(ReporterCommandManager manager)
-	{
+	public CompleteCommand(ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-		
+
 		super.getAliases().add("Finish");
-		
+
 		sendMessage = getManager().getConfig().getBoolean(
 				"general.messaging.completedMessageOnLogin.completedMessageOnLogin", true);
-		
+
 		updateDocumentation();
 	}
-	
+
+	/**
+	 * Returns the name of this command.
+	 *
+	 * @return The name of this command.
+	 */
+	public static String getCommandName() {
+		return name;
+	}
+
+	/**
+	 * Returns the permission node of this command.
+	 *
+	 * @return The permission node of this command.
+	 */
+	public static String getCommandPermissionNode() {
+		return permissionNode;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args)
-	{
+	public void execute(CommandSender sender, ArrayList<String> args) {
 		try {
-			if(!hasRequiredPermission(sender))
+			if (!hasRequiredPermission(sender))
 				return;
-			
+
 			int index = Util.parseInt(args.get(0));
-			
-			if(args.get(0).equalsIgnoreCase("last"))
-			{
-				if(!hasRequiredLastViewed(sender))
+
+			if (args.get(0).equalsIgnoreCase("last")) {
+				if (!hasRequiredLastViewed(sender))
 					return;
-				
+
 				index = getLastViewed(sender);
 			}
-			
-			if(!getManager().isReportIndexValid(sender, index))
+
+			if (!getManager().isReportIndexValid(sender, index))
 				return;
-			
-			if(!getManager().canAlterReport(sender, index))
+
+			if (!getManager().canAlterReport(sender, index))
 				return;
-			
+
 			String summary = "";
-			
-			for(int LCV = 1; LCV < args.size(); LCV++)
+
+			for (int LCV = 1; LCV < args.size(); LCV++)
 				summary = summary + " " + args.get(LCV);
-			
+
 			summary = summary.trim();
-			
-			if(!isSummaryValid(sender, summary))
+
+			if (!isSummaryValid(sender, summary))
 				return;
-			
+
 			completeReport(sender, index, summary);
 			broadcastCompletedMessage(index);
 		} catch (final Exception e) {
@@ -99,9 +111,8 @@ public class CompleteCommand extends ReporterCommand
 			sender.sendMessage(getErrorMessage());
 		}
 	}
-	
-	private void completeReport(CommandSender sender, int index, String summary) throws ClassNotFoundException, SQLException, InterruptedException
-	{
+
+	private void completeReport(CommandSender sender, int index, String summary) throws ClassNotFoundException, SQLException, InterruptedException {
 		ArrayList<String> params = new ArrayList<String>(5);
 		params.add(0, "1");
 		params.add(BukkitUtil.getUUIDString(sender));
@@ -109,7 +120,7 @@ public class CompleteCommand extends ReporterCommand
 		params.add(3, Reporter.getDateformat().format(new Date()));
 		params.add(4, summary);
 		params.add(5, Integer.toString(index));
-		
+
 		String query = "UPDATE Reports " +
 				"SET CompletionStatus=?, " +
 				"CompletedByUUID=?, " +
@@ -117,7 +128,7 @@ public class CompleteCommand extends ReporterCommand
 				"CompletionDate=?, " +
 				"CompletionSummary=? " +
 				"WHERE id=?";
-		
+
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
@@ -128,66 +139,58 @@ public class CompleteCommand extends ReporterCommand
 		} finally {
 			database.closeConnection(connectionId);
 		}
-		
+
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
 				ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
 				getManager().getLocale().getString(CompletePhrases.playerComplete)));
-		
-		if(BukkitUtil.isOfflinePlayer(sender))
-		{
+
+		if (BukkitUtil.isOfflinePlayer(sender)) {
 			OfflinePlayer senderPlayer = (OfflinePlayer) sender;
-		
+
 			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.COMPLETED);
 		}
 	}
-	
-	private boolean isSummaryValid(CommandSender sender, String summary)
-	{
-		if(!summary.equalsIgnoreCase("") || getManager().getConfig().getBoolean("general.canCompleteWithoutSummary", false))
+
+	private boolean isSummaryValid(CommandSender sender, String summary) {
+		if (!summary.equalsIgnoreCase("") || getManager().getConfig().getBoolean("general.canCompleteWithoutSummary", false))
 			return true;
-		
-		sender.sendMessage(ChatColor.RED + 
+
+		sender.sendMessage(ChatColor.RED +
 				getManager().getLocale().getString(CompletePhrases.completeNoSummary));
-		
+
 		return false;
 	}
-	
-	private void broadcastCompletedMessage(int index)
-	{
+
+	private void broadcastCompletedMessage(int index) {
 		final Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
-		
+
 		String reportCompleted = BukkitUtil.colorCodeReplaceAll(
-				getManager().getLocale().getString(CompletePhrases.broadcastCompleted));	
-		
+				getManager().getLocale().getString(CompletePhrases.broadcastCompleted));
+
 		reportCompleted = reportCompleted.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.WHITE);
-		
+
 		OfflinePlayer sender = null;
-		
+
 		String playerName = null;
 		String yourReportCompleted = null;
-		
-		if(getManager().getConfig().getBoolean("general.canViewSubmittedReports", true))
-		{
+
+		if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true)) {
 			final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 			Integer connectionId = null;
-			try
-			{
+			try {
 				connectionId = database.openPooledConnection();
-				
+
 				String query = "SELECT SenderUUID, Sender FROM Reports WHERE ID=" + Integer.toString(index);
-				
+
 				SQLResultSet result = database.sqlQuery(connectionId, query);
-				
+
 				String uuidString = result.getString("SenderUUID");
-				
-				if(!uuidString.isEmpty())
-				{
+
+				if (!uuidString.isEmpty()) {
 					UUID uuid = UUID.fromString(uuidString);
 					sender = Bukkit.getOfflinePlayer(uuid);
 					playerName = sender.getName();
-				}
-				else
-				{
+				} else {
 					playerName = result.getString("Sender");
 				}
 			} catch (final Exception e) {
@@ -197,69 +200,44 @@ public class CompleteCommand extends ReporterCommand
 					database.closeConnection(connectionId);
 				}
 			}
-			
+
 			yourReportCompleted = BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(CompletePhrases.broadcastYourReportCompleted));
-			
+
 			yourReportCompleted = yourReportCompleted.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.WHITE);
 		}
-		
+
 		boolean isReporterOnline = false;
-		
-		for(final Player player : onlinePlayers) {
-			if(hasPermission(player, "reporter.list")) {
+
+		for (final Player player : onlinePlayers) {
+			if (hasPermission(player, "reporter.list")) {
 				player.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + reportCompleted);
-			} else if(playerName != null && !playerName.isEmpty() && playerName.equals(player.getName())) {
+			} else if (playerName != null && !playerName.isEmpty() && playerName.equals(player.getName())) {
 				isReporterOnline = true;
 				player.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + yourReportCompleted);
 			}
 		}
-		
-		if(sendMessage && !isReporterOnline)
-		{
-			String message = ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + 
+
+		if (sendMessage && !isReporterOnline) {
+			String message = ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE +
 					getManager().getLocale().getString(CompletePhrases.yourReportsCompleted);
-			
-			if(sender != null)
-			{
+
+			if (sender != null) {
 				getManager().getMessageManager().addMessage(sender.getUniqueId().toString(), messageGroup, message, index);
-			}
-			else if(playerName != null && !playerName.equals(""))
-			{
+			} else if (playerName != null && !playerName.equals("")) {
 				getManager().getMessageManager().addMessage(playerName, messageGroup, message, index);
 			}
 		}
 	}
-	
+
 	/**
 	 * Updates the documentation for the command.
 	 * <br/>
 	 * This should be called after the locale has changed.
 	 */
-	public void updateDocumentation()
-	{
+	public void updateDocumentation() {
 		super.updateDocumentation(
 				getManager().getLocale().getString(CompletePhrases.completeHelp),
 				getManager().getLocale().getString(CompletePhrases.completeHelpDetails));
-	}
-	
-	/**
-	 * Returns the name of this command.
-	 * 
-	 * @return The name of this command.
-	 */
-	public static String getCommandName()
-	{
-		return name;
-	}
-	
-	/**
-	 * Returns the permission node of this command.
-	 * 
-	 * @return The permission node of this command.
-	 */
-	public static String getCommandPermissionNode()
-	{
-		return permissionNode;
 	}
 }

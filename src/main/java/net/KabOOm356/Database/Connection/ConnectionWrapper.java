@@ -10,16 +10,16 @@ import java.util.concurrent.Executor;
  */
 public abstract class ConnectionWrapper implements Connection {
 	private final Connection connection;
-	
+
 	public ConnectionWrapper(final Connection connection) {
 		this.connection = connection;
 	}
-	
+
 	@Override
 	public void close() throws SQLException {
 		connection.close();
 	}
-	
+
 	@Override
 	public boolean isWrapperFor(final Class<?> iface) throws SQLException {
 		return connection.isWrapperFor(iface);
@@ -96,13 +96,28 @@ public abstract class ConnectionWrapper implements Connection {
 	}
 
 	@Override
+	public void setAutoCommit(final boolean autoCommit) throws SQLException {
+		connection.setAutoCommit(autoCommit);
+	}
+
+	@Override
 	public String getCatalog() throws SQLException {
 		return connection.getCatalog();
 	}
 
 	@Override
+	public void setCatalog(final String catalog) throws SQLException {
+		connection.setCatalog(catalog);
+	}
+
+	@Override
 	public Properties getClientInfo() throws SQLException {
 		return connection.getClientInfo();
+	}
+
+	@Override
+	public void setClientInfo(final Properties properties) throws SQLClientInfoException {
+		connection.setClientInfo(properties);
 	}
 
 	@Override
@@ -113,6 +128,11 @@ public abstract class ConnectionWrapper implements Connection {
 	@Override
 	public int getHoldability() throws SQLException {
 		return connection.getHoldability();
+	}
+
+	@Override
+	public void setHoldability(final int holdability) throws SQLException {
+		connection.setHoldability(holdability);
 	}
 
 	@Override
@@ -131,13 +151,28 @@ public abstract class ConnectionWrapper implements Connection {
 	}
 
 	@Override
+	public void setSchema(final String schema) throws SQLException {
+		connection.setSchema(schema);
+	}
+
+	@Override
 	public int getTransactionIsolation() throws SQLException {
 		return connection.getTransactionIsolation();
 	}
 
 	@Override
+	public void setTransactionIsolation(final int level) throws SQLException {
+		connection.setTransactionIsolation(level);
+	}
+
+	@Override
 	public Map<String, Class<?>> getTypeMap() throws SQLException {
 		return connection.getTypeMap();
+	}
+
+	@Override
+	public void setTypeMap(final Map<String, Class<?>> map) throws SQLException {
+		connection.setTypeMap(map);
 	}
 
 	@Override
@@ -153,6 +188,11 @@ public abstract class ConnectionWrapper implements Connection {
 	@Override
 	public boolean isReadOnly() throws SQLException {
 		return connection.isReadOnly();
+	}
+
+	@Override
+	public void setReadOnly(final boolean readOnly) throws SQLException {
+		connection.setReadOnly(readOnly);
 	}
 
 	@Override
@@ -226,38 +266,13 @@ public abstract class ConnectionWrapper implements Connection {
 	}
 
 	@Override
-	public void setAutoCommit(final boolean autoCommit) throws SQLException {
-		connection.setAutoCommit(autoCommit);
-	}
-
-	@Override
-	public void setCatalog(final String catalog) throws SQLException {
-		connection.setCatalog(catalog);
-	}
-
-	@Override
-	public void setClientInfo(final Properties properties) throws SQLClientInfoException {
-		connection.setClientInfo(properties);
-	}
-
-	@Override
 	public void setClientInfo(final String name, final String value) throws SQLClientInfoException {
 		connection.setClientInfo(name, value);
 	}
 
 	@Override
-	public void setHoldability(final int holdability) throws SQLException {
-		connection.setHoldability(holdability);
-	}
-
-	@Override
 	public void setNetworkTimeout(final Executor executor, final int milliseconds) throws SQLException {
 		connection.setNetworkTimeout(executor, milliseconds);
-	}
-
-	@Override
-	public void setReadOnly(final boolean readOnly) throws SQLException {
-		connection.setReadOnly(readOnly);
 	}
 
 	@Override
@@ -268,20 +283,5 @@ public abstract class ConnectionWrapper implements Connection {
 	@Override
 	public Savepoint setSavepoint(final String name) throws SQLException {
 		return connection.setSavepoint(name);
-	}
-
-	@Override
-	public void setSchema(final String schema) throws SQLException {
-		connection.setSchema(schema);
-	}
-
-	@Override
-	public void setTransactionIsolation(final int level) throws SQLException {
-		connection.setTransactionIsolation(level);
-	}
-
-	@Override
-	public void setTypeMap(final Map<String, Class<?>> map) throws SQLException {
-		connection.setTypeMap(map);
 	}
 }

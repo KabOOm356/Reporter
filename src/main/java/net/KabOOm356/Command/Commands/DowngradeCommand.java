@@ -18,52 +18,65 @@ import java.util.ArrayList;
 /**
  * A {@link ReporterCommand} that will handle downgrading a report's priority.
  */
-public class DowngradeCommand extends ReporterCommand
-{
+public class DowngradeCommand extends ReporterCommand {
 	private static final Logger log = LogManager.getLogger(DowngradeCommand.class);
-	
+
 	private static final String name = "Downgrade";
-	private static int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.move";
-	
+	private static int minimumNumberOfArguments = 1;
+
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public DowngradeCommand(ReporterCommandManager manager)
-	{
+	public DowngradeCommand(ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-		
+
 		updateDocumentation();
 	}
-	
+
+	/**
+	 * Returns the name of this command.
+	 *
+	 * @return The name of this command.
+	 */
+	public static String getCommandName() {
+		return name;
+	}
+
+	/**
+	 * Returns the permission node of this command.
+	 *
+	 * @return The permission node of this command.
+	 */
+	public static String getCommandPermissionNode() {
+		return permissionNode;
+	}
+
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args)
-	{
+	public void execute(CommandSender sender, ArrayList<String> args) {
 		try {
-			if(!hasRequiredPermission(sender))
+			if (!hasRequiredPermission(sender))
 				return;
-			
+
 			int index = Util.parseInt(args.get(0));
-			
-			if(args.get(0).equalsIgnoreCase("last"))
-			{
-				if(!hasRequiredLastViewed(sender))
+
+			if (args.get(0).equalsIgnoreCase("last")) {
+				if (!hasRequiredLastViewed(sender))
 					return;
-				
+
 				index = getLastViewed(sender);
 			}
-			
-			if(!getManager().isReportIndexValid(sender, index))
+
+			if (!getManager().isReportIndexValid(sender, index))
 				return;
-			
-			if(!getManager().canAlterReport(sender, index))
+
+			if (!getManager().canAlterReport(sender, index))
 				return;
-			
+
 			final ModLevel newPriority = getNextLowestPriorityLevel(index);
-			if(newPriority == ModLevel.UNKNOWN)
-			{
+			if (newPriority == ModLevel.UNKNOWN) {
 				String output = getManager().getLocale().getString(DowngradePhrases.reportIsAtLowestPriority);
 				output = output.replaceAll("%i", ChatColor.GOLD + Integer.toString(index) + ChatColor.RED);
 				sender.sendMessage(ChatColor.RED + output);
@@ -77,11 +90,10 @@ public class DowngradeCommand extends ReporterCommand
 			sender.sendMessage(getErrorMessage());
 		}
 	}
-	
-	private ModLevel getNextLowestPriorityLevel(int index) throws ClassNotFoundException, SQLException, InterruptedException
-	{
+
+	private ModLevel getNextLowestPriorityLevel(int index) throws ClassNotFoundException, SQLException, InterruptedException {
 		String query = "SELECT Priority FROM Reports WHERE ID=" + index;
-		
+
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId;
 		// Log the error with more detail.
@@ -97,40 +109,19 @@ public class DowngradeCommand extends ReporterCommand
 		try {
 			SQLResultSet result = database.sqlQuery(connectionId, query);
 			int currentPriorityLevel = result.getInt("Priority");
-			return ModLevel.getByLevel(currentPriorityLevel-1);
-		}  catch (final SQLException e) {
+			return ModLevel.getByLevel(currentPriorityLevel - 1);
+		} catch (final SQLException e) {
 			log.error(String.format("Failed to get the next lowest priorirty on connection [%d]!", connectionId));
 			throw e;
 		} finally {
 			database.closeConnection(connectionId);
 		}
 	}
-	
+
 	@Override
-	public void updateDocumentation()
-	{
+	public void updateDocumentation() {
 		super.updateDocumentation(
 				getManager().getLocale().getString(DowngradePhrases.downgradeHelp),
 				getManager().getLocale().getString(DowngradePhrases.downgradeHelpDetails));
-	}
-	
-	/**
-	 * Returns the name of this command.
-	 * 
-	 * @return The name of this command.
-	 */
-	public static String getCommandName()
-	{
-		return name;
-	}
-	
-	/**
-	 * Returns the permission node of this command.
-	 * 
-	 * @return The permission node of this command.
-	 */
-	public static String getCommandPermissionNode()
-	{
-		return permissionNode;
 	}
 }

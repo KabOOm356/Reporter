@@ -332,6 +332,7 @@ public class BukkitUtil {
 
 	/**
 	 * Gets an offline player by name.
+	 *
 	 * @param playerName The name of the player
 	 * @return An {@link OfflinePlayer} with the given name.  If the name is null or empty, null is returned.
 	 * @see BukkitUtil#getOfflinePlayer(UUID, String)

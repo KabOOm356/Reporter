@@ -20,28 +20,24 @@ import java.sql.SQLException;
 /**
  * A class to help initialize and update Reporter's database.
  */
-public class ReporterDatabaseUtil
-{
+public class ReporterDatabaseUtil {
 	private static final Logger log = LogManager.getLogger(ReporterDatabaseUtil.class);
 
 	/**
 	 * Initializes the database.
-	 * 
-	 * @param configuration The {@link FileConfiguration} that will be used to get the database options.
-	 * @param dataFolder A {@link File} to the directory where the data should be stored.
-	 * 
-	 * @return An initialized {@link ExtendedDatabaseHandler}.
 	 *
+	 * @param configuration The {@link FileConfiguration} that will be used to get the database options.
+	 * @param dataFolder    A {@link File} to the directory where the data should be stored.
+	 * @return An initialized {@link ExtendedDatabaseHandler}.
 	 * @throws IllegalArgumentException Thrown if the connection pool configuration is invalid.
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 * @throws InterruptedException
 	 */
-	public static ExtendedDatabaseHandler initDB(final FileConfiguration configuration, final File dataFolder) throws IllegalArgumentException, IOException, ClassNotFoundException, SQLException, InterruptedException
-	{
+	public static ExtendedDatabaseHandler initDB(final FileConfiguration configuration, final File dataFolder) throws IllegalArgumentException, IOException, ClassNotFoundException, SQLException, InterruptedException {
 		ExtendedDatabaseHandler databaseHandler = null;
-		
+
 		final boolean connectionPoolLimit = configuration.getBoolean("database.connectionPool.enableLimiting", ConnectionPoolConfig.defaultInstance.isConnectionPoolLimited());
 		final int maxNumberOfConnections = configuration.getInt("database.connectionPool.maxNumberOfConnections", ConnectionPoolConfig.defaultInstance.getMaxConnections());
 		final int maxNumberOfAttemptsForConnection = configuration.getInt("database.connectionPool.maxNumberOfAttemptsForConnection", ConnectionPoolConfig.defaultInstance.getMaxAttemptsForConnection());
@@ -63,25 +59,21 @@ public class ReporterDatabaseUtil
 		 * MySQL -> SQLite -> Flatfile (When completed)
 		 */
 		boolean fallbackToNextDB = false;
-		
+
 		// Attempt to initialize a MySQL database
-		if(configuration.getString("database.type", DatabaseType.SQLITE.toString()).equalsIgnoreCase(DatabaseType.MYSQL.toString()))
-		{
-			try
-			{
+		if (configuration.getString("database.type", DatabaseType.SQLITE.toString()).equalsIgnoreCase(DatabaseType.MYSQL.toString())) {
+			try {
 				log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Connecting to MySQL server...");
 
 				final String host = configuration.getString("database.host", "localhost:3306");
 				final String database = configuration.getString("database.database", "Reporter");
 				final String username = configuration.getString("database.username", "root");
 				final String password = configuration.getString("database.password", "root");
-				
+
 				databaseHandler = new ExtendedDatabaseHandler(host, database, username, password, connectionPoolConfig);
 				checkConnection(databaseHandler.getDatabase());
 				initDatabaseTables(databaseHandler.getDatabase());
-			}
-			catch(final Exception e)
-			{
+			} catch (final Exception e) {
 				databaseHandler = null;
 				fallbackToNextDB = true;
 				log.log(Level.ERROR, Reporter.getDefaultConsolePrefix() + "Error connecting to MySQL server using SQLite.", e);
@@ -89,10 +81,9 @@ public class ReporterDatabaseUtil
 		} else {
 			fallbackToNextDB = true;
 		}
-		
+
 		// Attempt to initialize a SQLite database
-		if(fallbackToNextDB)
-		{
+		if (fallbackToNextDB) {
 			final String databaseName = configuration.getString("database.dbName", "reports.db");
 
 			try {
@@ -112,21 +103,19 @@ public class ReporterDatabaseUtil
 				throw e;
 			}
 		}
-		
+
 		return databaseHandler;
 	}
-	
+
 	/**
 	 * Creates the Reporter database tables, if they do not exist.
-	 * 
+	 *
 	 * @param database The {@link Database} to create the tables in.
-	 * 
 	 * @throws SQLException
-	 * @throws ClassNotFoundException 
+	 * @throws ClassNotFoundException
 	 * @throws InterruptedException
 	 */
-	private static void initDatabaseTables(final Database database) throws ClassNotFoundException, SQLException, InterruptedException
-	{
+	private static void initDatabaseTables(final Database database) throws ClassNotFoundException, SQLException, InterruptedException {
 		log.info(Reporter.getDefaultConsolePrefix() + "Checking " + database.getDatabaseType() + " tables...");
 
 		final String databaseVersion = Reporter.getDatabaseVersion();

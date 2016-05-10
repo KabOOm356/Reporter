@@ -6,13 +6,33 @@ import net.KabOOm356.Manager.SQLStatManager;
 /**
  * A class to manage tracking statistics for moderators.
  */
-public class ModeratorStatManager extends SQLStatManager
-{
+public class ModeratorStatManager extends SQLStatManager {
+	/**
+	 * The case-sensitive table name for the player statistics.
+	 */
+	public static final String tableName = "ModStats";
+	/**
+	 * The case-sensitive column name that should be used as an index.
+	 */
+	public static final String indexColumn = "ModUUID";
+	/**
+	 * The case-sensitive column name that should be used as a secondary index.
+	 */
+	public static final String secondaryIndexColumn = "ModName";
+
+	/**
+	 * Constructor.
+	 *
+	 * @param database The database where the statistics are being stored.
+	 */
+	public ModeratorStatManager(ExtendedDatabaseHandler database) {
+		super(database, tableName, indexColumn, secondaryIndexColumn);
+	}
+
 	/**
 	 * A class that represents a statistic for a moderator.
 	 */
-	public static class ModeratorStat extends SQLStat
-	{
+	public static class ModeratorStat extends SQLStat {
 		/**
 		 * The number of players assigned to reports by this moderator.
 		 */
@@ -46,39 +66,15 @@ public class ModeratorStatManager extends SQLStatManager
 		 * The number of reports unclaimed by this moderator.
 		 */
 		public static final ModeratorStat UNCLAIMED = new ModeratorStat("Unclaimed", "UnclaimCount");
-		
+
 		/**
 		 * Constructor.
-		 * 
-		 * @param name The name of the statistic.
+		 *
+		 * @param name       The name of the statistic.
 		 * @param columnName The case-sensitive column name of the statistic.
 		 */
-		protected ModeratorStat(String name, String columnName)
-		{
+		protected ModeratorStat(String name, String columnName) {
 			super(name, columnName);
 		}
-	}
-	
-	/**
-	 * The case-sensitive table name for the player statistics.
-	 */
-	public static final String tableName = "ModStats";
-	/**
-	 * The case-sensitive column name that should be used as an index.
-	 */
-	public static final String indexColumn = "ModUUID";
-	/**
-	 * The case-sensitive column name that should be used as a secondary index.
-	 */
-	public static final String secondaryIndexColumn = "ModName";
-	
-	/**
-	 * Constructor.
-	 * 
-	 * @param database The database where the statistics are being stored.
-	 */
-	public ModeratorStatManager(ExtendedDatabaseHandler database)
-	{
-		super(database, tableName, indexColumn, secondaryIndexColumn);
 	}
 }
