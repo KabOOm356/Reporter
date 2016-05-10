@@ -1,8 +1,8 @@
 package net.KabOOm356.File.AbstractFiles;
 
-import java.util.Date;
-
 import net.KabOOm356.File.AbstractFile;
+
+import java.util.Date;
 
 /**
  * An {@link AbstractFile} that resides somewhere on the network, given by a URL.

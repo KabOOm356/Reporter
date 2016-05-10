@@ -1,22 +1,21 @@
 package net.KabOOm356.Command.Commands;
 
-import java.util.ArrayList;
-
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ResultRow;
-import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.StatisticPhrases;
+import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Manager.SQLStatManager.SQLStat;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager.PlayerStat;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+
+import java.util.ArrayList;
 
 public class StatisticCommand extends ReporterCommand
 {

@@ -1,25 +1,19 @@
 package net.KabOOm356.Command.Commands;
 
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Map.Entry;
-
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.ResultRow;
-import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Database.SQL.QueryType;
-import net.KabOOm356.Locale.Locale;
+import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.DeletePhrases;
+import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +22,11 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Map.Entry;
 
 /**
  * A {@link ReporterCommand} that will handle deleting reports.

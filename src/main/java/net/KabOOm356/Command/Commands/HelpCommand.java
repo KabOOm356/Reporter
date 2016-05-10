@@ -1,9 +1,5 @@
 package net.KabOOm356.Command.Commands;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
@@ -11,9 +7,12 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.HelpPhrases;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 /**
  * A command that will display how to use the other commands.

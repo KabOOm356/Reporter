@@ -2,7 +2,6 @@ package net.KabOOm356.Command;
 
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Util.BukkitUtil;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 

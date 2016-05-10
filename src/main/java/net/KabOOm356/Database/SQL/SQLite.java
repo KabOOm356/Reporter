@@ -1,8 +1,8 @@
 package net.KabOOm356.Database.SQL;
 
+import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
 import net.KabOOm356.Database.Database;
 import net.KabOOm356.Database.DatabaseType;
-import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
 
 /**
  * A simple class to handle SQLite database connections using JDBC.

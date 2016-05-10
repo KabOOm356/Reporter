@@ -1,16 +1,5 @@
 package net.KabOOm356.Command.Commands;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -19,6 +8,16 @@ import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * A {@link ReporterCommand} to handle players claiming reports.

@@ -1,19 +1,15 @@
 package net.KabOOm356.Database;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-
 import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
 import net.KabOOm356.Database.Connection.ConnectionPooledDatabaseInterface;
 import net.KabOOm356.Database.SQL.MySQL;
 import net.KabOOm356.Database.SQL.SQLite;
 import net.KabOOm356.Util.FormattingUtil;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * Handler for a {@link Database}.

@@ -1,11 +1,11 @@
 package net.KabOOm356.Database.SQL;
 
-import java.sql.SQLException;
-
+import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
 import net.KabOOm356.Database.Database;
 import net.KabOOm356.Database.DatabaseType;
-import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
 import net.KabOOm356.Util.FormattingUtil;
+
+import java.sql.SQLException;
 
 
 /**

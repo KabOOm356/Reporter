@@ -1,13 +1,5 @@
 package net.KabOOm356.Command.Commands;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -15,6 +7,13 @@ import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.UpgradePhrases;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Util.Util;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * A {@link ReporterCommand} that will handle upgrading a report's priority.

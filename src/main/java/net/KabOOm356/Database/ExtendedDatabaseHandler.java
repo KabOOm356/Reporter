@@ -1,15 +1,14 @@
 package net.KabOOm356.Database;
 
+import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import net.KabOOm356.Database.Connection.ConnectionPoolConfig;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * An class that extends the functionality of {@link DatabaseHandler}.

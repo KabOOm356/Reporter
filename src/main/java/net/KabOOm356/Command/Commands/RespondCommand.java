@@ -1,9 +1,5 @@
 package net.KabOOm356.Command.Commands;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.UUID;
-
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -14,7 +10,6 @@ import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,6 +19,10 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * A {@link ReporterCommand} that will handle users responding to reports.

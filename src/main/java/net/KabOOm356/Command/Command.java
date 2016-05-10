@@ -1,22 +1,20 @@
 package net.KabOOm356.Command;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Runnable.RunnableWithState;
 import net.KabOOm356.Runnable.TimedRunnable;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.ObjectPair;
-
 import org.apache.commons.lang.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 
 /**
  * Abstract Command class.
