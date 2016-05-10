@@ -15,11 +15,11 @@ public class MySQL extends Database {
 	/**
 	 * The username to connect to the database with.
 	 */
-	private String username;
+	private final String username;
 	/**
 	 * The password to connect to the database with.
 	 */
-	private String password;
+	private final String password;
 
 	/**
 	 * Main constructor.

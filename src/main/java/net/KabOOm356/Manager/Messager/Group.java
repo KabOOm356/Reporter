@@ -9,7 +9,7 @@ public class Group {
 	 */
 	public final static Group DEFAULT = new Group("Default");
 
-	private String groupName;
+	private final String groupName;
 
 	/**
 	 * Constructor.

@@ -22,23 +22,17 @@ import java.util.ArrayList;
 public abstract class Command extends TimedRunnable implements RunnableWithState {
 	private static final Logger log = LogManager.getLogger(Command.class);
 
-	private ReporterCommandManager manager;
-
+	private final ReporterCommandManager manager;
+	private final String name;
+	private final String permissionNode;
+	private final ArrayList<String> aliases;
+	private final ArrayList<ObjectPair<String, String>> usages;
+	private final int minimumNumberOfArguments;
 	private boolean isRunning = false;
 	private boolean isPendingToRun = false;
 	private boolean hasRun = false;
-
 	private CommandSender sender = null;
 	private ArrayList<String> arguments = null;
-
-	private String name;
-	private String permissionNode;
-
-	private ArrayList<String> aliases;
-
-	private ArrayList<ObjectPair<String, String>> usages;
-
-	private int minimumNumberOfArguments;
 
 	/**
 	 * Constructor.

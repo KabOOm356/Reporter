@@ -109,7 +109,7 @@ public class RespondCommand extends ReporterCommand {
 		if (!playerLoc.equalsIgnoreCase("sender") && !playerLoc.equalsIgnoreCase("reported"))
 			player.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.RED + BukkitUtil.colorCodeReplaceAll(getUsage()));
 		else {
-			boolean requestedToReported = (playerLoc.equalsIgnoreCase("reported")) ? true : false;
+			boolean requestedToReported = playerLoc.equalsIgnoreCase("reported");
 			boolean sendToReported = requestedToReported;
 
 			int id = -1;
@@ -239,6 +239,7 @@ public class RespondCommand extends ReporterCommand {
 	 * <br/>
 	 * This should be called after the locale has changed.
 	 */
+	@Override
 	public void updateDocumentation() {
 		super.updateDocumentation(
 				getManager().getLocale().getString(RespondPhrases.respondHelp),

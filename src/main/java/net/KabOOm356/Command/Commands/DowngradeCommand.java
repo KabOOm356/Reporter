@@ -23,7 +23,7 @@ public class DowngradeCommand extends ReporterCommand {
 
 	private static final String name = "Downgrade";
 	private final static String permissionNode = "reporter.move";
-	private static int minimumNumberOfArguments = 1;
+	private static final int minimumNumberOfArguments = 1;
 
 	/**
 	 * Constructor.

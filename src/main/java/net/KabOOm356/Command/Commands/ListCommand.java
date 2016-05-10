@@ -93,7 +93,7 @@ public class ListCommand extends ReporterCommand {
 		} else if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true)) {
 			ArrayList<Integer> indexes = null;
 			try {
-				indexes = getManager().getViewableReports((Player) sender);
+				indexes = getManager().getViewableReports(sender);
 			} catch (final Exception e) {
 				sender.sendMessage(getErrorMessage());
 				log.log(Level.ERROR, "Failed to list submitted reports!", e);
@@ -444,6 +444,7 @@ public class ListCommand extends ReporterCommand {
 	 * <br/>
 	 * This should be called after the locale has changed.
 	 */
+	@Override
 	public void updateDocumentation() {
 		ArrayList<ObjectPair<String, String>> usages = super.getUsages();
 

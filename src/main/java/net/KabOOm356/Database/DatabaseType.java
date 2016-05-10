@@ -16,14 +16,14 @@ public enum DatabaseType {
 	/**
 	 * The predefined name of the DatabaseType.
 	 */
-	private String databaseTypeName;
+	private final String databaseTypeName;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param databaseTypeName The predefined name of the DatabaseType.
 	 */
-	private DatabaseType(String databaseTypeName) {
+	DatabaseType(String databaseTypeName) {
 		this.databaseTypeName = databaseTypeName;
 	}
 

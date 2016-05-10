@@ -141,7 +141,7 @@ public class ViewCommand extends ReporterCommand {
 			} else if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true)) {
 				ArrayList<Integer> indexes = null;
 				try {
-					indexes = getManager().getViewableReports((Player) sender);
+					indexes = getManager().getViewableReports(sender);
 				} catch (final Exception e) {
 					log.log(Level.ERROR, "Failed to view submitted report!");
 					throw e;
@@ -455,7 +455,6 @@ public class ViewCommand extends ReporterCommand {
 			throw e;
 		} finally {
 			database.closeConnection(connectionId);
-			;
 		}
 
 		if (index != 0) {

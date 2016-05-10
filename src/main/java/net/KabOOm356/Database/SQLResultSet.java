@@ -160,9 +160,7 @@ public class SQLResultSet extends ArrayList<ResultRow> {
 	 * @return True if the value is present in the given column, otherwise false.
 	 */
 	public boolean contains(String colName, Object value) {
-		if (this.get(colName, value) != null)
-			return true;
-		return false;
+		return this.get(colName, value) != null;
 	}
 
 	/**

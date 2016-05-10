@@ -12,7 +12,7 @@ public class RevisionFile extends ExtendedFile {
 	/**
 	 * The base name of the file.
 	 */
-	private String name;
+	private final String name;
 
 	/**
 	 * The current revision number.
@@ -170,6 +170,7 @@ public class RevisionFile extends ExtendedFile {
 	 *
 	 * @return The base file name.
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}

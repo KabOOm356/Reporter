@@ -34,7 +34,7 @@ public class CompleteCommand extends ReporterCommand {
 	private static final String name = "Complete";
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.complete";
-	private boolean sendMessage;
+	private final boolean sendMessage;
 
 	/**
 	 * Constructor.
@@ -235,6 +235,7 @@ public class CompleteCommand extends ReporterCommand {
 	 * <br/>
 	 * This should be called after the locale has changed.
 	 */
+	@Override
 	public void updateDocumentation() {
 		super.updateDocumentation(
 				getManager().getLocale().getString(CompletePhrases.completeHelp),

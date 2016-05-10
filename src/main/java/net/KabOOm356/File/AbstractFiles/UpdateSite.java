@@ -7,7 +7,7 @@ public class UpdateSite extends NetworkFile {
 	/**
 	 * The type of this UpdateSite.
 	 */
-	private Type type;
+	private final Type type;
 
 	/**
 	 * UpdateSite Constructor.
@@ -52,9 +52,9 @@ public class UpdateSite extends NetworkFile {
 		 */
 		XML("XML");
 
-		private String name;
+		private final String name;
 
-		private Type(String name) {
+		Type(String name) {
 			this.name = name;
 		}
 

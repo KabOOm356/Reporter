@@ -7,19 +7,19 @@ public interface Initializable {
 	/**
 	 * Default value for whether an Object is initialized.
 	 */
-	public boolean isInitialized = false;
+	boolean isInitialized = false;
 
 	/**
 	 * Gets whether this Object is initialized or not.
 	 *
 	 * @return True if the Object is initialized, otherwise false.
 	 */
-	public boolean isInitialized();
+	boolean isInitialized();
 
 	/**
 	 * Sets this Object to either being initialized or not.
 	 *
 	 * @param initialized Whether this Object is initialized or not.
 	 */
-	public void initialized();
+	void initialized();
 }

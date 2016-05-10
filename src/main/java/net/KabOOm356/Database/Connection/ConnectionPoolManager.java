@@ -9,5 +9,5 @@ public interface ConnectionPoolManager {
 	 *
 	 * @param connectionId The id of the connection that has been closed.
 	 */
-	public void connectionClosed(final Integer connectionId);
+	void connectionClosed(final Integer connectionId);
 }

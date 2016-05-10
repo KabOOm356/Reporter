@@ -12,12 +12,12 @@ public class LocaleEntry {
 	/**
 	 * The complete path to the entry.
 	 */
-	private String path;
+	private final String path;
 
 	/**
 	 * The default value to use if the entry is not present.
 	 */
-	private String def;
+	private final String def;
 
 	/**
 	 * Constructor.

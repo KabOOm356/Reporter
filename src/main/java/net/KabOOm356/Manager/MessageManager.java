@@ -22,7 +22,7 @@ public class MessageManager {
 	 */
 	// PlayerName -> (Message Grouping -> (Messages))
 	//private HashMap<String, HashMap<Group, ArrayList<Message>>> messages;
-	private PlayerMessages messages;
+	private final PlayerMessages messages;
 
 	/**
 	 * Constructor.

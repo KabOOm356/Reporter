@@ -13,14 +13,14 @@ public enum PermissionType {
 	/**
 	 * The preferred name of the Permissions type
 	 */
-	private String typeName;
+	private final String typeName;
 
 	/**
 	 * PermissionType constructor
 	 *
 	 * @param typeName The preferred name of the Permission type
 	 */
-	private PermissionType(String typeName) {
+	PermissionType(String typeName) {
 		this.typeName = typeName;
 	}
 

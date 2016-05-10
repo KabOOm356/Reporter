@@ -9,26 +9,26 @@ public interface RunnableWithState extends Runnable {
 	 *
 	 * @return True if the current runnable is executing, otherwise false.
 	 */
-	public boolean isRunning();
+	boolean isRunning();
 
 	/**
 	 * If the current runnable is pending to start running.
 	 *
 	 * @return True if the current runnable is pending to start running, otherwise false.
 	 */
-	public boolean isPendingToRun();
+	boolean isPendingToRun();
 
 	/**
 	 * If the current runnable is stopped.
 	 *
 	 * @return True if the current runnable is stopped.
 	 */
-	public boolean isStopped();
+	boolean isStopped();
 
 	/**
 	 * If the current runnable has run.
 	 *
 	 * @return True if the current runnable has run, otherwise false.
 	 */
-	public boolean hasRun();
+	boolean hasRun();
 }

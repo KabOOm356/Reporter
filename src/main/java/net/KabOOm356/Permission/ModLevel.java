@@ -72,9 +72,7 @@ public enum ModLevel {
 	 * @return True if the given level is in bounds to be a ModLevel level, otherwise false.
 	 */
 	public static boolean modLevelInBounds(final int modLevel) {
-		if (modLevel >= 0 && modLevel < 4)
-			return true;
-		return false;
+		return modLevel >= 0 && modLevel < 4;
 	}
 
 	/**

@@ -200,6 +200,7 @@ public class RequestCommand extends ReporterCommand {
 	 * <br/>
 	 * This should be called after the locale has changed.
 	 */
+	@Override
 	public void updateDocumentation() {
 		ArrayList<ObjectPair<String, String>> usages = super.getUsages();
 		usages.clear();

@@ -13,7 +13,7 @@ public class ReporterMessage extends Message {
 	/**
 	 * The indexes associated with this message.
 	 */
-	private ArrayList<Integer> indexes;
+	private final ArrayList<Integer> indexes;
 
 	/**
 	 * Constructor.

@@ -639,10 +639,10 @@ public class DeleteCommand extends ReporterCommand {
 	}
 
 	private enum BatchDeletionType {
-		ALL, INCOMPLETE, COMPLETE;
+		ALL, INCOMPLETE, COMPLETE
 	}
 
 	private enum PlayerDeletionType {
-		SENDER, REPORTED;
+		SENDER, REPORTED
 	}
 }

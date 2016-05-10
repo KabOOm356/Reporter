@@ -21,7 +21,14 @@ import java.text.ParseException;
  */
 public abstract class Updater implements Runnable {
 	private static final Logger log = LogManager.getLogger(Updater.class);
-
+	/**
+	 * The URL to the location to parse for updates.
+	 */
+	private final URL url;
+	/**
+	 * A connection to the URL to parse for updates.
+	 */
+	private final URLConnection connection;
 	/**
 	 * The name of the file to parse for.
 	 */
@@ -34,15 +41,6 @@ public abstract class Updater implements Runnable {
 	 * The lowest {@link ReleaseLevel} to be considered for downloading.
 	 */
 	private ReleaseLevel lowestLevel;
-
-	/**
-	 * The URL to the location to parse for updates.
-	 */
-	private URL url;
-	/**
-	 * A connection to the URL to parse for updates.
-	 */
-	private URLConnection connection;
 
 	/**
 	 * Constructor.

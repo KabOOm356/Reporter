@@ -14,19 +14,19 @@ public abstract class AbstractFile {
 	/**
 	 * The name of the file.
 	 */
-	private String name;
+	private final String name;
 	/**
 	 * The encoding of the file.
 	 */
-	private String encoding;
+	private final String encoding;
 	/**
 	 * The extension of the file.
 	 */
-	private String extension;
+	private final String extension;
 	/**
 	 * The file name as it would appear on the disk.
 	 */
-	private String fileName;
+	private final String fileName;
 	/**
 	 * The last time the file was modified.
 	 */

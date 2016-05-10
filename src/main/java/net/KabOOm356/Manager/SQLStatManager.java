@@ -24,19 +24,19 @@ public class SQLStatManager {
 	/**
 	 * The database where the statistics are being stored.
 	 */
-	private ExtendedDatabaseHandler database;
+	private final ExtendedDatabaseHandler database;
 	/**
 	 * The name of the table the statistics are being stored.
 	 */
-	private String tableName;
+	private final String tableName;
 	/**
 	 * The case-sensitive name of the column that should be used as the index.
 	 */
-	private String indexColumn;
+	private final String indexColumn;
 	/**
 	 * The case-sensitive column name that should be used as a secondary index.
 	 */
-	private String secondaryIndexColumn;
+	private final String secondaryIndexColumn;
 	/**
 	 * Constructor.
 	 *
@@ -397,12 +397,12 @@ public class SQLStatManager {
 		/**
 		 * The case-sensitive column name of the statistic this SQLStat represents.
 		 */
-		private String columnName;
+		private final String columnName;
 
 		/**
 		 * The name of this statistic.
 		 */
-		private String name;
+		private final String name;
 
 		/**
 		 * Constructor.

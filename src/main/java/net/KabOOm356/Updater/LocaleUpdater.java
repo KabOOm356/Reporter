@@ -54,6 +54,7 @@ public class LocaleUpdater extends Updater {
 	 * @throws IOException
 	 * @throws ParserConfigurationException
 	 */
+	@Override
 	public VersionedNetworkFile findLatestFile() throws SAXException, IOException, ParserConfigurationException {
 		URLConnection connection = getConnection();
 

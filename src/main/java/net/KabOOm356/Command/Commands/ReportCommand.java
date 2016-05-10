@@ -298,6 +298,7 @@ public class ReportCommand extends ReporterCommand {
 	 * <br/>
 	 * This should be called after the locale has changed.
 	 */
+	@Override
 	public void updateDocumentation() {
 		super.updateDocumentation(
 				getManager().getLocale().getString(ReportPhrases.reportHelp),

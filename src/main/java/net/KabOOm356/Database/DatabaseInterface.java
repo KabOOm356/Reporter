@@ -4,7 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public interface DatabaseInterface {
-	public void openConnection() throws ClassNotFoundException, SQLException, InterruptedException;
+	void openConnection() throws ClassNotFoundException, SQLException, InterruptedException;
 
 	/**
 	 * Attempts to perform a query on the database and returns a ResultSet of data.
@@ -17,7 +17,7 @@ public interface DatabaseInterface {
 	 * @throws ClassNotFoundException
 	 * @throws InterruptedException
 	 */
-	public ResultSet query(String query) throws ClassNotFoundException, SQLException, InterruptedException;
+	ResultSet query(String query) throws ClassNotFoundException, SQLException, InterruptedException;
 
 	/**
 	 * Attempts to perform a query on the database that returns no data.
@@ -27,7 +27,7 @@ public interface DatabaseInterface {
 	 * @throws ClassNotFoundException
 	 * @throws InterruptedException
 	 */
-	public void updateQuery(String query) throws ClassNotFoundException, SQLException, InterruptedException;
+	void updateQuery(String query) throws ClassNotFoundException, SQLException, InterruptedException;
 
 	/**
 	 * Attempts to perform a prepared query on the database that returns a ResultSet of data.
@@ -42,7 +42,7 @@ public interface DatabaseInterface {
 	 * @throws InterruptedException
 	 * @throws IllegalArgumentException If the number of parameters given do not match the number of parameters required.
 	 */
-	public ResultSet preparedQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException;
+	ResultSet preparedQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException;
 
 	/**
 	 * Attempts to perform a query on the database that returns no data.
@@ -54,7 +54,7 @@ public interface DatabaseInterface {
 	 * @throws InterruptedException
 	 * @throws IllegalArgumentException If the number of parameters given do not match the number of parameters required.
 	 */
-	public void preparedUpdateQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException;
+	void preparedUpdateQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException;
 
 	/**
 	 * Checks the database if a table exists.
@@ -65,7 +65,7 @@ public interface DatabaseInterface {
 	 * @throws ClassNotFoundException
 	 * @throws InterruptedException
 	 */
-	public boolean checkTable(String table) throws ClassNotFoundException, SQLException, InterruptedException;
+	boolean checkTable(String table) throws ClassNotFoundException, SQLException, InterruptedException;
 
 	/**
 	 * Returns the columns in a table.
@@ -76,7 +76,7 @@ public interface DatabaseInterface {
 	 * @throws ClassNotFoundException
 	 * @throws InterruptedException
 	 */
-	public ArrayList<String> getColumnNames(String table) throws SQLException, ClassNotFoundException, InterruptedException;
+	ArrayList<String> getColumnNames(String table) throws SQLException, ClassNotFoundException, InterruptedException;
 
 	/**
 	 * Returns the database's meta data.
@@ -88,7 +88,7 @@ public interface DatabaseInterface {
 	 * @throws SQLException
 	 * @throws InterruptedException
 	 */
-	public DatabaseMetaData getMetaData() throws ClassNotFoundException, SQLException, InterruptedException;
+	DatabaseMetaData getMetaData() throws ClassNotFoundException, SQLException, InterruptedException;
 
 	/**
 	 * Returns the database's column meta data.
@@ -101,12 +101,12 @@ public interface DatabaseInterface {
 	 * @throws SQLException
 	 * @throws InterruptedException
 	 */
-	public ResultSet getColumnMetaData(String table) throws ClassNotFoundException, SQLException, InterruptedException;
+	ResultSet getColumnMetaData(String table) throws ClassNotFoundException, SQLException, InterruptedException;
 
 	/**
 	 * Closes the connection to the database.
 	 */
-	public void closeConnection();
+	void closeConnection();
 
 	/**
 	 * Returns a Statement from the database connection.
@@ -116,7 +116,7 @@ public interface DatabaseInterface {
 	 * @throws ClassNotFoundException
 	 * @throws InterruptedException
 	 */
-	public Statement createStatement() throws SQLException, ClassNotFoundException, InterruptedException;
+	Statement createStatement() throws SQLException, ClassNotFoundException, InterruptedException;
 
 	/**
 	 * Returns a PreparedStatement from the database connection.
@@ -127,12 +127,12 @@ public interface DatabaseInterface {
 	 * @throws ClassNotFoundException
 	 * @throws InterruptedException
 	 */
-	public PreparedStatement prepareStatement(String query) throws SQLException, ClassNotFoundException, InterruptedException;
+	PreparedStatement prepareStatement(String query) throws SQLException, ClassNotFoundException, InterruptedException;
 
 	/**
 	 * Returns the {@link DatabaseType} of this database.
 	 *
 	 * @return The {@link DatabaseType} of this database.
 	 */
-	public DatabaseType getDatabaseType();
+	DatabaseType getDatabaseType();
 }

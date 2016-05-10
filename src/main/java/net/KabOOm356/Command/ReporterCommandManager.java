@@ -43,23 +43,17 @@ import java.util.UUID;
 public class ReporterCommandManager implements CommandExecutor {
 	private static final Logger log = LogManager.getLogger(ReporterCommandManager.class);
 
-	private Reporter plugin;
-
+	private final Reporter plugin;
+	private final HashMap<CommandSender, Integer> lastViewed = new HashMap<CommandSender, Integer>();
+	private final MessageManager messageManager;
+	private final ReporterPermissionManager permissionManager;
+	private final ReportLimitManager limitManager;
+	private final ModeratorStatManager modStatsManager;
+	private final PlayerStatManager playerStatsManager;
 	private LinkedHashMap<String, ReporterCommand> reportCommands;
 	private HashMap<String, String> aliasReportCommands;
-
 	private LinkedHashMap<String, ReporterCommand> respondCommands;
 	private HashMap<String, String> aliasRespondCommands;
-
-	private HashMap<CommandSender, Integer> lastViewed = new HashMap<CommandSender, Integer>();
-
-	private MessageManager messageManager;
-
-	private ReporterPermissionManager permissionManager;
-	private ReportLimitManager limitManager;
-
-	private ModeratorStatManager modStatsManager;
-	private PlayerStatManager playerStatsManager;
 
 	/**
 	 * Constructor.

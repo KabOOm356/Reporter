@@ -7,21 +7,21 @@ import java.util.ArrayList;
  * A database that can have multiple connections in use at the same time.
  */
 public interface ConnectionPooledDatabaseInterface {
-	public int openPooledConnection() throws ClassNotFoundException, SQLException, InterruptedException;
+	int openPooledConnection() throws ClassNotFoundException, SQLException, InterruptedException;
 
 	/**
 	 * Closes a pooled connection.
 	 *
 	 * @param connectionId The id of the connection to close.
 	 */
-	public void closeConnection(final Integer connectionId);
+	void closeConnection(final Integer connectionId);
 
 	/**
 	 * Closes all currently open connections.
 	 * <br/><br/>
 	 * This should only be called when the database is being closed.
 	 */
-	public void closeConnections();
+	void closeConnections();
 
 	/**
 	 * Attempts to perform a query on the database and returns a ResultSet of data.
@@ -33,7 +33,7 @@ public interface ConnectionPooledDatabaseInterface {
 	 * @return A {@link ResultSet} of information returned from the database.
 	 * @throws SQLException
 	 */
-	public ResultSet query(Integer connectionId, String query) throws SQLException;
+	ResultSet query(Integer connectionId, String query) throws SQLException;
 
 	/**
 	 * Attempts to perform a query on the database that returns no data.
@@ -42,7 +42,7 @@ public interface ConnectionPooledDatabaseInterface {
 	 * @param query        The string to query the database with.
 	 * @throws SQLException
 	 */
-	public void updateQuery(Integer connectionId, String query) throws SQLException;
+	void updateQuery(Integer connectionId, String query) throws SQLException;
 
 	/**
 	 * Attempts to perform a prepared query on the database that returns a ResultSet of data.
@@ -56,7 +56,7 @@ public interface ConnectionPooledDatabaseInterface {
 	 * @throws SQLException
 	 * @throws IllegalArgumentException If the number of parameters given do not match the number of parameters required.
 	 */
-	public ResultSet preparedQuery(Integer connectionId, String query, ArrayList<String> params) throws SQLException;
+	ResultSet preparedQuery(Integer connectionId, String query, ArrayList<String> params) throws SQLException;
 
 	/**
 	 * Attempts to perform a query on the database that returns no data.
@@ -67,7 +67,7 @@ public interface ConnectionPooledDatabaseInterface {
 	 * @throws SQLException
 	 * @throws IllegalArgumentException If the number of parameters given do not match the number of parameters required.
 	 */
-	public void preparedUpdateQuery(Integer connectionId, String query, ArrayList<String> params) throws SQLException;
+	void preparedUpdateQuery(Integer connectionId, String query, ArrayList<String> params) throws SQLException;
 
 	/**
 	 * Checks the database if a table exists.
@@ -77,7 +77,7 @@ public interface ConnectionPooledDatabaseInterface {
 	 * @return If the table exists then returns true, otherwise false.
 	 * @throws SQLException
 	 */
-	public boolean checkTable(Integer connectionId, String table) throws SQLException;
+	boolean checkTable(Integer connectionId, String table) throws SQLException;
 
 	/**
 	 * Returns the columns in a table.
@@ -87,7 +87,7 @@ public interface ConnectionPooledDatabaseInterface {
 	 * @return An {@link ArrayList} containing the names of the columns.
 	 * @throws SQLException
 	 */
-	public ArrayList<String> getColumnNames(Integer connectionId, String table) throws SQLException;
+	ArrayList<String> getColumnNames(Integer connectionId, String table) throws SQLException;
 
 	/**
 	 * Returns the database's meta data.
@@ -98,7 +98,7 @@ public interface ConnectionPooledDatabaseInterface {
 	 * @return A {@link DatabaseMetaData} object.
 	 * @throws SQLException
 	 */
-	public DatabaseMetaData getMetaData(Integer connectionId) throws SQLException;
+	DatabaseMetaData getMetaData(Integer connectionId) throws SQLException;
 
 	/**
 	 * Returns the database's column meta data.
@@ -110,7 +110,7 @@ public interface ConnectionPooledDatabaseInterface {
 	 * @return A {@link ResultSet} containing the database's column meta data.
 	 * @throws SQLException
 	 */
-	public ResultSet getColumnMetaData(Integer connectionId, String table) throws SQLException;
+	ResultSet getColumnMetaData(Integer connectionId, String table) throws SQLException;
 
 	/**
 	 * Returns a Statement from the database connection.
@@ -119,7 +119,7 @@ public interface ConnectionPooledDatabaseInterface {
 	 * @return A Statement from the database.
 	 * @throws SQLException
 	 */
-	public Statement createStatement(Integer connectionId) throws SQLException;
+	Statement createStatement(Integer connectionId) throws SQLException;
 
 	/**
 	 * Returns a PreparedStatement from the database connection.
@@ -129,5 +129,5 @@ public interface ConnectionPooledDatabaseInterface {
 	 * @return A PreparedStatement created from the given query.
 	 * @throws SQLException
 	 */
-	public PreparedStatement prepareStatement(Integer connectionId, String query) throws SQLException;
+	PreparedStatement prepareStatement(Integer connectionId, String query) throws SQLException;
 }

@@ -73,9 +73,7 @@ public abstract class ReporterCommand extends Command {
 	 * @see #hasRequiredLastViewed(CommandSender)
 	 */
 	public boolean hasLastViewed(CommandSender sender) {
-		if (getManager().getLastViewed().get(sender) == -1)
-			return false;
-		return true;
+		return getManager().getLastViewed().get(sender) != -1;
 	}
 
 	/**

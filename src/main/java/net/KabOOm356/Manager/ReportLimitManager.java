@@ -27,41 +27,35 @@ public class ReportLimitManager {
 	/**
 	 * An instance of the main class.
 	 */
-	private Reporter plugin;
-
+	private final Reporter plugin;
+	/**
+	 * A {@link HashMap} that holds all the players who have reported.
+	 */
+	private final HashMap<String, HashMap<String, PriorityQueue<ReportTimer>>> playerReports;
 	/**
 	 * If the configuration is set to limit the number of reports.
 	 */
 	private boolean limitReports = true;
-
 	/**
 	 * The number of reports allowed within a certain amount of time.
 	 */
 	private int reportLimit = 5;
-
 	/**
 	 * The time that it takes before the player can report again.
 	 */
 	private int limitTime = 600;
-
 	/**
 	 * If the configuration is set to limit the number
 	 * of reports against another player.
 	 */
 	private boolean limitReportsAgainstPlayers = false;
 
+	// Have to use a String as the Key because if a player logs off
+	// then logs in again the Player object has a different hash.
 	/**
 	 * The number of reports allowed against another player.
 	 */
 	private int reportLimitAgainstPlayers = 2;
-
-	// Have to use a String as the Key because if a player logs off
-	// then logs in again the Player object has a different hash.
-	/**
-	 * A {@link HashMap} that holds all the players who have reported.
-	 */
-	private HashMap<String, HashMap<String, PriorityQueue<ReportTimer>>> playerReports;
-
 	/**
 	 * If the configuration is set to alert the
 	 * console when a player reaches their reporting limit.

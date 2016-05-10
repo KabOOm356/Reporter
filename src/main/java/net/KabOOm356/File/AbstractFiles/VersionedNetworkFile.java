@@ -449,7 +449,7 @@ public class VersionedNetworkFile extends NetworkFile {
 		 * @param name  The name of the ReleaseLevel.
 		 * @param value The value associated with the ReleaseLevel.
 		 */
-		private ReleaseLevel(String name, int value) {
+		ReleaseLevel(String name, int value) {
 			this.name = name;
 			this.value = value;
 		}
