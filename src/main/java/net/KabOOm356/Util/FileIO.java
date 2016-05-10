@@ -9,13 +9,16 @@ import java.io.*;
 /**
  * A class to help with file input and output.
  */
-public class FileIO {
+public final class FileIO {
 	/**
 	 * The encoding to always use when writing to a file.
 	 */
 	public static final String encoding = "UTF-8";
 	public static final String BACKUP_FILE_EXTENSION = ".backup";
 	private static final Logger log = LogManager.getLogger(FileIO.class);
+
+	private FileIO() {
+	}
 
 	/**
 	 * Copies a given text {@link File} to another {@link File}.

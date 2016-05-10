@@ -15,7 +15,6 @@ import java.util.ArrayList;
 
 import static org.mockito.Mockito.never;
 import static org.powermock.api.mockito.PowerMockito.*;
-import static org.powermock.api.support.membermodification.MemberMatcher.method;
 
 @PrepareForTest(DatabaseTableVersionUpdater.class)
 public class DatabaseTableVersionUpdaterTest extends PowerMockitoTest {

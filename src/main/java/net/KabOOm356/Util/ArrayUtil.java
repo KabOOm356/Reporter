@@ -5,7 +5,6 @@ import net.KabOOm356.Database.SQLResultSet;
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 
-import java.sql.SQLException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -142,7 +141,6 @@ public final class ArrayUtil {
 	 * @param indexColor     The color to make the indexes.
 	 * @param separatorColor The color to make the separator.
 	 * @return The string representation of the given indexes.
-	 * @throws SQLException
 	 */
 	public static String indexesToString(final SQLResultSet resultSet, final String columnName, final ChatColor indexColor, final ChatColor separatorColor) {
 		Validate.notNull(resultSet);

@@ -17,8 +17,11 @@ import java.util.Map.Entry;
 /**
  * A command that will display how to use the other commands.
  */
-public class HelpCommand {
+public final class HelpCommand {
 	private static final String format = ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.RED + "%usage" + ChatColor.WHITE + " - %description";
+
+	private HelpCommand() {
+	}
 
 	/**
 	 * Displays help messages for the report commands.
@@ -27,16 +30,16 @@ public class HelpCommand {
 	 * @param sender  The {@link CommandSender} to display the help messages to.
 	 * @param page    The help page number requested.
 	 */
-	public static void reportHelp(ReporterCommandManager manager, CommandSender sender, int page) {
-		HashMap<String, ReporterCommand> commands = manager.getReportCommands();
+	public static void reportHelp(final ReporterCommandManager manager, final CommandSender sender, final int page) {
+		final HashMap<String, ReporterCommand> commands = manager.getReportCommands();
 
-		int numberOfHelpMessages = getNumberOfHelpMessages(commands);
+		final int numberOfHelpMessages = getNumberOfHelpMessages(commands);
 
-		int pageCount = getNumberOfPages(numberOfHelpMessages);
+		final int pageCount = getNumberOfPages(numberOfHelpMessages);
 
 		if (requireHelpPageValid(manager, sender, pageCount, page)) {
-			int startNumber = getStartNumber(page);
-			int endNumber = getEndNumber(numberOfHelpMessages, startNumber);
+			final int startNumber = getStartNumber(page);
+			final int endNumber = getEndNumber(numberOfHelpMessages, startNumber);
 
 			String line = manager.getLocale().getString(HelpPhrases.reportHelpHeader);
 			line = line.replaceAll("%p", ChatColor.GOLD + Integer.toString(page) + ChatColor.GREEN);
@@ -66,16 +69,16 @@ public class HelpCommand {
 	 * @param sender  The {@link CommandSender} to display the help messages to.
 	 * @param page    The help page number requested.
 	 */
-	public static void respondHelp(ReporterCommandManager manager, CommandSender sender, int page) {
-		HashMap<String, ReporterCommand> commands = manager.getRespondCommands();
+	public static void respondHelp(final ReporterCommandManager manager, final CommandSender sender, final int page) {
+		final HashMap<String, ReporterCommand> commands = manager.getRespondCommands();
 
-		int numberOfHelpMessages = getNumberOfHelpMessages(commands);
+		final int numberOfHelpMessages = getNumberOfHelpMessages(commands);
 
-		int pageCount = getNumberOfPages(numberOfHelpMessages);
+		final int pageCount = getNumberOfPages(numberOfHelpMessages);
 
 		if (requireHelpPageValid(manager, sender, pageCount, page)) {
-			int startNumber = getStartNumber(page);
-			int endNumber = getEndNumber(numberOfHelpMessages, startNumber);
+			final int startNumber = getStartNumber(page);
+			final int endNumber = getEndNumber(numberOfHelpMessages, startNumber);
 
 			String line = manager.getLocale().getString(HelpPhrases.respondHelpHeader);
 			line = line.replaceAll("%p", ChatColor.GOLD + Integer.toString(page) + ChatColor.GREEN);
@@ -106,12 +109,10 @@ public class HelpCommand {
 	 * @param start    The number to start displaying help messages from.
 	 * @param end      The number to stop displaying help messages at.
 	 */
-	public static void printHelp(CommandSender sender, HashMap<String, ReporterCommand> commands, int start, int end) {
-		String[][] usagesAndDescriptions = getUsagesAndDescriptions(commands, start, end);
+	public static void printHelp(final CommandSender sender, final HashMap<String, ReporterCommand> commands, final int start, final int end) {
+		final String[][] usagesAndDescriptions = getUsagesAndDescriptions(commands, start, end);
 
-		for (int LCV = 0; LCV < usagesAndDescriptions.length; LCV++) {
-			String[] usageDescription = usagesAndDescriptions[LCV];
-
+		for (final String[] usageDescription : usagesAndDescriptions) {
 			printHelpLine(sender, usageDescription[0], usageDescription[1]);
 		}
 	}
@@ -124,25 +125,23 @@ public class HelpCommand {
 	 * @param endNumber   The number to stop getting usages and descriptions.
 	 * @return The usages, in index zero, and descriptions, in index one, of the commands that fall between the start number and end number.
 	 */
-	private static String[][] getUsagesAndDescriptions(HashMap<String, ReporterCommand> commands, int startNumber, int endNumber) {
-		int difference = endNumber - startNumber;
+	private static String[][] getUsagesAndDescriptions(final HashMap<String, ReporterCommand> commands, final int startNumber, final int endNumber) {
+		final int difference = endNumber - startNumber;
 
-		String[][] usagesAndDescriptions = new String[difference][2];
+		final String[][] usagesAndDescriptions = new String[difference][2];
 
 		int arrayCount = 0;
 		int current = 0;
 
-		for (Entry<String, ReporterCommand> e : commands.entrySet()) {
-			ReporterCommand cmd = e.getValue();
+		for (final Entry<String, ReporterCommand> e : commands.entrySet()) {
+			final ReporterCommand cmd = e.getValue();
 
-			ArrayList<ObjectPair<String, String>> usages = cmd.getUsages();
-			int usagesCount = usages.size();
+			final ArrayList<ObjectPair<String, String>> usages = cmd.getUsages();
+			final int usagesCount = usages.size();
 
 			if ((current + usagesCount) > startNumber) {
-				for (int LCV = 0; LCV < usagesCount; LCV++) {
+				for (final ObjectPair<String, String> usage : usages) {
 					if (current >= startNumber && current <= endNumber) {
-						ObjectPair<String, String> usage = usages.get(LCV);
-
 						usagesAndDescriptions[arrayCount][0] = usage.getKey();
 						usagesAndDescriptions[arrayCount][1] = usage.getValue();
 
@@ -151,15 +150,17 @@ public class HelpCommand {
 
 					current++;
 
-					if (current > endNumber || arrayCount >= difference)
+					if (current > endNumber || arrayCount >= difference) {
 						break;
+					}
 				}
 			} else {
 				current += usagesCount;
 			}
 
-			if (current > endNumber || arrayCount >= difference)
+			if (current > endNumber || arrayCount >= difference) {
 				break;
+			}
 		}
 
 		return usagesAndDescriptions;
@@ -171,11 +172,12 @@ public class HelpCommand {
 	 * @param commands The pool of commands to get the number of help messages from.
 	 * @return The total number of help messages.
 	 */
-	private static int getNumberOfHelpMessages(HashMap<String, ReporterCommand> commands) {
+	private static int getNumberOfHelpMessages(final HashMap<String, ReporterCommand> commands) {
 		int numberOfHelpMessages = 0;
 
-		for (Entry<String, ReporterCommand> e : commands.entrySet())
+		for (final Entry<String, ReporterCommand> e : commands.entrySet()) {
 			numberOfHelpMessages += e.getValue().getUsages().size();
+		}
 
 		return numberOfHelpMessages;
 	}
@@ -186,7 +188,7 @@ public class HelpCommand {
 	 * @param numberOfHelpMessages The total number of help messages.
 	 * @return The number of pages that are available.
 	 */
-	private static int getNumberOfPages(int numberOfHelpMessages) {
+	private static int getNumberOfPages(final int numberOfHelpMessages) {
 		return (int) Math.ceil(numberOfHelpMessages / 5f);
 	}
 
@@ -201,7 +203,7 @@ public class HelpCommand {
 	 * @param page      The page number being requested.
 	 * @return True if the page number requested is valid, otherwise false.
 	 */
-	private static boolean requireHelpPageValid(ReporterCommandManager manager, CommandSender sender, int pageCount, int page) {
+	private static boolean requireHelpPageValid(final ReporterCommandManager manager, final CommandSender sender, final int pageCount, final int page) {
 		String line;
 
 		if (page <= 0) {
@@ -229,7 +231,7 @@ public class HelpCommand {
 	 * @param page The page number to get the starting number for.
 	 * @return The starting number for the given page.
 	 */
-	private static int getStartNumber(int page) {
+	private static int getStartNumber(final int page) {
 		return (page - 1) * 5;
 	}
 
@@ -240,7 +242,7 @@ public class HelpCommand {
 	 * @param startNumber          The starting number.
 	 * @return The ending number based off the starting number and total number of help messages.
 	 */
-	private static int getEndNumber(int numberOfHelpMessages, int startNumber) {
+	private static int getEndNumber(final int numberOfHelpMessages, final int startNumber) {
 		return ((startNumber + 5) > numberOfHelpMessages) ? numberOfHelpMessages : startNumber + 5;
 	}
 
@@ -251,7 +253,7 @@ public class HelpCommand {
 	 * @param usage       The usage of the command.
 	 * @param description The description of the usage of the command.
 	 */
-	private static void printHelpLine(CommandSender sender, String usage, String description) {
+	private static void printHelpLine(final CommandSender sender, final String usage, final String description) {
 		String line = format.replaceAll("%usage", usage);
 		line = line.replaceAll("%description", description);
 		sender.sendMessage(BukkitUtil.colorCodeReplaceAll(line));

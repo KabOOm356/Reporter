@@ -18,8 +18,6 @@ public interface Initializable {
 
 	/**
 	 * Sets this Object to either being initialized or not.
-	 *
-	 * @param initialized Whether this Object is initialized or not.
 	 */
 	void initialized();
 }

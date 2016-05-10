@@ -30,17 +30,17 @@ public class ResultRow extends HashMap<String, Object> {
 	/**
 	 * Constructor.
 	 *
-	 * @param result The {@link ResultSet} to initialize this {@link ResultRow} to.
+	 * @param result The {@link ResultSet} to initialize this to.
 	 * @throws SQLException
 	 */
-	public ResultRow(ResultSet result) throws SQLException {
+	public ResultRow(final ResultSet result) throws SQLException {
 		super();
 
 		set(result);
 	}
 
 	/**
-	 * Sets the contents of this {@link ResultRow} to the current row of the given ResultSet.
+	 * Sets the contents of this to the current row of the given ResultSet.
 	 *
 	 * @param result The {@link ResultSet}.
 	 * @throws SQLException
@@ -48,7 +48,7 @@ public class ResultRow extends HashMap<String, Object> {
 	public void set(final ResultSet result) throws SQLException {
 		try {
 			final ResultSetMetaData metaData = result.getMetaData();
-			int columns = metaData.getColumnCount();
+			final int columns = metaData.getColumnCount();
 			clear();
 			for (int LCV = 1; LCV <= columns; LCV++) {
 				put(metaData.getColumnName(LCV), result.getObject(LCV));
@@ -67,9 +67,10 @@ public class ResultRow extends HashMap<String, Object> {
 	 * @param colName The name of the column.
 	 * @return The column cast to a String if the column exists, otherwise null.
 	 */
-	public String getString(String colName) {
-		if (get(colName) == null)
+	public String getString(final String colName) {
+		if (get(colName) == null) {
 			return null;
+		}
 		return get(colName).toString();
 	}
 
@@ -79,9 +80,10 @@ public class ResultRow extends HashMap<String, Object> {
 	 * @param colName The name of the column.
 	 * @return The column cast to a Boolean if the column exists, otherwise null.
 	 */
-	public Boolean getBoolean(String colName) {
-		if (get(colName) == null)
+	public Boolean getBoolean(final String colName) {
+		if (get(colName) == null) {
 			return null;
+		}
 
 		// Try to parse for the Boolean, only returns true if the string value is "true".
 		Boolean value = Boolean.parseBoolean(getString(colName));
@@ -97,9 +99,10 @@ public class ResultRow extends HashMap<String, Object> {
 	 * @param colName The name of the column.
 	 * @return The column cast to an Integer if the column exists, otherwise null.
 	 */
-	public Integer getInt(String colName) {
-		if (get(colName) == null)
+	public Integer getInt(final String colName) {
+		if (get(colName) == null) {
 			return null;
+		}
 		return Integer.parseInt(getString(colName));
 	}
 
@@ -109,9 +112,10 @@ public class ResultRow extends HashMap<String, Object> {
 	 * @param colName The name of the column.
 	 * @return The column cast to a Double if the column exists, otherwise null.
 	 */
-	public Double getDouble(String colName) {
-		if (get(colName) == null)
+	public Double getDouble(final String colName) {
+		if (get(colName) == null) {
 			return null;
+		}
 		return Double.parseDouble(getString(colName));
 	}
 }

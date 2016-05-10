@@ -33,8 +33,9 @@ public class ReporterPermissionManager {
 
 		setupPermissionsEx();
 
-		if (type == null)
+		if (type == null) {
 			type = PermissionType.SuperPerms;
+		}
 
 		log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + type + " support enabled.");
 	}
@@ -49,8 +50,9 @@ public class ReporterPermissionManager {
 			if (permissionsExHandler == null) {
 				log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Failed to obtain PermissionsEx handler.");
 				log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "PermissionsEx support could not be enabled.");
-			} else
+			} else {
 				type = PermissionType.PermissionsEx;
+			}
 		}
 	}
 
@@ -70,9 +72,10 @@ public class ReporterPermissionManager {
 	 * @param perm   The permission node to check for.
 	 * @return True if the given {@link Player} has the given permission node, otherwise false.
 	 */
-	public boolean hasPermission(Player player, String perm) {
-		if (type == PermissionType.PermissionsEx)
+	public boolean hasPermission(final Player player, final String perm) {
+		if (type == PermissionType.PermissionsEx) {
 			return permissionsExHandler.has(player, perm);
+		}
 		return player.hasPermission(perm);
 	}
 }

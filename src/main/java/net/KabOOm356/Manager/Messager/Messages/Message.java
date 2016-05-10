@@ -14,7 +14,7 @@ public abstract class Message {
 	 *
 	 * @param message The message.
 	 */
-	public Message(String message) {
+	public Message(final String message) {
 		this.message = message;
 	}
 
@@ -32,7 +32,7 @@ public abstract class Message {
 	 *
 	 * @param message The message to be set to.
 	 */
-	public void setMessage(String message) {
+	public void setMessage(final String message) {
 		this.message = message;
 	}
 
@@ -42,7 +42,7 @@ public abstract class Message {
 	 * @param message The message to compare to.
 	 * @return True if both messages are equal.
 	 */
-	public boolean messagesEqual(Message message) {
+	public boolean messagesEqual(final Message message) {
 		return getMessage().equalsIgnoreCase(message.getMessage());
 	}
 

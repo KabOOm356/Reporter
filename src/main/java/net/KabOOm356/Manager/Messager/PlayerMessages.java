@@ -29,7 +29,7 @@ public class PlayerMessages extends HashMap<String, GroupMessages> {
 	 * @param player  The player to add the message to.
 	 * @param message The message to add to the player.
 	 */
-	public void put(String player, Message message) {
+	public void put(final String player, final Message message) {
 		put(player, Group.DEFAULT, message);
 	}
 
@@ -40,16 +40,17 @@ public class PlayerMessages extends HashMap<String, GroupMessages> {
 	 * @param group   The group to add to the player.
 	 * @param message The message to add to the group.
 	 */
-	public void put(String player, Group group, Message message) {
-		if (!containsKey(player))
+	public void put(final String player, final Group group, final Message message) {
+		if (!containsKey(player)) {
 			put(player, new GroupMessages(group, message));
-		else
+		} else {
 			get(player).put(group, message);
+		}
 	}
 
 	@Override
-	public GroupMessages remove(Object key) {
-		GroupMessages removed = super.remove(key);
+	public GroupMessages remove(final Object key) {
+		final GroupMessages removed = super.remove(key);
 
 		removeEmpty();
 
@@ -62,12 +63,13 @@ public class PlayerMessages extends HashMap<String, GroupMessages> {
 	 * @param player The player to remove the group from.
 	 * @param group  The group to remove.
 	 */
-	public void remove(String player, Group group) {
+	public void remove(final String player, final Group group) {
 		if (this.containsKey(player)) {
-			GroupMessages messages = get(player);
+			final GroupMessages messages = get(player);
 
-			if (messages.containsKey(group))
+			if (messages.containsKey(group)) {
 				messages.remove(group);
+			}
 		}
 
 		removeEmpty();
@@ -78,9 +80,10 @@ public class PlayerMessages extends HashMap<String, GroupMessages> {
 	 *
 	 * @param message The message to remove.
 	 */
-	public void remove(Message message) {
-		for (GroupMessages messages : this.values())
+	public void remove(final Message message) {
+		for (final GroupMessages messages : this.values()) {
 			messages.remove(message);
+		}
 
 		removeEmpty();
 	}
@@ -90,9 +93,10 @@ public class PlayerMessages extends HashMap<String, GroupMessages> {
 	 *
 	 * @param group The group to remove.
 	 */
-	public void remove(Group group) {
-		for (GroupMessages messages : this.values())
+	public void remove(final Group group) {
+		for (final GroupMessages messages : this.values()) {
 			messages.remove(group);
+		}
 
 		removeEmpty();
 	}
@@ -102,9 +106,9 @@ public class PlayerMessages extends HashMap<String, GroupMessages> {
 	 *
 	 * @param remainingIndexes The remaining indexes after a batch deletion.
 	 */
-	public void reindexMessages(ArrayList<Integer> remainingIndexes) {
-		for (Entry<String, GroupMessages> messages : this.entrySet()) {
-			GroupMessages groupMessages = messages.getValue();
+	public void reindexMessages(final ArrayList<Integer> remainingIndexes) {
+		for (final Entry<String, GroupMessages> messages : this.entrySet()) {
+			final GroupMessages groupMessages = messages.getValue();
 
 			groupMessages.reindexMessages(remainingIndexes);
 		}
@@ -117,31 +121,35 @@ public class PlayerMessages extends HashMap<String, GroupMessages> {
 	 *
 	 * @param index The index to remove.
 	 */
-	public void removeIndex(int index) {
-		for (GroupMessages messages : this.values())
+	public void removeIndex(final int index) {
+		for (final GroupMessages messages : this.values()) {
 			messages.removeIndex(index);
+		}
 
 		removeEmpty();
 	}
 
 	private void removeEmpty() {
-		ArrayList<String> removalKeys = new ArrayList<String>();
+		final ArrayList<String> removalKeys = new ArrayList<String>();
 
-		for (Entry<String, GroupMessages> messages : entrySet()) {
-			if (messages.getValue().isEmpty())
+		for (final Entry<String, GroupMessages> messages : entrySet()) {
+			if (messages.getValue().isEmpty()) {
 				removalKeys.add(messages.getKey());
+			}
 		}
 
-		for (String key : removalKeys)
+		for (final String key : removalKeys) {
 			this.remove(key);
+		}
 	}
 
 	@Override
 	public boolean isEmpty() {
 		if (!super.isEmpty()) {
-			for (GroupMessages message : values()) {
-				if (!message.isEmpty())
+			for (final GroupMessages message : values()) {
+				if (!message.isEmpty()) {
 					return false;
+				}
 			}
 		}
 

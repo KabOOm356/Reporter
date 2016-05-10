@@ -56,7 +56,7 @@ public class DatabaseTableCreatorTest extends PowerMockitoTest {
 
 	@Test(expected = InterruptedException.class)
 	public void testCreateInterruptedException() throws Exception {
-		doThrow(new InterruptedException("Test Exception")).when(databaseTableCreator, "needsToCreateTable");
+		doThrow(new InterruptedException("Test Exception")).when(databaseTableCreator, "startTransaction");
 		databaseTableCreator.create();
 	}
 
@@ -68,7 +68,7 @@ public class DatabaseTableCreatorTest extends PowerMockitoTest {
 
 	@Test(expected = ClassNotFoundException.class)
 	public void testCreateClassNotFoundException() throws Exception {
-		doThrow(new ClassNotFoundException("Test Exception")).when(databaseTableCreator, "needsToCreateTable");
+		doThrow(new ClassNotFoundException("Test Exception")).when(databaseTableCreator, "startTransaction");
 		databaseTableCreator.create();
 	}
 

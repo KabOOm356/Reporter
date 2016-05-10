@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLConnection;
-import java.text.ParseException;
 
 /**
  * An {@link Updater} to update the locale file from an XML update site.
@@ -41,7 +40,7 @@ public class LocaleUpdater extends Updater {
 	 * @param lowestLevel  The lowest {@link ReleaseLevel} to consider.
 	 * @throws IOException
 	 */
-	public LocaleUpdater(UpdateSite updateSite, String name, String localVersion, ReleaseLevel lowestLevel) throws IOException {
+	public LocaleUpdater(final UpdateSite updateSite, final String name, final String localVersion, final ReleaseLevel lowestLevel) throws IOException {
 		super(updateSite, name, localVersion, lowestLevel);
 	}
 
@@ -56,37 +55,39 @@ public class LocaleUpdater extends Updater {
 	 */
 	@Override
 	public VersionedNetworkFile findLatestFile() throws SAXException, IOException, ParserConfigurationException {
-		URLConnection connection = getConnection();
+		final URLConnection connection = getConnection();
 
-		String name = getName();
-		ReleaseLevel lowestLevel = getLowestLevel();
+		final String name = getName();
+		final ReleaseLevel lowestLevel = getLowestLevel();
 
 		if (connection == null) {
-			if (name == null || name.equals(""))
+			if (name == null || name.isEmpty()) {
 				throw new IllegalArgumentException("Both the connection and the name cannot be null!");
+			}
 			throw new IllegalArgumentException("The connection cannot be null!");
-		} else if (name == null || name.equals(""))
+		} else if (name == null || name.isEmpty()) {
 			throw new IllegalArgumentException("File name to search for cannot be null!");
+		}
 
-		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(connection.getInputStream());
+		final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(connection.getInputStream());
 
 		doc.getDocumentElement().normalize();
 
-		NodeList nodeList = doc.getElementsByTagName("locale");
+		final NodeList nodeList = doc.getElementsByTagName("locale");
 
 		VersionedNetworkFile file = null;
 		VersionedNetworkFile latestFile = null;
 
 		for (int LCV = 0; LCV < nodeList.getLength(); LCV++) {
-			Node nNode = nodeList.item(LCV);
+			final Node nNode = nodeList.item(LCV);
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-				Element element = (Element) nNode;
+				final Element element = (Element) nNode;
 
 				if (Util.startsWithIgnoreCase(UrlIO.getNodeValue(element, "file_name"), name)) {
-					String fileName = UrlIO.getNodeValue(element, "file_name");
-					String version = UrlIO.getNodeValue(element, "version");
-					String encoding = UrlIO.getNodeValue(element, "encoding");
-					String link = UrlIO.getNodeValue(element, "download_link");
+					final String fileName = UrlIO.getNodeValue(element, "file_name");
+					final String version = UrlIO.getNodeValue(element, "version");
+					final String encoding = UrlIO.getNodeValue(element, "encoding");
+					final String link = UrlIO.getNodeValue(element, "download_link");
 
 					file = new VersionedNetworkFile(fileName, version, encoding, link);
 
@@ -94,15 +95,17 @@ public class LocaleUpdater extends Updater {
 					if (file.getReleaseLevel().compareToByValue(lowestLevel) >= 0) {
 						// If latestFile is not initialized, set latestFile to the current file.
 						// If the current file's version is greater than the latestFile's version, set latestFile to the current file.
-						if (latestFile == null || latestFile.compareVersionTo(file) < 0)
+						if (latestFile == null || latestFile.compareVersionTo(file) < 0) {
 							latestFile = file;
+						}
 					}
 				}
 			}
 		}
 
-		if (latestFile == null)
+		if (latestFile == null) {
 			throw new FileNotFoundException("File " + name + " could not be found!");
+		}
 
 		return latestFile;
 	}
@@ -113,14 +116,14 @@ public class LocaleUpdater extends Updater {
 	 * @return True if the file is found and downloaded, otherwise false.
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
-	 * @throws ParseException
 	 * @throws IOException
 	 */
-	public boolean localeDownloadProcess(File destination) throws ParserConfigurationException, SAXException, ParseException, IOException {
+	public boolean localeDownloadProcess(final File destination) throws ParserConfigurationException, SAXException, IOException {
 		String localeName = getName();
 
-		if (localeName.contains(ConstantsLocale.LOCALE_FILE_EXTENSION))
+		if (localeName.contains(ConstantsLocale.LOCALE_FILE_EXTENSION)) {
 			localeName = localeName.substring(0, localeName.indexOf(ConstantsLocale.LOCALE_FILE_EXTENSION));
+		}
 
 		log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Checking for file: " + destination.getName());
 
@@ -128,7 +131,7 @@ public class LocaleUpdater extends Updater {
 
 		try {
 			downloadFile = findLatestFile();
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Could not find the locale file " + localeName + ".yml!", e);
 		}
 
@@ -151,14 +154,14 @@ public class LocaleUpdater extends Updater {
 	 * @return True if the locale file is updated.  False if the file is already up to date or failed to updated.
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
-	 * @throws ParseException
 	 * @throws IOException
 	 */
-	public boolean localeUpdateProcess(File destination) throws ParserConfigurationException, SAXException, ParseException, IOException {
+	public boolean localeUpdateProcess(final File destination) throws ParserConfigurationException, SAXException, IOException {
 		String localeName = getName();
 
-		if (localeName.contains(".yml"))
+		if (localeName.contains(".yml")) {
 			localeName = localeName.substring(0, localeName.indexOf(ConstantsLocale.LOCALE_FILE_EXTENSION));
+		}
 
 		log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Checking for update for file: " + destination.getName());
 
@@ -166,14 +169,14 @@ public class LocaleUpdater extends Updater {
 
 		try {
 			updateNetworkFile = checkForUpdates();
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Could not find the locale file " + localeName + ".yml!", e);
 			log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Failed to check for locale update!");
 		}
 
-		if (updateNetworkFile == null)
+		if (updateNetworkFile == null) {
 			log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Locale file is up to date.");
-		else {
+		} else {
 			// Create backup
 			RevisionFile localeBackupFile = null;
 
@@ -186,12 +189,13 @@ public class LocaleUpdater extends Updater {
 				log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Locale backup successful.");
 				log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Locale backup created in file: " + localeBackupFile.getFileName());
 				destination.delete();
-			} else
+			} else {
 				log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Creating backup unsuccessful.");
+			}
 
 			try {
 				UrlIO.downloadFile(updateNetworkFile, destination);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "Updating the locale file failed.", e);
 				destination.delete();
 				return false;

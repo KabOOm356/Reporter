@@ -19,7 +19,7 @@ public class NetworkFile extends AbstractFile {
 	 * @param url The URL location of the file on the network.
 	 * @see AbstractFile#AbstractFile(String)
 	 */
-	public NetworkFile(String url) {
+	public NetworkFile(final String url) {
 		super(getFileName(url));
 		this.url = url;
 	}
@@ -31,7 +31,7 @@ public class NetworkFile extends AbstractFile {
 	 * @param encoding A String that represents the encoding of this file.
 	 * @param url      The URL location of the file on the network.
 	 */
-	public NetworkFile(String fileName, String encoding, String url) {
+	public NetworkFile(final String fileName, final String encoding, final String url) {
 		super(fileName, encoding);
 		this.url = url;
 	}
@@ -43,7 +43,7 @@ public class NetworkFile extends AbstractFile {
 	 * @param url      The URL location of the file on the network.
 	 * @see AbstractFile#AbstractFile(String)
 	 */
-	public NetworkFile(String fileName, String url) {
+	public NetworkFile(final String fileName, final String url) {
 		super(fileName);
 		this.url = url;
 	}
@@ -57,7 +57,7 @@ public class NetworkFile extends AbstractFile {
 	 * @param url       The URL location of the file on the network.
 	 * @see AbstractFile#AbstractFile(String, String, String)
 	 */
-	public NetworkFile(String name, String extension, String fileName, String url) {
+	public NetworkFile(final String name, final String extension, final String fileName, final String url) {
 		super(name, extension, fileName);
 		this.url = url;
 	}
@@ -72,7 +72,7 @@ public class NetworkFile extends AbstractFile {
 	 * @param url       The URL location of this file.
 	 * @see AbstractFile#AbstractFile(String, String, String, String)
 	 */
-	public NetworkFile(String name, String extension, String fileName, String encoding, String url) {
+	public NetworkFile(final String name, final String extension, final String fileName, final String encoding, final String url) {
 		super(name, extension, fileName, encoding);
 		this.url = url;
 	}
@@ -87,7 +87,7 @@ public class NetworkFile extends AbstractFile {
 	 * @param url              The URL location of the file.
 	 * @see AbstractFile#AbstractFile(String, String, String, Date)
 	 */
-	public NetworkFile(String name, String extension, String fileName, Date modificationDate, String url) {
+	public NetworkFile(final String name, final String extension, final String fileName, final Date modificationDate, final String url) {
 		super(name, extension, fileName, modificationDate);
 		this.url = url;
 	}
@@ -101,7 +101,7 @@ public class NetworkFile extends AbstractFile {
 	 * @param modificationDate The last time the file was modified.
 	 * @see AbstractFile#AbstractFile(String, String, String, Date)
 	 */
-	public NetworkFile(String name, String extension, String fileName, Date modificationDate) {
+	public NetworkFile(final String name, final String extension, final String fileName, final Date modificationDate) {
 		super(name, extension, fileName, modificationDate);
 		this.url = null;
 	}
@@ -117,7 +117,7 @@ public class NetworkFile extends AbstractFile {
 	 * @param url              The URL location of the file.
 	 * @see AbstractFile#AbstractFile(String, String, String, String, Date)
 	 */
-	public NetworkFile(String name, String extension, String fileName, String encoding, Date modificationDate, String url) {
+	public NetworkFile(final String name, final String extension, final String fileName, final String encoding, final Date modificationDate, final String url) {
 		super(name, extension, fileName, encoding, modificationDate);
 		this.url = url;
 	}
@@ -128,10 +128,11 @@ public class NetworkFile extends AbstractFile {
 	 * @param url The URL to parse the file name from.
 	 * @return The file name parsed from the URL.
 	 */
-	private static String getFileName(String url) {
-		int index = url.lastIndexOf("/");
-		if (index != -1 && index + 1 < url.length())
+	private static String getFileName(final String url) {
+		final int index = url.lastIndexOf('/');
+		if (index != -1 && index + 1 < url.length()) {
 			return url.substring(index);
+		}
 		return url;
 	}
 
@@ -147,13 +148,10 @@ public class NetworkFile extends AbstractFile {
 	 *
 	 * @param url The new URL to this file.
 	 */
-	public void setUrl(String url) {
+	public void setUrl(final String url) {
 		this.url = url;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public String toString() {
 		String string = super.toString();

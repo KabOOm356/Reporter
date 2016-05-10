@@ -1,23 +1,21 @@
 package test.KabOOm356.Manager;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-
 import net.KabOOm356.Manager.SQLStatManager.SQLStat;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager.PlayerStat;
-
 import org.junit.Test;
 
-public class SQLStatTest
-{
+import java.util.ArrayList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class SQLStatTest {
 	@Test
-	public void testGetByName()
-	{
+	public void testGetByName() {
 		SQLStat stat = SQLStat.ALL;
 		assertEquals(stat, SQLStat.getByName(stat.getName()));
-		
+
 		stat = ModeratorStat.ASSIGNED;
 		assertEquals(stat, SQLStat.getByName(stat.getName()));
 		stat = ModeratorStat.CLAIMED;
@@ -34,7 +32,7 @@ public class SQLStatTest
 		assertEquals(stat, SQLStat.getByName(stat.getName()));
 		stat = ModeratorStat.UNCLAIMED;
 		assertEquals(stat, SQLStat.getByName(stat.getName()));
-		
+
 		stat = PlayerStat.FIRSTREPORTDATE;
 		assertEquals(stat, SQLStat.getByName(stat.getName()));
 		stat = PlayerStat.FIRSTREPORTEDDATE;
@@ -48,17 +46,16 @@ public class SQLStatTest
 		stat = PlayerStat.REPORTED;
 		assertEquals(stat, SQLStat.getByName(stat.getName()));
 	}
-	
+
 	@Test
-	public void testGetAll()
-	{
+	public void testGetAll() {
 		ArrayList<SQLStat> stats = SQLStat.getAll(SQLStat.class);
-		
+
 		assertEquals(1, stats.size());
 		assertTrue(stats.contains(SQLStat.ALL));
-		
+
 		stats = SQLStat.getAll(ModeratorStat.class);
-		
+
 		assertTrue(stats.contains(ModeratorStat.ASSIGNED));
 		assertTrue(stats.contains(ModeratorStat.CLAIMED));
 		assertTrue(stats.contains(ModeratorStat.COMPLETED));
@@ -67,9 +64,9 @@ public class SQLStatTest
 		assertTrue(stats.contains(ModeratorStat.RESPONDED));
 		assertTrue(stats.contains(ModeratorStat.UNASSIGNED));
 		assertTrue(stats.contains(ModeratorStat.UNCLAIMED));
-		
+
 		stats = SQLStat.getAll(PlayerStat.class);
-		
+
 		assertTrue(stats.contains(PlayerStat.FIRSTREPORTDATE));
 		assertTrue(stats.contains(PlayerStat.FIRSTREPORTEDDATE));
 		assertTrue(stats.contains(PlayerStat.LASTREPORTDATE));

@@ -34,7 +34,7 @@ public class ClaimCommand extends ReporterCommand {
 	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public ClaimCommand(ReporterCommandManager manager) {
+	public ClaimCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 
 		updateDocumentation();
@@ -59,24 +59,28 @@ public class ClaimCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args) {
+	public void execute(final CommandSender sender, final ArrayList<String> args) {
 		try {
-			if (!hasRequiredPermission(sender))
+			if (!hasRequiredPermission(sender)) {
 				return;
+			}
 
 			int index = Util.parseInt(args.get(0));
 			if (args.get(0).equalsIgnoreCase("last")) {
-				if (!hasRequiredLastViewed(sender))
+				if (!hasRequiredLastViewed(sender)) {
 					return;
+				}
 
 				index = getLastViewed(sender);
 			}
 
-			if (!getManager().isReportIndexValid(sender, index))
+			if (!getManager().isReportIndexValid(sender, index)) {
 				return;
+			}
 
-			if (!getManager().canAlterReport(sender, index))
+			if (!getManager().canAlterReport(sender, index)) {
 				return;
+			}
 
 			claimReport(sender, index);
 		} catch (final Exception e) {
@@ -85,8 +89,8 @@ public class ClaimCommand extends ReporterCommand {
 		}
 	}
 
-	private void claimReport(CommandSender sender, int index) throws ClassNotFoundException, SQLException, InterruptedException {
-		ArrayList<String> params = new ArrayList<String>();
+	private void claimReport(final CommandSender sender, final int index) throws ClassNotFoundException, SQLException, InterruptedException {
+		final ArrayList<String> params = new ArrayList<String>();
 
 		params.add("1");
 		params.add(BukkitUtil.getUUIDString(sender));
@@ -95,7 +99,7 @@ public class ClaimCommand extends ReporterCommand {
 		params.add(Reporter.getDateformat().format(new Date()));
 		params.add(Integer.toString(index));
 
-		String query = "UPDATE Reports " +
+		final String query = "UPDATE Reports " +
 				"SET ClaimStatus=?, ClaimedByUUID=?, ClaimedBy=?, ClaimPriority=?, ClaimDate=? " +
 				"WHERE ID=?";
 
@@ -116,7 +120,7 @@ public class ClaimCommand extends ReporterCommand {
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 
 		if (BukkitUtil.isOfflinePlayer(sender)) {
-			OfflinePlayer senderPlayer = (OfflinePlayer) sender;
+			final OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 
 			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.CLAIMED);
 		}

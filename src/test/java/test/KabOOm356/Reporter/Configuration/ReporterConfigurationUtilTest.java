@@ -16,8 +16,6 @@ import java.net.URL;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
@@ -27,6 +25,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
 @PrepareForTest({ReporterConfigurationUtil.class})
 public class ReporterConfigurationUtilTest extends PowerMockitoTest {
 	@Spy
+	final
 	File dataFolder = new File("TestFolder");
 
 	@Mock

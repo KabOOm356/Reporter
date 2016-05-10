@@ -35,7 +35,7 @@ public class ListCommand extends ReporterCommand {
 	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public ListCommand(ReporterCommandManager manager) {
+	public ListCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 
 		updateDocumentation();
@@ -59,33 +59,33 @@ public class ListCommand extends ReporterCommand {
 		return permissionNode;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args) {
+	public void execute(final CommandSender sender, final ArrayList<String> args) {
 		if (hasPermission(sender)) {
 			try {
-				if (args == null || args.isEmpty())
+				if (args == null || args.isEmpty()) {
 					listCommand(sender);
-				else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("indexes"))
+				} else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("indexes")) {
 					listIndexes(sender);
-				else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("priority")) {
-					if (args.size() >= 2 && args.get(1).equalsIgnoreCase("indexes"))
+				} else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("priority")) {
+					if (args.size() >= 2 && args.get(1).equalsIgnoreCase("indexes")) {
 						listPriorityIndexes(sender);
-					else
+					} else {
 						listPriority(sender);
+					}
 				} else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("claimed")) {
-					if (args.size() >= 3 && args.get(1).equalsIgnoreCase("priority") && args.get(2).equalsIgnoreCase("indexes"))
+					if (args.size() >= 3 && args.get(1).equalsIgnoreCase("priority") && args.get(2).equalsIgnoreCase("indexes")) {
 						listClaimedPriorityIndexes(sender);
-					else if (args.size() >= 2 && args.get(1).equalsIgnoreCase("indexes"))
+					} else if (args.size() >= 2 && args.get(1).equalsIgnoreCase("indexes")) {
 						listClaimedIndexes(sender);
-					else if (args.size() >= 2 && args.get(1).equalsIgnoreCase("priority"))
+					} else if (args.size() >= 2 && args.get(1).equalsIgnoreCase("priority")) {
 						listClaimedPriority(sender);
-					else
+					} else {
 						listClaimed(sender);
-				} else
+					}
+				} else {
 					sender.sendMessage(ChatColor.RED + BukkitUtil.colorCodeReplaceAll(getUsage()));
+				}
 			} catch (final Exception e) {
 				log.error("Failed to execute list command!", e);
 				sender.sendMessage(getErrorMessage());
@@ -100,29 +100,31 @@ public class ListCommand extends ReporterCommand {
 				return;
 			}
 
-			String indexesString = ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
+			final String indexesString = ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
 
-			if (!indexesString.equals("")) {
+			if (!indexesString.isEmpty()) {
 				String out = ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
 						getManager().getLocale().getString(ListPhrases.listReportsAvailable));
 				out = out.replaceAll("%i", ChatColor.GOLD + indexesString + ChatColor.WHITE);
 				sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + out);
-			} else
+			} else {
 				sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
 						ChatColor.RED + BukkitUtil.colorCodeReplaceAll(
 						getManager().getLocale().getString(ListPhrases.listNoReportsAvailable)));
-		} else
+			}
+		} else {
 			sender.sendMessage(getFailedPermissionsMessage());
+		}
 	}
 
-	private void listClaimed(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException {
+	private void listClaimed(final CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException {
 		final StringBuilder query = new StringBuilder();
 		query.append("SELECT COUNT(*) AS Count ");
 		query.append("FROM Reports ");
 		query.append("WHERE ClaimStatus = 1 AND ");
 
 		if (BukkitUtil.isPlayer(sender)) {
-			Player p = (Player) sender;
+			final Player p = (Player) sender;
 			query.append("ClaimedByUUID = '").append(p.getUniqueId()).append('\'');
 		} else {
 			query.append("ClaimedBy = '").append(sender.getName()).append('\'');
@@ -136,7 +138,7 @@ public class ListCommand extends ReporterCommand {
 			String message = getManager().getLocale().getString(ListPhrases.listClaimed);
 			message = message.replaceAll("%n", ChatColor.GOLD + Integer.toString(count) + ChatColor.WHITE);
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + message);
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			log.log(Level.ERROR, String.format("Failed to list claimed reports on connection [%d]!", connectionId));
 			throw e;
 		} finally {
@@ -144,13 +146,13 @@ public class ListCommand extends ReporterCommand {
 		}
 	}
 
-	private void listClaimedPriority(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException {
+	private void listClaimedPriority(final CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException {
 		final StringBuilder queryFormat = new StringBuilder();
 		queryFormat.append("SELECT COUNT(*) AS Count ");
 		queryFormat.append("FROM Reports ");
 		queryFormat.append("WHERE ClaimStatus = 1 ");
 		if (BukkitUtil.isPlayer(sender)) {
-			Player p = (Player) sender;
+			final Player p = (Player) sender;
 			queryFormat.append("AND ClaimedByUUID = '").append(p.getUniqueId()).append("' ");
 		} else {
 			queryFormat.append("AND ClaimedBy = '").append(sender.getName()).append("' ");
@@ -191,8 +193,8 @@ public class ListCommand extends ReporterCommand {
 		printClaimedPriorityCount(sender, ModLevel.HIGH, highPriorityCount);
 	}
 
-	private void printClaimedPriorityCount(CommandSender sender, ModLevel level, int count) {
-		String format = getManager().getLocale().getString(ListPhrases.listClaimedPriorityCount);
+	private void printClaimedPriorityCount(final CommandSender sender, final ModLevel level, final int count) {
+		final String format = getManager().getLocale().getString(ListPhrases.listClaimedPriorityCount);
 
 		String output = format.replaceAll("%n", level.getColor() + Integer.toString(count) + ChatColor.WHITE);
 		output = output.replaceAll("%p", level.getColor() + level.getName() + ChatColor.WHITE);
@@ -200,14 +202,14 @@ public class ListCommand extends ReporterCommand {
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 	}
 
-	private void listClaimedIndexes(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException {
+	private void listClaimedIndexes(final CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException {
 		final StringBuilder query = new StringBuilder();
 		query.append("SELECT ID ");
 		query.append("FROM Reports ");
 		query.append("WHERE ClaimStatus = 1 AND ");
 
 		if (BukkitUtil.isPlayer(sender)) {
-			Player p = (Player) sender;
+			final Player p = (Player) sender;
 			query.append("ClaimedByUUID = '").append(p.getUniqueId()).append('\'');
 		} else {
 			query.append("ClaimedBy = '").append(sender.getName()).append('\'');
@@ -216,8 +218,8 @@ public class ListCommand extends ReporterCommand {
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			SQLResultSet result = database.sqlQuery(connectionId, query.toString());
-			String indexes = ArrayUtil.indexesToString(result, "ID", ChatColor.GOLD, ChatColor.WHITE);
+			final SQLResultSet result = database.sqlQuery(connectionId, query.toString());
+			final String indexes = ArrayUtil.indexesToString(result, "ID", ChatColor.GOLD, ChatColor.WHITE);
 			String message = getManager().getLocale().getString(ListPhrases.listClaimedIndexes);
 			message = message.replaceAll("%i", indexes);
 
@@ -230,7 +232,7 @@ public class ListCommand extends ReporterCommand {
 		}
 	}
 
-	private void listClaimedPriorityIndexes(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException {
+	private void listClaimedPriorityIndexes(final CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException {
 		final StringBuilder queryFormat = new StringBuilder();
 
 		queryFormat.append("SELECT ID ");
@@ -238,7 +240,7 @@ public class ListCommand extends ReporterCommand {
 		queryFormat.append("WHERE ");
 		queryFormat.append("ClaimStatus = 1 ");
 		if (BukkitUtil.isPlayer(sender)) {
-			Player p = (Player) sender;
+			final Player p = (Player) sender;
 			queryFormat.append("AND ClaimedByUUID = '").append(p.getUniqueId()).append("' ");
 		} else {
 			queryFormat.append("AND ClaimedBy = '").append(sender.getName()).append("' ");
@@ -281,10 +283,10 @@ public class ListCommand extends ReporterCommand {
 		printClaimedPriorityIndexes(sender, ModLevel.HIGH, highPriorityIndexes);
 	}
 
-	private void printClaimedPriorityIndexes(CommandSender sender, ModLevel level, String indexes) {
+	private void printClaimedPriorityIndexes(final CommandSender sender, final ModLevel level, final String indexes) {
 		String output;
 
-		if (!indexes.equals("")) {
+		if (!indexes.isEmpty()) {
 			output = getManager().getLocale().getString(ListPhrases.listClaimedPriorityIndexes);
 
 			output = output.replaceAll("%p", level.getColor() + level.getName() + ChatColor.WHITE);
@@ -298,7 +300,7 @@ public class ListCommand extends ReporterCommand {
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 	}
 
-	private void listPriority(CommandSender sender) {
+	private void listPriority(final CommandSender sender) {
 		int noPriorityCount = 0;
 		int lowPriorityCount = 0;
 		int normalPriorityCount = 0;
@@ -321,8 +323,8 @@ public class ListCommand extends ReporterCommand {
 		printPriorityCount(sender, ModLevel.HIGH, highPriorityCount);
 	}
 
-	private void printPriorityCount(CommandSender sender, ModLevel level, int count) {
-		String format = getManager().getLocale().getString(ListPhrases.listPriorityCount);
+	private void printPriorityCount(final CommandSender sender, final ModLevel level, final int count) {
+		final String format = getManager().getLocale().getString(ListPhrases.listPriorityCount);
 
 		String output = format.replaceAll("%n", level.getColor() + Integer.toString(count) + ChatColor.WHITE);
 		output = output.replaceAll("%p", level.getColor() + level.getName() + ChatColor.WHITE);
@@ -330,11 +332,11 @@ public class ListCommand extends ReporterCommand {
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 	}
 
-	private void listPriorityIndexes(CommandSender sender) {
-		ArrayList<Integer> noPriorityIndexes;
-		ArrayList<Integer> lowPriorityIndexes;
-		ArrayList<Integer> normalPriorityIndexes;
-		ArrayList<Integer> highPriorityIndexes;
+	private void listPriorityIndexes(final CommandSender sender) {
+		final ArrayList<Integer> noPriorityIndexes;
+		final ArrayList<Integer> lowPriorityIndexes;
+		final ArrayList<Integer> normalPriorityIndexes;
+		final ArrayList<Integer> highPriorityIndexes;
 
 		try {
 			noPriorityIndexes = getManager().getIndexesOfPriority(ModLevel.NONE);
@@ -353,8 +355,9 @@ public class ListCommand extends ReporterCommand {
 		printPriorityIndexes(sender, ModLevel.HIGH, highPriorityIndexes);
 	}
 
-	private void printPriorityIndexes(CommandSender sender, ModLevel level, ArrayList<Integer> indexes) {
-		String format, output;
+	private void printPriorityIndexes(final CommandSender sender, final ModLevel level, final ArrayList<Integer> indexes) {
+		final String format;
+		String output;
 
 		if (!indexes.isEmpty()) {
 			format = getManager().getLocale().getString(ListPhrases.listPriorityIndexes);
@@ -370,12 +373,12 @@ public class ListCommand extends ReporterCommand {
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 	}
 
-	private void listCommand(CommandSender sender) {
+	private void listCommand(final CommandSender sender) {
 		String listString = BukkitUtil.colorCodeReplaceAll(
 				getManager().getLocale().getString(ListPhrases.reportList));
 
-		int incompleteReports;
-		int completeReports;
+		final int incompleteReports;
+		final int completeReports;
 		try {
 			incompleteReports = getManager().getIncompleteReports();
 			completeReports = getManager().getCompletedReports();
@@ -389,19 +392,20 @@ public class ListCommand extends ReporterCommand {
 			listString = listString.replaceAll("%r", ChatColor.RED + Integer.toString(incompleteReports) + ChatColor.WHITE);
 			listString = listString.replaceAll("%c", ChatColor.GREEN + Integer.toString(completeReports) + ChatColor.WHITE);
 
-			String[] parts = listString.split("%n");
+			final String[] parts = listString.split("%n");
 
-			for (int LCV = 0; LCV < parts.length; LCV++) {
-				listString = parts[LCV];
+			for (final String part : parts) {
+				listString = part;
 				sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + listString);
 			}
-		} else
+		} else {
 			sender.sendMessage(getErrorMessage());
+		}
 	}
 
-	private void listIndexes(CommandSender sender) {
-		ArrayList<Integer> completeIndexes;
-		ArrayList<Integer> incompleteIndexes;
+	private void listIndexes(final CommandSender sender) {
+		final ArrayList<Integer> completeIndexes;
+		final ArrayList<Integer> incompleteIndexes;
 		try {
 			completeIndexes = getManager().getCompletedReportIndexes();
 			incompleteIndexes = getManager().getIncompleteReportIndexes();
@@ -411,28 +415,30 @@ public class ListCommand extends ReporterCommand {
 			return;
 		}
 
-		String complete = ArrayUtil.indexesToString(completeIndexes, ChatColor.GREEN, ChatColor.WHITE);
-		String incomplete = ArrayUtil.indexesToString(incompleteIndexes, ChatColor.RED, ChatColor.WHITE);
+		final String complete = ArrayUtil.indexesToString(completeIndexes, ChatColor.GREEN, ChatColor.WHITE);
+		final String incomplete = ArrayUtil.indexesToString(incompleteIndexes, ChatColor.RED, ChatColor.WHITE);
 
 		String out;
 
-		if (!completeIndexes.isEmpty())
+		if (!completeIndexes.isEmpty()) {
 			out = BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(ListPhrases.listReportCompleteIndexes));
-		else
+		} else {
 			out = BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(ListPhrases.listReportNoCompleteIndexes));
+		}
 
 		out = out.replaceAll("%i", complete);
 
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + out);
 
-		if (!incompleteIndexes.isEmpty())
+		if (!incompleteIndexes.isEmpty()) {
 			out = BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(ListPhrases.listReportIncompleteIndexes));
-		else
+		} else {
 			out = BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(ListPhrases.listReportNoIncompleteIndexes));
+		}
 
 		out = out.replaceAll("%i", incomplete);
 
@@ -446,7 +452,7 @@ public class ListCommand extends ReporterCommand {
 	 */
 	@Override
 	public void updateDocumentation() {
-		ArrayList<ObjectPair<String, String>> usages = super.getUsages();
+		final ArrayList<ObjectPair<String, String>> usages = super.getUsages();
 
 		usages.clear();
 

@@ -88,8 +88,9 @@ public enum ModLevel {
 		ModLevel level = getByName(modLevel);
 
 		if (level == UNKNOWN) {
-			if (Util.isInteger(modLevel))
+			if (Util.isInteger(modLevel)) {
 				level = getByLevel(Util.parseInt(modLevel));
+			}
 		}
 		return level;
 	}
@@ -125,14 +126,15 @@ public enum ModLevel {
 	public static ModLevel getByName(final String level) {
 		final boolean isInteger = Util.isInteger(level);
 
-		if (level.equalsIgnoreCase(LOW.name) || isInteger && Integer.parseInt(level) == LOW.level)
+		if (level.equalsIgnoreCase(LOW.name) || isInteger && Integer.parseInt(level) == LOW.level) {
 			return LOW;
-		else if (level.equalsIgnoreCase(NORMAL.name) || isInteger && Integer.parseInt(level) == NORMAL.level)
+		} else if (level.equalsIgnoreCase(NORMAL.name) || isInteger && Integer.parseInt(level) == NORMAL.level) {
 			return NORMAL;
-		else if (level.equalsIgnoreCase(HIGH.name) || isInteger && Integer.parseInt(level) == HIGH.level)
+		} else if (level.equalsIgnoreCase(HIGH.name) || isInteger && Integer.parseInt(level) == HIGH.level) {
 			return HIGH;
-		else if (level.equalsIgnoreCase(NONE.name) || isInteger && Integer.parseInt(level) == NONE.level)
+		} else if (level.equalsIgnoreCase(NONE.name) || isInteger && Integer.parseInt(level) == NONE.level) {
 			return NONE;
+		}
 		return UNKNOWN;
 	}
 

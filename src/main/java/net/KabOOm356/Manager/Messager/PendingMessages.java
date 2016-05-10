@@ -24,7 +24,7 @@ public class PendingMessages extends ArrayList<Message> {
 	 *
 	 * @param message An initial message.
 	 */
-	public PendingMessages(Message message) {
+	public PendingMessages(final Message message) {
 		super();
 
 		add(message);
@@ -35,25 +35,25 @@ public class PendingMessages extends ArrayList<Message> {
 	 *
 	 * @param messages Initial messages.
 	 */
-	public PendingMessages(ArrayList<Message> messages) {
+	public PendingMessages(final ArrayList<Message> messages) {
 		super();
 
 		addAll(messages);
 	}
 
 	@Override
-	public boolean add(Message message) {
+	public boolean add(final Message message) {
 		if (message instanceof ReporterMessage) {
-			ReporterMessage reporterMessage = (ReporterMessage) message;
+			final ReporterMessage reporterMessage = (ReporterMessage) message;
 
-			Iterator<Message> messages = this.iterator();
+			final Iterator<Message> messages = this.iterator();
 			Message pendingMessage;
 
 			while (messages.hasNext()) {
 				pendingMessage = messages.next();
 
 				if (pendingMessage instanceof ReporterMessage) {
-					ReporterMessage reporterPendingMessage = (ReporterMessage) pendingMessage;
+					final ReporterMessage reporterPendingMessage = (ReporterMessage) pendingMessage;
 
 					if (reporterMessage.messagesEqual(reporterPendingMessage)) {
 						reporterPendingMessage.addIndexes(reporterMessage.getIndexes());
@@ -73,10 +73,10 @@ public class PendingMessages extends ArrayList<Message> {
 	 *
 	 * @param remainingIndexes The remaining indexes after a batch deletion.
 	 */
-	public void reindexMessages(ArrayList<Integer> remainingIndexes) {
-		for (Message message : this) {
+	public void reindexMessages(final ArrayList<Integer> remainingIndexes) {
+		for (final Message message : this) {
 			if (message instanceof ReporterMessage) {
-				ReporterMessage reporterMessage = (ReporterMessage) message;
+				final ReporterMessage reporterMessage = (ReporterMessage) message;
 
 				reporterMessage.reindex(remainingIndexes);
 			}
@@ -90,17 +90,18 @@ public class PendingMessages extends ArrayList<Message> {
 	 *
 	 * @param index The index to remove from all messages.
 	 */
-	public void removeIndex(int index) {
-		for (Message message : this) {
-			if (message instanceof ReporterMessage)
+	public void removeIndex(final int index) {
+		for (final Message message : this) {
+			if (message instanceof ReporterMessage) {
 				((ReporterMessage) message).removeIndex(index);
+			}
 		}
 
 		removeEmpty();
 	}
 
 	@Override
-	public boolean remove(Object obj) {
+	public boolean remove(final Object obj) {
 		boolean removed = false;
 
 		do {
@@ -117,23 +118,26 @@ public class PendingMessages extends ArrayList<Message> {
 	 * Cleans up this structure, removing messages with no indexes.
 	 */
 	private void removeEmpty() {
-		ArrayList<Message> deletion = new ArrayList<Message>();
+		final ArrayList<Message> deletion = new ArrayList<Message>();
 
-		for (Message message : this) {
-			if (message.isEmpty())
+		for (final Message message : this) {
+			if (message.isEmpty()) {
 				deletion.add(message);
+			}
 		}
 
-		for (Message message : deletion)
+		for (final Message message : deletion) {
 			this.remove(message);
+		}
 	}
 
 	@Override
 	public boolean isEmpty() {
 		if (!super.isEmpty()) {
-			for (Message message : this) {
-				if (!message.isEmpty())
+			for (final Message message : this) {
+				if (!message.isEmpty()) {
 					return false;
+				}
 			}
 		}
 

@@ -19,7 +19,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLConnection;
-import java.text.ParseException;
 
 /**
  * A {@link Updater} to update the plugin from the ServerMods API.
@@ -36,8 +35,8 @@ public class PluginUpdater extends Updater {
 	 * @param localVersion The local version.
 	 * @param lowestLevel  The lowest {@link ReleaseLevel} to consider.
 	 */
-	public PluginUpdater(URLConnection connection, String name,
-						 String localVersion, ReleaseLevel lowestLevel) {
+	public PluginUpdater(final URLConnection connection, final String name,
+						 final String localVersion, final ReleaseLevel lowestLevel) {
 		super(connection, name, localVersion, lowestLevel);
 	}
 
@@ -49,21 +48,22 @@ public class PluginUpdater extends Updater {
 	 * @throws SAXException
 	 * @throws IOException
 	 * @throws ParserConfigurationException
-	 * @throws ParseException
 	 */
 	@Override
-	protected VersionedNetworkFile findLatestFile() throws SAXException, IOException, ParserConfigurationException, ParseException {
-		URLConnection connection = getConnection();
+	protected VersionedNetworkFile findLatestFile() throws SAXException, IOException, ParserConfigurationException {
+		final URLConnection connection = getConnection();
 
-		String name = getName();
-		ReleaseLevel lowestLevel = getLowestLevel();
+		final String name = getName();
+		final ReleaseLevel lowestLevel = getLowestLevel();
 
 		if (connection == null && UrlIO.isResponseValid(connection)) {
-			if (name == null || name.equals(""))
+			if (name == null || name.isEmpty()) {
 				throw new IllegalArgumentException("Both the connection and the name cannot be null!");
+			}
 			throw new IllegalArgumentException("The connection cannot be null!");
-		} else if (name == null || name.equals(""))
+		} else if (name == null || name.isEmpty()) {
 			throw new IllegalArgumentException("File name to search for cannot be null!");
+		}
 
 		BufferedReader in = null;
 		String list = null;
@@ -72,16 +72,17 @@ public class PluginUpdater extends Updater {
 			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			list = in.readLine();
 		} finally {
-			if (in != null)
+			if (in != null) {
 				in.close();
+			}
 		}
 
 		final JSONArray array = (JSONArray) JSONValue.parse(list);
 
 		VersionedNetworkFile latestFile = null;
 
-		for (int LCV = 0; LCV < array.size(); LCV++) {
-			final JSONObject node = (JSONObject) array.get(LCV);
+		for (final Object object : array) {
+			final JSONObject node = (JSONObject) object;
 
 			final String currentName = (String) node.get("name");
 
@@ -97,14 +98,16 @@ public class PluginUpdater extends Updater {
 				if (file.getReleaseLevel().compareToByValue(lowestLevel) >= 0) {
 					// If latestFile is not initialized, set latestFile to the current file.
 					// If the current file's version is greater than the latestFile's version, set latestFile to the current file.
-					if (latestFile == null || latestFile.compareVersionTo(file) < 0)
+					if (latestFile == null || latestFile.compareVersionTo(file) < 0) {
 						latestFile = file;
+					}
 				}
 			}
 		}
 
-		if (latestFile == null)
+		if (latestFile == null) {
 			throw new FileNotFoundException("File " + name + " could not be found!");
+		}
 
 		return latestFile;
 	}
@@ -114,15 +117,16 @@ public class PluginUpdater extends Updater {
 		try {
 			final VersionedNetworkFile latestFile = checkForUpdates();
 
-			if (latestFile == null)
+			if (latestFile == null) {
 				log.log(Level.INFO, Reporter.getDefaultConsolePrefix() + "Reporter is up to date!");
-			else {
-				if (latestFile.getVersion() != null)
+			} else {
+				if (latestFile.getVersion() != null) {
 					log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "There is a new update available on BukkitDev: Version " + latestFile.getVersion());
-				else
+				} else {
 					log.log(Level.WARN, Reporter.getDefaultConsolePrefix() + "There is a new update available on BukkitDev!");
+				}
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			log.log(Level.FATAL, Reporter.getDefaultConsolePrefix() + "Plugin update thread failed!", e);
 		}
 	}

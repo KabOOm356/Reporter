@@ -30,9 +30,7 @@ public abstract class TimedRunnable implements Runnable {
 	protected void end() {
 		endTime = System.currentTimeMillis();
 		if (startTime != null && log.isDebugEnabled()) {
-			final StringBuilder message = new StringBuilder();
-			message.append("Execution of ").append(getClass().getName()).append(" took ").append(getExecutionTime()).append("ms!");
-			log.log(Level.INFO, message.toString());
+			log.log(Level.INFO, "Execution of " + getClass().getName() + " took " + getExecutionTime() + "ms!");
 		}
 	}
 

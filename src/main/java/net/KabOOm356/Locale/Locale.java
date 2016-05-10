@@ -18,7 +18,7 @@ public class Locale extends YamlConfiguration implements Initializable {
 	 * @param entry The entry to get.
 	 * @return The line in the locale if it exists, or the entry's default line if it does not exist.
 	 */
-	public String getString(LocaleEntry entry) {
+	public String getString(final LocaleEntry entry) {
 		return getString(entry.getPath(), entry.getDefault());
 	}
 
@@ -28,7 +28,7 @@ public class Locale extends YamlConfiguration implements Initializable {
 	 * @param phrase The phrase line to get.
 	 * @return The line from the locale file under the phrases section.
 	 */
-	public String getPhrase(String phrase) {
+	public String getPhrase(final String phrase) {
 		return super.getString(LocaleEntry.prefix + LocalePhrase.prefix + phrase);
 	}
 
@@ -38,7 +38,7 @@ public class Locale extends YamlConfiguration implements Initializable {
 	 * @param info The info line to get.
 	 * @return The line from the locale file under the info section.
 	 */
-	public String getInfo(String info) {
+	public String getInfo(final String info) {
 		return getString(LocaleEntry.prefix + LocaleInfo.prefix + info);
 	}
 

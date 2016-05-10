@@ -30,7 +30,7 @@ public class UpgradeCommand extends ReporterCommand {
 	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public UpgradeCommand(ReporterCommandManager manager) {
+	public UpgradeCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 
 		updateDocumentation();
@@ -55,25 +55,29 @@ public class UpgradeCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args) {
+	public void execute(final CommandSender sender, final ArrayList<String> args) {
 		try {
-			if (!hasRequiredPermission(sender))
+			if (!hasRequiredPermission(sender)) {
 				return;
+			}
 
 			int index = Util.parseInt(args.get(0));
 
 			if (args.get(0).equalsIgnoreCase("last")) {
-				if (!hasRequiredLastViewed(sender))
+				if (!hasRequiredLastViewed(sender)) {
 					return;
+				}
 
 				index = getLastViewed(sender);
 			}
 
-			if (!getManager().isReportIndexValid(sender, index))
+			if (!getManager().isReportIndexValid(sender, index)) {
 				return;
+			}
 
-			if (!getManager().canAlterReport(sender, index))
+			if (!getManager().canAlterReport(sender, index)) {
 				return;
+			}
 
 			final ModLevel newPriority = getNextPriorityLevel(index);
 			if (newPriority == ModLevel.UNKNOWN) {
@@ -92,8 +96,8 @@ public class UpgradeCommand extends ReporterCommand {
 		}
 	}
 
-	private ModLevel getNextPriorityLevel(int index) throws ClassNotFoundException, SQLException, InterruptedException {
-		String query = "SELECT Priority FROM Reports WHERE ID=" + index;
+	private ModLevel getNextPriorityLevel(final int index) throws ClassNotFoundException, SQLException, InterruptedException {
+		final String query = "SELECT Priority FROM Reports WHERE ID=" + index;
 
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId;

@@ -25,7 +25,7 @@ public class LocaleEntry {
 	 * @param path The path to the entry.
 	 * @param def  The default for the entry.
 	 */
-	public LocaleEntry(String path, String def) {
+	public LocaleEntry(final String path, final String def) {
 		this.path = prefix + path;
 		this.def = def;
 	}

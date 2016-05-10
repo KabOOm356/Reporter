@@ -71,9 +71,6 @@ public class DeleteCommand extends ReporterCommand {
 		return permissionNode;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void execute(final CommandSender sender, final ArrayList<String> args) {
 		try {
@@ -189,24 +186,26 @@ public class DeleteCommand extends ReporterCommand {
 
 			String message;
 
-			if (deletion == PlayerDeletionType.REPORTED)
+			if (deletion == PlayerDeletionType.REPORTED) {
 				message = getManager().getLocale().getString(DeletePhrases.deletePlayerReported);
-			else
+			} else {
 				message = getManager().getLocale().getString(DeletePhrases.deletePlayerSender);
+			}
 
 			String displayName = player.getName();
 
-			if (player.isOnline())
+			if (player.isOnline()) {
 				displayName = player.getPlayer().getDisplayName();
+			}
 
-			String playerName = BukkitUtil.formatPlayerName(displayName, player.getName());
+			final String playerName = BukkitUtil.formatPlayerName(displayName, player.getName());
 
 			message = message.replaceAll("%p", ChatColor.BLUE + playerName + ChatColor.WHITE);
 
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
 					ChatColor.WHITE + message);
 
-			int totalDeleted = count - remainingIndexes.size();
+			final int totalDeleted = count - remainingIndexes.size();
 
 			// Display the total number of reports delete.
 			displayTotalReportsDeleted(sender, totalDeleted);
@@ -224,10 +223,11 @@ public class DeleteCommand extends ReporterCommand {
 	}
 
 	private String getQuery(final CommandSender sender, final OfflinePlayer player, final QueryType queryType, final PlayerDeletionType deletion) {
-		if (queryType == QueryType.DELETE)
+		if (queryType == QueryType.DELETE) {
 			return getDeleteQuery(sender, player, deletion);
-		else
+		} else {
 			return getSelectQuery(sender, player, deletion);
+		}
 	}
 
 	private String getSelectQuery(final CommandSender sender, final OfflinePlayer player, final PlayerDeletionType deletion) {
@@ -237,15 +237,17 @@ public class DeleteCommand extends ReporterCommand {
 
 		if (sender.isOp() || sender instanceof ConsoleCommandSender) {
 			if (player.getName().equalsIgnoreCase("* (Anonymous)")) {
-				if (deletion == PlayerDeletionType.REPORTED)
+				if (deletion == PlayerDeletionType.REPORTED) {
 					query.append("Reported != '").append(player.getName()).append('\'');
-				else if (deletion == PlayerDeletionType.SENDER)
+				} else if (deletion == PlayerDeletionType.SENDER) {
 					query.append("Sender != '").append(player.getName()).append('\'');
+				}
 			} else {
-				if (deletion == PlayerDeletionType.REPORTED)
+				if (deletion == PlayerDeletionType.REPORTED) {
 					query.append("ReportedUUID != '").append(player.getUniqueId()).append('\'');
-				else if (deletion == PlayerDeletionType.SENDER)
+				} else if (deletion == PlayerDeletionType.SENDER) {
 					query.append("SenderUUID != '").append(player.getUniqueId()).append('\'');
+				}
 			}
 		} else {
 			query.append("NOT (Priority <= ").append(level.getLevel())
@@ -261,15 +263,17 @@ public class DeleteCommand extends ReporterCommand {
 			}
 
 			if (player.getName().equalsIgnoreCase("* (Anonymous)")) {
-				if (deletion == PlayerDeletionType.REPORTED)
+				if (deletion == PlayerDeletionType.REPORTED) {
 					query.append("AND Reported = '").append(player.getName()).append("')");
-				else if (deletion == PlayerDeletionType.SENDER)
+				} else if (deletion == PlayerDeletionType.SENDER) {
 					query.append("AND Sender = '").append(player.getName()).append("')");
+				}
 			} else {
-				if (deletion == PlayerDeletionType.REPORTED)
+				if (deletion == PlayerDeletionType.REPORTED) {
 					query.append("AND ReportedUUID = '").append(player.getUniqueId()).append("')");
-				else if (deletion == PlayerDeletionType.SENDER)
+				} else if (deletion == PlayerDeletionType.SENDER) {
 					query.append("AND SenderUUID = '").append(player.getUniqueId()).append("')");
+				}
 			}
 		}
 
@@ -283,15 +287,17 @@ public class DeleteCommand extends ReporterCommand {
 
 		if (sender.isOp() || sender instanceof ConsoleCommandSender) {
 			if (player.getName().equals("* (Anonymous)")) {
-				if (deletion == PlayerDeletionType.REPORTED)
+				if (deletion == PlayerDeletionType.REPORTED) {
 					query.append("Reported = '").append(player.getName()).append('\'');
-				else if (deletion == PlayerDeletionType.SENDER)
+				} else if (deletion == PlayerDeletionType.SENDER) {
 					query.append("Sender = '").append(player.getName()).append('\'');
+				}
 			} else {
-				if (deletion == PlayerDeletionType.REPORTED)
+				if (deletion == PlayerDeletionType.REPORTED) {
 					query.append("ReportedUUID = '").append(player.getUniqueId()).append('\'');
-				else if (deletion == PlayerDeletionType.SENDER)
+				} else if (deletion == PlayerDeletionType.SENDER) {
 					query.append("SenderUUID = '").append(player.getUniqueId()).append('\'');
+				}
 			}
 		} else {
 			query.append("(Priority <= ").append(level.getLevel())
@@ -300,7 +306,7 @@ public class DeleteCommand extends ReporterCommand {
 					.append(" OR ");
 
 			if (BukkitUtil.isPlayer(sender)) {
-				Player senderPlayer = (Player) sender;
+				final Player senderPlayer = (Player) sender;
 
 				query.append("ClaimedByUUID = '").append(senderPlayer.getUniqueId()).append("') ");
 			} else {
@@ -308,15 +314,17 @@ public class DeleteCommand extends ReporterCommand {
 			}
 
 			if (player.getName().equals("* (Anonymous)")) {
-				if (deletion == PlayerDeletionType.REPORTED)
+				if (deletion == PlayerDeletionType.REPORTED) {
 					query.append("AND Reported = '").append(player.getName()).append("')");
-				else if (deletion == PlayerDeletionType.SENDER)
+				} else if (deletion == PlayerDeletionType.SENDER) {
 					query.append("AND Sender = '").append(player.getName()).append("')");
+				}
 			} else {
-				if (deletion == PlayerDeletionType.REPORTED)
+				if (deletion == PlayerDeletionType.REPORTED) {
 					query.append("AND ReportedUUID = '").append(player.getUniqueId()).append("')");
-				else if (deletion == PlayerDeletionType.SENDER)
+				} else if (deletion == PlayerDeletionType.SENDER) {
 					query.append("AND SenderUUID = '").append(player.getUniqueId()).append("')");
+				}
 			}
 		}
 
@@ -338,12 +346,13 @@ public class DeleteCommand extends ReporterCommand {
 			final Locale locale = getManager().getLocale();
 			String message = "";
 
-			if (deletion == BatchDeletionType.ALL)
+			if (deletion == BatchDeletionType.ALL) {
 				message = locale.getString(DeletePhrases.deleteAll);
-			else if (deletion == BatchDeletionType.COMPLETE)
+			} else if (deletion == BatchDeletionType.COMPLETE) {
 				message = locale.getString(DeletePhrases.deleteComplete);
-			else if (deletion == BatchDeletionType.INCOMPLETE)
+			} else if (deletion == BatchDeletionType.INCOMPLETE) {
 				message = locale.getString(DeletePhrases.deleteIncomplete);
+			}
 
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + message);
 			displayTotalReportsDeleted(sender, totalDeleted);
@@ -370,10 +379,11 @@ public class DeleteCommand extends ReporterCommand {
 	 * Will create the SQL query to perform the wanted query type and deletion type.
 	 */
 	private String getQuery(final CommandSender sender, final QueryType type, final BatchDeletionType deletion) {
-		if (type == QueryType.DELETE)
+		if (type == QueryType.DELETE) {
 			return getDeleteQuery(sender, deletion);
-		else
+		} else {
 			return getSelectQuery(sender, deletion);
+		}
 	}
 
 	private String getSelectQuery(final CommandSender sender, final BatchDeletionType deletion) {
@@ -381,12 +391,13 @@ public class DeleteCommand extends ReporterCommand {
 		query.append("SELECT ID FROM Reports WHERE ");
 
 		if (sender.isOp() || sender instanceof ConsoleCommandSender) {
-			if (deletion == BatchDeletionType.ALL)
-				query.append("0");
-			else if (deletion == BatchDeletionType.COMPLETE)
+			if (deletion == BatchDeletionType.ALL) {
+				query.append('0');
+			} else if (deletion == BatchDeletionType.COMPLETE) {
 				query.append("CompletionStatus = 0");
-			else if (deletion == BatchDeletionType.INCOMPLETE)
+			} else if (deletion == BatchDeletionType.INCOMPLETE) {
 				query.append("CompletionStatus = 1");
+			}
 		} else {
 			final ModLevel level = getManager().getModLevel(sender);
 			
@@ -399,15 +410,15 @@ public class DeleteCommand extends ReporterCommand {
 			 *    or claimed by another player with a lower modlevel,
 			 *    or claimed by the sender.
 			 */
-			query.append("NOT (Priority <= ").append(level.getLevel()).append(" ")
+			query.append("NOT (Priority <= ").append(level.getLevel()).append(' ')
 					.append("AND ")
 					.append("(ClaimStatus = 0 ")
 					.append("OR ")
-					.append("ClaimPriority < ").append(level.getLevel()).append(" ")
+					.append("ClaimPriority < ").append(level.getLevel()).append(' ')
 					.append("OR ");
 
 			if (BukkitUtil.isPlayer(sender)) {
-				Player senderPlayer = (Player) sender;
+				final Player senderPlayer = (Player) sender;
 
 				query.append("ClaimedByUUID = '").append(senderPlayer.getUniqueId()).append("')");
 			} else {
@@ -415,14 +426,14 @@ public class DeleteCommand extends ReporterCommand {
 			}
 
 
-			if (deletion == BatchDeletionType.ALL)
-				query.append(")");
-			else if (deletion == BatchDeletionType.COMPLETE) {
-				query.append(" ")
+			if (deletion == BatchDeletionType.ALL) {
+				query.append(')');
+			} else if (deletion == BatchDeletionType.COMPLETE) {
+				query.append(' ')
 						.append("AND ")
 						.append("CompletionStatus = 0)");
 			} else if (deletion == BatchDeletionType.INCOMPLETE) {
-				query.append(" ")
+				query.append(' ')
 						.append("AND ")
 						.append("CompletionStatus = 1)");
 			}
@@ -436,12 +447,13 @@ public class DeleteCommand extends ReporterCommand {
 		query.append("DELETE FROM Reports WHERE ");
 
 		if (sender.isOp() || sender instanceof ConsoleCommandSender) {
-			if (deletion == BatchDeletionType.ALL)
-				query.append("1");
-			else if (deletion == BatchDeletionType.COMPLETE)
+			if (deletion == BatchDeletionType.ALL) {
+				query.append('1');
+			} else if (deletion == BatchDeletionType.COMPLETE) {
 				query.append("CompletionStatus = 1");
-			else if (deletion == BatchDeletionType.INCOMPLETE)
+			} else if (deletion == BatchDeletionType.INCOMPLETE) {
 				query.append("CompletionStatus = 0");
+			}
 		} else {
 			final ModLevel level = getManager().getModLevel(sender);
 			
@@ -454,15 +466,15 @@ public class DeleteCommand extends ReporterCommand {
 			 *    or claimed by another player with a lower modlevel,
 			 *    or claimed by the sender.
 			 */
-			query.append("(Priority <= ").append(level.getLevel()).append(" ")
+			query.append("(Priority <= ").append(level.getLevel()).append(' ')
 					.append("AND ")
 					.append("(ClaimStatus = 0 ")
 					.append("OR ")
-					.append("ClaimPriority < ").append(level.getLevel()).append(" ")
+					.append("ClaimPriority < ").append(level.getLevel()).append(' ')
 					.append("OR ");
 
 			if (BukkitUtil.isPlayer(sender)) {
-				Player senderPlayer = (Player) sender;
+				final Player senderPlayer = (Player) sender;
 
 				query.append("ClaimedByUUID = '").append(senderPlayer.getUniqueId()).append("')");
 			} else {
@@ -470,14 +482,14 @@ public class DeleteCommand extends ReporterCommand {
 			}
 
 			// Append on the rest of the query to perform the required deletion type.
-			if (deletion == BatchDeletionType.ALL)
-				query.append(")");
-			else if (deletion == BatchDeletionType.COMPLETE) {
-				query.append(" ")
+			if (deletion == BatchDeletionType.ALL) {
+				query.append(')');
+			} else if (deletion == BatchDeletionType.COMPLETE) {
+				query.append(' ')
 						.append("AND ")
 						.append("CompletionStatus = 1)");
 			} else if (deletion == BatchDeletionType.INCOMPLETE) {
-				query.append(" ")
+				query.append(' ')
 						.append("AND ")
 						.append("CompletionStatus = 0)");
 			}
@@ -506,19 +518,21 @@ public class DeleteCommand extends ReporterCommand {
 
 	private void updateLastViewed(final int removedIndex) {
 		for (final Entry<CommandSender, Integer> e : getManager().getLastViewed().entrySet()) {
-			if (e.getValue() == removedIndex)
+			if (e.getValue() == removedIndex) {
 				e.setValue(-1);
-			else if (e.getValue() > removedIndex)
+			} else if (e.getValue() > removedIndex) {
 				e.setValue(e.getValue() - 1);
+			}
 		}
 	}
 
 	private void updateLastViewed(final ArrayList<Integer> remainingIndexes) {
 		for (final Entry<CommandSender, Integer> e : getManager().getLastViewed().entrySet()) {
-			if (remainingIndexes.contains(e.getValue()))
+			if (remainingIndexes.contains(e.getValue())) {
 				e.setValue(remainingIndexes.indexOf(e.getValue()) + 1);
-			else
+			} else {
 				e.setValue(-1);
+			}
 		}
 	}
 
@@ -547,7 +561,10 @@ public class DeleteCommand extends ReporterCommand {
 				if (stmt != null) {
 					stmt.close();
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
+				if (log.isDebugEnabled()) {
+					log.warn("Failed to close statement!", e);
+				}
 			}
 
 			database.closeConnection(connectionId);
@@ -585,7 +602,10 @@ public class DeleteCommand extends ReporterCommand {
 				if (statement != null) {
 					statement.close();
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
+				if (log.isDebugEnabled()) {
+					log.warn("Failed to close statement!", e);
+				}
 			}
 			database.closeConnection(connectionId);
 		}
@@ -597,9 +617,6 @@ public class DeleteCommand extends ReporterCommand {
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + message);
 	}
 
-	/**
-	 * @see net.KabOOm356.Command.ReporterCommand#updateDocumentation()
-	 */
 	@Override
 	public void updateDocumentation() {
 		final Locale locale = getManager().getLocale();

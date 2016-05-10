@@ -37,7 +37,7 @@ public class UnclaimCommand extends ReporterCommand {
 	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public UnclaimCommand(ReporterCommandManager manager) {
+	public UnclaimCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 
 		updateDocumentation();
@@ -62,22 +62,25 @@ public class UnclaimCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args) {
+	public void execute(final CommandSender sender, final ArrayList<String> args) {
 		try {
-			if (!hasRequiredPermission(sender))
+			if (!hasRequiredPermission(sender)) {
 				return;
+			}
 
 			int index = Util.parseInt(args.get(0));
 
 			if (args.get(0).equalsIgnoreCase("last")) {
-				if (!hasRequiredLastViewed(sender))
+				if (!hasRequiredLastViewed(sender)) {
 					return;
+				}
 
 				index = getLastViewed(sender);
 			}
 
-			if (!getManager().isReportIndexValid(sender, index))
+			if (!getManager().isReportIndexValid(sender, index)) {
 				return;
+			}
 
 			if (canUnclaimReport(sender, index)) {
 				unclaimReport(sender, index);
@@ -88,13 +91,13 @@ public class UnclaimCommand extends ReporterCommand {
 		}
 	}
 
-	private boolean canUnclaimReport(CommandSender sender, int index) throws ClassNotFoundException, SQLException, InterruptedException {
+	private boolean canUnclaimReport(final CommandSender sender, final int index) throws ClassNotFoundException, SQLException, InterruptedException {
 		final String query = "SELECT ClaimStatus, ClaimedByUUID, ClaimedBy FROM Reports WHERE ID=" + index;
 
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			SQLResultSet result = database.sqlQuery(connectionId, query);
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 
 			if (result.getBoolean("ClaimStatus")) {
 				boolean senderIsClaimingPlayer = false;
@@ -102,12 +105,12 @@ public class UnclaimCommand extends ReporterCommand {
 
 				// Do UUID player comparison.
 				if (!result.getString("ClaimedByUUID").isEmpty()) {
-					UUID uuid = UUID.fromString(result.getString("ClaimedByUUID"));
+					final UUID uuid = UUID.fromString(result.getString("ClaimedByUUID"));
 
 					claimingPlayer = Bukkit.getPlayer(uuid);
 
 					if (BukkitUtil.isPlayer(sender)) {
-						Player senderPlayer = (Player) sender;
+						final Player senderPlayer = (Player) sender;
 
 						if (senderPlayer.getUniqueId().equals(claimingPlayer.getUniqueId())) {
 							senderIsClaimingPlayer = true;
@@ -155,8 +158,8 @@ public class UnclaimCommand extends ReporterCommand {
 		return true;
 	}
 
-	private void unclaimReport(CommandSender sender, int index) throws ClassNotFoundException, SQLException, InterruptedException {
-		String query = "UPDATE Reports " +
+	private void unclaimReport(final CommandSender sender, final int index) throws ClassNotFoundException, SQLException, InterruptedException {
+		final String query = "UPDATE Reports " +
 				"SET " +
 				"ClaimStatus=0, ClaimedByUUID='', ClaimedBy='', ClaimPriority=0, ClaimDate='' " +
 				"WHERE ID=" + index;
@@ -179,7 +182,7 @@ public class UnclaimCommand extends ReporterCommand {
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 
 		if (BukkitUtil.isOfflinePlayer(sender)) {
-			OfflinePlayer senderPlayer = (OfflinePlayer) sender;
+			final OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 
 			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.UNCLAIMED);
 		}

@@ -33,7 +33,7 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @param url The URL location of this file.
 	 * @see NetworkFile#NetworkFile(String)
 	 */
-	public VersionedNetworkFile(String url) {
+	public VersionedNetworkFile(final String url) {
 		super(url);
 
 		this.version = "";
@@ -49,7 +49,7 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @param url      The URL location of this file.
 	 * @see NetworkFile#NetworkFile(String, String)
 	 */
-	public VersionedNetworkFile(String fileName, String version, String url) {
+	public VersionedNetworkFile(final String fileName, final String version, final String url) {
 		super(fileName, url);
 
 		this.setVersion(version);
@@ -62,7 +62,7 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @param url      The URL location of this file.
 	 * @see NetworkFile#NetworkFile(String, String)
 	 */
-	public VersionedNetworkFile(String fileName, String url) {
+	public VersionedNetworkFile(final String fileName, final String url) {
 		super(fileName, url);
 
 		this.setVersion("");
@@ -76,7 +76,7 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @param encoding A String representation of the encoding of this file.
 	 * @param url      The URL location of the file.
 	 */
-	public VersionedNetworkFile(String fileName, String version, String encoding, String url) {
+	public VersionedNetworkFile(final String fileName, final String version, final String encoding, final String url) {
 		super(fileName, encoding, url);
 
 		this.setVersion(version);
@@ -92,7 +92,7 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @param url              The URL location of the file.
 	 * @see NetworkFile#NetworkFile(String, String, String, Date, String)
 	 */
-	public VersionedNetworkFile(String name, String extension, String fileName, Date modificationDate, String url) {
+	public VersionedNetworkFile(final String name, final String extension, final String fileName, final Date modificationDate, final String url) {
 		super(name, extension, fileName, modificationDate, url);
 
 		this.setVersion("");
@@ -109,10 +109,10 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @param url              The URL location of the file.
 	 * @see NetworkFile#NetworkFile(String, String, String, Date, String)
 	 */
-	public VersionedNetworkFile(String name, String extension, String fileName, String version, Date modificationDate, String url) {
+	public VersionedNetworkFile(final String name, final String extension, final String fileName, final String version, final Date modificationDate, final String url) {
 		super(name, extension, fileName, modificationDate, url);
 
-		this.setVersion("");
+		this.setVersion(version);
 	}
 
 	/**
@@ -127,10 +127,10 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @param url              The URL location of the file.
 	 * @see NetworkFile#NetworkFile(String, String, String, String, Date, String)
 	 */
-	public VersionedNetworkFile(String name, String extension, String fileName, String version, String encoding, Date modificationDate, String url) {
+	public VersionedNetworkFile(final String name, final String extension, final String fileName, final String version, final String encoding, final Date modificationDate, final String url) {
 		super(name, extension, fileName, encoding, modificationDate, url);
 
-		this.setVersion("");
+		this.setVersion(version);
 	}
 
 	/**
@@ -142,12 +142,13 @@ public class VersionedNetworkFile extends NetworkFile {
 	 *
 	 * @return An ArrayList of Strings with each version number in an index.
 	 */
-	private static ArrayList<String> separateVersion(String version) {
-		ArrayList<String> list = new ArrayList<String>();
-		String[] array = version.split("[\\.]|[-]|[_]|[ ]");
+	private static ArrayList<String> separateVersion(final String version) {
+		final ArrayList<String> list = new ArrayList<String>();
+		final String[] array = version.split("[\\.]|[-]|[_]|[ ]");
 
-		for (String str : array)
+		for (final String str : array) {
 			list.add(str.toLowerCase());
+		}
 
 		return list;
 	}
@@ -162,16 +163,18 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @return The difference between version.
 	 * @see #compareVersionTo(String)
 	 */
-	public static int compareVersionTo(String comp1, String comp2) {
+	public static int compareVersionTo(final String comp1, final String comp2) {
 		if (comp1 == null) {
-			if (comp2 == null)
+			if (comp2 == null) {
 				throw new IllegalArgumentException("Both versions to compare cannot be null!");
-			else
+			} else {
 				throw new IllegalArgumentException("First version cannot be null!");
-		} else if (comp2 == null)
+			}
+		} else if (comp2 == null) {
 			throw new IllegalArgumentException("Second version cannot be null!");
+		}
 
-		VersionedNetworkFile f = new VersionedNetworkFile("temporary.tmp");
+		final VersionedNetworkFile f = new VersionedNetworkFile("temporary.tmp");
 		f.setVersion(comp1);
 
 		return f.compareVersionTo(comp2);
@@ -189,13 +192,13 @@ public class VersionedNetworkFile extends NetworkFile {
 	 *
 	 * @param version The new version to set this file to.
 	 */
-	public void setVersion(String version) {
+	public void setVersion(final String version) {
 		this.version = version;
 
-		ArrayList<String> separatedVersions = separateVersion();
+		final ArrayList<String> separatedVersions = separateVersion();
 
-		int index;
-		int lastIndex = separatedVersions.size() - 1;
+		final int index;
+		final int lastIndex = separatedVersions.size() - 1;
 
 		if (separatedVersions.contains("alpha")) {
 			this.releaseLevel = ReleaseLevel.ALPHA;
@@ -274,13 +277,14 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @param depth The depth of the version number to get, starting at 0.
 	 * @return The version number at the given depth, or zero if there is not a number at the given depth.
 	 */
-	public int getVersion(int depth) {
-		String versionNumber;
+	public int getVersion(final int depth) {
+		final String versionNumber;
 
-		if (versions.size() > depth)
+		if (versions.size() > depth) {
 			versionNumber = versions.get(depth);
-		else
+		} else {
 			versionNumber = "0";
+		}
 
 		return parseInt(versionNumber);
 	}
@@ -297,7 +301,7 @@ public class VersionedNetworkFile extends NetworkFile {
 	 *
 	 * @param level The {@link ReleaseLevel} to this file to.
 	 */
-	public void setReleaseLevel(ReleaseLevel level) {
+	public void setReleaseLevel(final ReleaseLevel level) {
 		this.releaseLevel = level;
 	}
 
@@ -330,22 +334,25 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @param comp The {@link VersionedNetworkFile} to compare versions with.
 	 * @return The difference between version of the two objects.
 	 */
-	public int compareVersionTo(VersionedNetworkFile comp) {
-		if (comp == null)
+	public int compareVersionTo(final VersionedNetworkFile comp) {
+		if (comp == null) {
 			throw new IllegalArgumentException("Object to compare to cannot be null!");
+		}
 
 		int difference = 0;
 
 		// Get the length of the longest version number sequence.
-		int length = (this.versions.size() > comp.getVersions().size()) ? this.versions.size() : comp.getVersions().size();
+		final int length = (this.versions.size() > comp.getVersions().size()) ? this.versions.size() : comp.getVersions().size();
 
 		// Calculate the difference between the two versions.
-		for (int LCV = length - 1; LCV >= 0; LCV--)
+		for (int LCV = length - 1; LCV >= 0; LCV--) {
 			difference += ((length - LCV) + Math.abs(difference)) * (this.getVersion(LCV) - comp.getVersion(LCV));
+		}
 
 		// Take release level into account if the two versions are the same.
-		if (difference == 0)
+		if (difference == 0) {
 			difference = this.getReleaseLevel().value - comp.getReleaseLevel().value;
+		}
 
 		// Take the release level version into account if the two versions are the same.
 		if (difference == 0) {
@@ -362,28 +369,26 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @return The difference between the two versions.
 	 * @see #compareVersionTo(VersionedNetworkFile)
 	 */
-	public int compareVersionTo(String compVersion) {
-		if (compVersion == null)
+	public int compareVersionTo(final String compVersion) {
+		if (compVersion == null) {
 			throw new IllegalArgumentException("Object to compare to cannot be null!");
+		}
 
-		VersionedNetworkFile comp = new VersionedNetworkFile("temporary.tmp");
+		final VersionedNetworkFile comp = new VersionedNetworkFile("temporary.tmp");
 
 		comp.setVersion(compVersion);
 
 		return this.compareVersionTo(comp);
 	}
 
-	private int parseInt(String str) {
+	private int parseInt(final String str) {
 		try {
 			return Integer.parseInt(str);
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			return 0;
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public String toString() {
 		String string = super.toString();
@@ -425,7 +430,7 @@ public class VersionedNetworkFile extends NetworkFile {
 		/**
 		 * The name of the ReleaseLevel.
 		 */
-		String name;
+		final String name;
 
 		/**
 		 * An integer value that is associated with release levels.
@@ -441,7 +446,7 @@ public class VersionedNetworkFile extends NetworkFile {
 		 * <br />
 		 * Any Release = 0.
 		 */
-		int value;
+		final int value;
 
 		/**
 		 * VersionednetworkFile Constructor.
@@ -449,7 +454,7 @@ public class VersionedNetworkFile extends NetworkFile {
 		 * @param name  The name of the ReleaseLevel.
 		 * @param value The value associated with the ReleaseLevel.
 		 */
-		ReleaseLevel(String name, int value) {
+		ReleaseLevel(final String name, final int value) {
 			this.name = name;
 			this.value = value;
 		}
@@ -462,27 +467,28 @@ public class VersionedNetworkFile extends NetworkFile {
 		 * @param name The name of the {@link ReleaseLevel} that will be returned.
 		 * @return The {@link ReleaseLevel} associated with the given name.
 		 */
-		public static ReleaseLevel getByName(String name) {
-			if (name.equalsIgnoreCase(ANY.getName()))
+		public static ReleaseLevel getByName(final String name) {
+			if (name.equalsIgnoreCase(ANY.getName())) {
 				return ANY;
-			else if (name.equalsIgnoreCase(ALPHA.getName()))
+			} else if (name.equalsIgnoreCase(ALPHA.getName())) {
 				return ALPHA;
-			else if (name.equalsIgnoreCase(BETA.getName()))
+			} else if (name.equalsIgnoreCase(BETA.getName())) {
 				return BETA;
-			else if (name.equalsIgnoreCase(RC.getName()))
+			} else if (name.equalsIgnoreCase(RC.getName())) {
 				return RC;
+			}
 			return RELEASE;
 		}
 
 		/**
-		 * @return The name of the RelaseLevel.
+		 * @return The name of the ReleaseLevel.
 		 */
 		public String getName() {
 			return name;
 		}
 
 		/**
-		 * @return The value associated with the RelaseLevel
+		 * @return The value associated with the ReleaseLevel
 		 */
 		public int getValue() {
 			return value;
@@ -498,15 +504,10 @@ public class VersionedNetworkFile extends NetworkFile {
 		 * @param level The given {@link ReleaseLevel} to compare to.
 		 * @return The difference between the two ReleaseLevels.
 		 */
-		public int compareToByValue(ReleaseLevel level) {
+		public int compareToByValue(final ReleaseLevel level) {
 			return this.value - level.value;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 *
-		 * @see java.lang.Enum#toString()
-		 */
 		@Override
 		public String toString() {
 			return name;

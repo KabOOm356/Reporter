@@ -23,15 +23,10 @@ public enum DatabaseType {
 	 *
 	 * @param databaseTypeName The predefined name of the DatabaseType.
 	 */
-	DatabaseType(String databaseTypeName) {
+	DatabaseType(final String databaseTypeName) {
 		this.databaseTypeName = databaseTypeName;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @see java.lang.Enum#toString()
-	 */
 	@Override
 	public String toString() {
 		return databaseTypeName;

@@ -45,12 +45,12 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 * @param minimumNumberOfArguments The minimum number of required arguments to run this command.
 	 */
 	protected Command(
-			ReporterCommandManager manager,
-			String commandName,
-			String commandUsage,
-			String commandDescription,
-			String commandPermissionNode,
-			int minimumNumberOfArguments) {
+			final ReporterCommandManager manager,
+			final String commandName,
+			final String commandUsage,
+			final String commandDescription,
+			final String commandPermissionNode,
+			final int minimumNumberOfArguments) {
 		this.manager = manager;
 
 		this.name = commandName;
@@ -62,7 +62,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 
 		this.usages = new ArrayList<ObjectPair<String, String>>();
 
-		ObjectPair<String, String> entry = new ObjectPair<String, String>(commandUsage, commandDescription);
+		final ObjectPair<String, String> entry = new ObjectPair<String, String>(commandUsage, commandDescription);
 
 		updateDocumentation(entry);
 	}
@@ -76,10 +76,10 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 * @param minimumNumberOfArguments The minimum number of required arguments to run this command.
 	 */
 	protected Command(
-			ReporterCommandManager manager,
-			String commandName,
-			String commandPermissionNode,
-			int minimumNumberOfArguments) {
+			final ReporterCommandManager manager,
+			final String commandName,
+			final String commandPermissionNode,
+			final int minimumNumberOfArguments) {
 		this.manager = manager;
 
 		this.name = commandName;
@@ -108,10 +108,10 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 * @param usage       The usage of the command.
 	 * @param description A description of the command.
 	 */
-	protected void updateDocumentation(String usage, String description) {
+	protected void updateDocumentation(final String usage, final String description) {
 		this.usages.clear();
 
-		ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
+		final ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
 
 		this.usages.add(entry);
 	}
@@ -123,7 +123,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 *
 	 * @param usage The usage and description for the command.
 	 */
-	protected void updateDocumentation(ObjectPair<String, String> usage) {
+	protected void updateDocumentation(final ObjectPair<String, String> usage) {
 		this.usages.clear();
 
 		this.usages.add(usage);
@@ -135,7 +135,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 * @param player The {@link Player} to check.
 	 * @return True if the {@link Player} has permission or is OP, otherwise false.
 	 */
-	public boolean hasPermission(Player player) {
+	public boolean hasPermission(final Player player) {
 		return this.hasPermission(player, permissionNode);
 	}
 
@@ -146,7 +146,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 * @param perm   The permission node to check.
 	 * @return True if the {@link Player} has the permission node or is OP, otherwise false.
 	 */
-	public boolean hasPermission(Player player, String perm) {
+	public boolean hasPermission(final Player player, final String perm) {
 		return manager.hasPermission(player, perm);
 	}
 
@@ -156,11 +156,12 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 * @param sender The {@link CommandSender} to check.
 	 * @return True if the {@link CommandSender} has permission or is OP, otherwise false.
 	 */
-	public boolean hasPermission(CommandSender sender) {
+	public boolean hasPermission(final CommandSender sender) {
 		if (BukkitUtil.isPlayer(sender)) {
-			Player player = (Player) sender;
-			if (!hasPermission(player))
+			final Player player = (Player) sender;
+			if (!hasPermission(player)) {
 				return false;
+			}
 		}
 		return true;
 	}
@@ -171,7 +172,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 * @param sender The {@link CommandSender} to check.
 	 * @return True if the {@link CommandSender} has permission or is OP, otherwise false.
 	 */
-	public boolean hasRequiredPermission(CommandSender sender) {
+	public boolean hasRequiredPermission(final CommandSender sender) {
 		if (!hasPermission(sender)) {
 			sender.sendMessage(getFailedPermissionsMessage());
 			return false;
@@ -288,12 +289,10 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("Command Name: ").append(name).append("\n");
-		builder.append("Aliases: ").append(aliases).append("\n");
-		builder.append("Permission Node: ").append(permissionNode).append("\n");
-		builder.append("Minimum Number of Arguments: ").append(minimumNumberOfArguments).append("\n");
-		builder.append("Usages: ").append(usages);
-		return builder.toString();
+		return "Command Name: " + name + '\n' +
+				"Aliases: " + aliases + '\n' +
+				"Permission Node: " + permissionNode + '\n' +
+				"Minimum Number of Arguments: " + minimumNumberOfArguments + '\n' +
+				"Usages: " + usages;
 	}
 }

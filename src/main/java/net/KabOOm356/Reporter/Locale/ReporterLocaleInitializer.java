@@ -16,7 +16,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 
 /**
  * A {@link Runnable} that when run will initialize the Locale file to be used.
@@ -70,9 +69,10 @@ public class ReporterLocaleInitializer implements Runnable {
 	 * @param localeName The name of the locale file.
 	 * @return A file in the given dataFolder with a name of the given localeName.
 	 */
-	private static File getLocaleFile(File dataFolder, String localeName) {
-		if (localeName.contains("."))
-			localeName = localeName.substring(0, localeName.indexOf("."));
+	private static File getLocaleFile(final File dataFolder, String localeName) {
+		if (localeName.contains(".")) {
+			localeName = localeName.substring(0, localeName.indexOf('.'));
+		}
 
 		return new File(dataFolder, localeName + ConstantsLocale.LOCALE_FILE_EXTENSION);
 	}
@@ -99,8 +99,9 @@ public class ReporterLocaleInitializer implements Runnable {
 	 */
 	public Locale initLocale() {
 		// No need to initialize the locale if it is already initialized.
-		if (locale.isInitialized())
+		if (locale.isInitialized()) {
 			return locale;
+		}
 
 		if (localeName.equalsIgnoreCase(ConstantsLocale.ENGLISH_LOCALE)) {
 			locale.initialized();
@@ -124,8 +125,9 @@ public class ReporterLocaleInitializer implements Runnable {
 			log.warn(Reporter.getDefaultConsolePrefix() + "Using English default.");
 		}
 
-		if (!localeFile.exists())
+		if (!localeFile.exists()) {
 			localeFile = null;
+		}
 
 		final RevisionFile localeBackupFile = new RevisionFile(
 				dataFolder,
@@ -143,22 +145,25 @@ public class ReporterLocaleInitializer implements Runnable {
 					if (!keepBackup) {
 						log.info(Reporter.getDefaultConsolePrefix() + "Purging backup file " + localeBackupFile.getFileName());
 						localeBackupFile.delete();
-					} else
+					} else {
 						log.info(Reporter.getDefaultConsolePrefix() + "Retaining backup file " + localeBackupFile.getFileName());
+					}
 				}
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			log.log(Level.ERROR, Reporter.getDefaultConsolePrefix() + "There was an error loading " + localeFile.getName(), e);
 
-			if (e.getMessage().contains(ConstantsLocale.CONVERT_LOCALE_EXCEPTION_MESSAGE))
+			if (e.getMessage().contains(ConstantsLocale.CONVERT_LOCALE_EXCEPTION_MESSAGE)) {
 				log.warn(Reporter.getDefaultConsolePrefix() + "Try converting the file to UTF-8 without BOM (Byte Order Marks) then try to reload it.");
-			else
+			} else {
 				log.warn(Reporter.getDefaultConsolePrefix() + "Please let the author know this.");
+			}
 
 			if (update) {
 				this.restoreBackup(localeFile, localeBackupFile);
-			} else
+			} else {
 				log.warn(Reporter.getDefaultConsolePrefix() + "Using English default.");
+			}
 		}
 
 		locale.initialized();
@@ -176,13 +181,13 @@ public class ReporterLocaleInitializer implements Runnable {
 	private LocaleUpdater initUpdater(final File localeFile) throws IOException {
 		String localLocaleVersion = "1";
 		try {
-			YamlConfiguration localLocale = YamlConfiguration.loadConfiguration(localeFile);
+			final YamlConfiguration localLocale = YamlConfiguration.loadConfiguration(localeFile);
 			localLocaleVersion = localLocale.getString("locale.info.version", "1");
 		} catch (final Exception e) {
 			log.log(Level.WARN, "Failed to pre-load locale file!", e);
 		}
 
-		UpdateSite localeXMLUpdateSite = Reporter.getLocaleXMLUpdateSite();
+		final UpdateSite localeXMLUpdateSite = Reporter.getLocaleXMLUpdateSite();
 
 		return new LocaleUpdater(localeXMLUpdateSite, localeName, localLocaleVersion, lowestLevel);
 	}
@@ -199,10 +204,9 @@ public class ReporterLocaleInitializer implements Runnable {
 	 * <b>NOTE:</b> Downloaded means if the original file was overwritten.
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
-	 * @throws ParseException
 	 * @throws IOException
 	 */
-	private boolean downloadOrUpdate(final File localeFile) throws ParserConfigurationException, SAXException, ParseException, IOException {
+	private boolean downloadOrUpdate(final File localeFile) throws ParserConfigurationException, SAXException, IOException {
 		final LocaleUpdater updater = initUpdater(localeFile);
 
 		if (localeFile.exists()) {
@@ -225,11 +229,11 @@ public class ReporterLocaleInitializer implements Runnable {
 			log.warn(Reporter.getDefaultConsolePrefix() + "The backup file does not exist.");
 			log.warn(Reporter.getDefaultConsolePrefix() + "Using English default.");
 		} else {
-			boolean loadSuccessful = attemptToLoadBackups(localeFile, localeBackupFile);
+			final boolean loadSuccessful = attemptToLoadBackups(localeFile, localeBackupFile);
 
-			if (loadSuccessful)
+			if (loadSuccessful) {
 				log.info(Reporter.getDefaultConsolePrefix() + "Successfully restored and loaded backup file.");
-			else {
+			} else {
 				localeFile.delete();
 				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to restore backups.");
 				log.warn(Reporter.getDefaultConsolePrefix() + "Using English default.");

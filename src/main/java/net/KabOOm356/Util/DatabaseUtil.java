@@ -4,7 +4,7 @@ import net.KabOOm356.Database.Database;
 import net.KabOOm356.Database.DatabaseType;
 import org.apache.commons.lang.Validate;
 
-public abstract class DatabaseUtil {
+public final class DatabaseUtil {
 	private DatabaseUtil() {
 	}
 
@@ -13,11 +13,8 @@ public abstract class DatabaseUtil {
 		Validate.notNull(columnName);
 		Validate.notEmpty(columnName);
 
-		final StringBuilder primaryKey = new StringBuilder();
-		primaryKey.append(columnName).append(" INTEGER PRIMARY KEY");
-		primaryKey.append(getAutoIncrementingPrimaryKeySuffix(database));
-
-		return primaryKey.toString();
+		return columnName + " INTEGER PRIMARY KEY" +
+				getAutoIncrementingPrimaryKeySuffix(database);
 	}
 
 	public static String getAutoIncrementingPrimaryKeySuffix(final Database database) {

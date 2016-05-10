@@ -37,7 +37,7 @@ public class MessageManager {
 	 * @param player  The player.
 	 * @param message The message to send to the player.
 	 */
-	public void addMessage(String player, String message) {
+	public void addMessage(final String player, final String message) {
 		messages.put(player, Group.DEFAULT, new SimpleMessage(message));
 	}
 
@@ -48,7 +48,7 @@ public class MessageManager {
 	 * @param message The message to send to the player.
 	 * @param index   The report index the message is referring to.
 	 */
-	public void addMessage(String player, String message, int index) {
+	public void addMessage(final String player, final String message, final int index) {
 		addMessage(player, Group.DEFAULT, message, index);
 	}
 
@@ -59,7 +59,7 @@ public class MessageManager {
 	 * @param group   The {@link Group} the message belongs to.
 	 * @param message The message to send to the player.
 	 */
-	public void addMessage(String player, Group group, String message, int index) {
+	public void addMessage(final String player, final Group group, final String message, final int index) {
 		messages.put(player, group, new ReporterMessage(message, index));
 	}
 
@@ -70,7 +70,7 @@ public class MessageManager {
 	 *
 	 * @param remainingIndexes The remaining indexes in the database.
 	 */
-	public void reindexMessages(ArrayList<Integer> remainingIndexes) {
+	public void reindexMessages(final ArrayList<Integer> remainingIndexes) {
 		messages.reindexMessages(remainingIndexes);
 	}
 
@@ -80,7 +80,7 @@ public class MessageManager {
 	 * @param player The player.
 	 * @return True if the given player has any pending messages, otherwise false.
 	 */
-	public boolean hasMessages(String player) {
+	public boolean hasMessages(final String player) {
 		return messages.containsKey(player);
 	}
 
@@ -91,11 +91,9 @@ public class MessageManager {
 	 * @param group  The grouping of messages to check for.
 	 * @return True if the given player has any pending messages in the given grouping, otherwise false.
 	 */
-	public boolean hasGroup(String player, Group group) {
-		if (!hasMessages(player))
-			return false;
+	public boolean hasGroup(final String player, final Group group) {
+		return hasMessages(player) && messages.get(player).containsKey(group);
 
-		return messages.get(player).containsKey(group);
 	}
 
 	/**
@@ -105,7 +103,7 @@ public class MessageManager {
 	 *
 	 * @param index The report index to remove.
 	 */
-	public void removeMessage(int index) {
+	public void removeMessage(final int index) {
 		messages.removeIndex(index);
 	}
 
@@ -123,13 +121,14 @@ public class MessageManager {
 	 * @return An {@link ArrayList} of messages that contains all the messages
 	 * <br/ >sent since the player has been offline.
 	 */
-	public ArrayList<String> getMessages(String player) {
-		ArrayList<String> playerMessages = new ArrayList<String>();
+	public ArrayList<String> getMessages(final String player) {
+		final ArrayList<String> playerMessages = new ArrayList<String>();
 
 		if (messages.containsKey(player)) {
-			for (Entry<Group, PendingMessages> e : messages.get(player).entrySet()) {
-				for (Message message : e.getValue())
+			for (final Entry<Group, PendingMessages> e : messages.get(player).entrySet()) {
+				for (final Message message : e.getValue()) {
 					playerMessages.add(message.getMessage());
+				}
 			}
 		}
 
@@ -144,15 +143,16 @@ public class MessageManager {
 	 * @return An {@link ArrayList} of messages that contains all the messages
 	 * <br/ >sent since the player has been offline.
 	 */
-	public ArrayList<String> getMessages(String player, Group group) {
-		ArrayList<String> playerMessages = new ArrayList<String>();
+	public ArrayList<String> getMessages(final String player, final Group group) {
+		final ArrayList<String> playerMessages = new ArrayList<String>();
 
 		if (messages.containsKey(player)) {
-			HashMap<Group, PendingMessages> groupedMessages = messages.get(player);
+			final HashMap<Group, PendingMessages> groupedMessages = messages.get(player);
 
 			if (groupedMessages.containsKey(group)) {
-				for (Message message : groupedMessages.get(group))
+				for (final Message message : groupedMessages.get(group)) {
 					playerMessages.add(message.getMessage());
+				}
 			}
 		}
 
@@ -165,8 +165,8 @@ public class MessageManager {
 	 * @param player The player.
 	 * @return The number of pending messages there are for the player.
 	 */
-	public int getNumberOfMessages(String player) {
-		ArrayList<String> messages = getMessages(player);
+	public int getNumberOfMessages(final String player) {
+		final ArrayList<String> messages = getMessages(player);
 
 		return messages.size();
 	}
@@ -178,8 +178,8 @@ public class MessageManager {
 	 * @param group  The group.
 	 * @return The number of pending messages in the given group for the player.
 	 */
-	public int getNumberOfMessages(String player, Group group) {
-		ArrayList<String> messages = getMessages(player, group);
+	public int getNumberOfMessages(final String player, final Group group) {
+		final ArrayList<String> messages = getMessages(player, group);
 
 		return messages.size();
 	}
@@ -189,7 +189,7 @@ public class MessageManager {
 	 *
 	 * @param player The name of the player to be removed.
 	 */
-	public void removePlayerMessages(String player) {
+	public void removePlayerMessages(final String player) {
 		messages.remove(player);
 	}
 
@@ -198,7 +198,7 @@ public class MessageManager {
 	 *
 	 * @param group The {@link Group} to be removed.
 	 */
-	public void removeGroup(Group group) {
+	public void removeGroup(final Group group) {
 		messages.remove(group);
 	}
 
@@ -208,27 +208,23 @@ public class MessageManager {
 	 * @param player The player to remove the group from.
 	 * @param group  The group to remove.
 	 */
-	public void removeGroupFromPlayer(String player, Group group) {
+	public void removeGroupFromPlayer(final String player, final Group group) {
 		messages.remove(player, group);
 	}
 
 	@Override
 	public String toString() {
-		String str = FormattingUtil.addTabsToNewLines("Message Manager\nMessages", 1);
-
-		for (Entry<String, GroupMessages> players : messages.entrySet()) {
-			str += FormattingUtil.addTabsToNewLines("\nPlayer: " + players.getKey(), 2);
-
-			for (Entry<Group, PendingMessages> groupedMessages : players.getValue().entrySet()) {
-				str += FormattingUtil.addTabsToNewLines("\n" + groupedMessages.getKey(), 3);
-
-				for (Message message : groupedMessages.getValue()) {
-					str += FormattingUtil.addTabsToNewLines("\n" + message, 4);
+		final StringBuilder str = new StringBuilder();
+		str.append(FormattingUtil.addTabsToNewLines("Message Manager\nMessages", 1));
+		for (final Entry<String, GroupMessages> players : messages.entrySet()) {
+			str.append(FormattingUtil.addTabsToNewLines("\nPlayer: " + players.getKey(), 2));
+			for (final Entry<Group, PendingMessages> groupedMessages : players.getValue().entrySet()) {
+				str.append(FormattingUtil.addTabsToNewLines("\n" + groupedMessages.getKey(), 3));
+				for (final Message message : groupedMessages.getValue()) {
+					str.append(FormattingUtil.addTabsToNewLines("\n" + message, 4));
 				}
 			}
 		}
-
-
-		return str;
+		return str.toString();
 	}
 }

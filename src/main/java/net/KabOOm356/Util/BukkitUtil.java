@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 /**
  * A class to help with Bukkit related activities.
  */
-public class BukkitUtil {
+public final class BukkitUtil {
 	/**
 	 * A UUID that Bukkit assigns to players without a valid username.
 	 */
@@ -29,6 +29,9 @@ public class BukkitUtil {
 	public static final OfflinePlayer anonymousPlayer = Bukkit.getOfflinePlayer("* (Anonymous)");
 
 	private static final String realPlayerNameFormat = "%s " + ChatColor.GOLD + "(%s)";
+
+	private BukkitUtil() {
+	}
 
 	/**
 	 * Returns the given player's name in a custom display format.

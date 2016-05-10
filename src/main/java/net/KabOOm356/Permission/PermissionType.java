@@ -20,15 +20,10 @@ public enum PermissionType {
 	 *
 	 * @param typeName The preferred name of the Permission type
 	 */
-	PermissionType(String typeName) {
+	PermissionType(final String typeName) {
 		this.typeName = typeName;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @see java.lang.Enum#toString()
-	 */
 	@Override
 	public String toString() {
 		return typeName;

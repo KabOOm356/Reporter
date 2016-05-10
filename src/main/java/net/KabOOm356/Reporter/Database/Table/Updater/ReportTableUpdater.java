@@ -14,7 +14,6 @@ public class ReportTableUpdater extends DatabaseTableUpdater {
 	private static final Logger log = LogManager.getLogger(ReportTableUpdater.class);
 
 	private final List<DatabaseTableVersionUpdater> versionUpdaters = new ArrayList<DatabaseTableVersionUpdater>();
-	;
 
 	public ReportTableUpdater(final Database database, final String updateVersion, final String tableName) {
 		super(database, updateVersion, tableName);

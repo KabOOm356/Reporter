@@ -101,7 +101,7 @@ public class ReportLimitManager {
 	 *
 	 * @param instance An instance of {@link Reporter} that this will manager reporting limits for.
 	 */
-	public ReportLimitManager(Reporter instance) {
+	public ReportLimitManager(final Reporter instance) {
 		this.plugin = instance;
 
 		this.limitReports = plugin.getConfig().getBoolean(
@@ -159,21 +159,22 @@ public class ReportLimitManager {
 	 * @param sender The {@link CommandSender}.
 	 * @return True if the {@link CommandSender} can submit a report, otherwise false.
 	 */
-	public boolean canReport(CommandSender sender) {
-		boolean isPlayer = BukkitUtil.isPlayer(sender);
+	public boolean canReport(final CommandSender sender) {
+		final boolean isPlayer = BukkitUtil.isPlayer(sender);
 
 		if (isPlayer) {
-			Player player = (Player) sender;
+			final Player player = (Player) sender;
 
-			boolean hasReported = !this.getReportedPlayers(sender).isEmpty();
+			final boolean hasReported = !this.getReportedPlayers(sender).isEmpty();
 
 			if (limitReports && hasReported) {
-				boolean override = plugin.getCommandManager().hasPermission(player, "reporter.report.nolimit");
+				final boolean override = plugin.getCommandManager().hasPermission(player, "reporter.report.nolimit");
 
-				if (override)
+				if (override) {
 					return true;
+				}
 
-				int numberOfReports = this.getAllReportTimers(sender).size();
+				final int numberOfReports = this.getAllReportTimers(sender).size();
 
 				return numberOfReports < reportLimit;
 			}
@@ -191,21 +192,22 @@ public class ReportLimitManager {
 	 * @return True if the {@link CommandSender} can submit a report against
 	 * the given {@link OfflinePlayer}, otherwise false.
 	 */
-	public boolean canReport(CommandSender sender, OfflinePlayer reported) {
-		boolean isPlayer = BukkitUtil.isPlayer(sender);
+	public boolean canReport(final CommandSender sender, final OfflinePlayer reported) {
+		final boolean isPlayer = BukkitUtil.isPlayer(sender);
 
 		if (isPlayer) {
-			Player player = (Player) sender;
+			final Player player = (Player) sender;
 
-			boolean hasReported = !this.getReportedPlayers(sender).isEmpty();
+			final boolean hasReported = !this.getReportedPlayers(sender).isEmpty();
 
 			if (limitReportsAgainstPlayers && hasReported) {
-				boolean override = plugin.getCommandManager().hasPermission(player, "reporter.report.nolimit");
+				final boolean override = plugin.getCommandManager().hasPermission(player, "reporter.report.nolimit");
 
-				if (override)
+				if (override) {
 					return true;
+				}
 
-				Queue<ReportTimer> timers = this.getAllReportTimers(sender, reported);
+				final Queue<ReportTimer> timers = this.getAllReportTimers(sender, reported);
 
 				return timers.size() < reportLimitAgainstPlayers;
 			}
@@ -219,25 +221,25 @@ public class ReportLimitManager {
 	 * @param sender         The {@link CommandSender} that has reported.
 	 * @param reportedPlayer The {@link OfflinePlayer} the report was against.
 	 */
-	public void hasReported(CommandSender sender, OfflinePlayer reportedPlayer) {
-		boolean isPlayer = BukkitUtil.isPlayer(sender);
-		boolean canReport = limitReports && canReport(sender);
-		boolean canReportPlayer = limitReportsAgainstPlayers && canReport(sender, reportedPlayer);
+	public void hasReported(final CommandSender sender, final OfflinePlayer reportedPlayer) {
+		final boolean isPlayer = BukkitUtil.isPlayer(sender);
+		final boolean canReport = limitReports && canReport(sender);
+		final boolean canReportPlayer = limitReportsAgainstPlayers && canReport(sender, reportedPlayer);
 
 		if (isPlayer && (canReport || canReportPlayer)) {
-			Player player = (Player) sender;
-			boolean noLimit = plugin.getCommandManager().hasPermission(player, "reporter.report.nolimit");
+			final Player player = (Player) sender;
+			final boolean noLimit = plugin.getCommandManager().hasPermission(player, "reporter.report.nolimit");
 
 			if (!noLimit) {
-				ReportTimer timer = new ReportTimer();
+				final ReportTimer timer = new ReportTimer();
 
-				Calendar executionTime = Calendar.getInstance();
+				final Calendar executionTime = Calendar.getInstance();
 				executionTime.add(Calendar.SECOND, limitTime);
 
 				timer.init(this, player, reportedPlayer, executionTime.getTimeInMillis());
 
 				// Convert from seconds to bukkit ticks
-				long bukkitTicks = limitTime * 20;
+				final long bukkitTicks = limitTime * 20;
 
 				Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, timer, bukkitTicks);
 
@@ -275,11 +277,11 @@ public class ReportLimitManager {
 	 * @param sender The {@link CommandSender}.
 	 * @param timer  The {@link ReportTimer}.
 	 */
-	private void addReportToPlayer(CommandSender sender, ReportTimer timer) {
+	private void addReportToPlayer(final CommandSender sender, final ReportTimer timer) {
 		HashMap<String, PriorityQueue<ReportTimer>> entry;
 
 		if (BukkitUtil.isPlayer(sender)) {
-			Player player = (Player) sender;
+			final Player player = (Player) sender;
 
 			if (!playerReports.containsKey(player.getUniqueId().toString())) {
 				entry = new HashMap<String, PriorityQueue<ReportTimer>>();
@@ -305,7 +307,7 @@ public class ReportLimitManager {
 		}
 
 		if (!containsReported) {
-			PriorityQueue<ReportTimer> queue = new PriorityQueue<ReportTimer>(
+			final PriorityQueue<ReportTimer> queue = new PriorityQueue<ReportTimer>(
 					reportLimitAgainstPlayers,
 					ReportTimer.compareByTimeRemaining);
 
@@ -326,12 +328,12 @@ public class ReportLimitManager {
 	/**
 	 * Returns the remaining time before the sender can report the given player again (in Seconds).
 	 *
-	 * @param sender The sender to get the remaining time for.
-	 * @param key    The key to the reported player to get the remaining time for.
+	 * @param sender   The sender to get the remaining time for.
+	 * @param reported The reported player to get the remaining time for.
 	 * @return The seconds remaining before the sender can report the given player again.
 	 */
-	public int getRemainingTime(CommandSender sender, OfflinePlayer reported) {
-		Queue<ReportTimer> timers = this.getAllReportTimers(sender, reported);
+	public int getRemainingTime(final CommandSender sender, final OfflinePlayer reported) {
+		final Queue<ReportTimer> timers = this.getAllReportTimers(sender, reported);
 
 		if (timers == null || timers.peek() == null) {
 			return Integer.MAX_VALUE;
@@ -347,10 +349,10 @@ public class ReportLimitManager {
 	 * @param key    The key to the reported player to get the remaining time for.
 	 * @return The seconds remaining before the sender can report the given player again.
 	 */
-	private int getRemainingTime(CommandSender sender, String key) {
-		HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers = getReportedPlayers(sender);
+	private int getRemainingTime(final CommandSender sender, final String key) {
+		final HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers = getReportedPlayers(sender);
 
-		Queue<ReportTimer> timers = reportedPlayers.get(key);
+		final Queue<ReportTimer> timers = reportedPlayers.get(key);
 
 		if (timers == null || timers.peek() == null) {
 			return Integer.MAX_VALUE;
@@ -365,17 +367,18 @@ public class ReportLimitManager {
 	 * @param sender The sender to get the remaining time for.
 	 * @return The seconds remaining before the sender can report again.
 	 */
-	public int getRemainingTime(CommandSender sender) {
-		HashMap<String, PriorityQueue<ReportTimer>> entry = getReportedPlayers(sender);
+	public int getRemainingTime(final CommandSender sender) {
+		final HashMap<String, PriorityQueue<ReportTimer>> entry = getReportedPlayers(sender);
 
 		int time = Integer.MAX_VALUE;
 
 		// Find the timer that will expire next.
-		for (String key : entry.keySet()) {
-			int current = getRemainingTime(sender, key);
+		for (final String key : entry.keySet()) {
+			final int current = getRemainingTime(sender, key);
 
-			if (current < time)
+			if (current < time) {
 				time = current;
+			}
 		}
 
 		return time;
@@ -386,7 +389,7 @@ public class ReportLimitManager {
 	 *
 	 * @param expired The expiring {@link ReportTimer}.
 	 */
-	public void limitExpired(ReportTimer expired) {
+	public void limitExpired(final ReportTimer expired) {
 		if (!canReport(expired.getPlayer())) {
 			// Alert player they can report again
 			if (alertPlayerWhenAllowedToReportAgain) {
@@ -406,7 +409,7 @@ public class ReportLimitManager {
 
 			if (this.alertPlayerWhenAllowedToReportPlayerAgain) {
 				output = plugin.getLocale().getString(ReportPhrases.allowedToReportPlayerAgain);
-				String reportedNameFormatted = BukkitUtil.formatPlayerName(expired.getReported());
+				final String reportedNameFormatted = BukkitUtil.formatPlayerName(expired.getReported());
 
 				output = output.replaceAll("%r", ChatColor.BLUE + reportedNameFormatted + ChatColor.WHITE);
 				expired.getPlayer().sendMessage(
@@ -424,11 +427,11 @@ public class ReportLimitManager {
 			}
 		}
 
-		Player player = expired.getPlayer();
-		OfflinePlayer reported = expired.getReported();
+		final Player player = expired.getPlayer();
+		final OfflinePlayer reported = expired.getReported();
 
 		// Remove the expired report from the player reports queue.
-		HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers = getReportedPlayers(player);
+		final HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers = getReportedPlayers(player);
 
 		if (BukkitUtil.isPlayerValid(reported)) {
 			reportedPlayers.get(reported.getUniqueId().toString()).remove(expired);
@@ -443,8 +446,8 @@ public class ReportLimitManager {
 	 * @param sender The {@link CommandSender}.
 	 * @return A HashMap containing all the players the {@link CommandSender} has reported.
 	 */
-	private HashMap<String, PriorityQueue<ReportTimer>> getReportedPlayers(CommandSender sender) {
-		HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers =
+	private HashMap<String, PriorityQueue<ReportTimer>> getReportedPlayers(final CommandSender sender) {
+		final HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers =
 				new HashMap<String, PriorityQueue<ReportTimer>>();
 
 		if (playerReports.get(sender.getName()) != null) {
@@ -452,7 +455,7 @@ public class ReportLimitManager {
 		}
 
 		if (BukkitUtil.isPlayer(sender)) {
-			Player player = (Player) sender;
+			final Player player = (Player) sender;
 
 			if (playerReports.get(player.getUniqueId().toString()) != null) {
 				reportedPlayers.putAll(playerReports.get(player.getUniqueId().toString()));
@@ -469,8 +472,8 @@ public class ReportLimitManager {
 	 * @param reportedPlayers A HashMap containing all the players reported by a certain sender.
 	 * @return All {@link ReportTimer}s where the given player is reported.
 	 */
-	private PriorityQueue<ReportTimer> getTimers(OfflinePlayer reported, HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers) {
-		PriorityQueue<ReportTimer> timers = new PriorityQueue<ReportTimer>();
+	private PriorityQueue<ReportTimer> getTimers(final OfflinePlayer reported, final HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers) {
+		final PriorityQueue<ReportTimer> timers = new PriorityQueue<ReportTimer>();
 
 		if (reportedPlayers.get(reported.getName()) != null) {
 			timers.addAll(reportedPlayers.get(reported.getName()));
@@ -491,12 +494,10 @@ public class ReportLimitManager {
 	 * @return A {@link PriorityQueue} containing {@link ReportTimer}s where the given
 	 * {@link CommandSender} has reported the given {@link OfflinePlayer}.
 	 */
-	private PriorityQueue<ReportTimer> getAllReportTimers(CommandSender sender, OfflinePlayer reported) {
-		HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers = this.getReportedPlayers(sender);
+	private PriorityQueue<ReportTimer> getAllReportTimers(final CommandSender sender, final OfflinePlayer reported) {
+		final HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers = this.getReportedPlayers(sender);
 
-		PriorityQueue<ReportTimer> timers = this.getTimers(reported, reportedPlayers);
-
-		return timers;
+		return this.getTimers(reported, reportedPlayers);
 	}
 
 	/**
@@ -505,12 +506,12 @@ public class ReportLimitManager {
 	 * @param sender The {@link CommandSender}.
 	 * @return A {@link PriorityQueue} containing {@link ReportTimer}s the given {@link CommandSender} has created.
 	 */
-	private PriorityQueue<ReportTimer> getAllReportTimers(CommandSender sender) {
-		HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers = this.getReportedPlayers(sender);
+	private PriorityQueue<ReportTimer> getAllReportTimers(final CommandSender sender) {
+		final HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers = this.getReportedPlayers(sender);
 
-		PriorityQueue<ReportTimer> timers = new PriorityQueue<ReportTimer>();
+		final PriorityQueue<ReportTimer> timers = new PriorityQueue<ReportTimer>();
 
-		for (PriorityQueue<ReportTimer> e : reportedPlayers.values()) {
+		for (final PriorityQueue<ReportTimer> e : reportedPlayers.values()) {
 			timers.addAll(e);
 		}
 

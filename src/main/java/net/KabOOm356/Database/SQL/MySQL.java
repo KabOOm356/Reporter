@@ -31,7 +31,7 @@ public class MySQL extends Database {
 	 * @param connectionPoolConfig The configuration for the connection pool.
 	 */
 	public MySQL(final String host, final String database, final String username, final String password, final ConnectionPoolConfig connectionPoolConfig) {
-		super(DatabaseType.MYSQL, "com.mysql.jdbc.Driver", "jdbc:mysql://" + host + "/" + database, connectionPoolConfig);
+		super(DatabaseType.MYSQL, "com.mysql.jdbc.Driver", "jdbc:mysql://" + host + '/' + database, connectionPoolConfig);
 
 		this.username = username;
 		this.password = password;
@@ -61,7 +61,7 @@ public class MySQL extends Database {
 	public String toString() {
 		String toString = "Database Type: MySQL\n";
 		toString += "Database Username: " + username;
-		toString += "\n" + super.toString();
+		toString += '\n' + super.toString();
 
 		toString = FormattingUtil.addTabsToNewLines(toString, 1);
 

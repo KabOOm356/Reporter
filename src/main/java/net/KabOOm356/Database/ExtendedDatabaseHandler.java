@@ -21,7 +21,7 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 	 *
 	 * @see DatabaseHandler#DatabaseHandler(String, String, String, String, ConnectionPoolConfig)
 	 */
-	public ExtendedDatabaseHandler(String host, String database, String username, String password, final ConnectionPoolConfig connectionPoolConfig) {
+	public ExtendedDatabaseHandler(final String host, final String database, final String username, final String password, final ConnectionPoolConfig connectionPoolConfig) {
 		super(host, database, username, password, connectionPoolConfig);
 	}
 
@@ -30,7 +30,7 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 	 *
 	 * @see DatabaseHandler#DatabaseHandler(DatabaseType, String, String, ConnectionPoolConfig)
 	 */
-	public ExtendedDatabaseHandler(DatabaseType type, String path, String name, final ConnectionPoolConfig connectionPoolConfig) throws IOException {
+	public ExtendedDatabaseHandler(final DatabaseType type, final String path, final String name, final ConnectionPoolConfig connectionPoolConfig) throws IOException {
 		super(type, path, name, connectionPoolConfig);
 	}
 
@@ -39,7 +39,7 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 	 *
 	 * @see DatabaseHandler#DatabaseHandler(Database)
 	 */
-	public ExtendedDatabaseHandler(Database database) {
+	public ExtendedDatabaseHandler(final Database database) {
 		super(database);
 	}
 

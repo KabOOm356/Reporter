@@ -45,7 +45,7 @@ public abstract class DatabaseTableCreator extends DatabaseTableUpdateHandler {
 		}
 	}
 
-	private void createTable() throws InterruptedException, SQLException, ClassNotFoundException {
+	private void createTable() throws SQLException {
 		final String query = getTableCreationQuery();
 		if (log.isDebugEnabled()) {
 			log.trace(String.format("Creating table [%s].", getTableName()), query);
@@ -53,7 +53,7 @@ public abstract class DatabaseTableCreator extends DatabaseTableUpdateHandler {
 		addQueryToTransaction(query);
 	}
 
-	private boolean needsToCreateTable() throws InterruptedException, SQLException, ClassNotFoundException {
+	private boolean needsToCreateTable() throws SQLException {
 		if (log.isDebugEnabled()) {
 			log.trace(String.format("Checking if table [%s] exists.", getTableName()));
 		}

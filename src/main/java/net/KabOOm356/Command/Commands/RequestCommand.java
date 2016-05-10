@@ -38,7 +38,7 @@ public class RequestCommand extends ReporterCommand {
 	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public RequestCommand(ReporterCommandManager manager) {
+	public RequestCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 
 		updateDocumentation();
@@ -62,17 +62,15 @@ public class RequestCommand extends ReporterCommand {
 		return permissionNode;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args) {
+	public void execute(final CommandSender sender, final ArrayList<String> args) {
 		try {
 			if (hasRequiredPermission(sender)) {
-				if (args.get(0).equalsIgnoreCase("most"))
+				if (args.get(0).equalsIgnoreCase("most")) {
 					requestMostReported(sender);
-				else
+				} else {
 					requestPlayer(sender, args.get(0));
+				}
 			}
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to request!", e);
@@ -80,7 +78,7 @@ public class RequestCommand extends ReporterCommand {
 		}
 	}
 
-	private void requestMostReported(CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException {
+	private void requestMostReported(final CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException {
 		// Return the most reported players and the number of reports against them.
 		final StringBuilder query = new StringBuilder();
 		query.append("SELECT COUNT(*) AS Count, ReportedUUID, Reported ");
@@ -96,21 +94,21 @@ public class RequestCommand extends ReporterCommand {
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			ArrayList<String> players = new ArrayList<String>();
-			SQLResultSet result;
+			final ArrayList<String> players = new ArrayList<String>();
+			final SQLResultSet result;
 			int numberOfReports = -1;
 
 			result = database.sqlQuery(connectionId, query.toString());
 
-			for (ResultRow row : result) {
+			for (final ResultRow row : result) {
 				numberOfReports = result.getInt("Count");
 
-				String uuidString = row.getString("ReportedUUID");
+				final String uuidString = row.getString("ReportedUUID");
 
 				if (!uuidString.isEmpty()) {
-					UUID uuid = UUID.fromString(uuidString);
+					final UUID uuid = UUID.fromString(uuidString);
 
-					OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+					final OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
 
 					players.add(BukkitUtil.formatPlayerName(player));
 				} else {
@@ -138,8 +136,8 @@ public class RequestCommand extends ReporterCommand {
 		}
 	}
 
-	private void requestPlayer(CommandSender sender, String playerName) throws ClassNotFoundException, SQLException, InterruptedException {
-		OfflinePlayer player = getManager().getPlayer(playerName);
+	private void requestPlayer(final CommandSender sender, final String playerName) throws ClassNotFoundException, SQLException, InterruptedException {
+		final OfflinePlayer player = getManager().getPlayer(playerName);
 
 		if (player == null) {
 			sender.sendMessage(ChatColor.RED + BukkitUtil.colorCodeReplaceAll(
@@ -152,7 +150,7 @@ public class RequestCommand extends ReporterCommand {
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			ArrayList<String> params = new ArrayList<String>();
+			final ArrayList<String> params = new ArrayList<String>();
 			String query = "SELECT ID FROM Reports WHERE ReportedUUID=?";
 
 			if (!player.getName().equalsIgnoreCase("* (Anonymous)")) {
@@ -162,10 +160,11 @@ public class RequestCommand extends ReporterCommand {
 				params.add(player.getName());
 			}
 
-			if (getManager().getDatabaseHandler().usingSQLite())
+			if (getManager().getDatabaseHandler().usingSQLite()) {
 				query += " COLLATE NOCASE";
+			}
 
-			SQLResultSet result = getManager().getDatabaseHandler().preparedSQLQuery(connectionId, query, params);
+			final SQLResultSet result = getManager().getDatabaseHandler().preparedSQLQuery(connectionId, query, params);
 
 			indexes = ArrayUtil.indexesToString(result, "ID", ChatColor.GOLD, ChatColor.WHITE);
 		} catch (final SQLException e) {
@@ -202,7 +201,7 @@ public class RequestCommand extends ReporterCommand {
 	 */
 	@Override
 	public void updateDocumentation() {
-		ArrayList<ObjectPair<String, String>> usages = super.getUsages();
+		final ArrayList<ObjectPair<String, String>> usages = super.getUsages();
 		usages.clear();
 
 		String usage = getManager().getLocale().getString(RequestPhrases.requestHelp);

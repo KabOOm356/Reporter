@@ -6,7 +6,7 @@ import org.bukkit.ChatColor;
 /**
  * Utility class to help with formatting.
  */
-public class FormattingUtil {
+public final class FormattingUtil {
 	/**
 	 * Character representation of a tab.
 	 */
@@ -27,6 +27,9 @@ public class FormattingUtil {
 	 */
 	public static final String newLine = Character.toString(newLineCharacter);
 
+	private FormattingUtil() {
+	}
+
 	/**
 	 * Appends a character behind all occurrences of another character.
 	 *
@@ -38,30 +41,35 @@ public class FormattingUtil {
 	 */
 	public static String appendCharacterAfter(
 			String str,
-			String character,
-			String additionCharacter,
-			int additions) {
-		if (str == null)
+			final String character,
+			final String additionCharacter,
+			final int additions) {
+		if (str == null) {
 			throw new IllegalArgumentException("Parameter 'str' cannot be null!");
-		if (character == null)
+		}
+		if (character == null) {
 			throw new IllegalArgumentException("Parameter 'character' cannot be null!");
-		if (additionCharacter == null)
+		}
+		if (additionCharacter == null) {
 			throw new IllegalArgumentException("Parameter 'additionCharacter' cannot be null!");
-		if (additions < 0)
+		}
+		if (additions < 0) {
 			throw new IllegalArgumentException("Parameter 'additions' must be greater than zero(0)!\n"
-					+ "Recieved value: " + additions);
+					+ "Received value: " + additions);
+		}
 
 		// If there are no additions to be made, return the string.
-		if (additions == 0)
+		if (additions == 0) {
 			return str;
+		}
 
-		StringBuilder strb = new StringBuilder();
-
+		final StringBuilder builder = new StringBuilder();
 		// Build a String that has the addition character repeated as many times as needed.
-		for (int LCV = 0; LCV < additions; LCV++)
-			strb.append(additionCharacter);
+		for (int LCV = 0; LCV < additions; LCV++) {
+			builder.append(additionCharacter);
+		}
 
-		String repeatedAdditionCharacter = strb.toString();
+		final String repeatedAdditionCharacter = builder.toString();
 
 		// Replace all occurrences of the character with the character
 		// and the addition character appended behind.
@@ -80,12 +88,12 @@ public class FormattingUtil {
 	 * @return The string with the addition character placed behind all occurrences of the given character.
 	 */
 	public static String appendCharacterAfter(
-			String str,
-			char character,
-			char additionCharacter,
-			int additions) {
-		String c = Character.toString(character);
-		String ac = Character.toString(additionCharacter);
+			final String str,
+			final char character,
+			final char additionCharacter,
+			final int additions) {
+		final String c = Character.toString(character);
+		final String ac = Character.toString(additionCharacter);
 
 		return appendCharacterAfter(str, c, ac, additions);
 	}
@@ -98,7 +106,7 @@ public class FormattingUtil {
 	 * @param additions         The number of times to add the addition character to each new line.
 	 * @return The string with the character inserted after each new line character.
 	 */
-	public static String addCharacterToNewLines(String str, char additionCharacter, int additions) {
+	public static String addCharacterToNewLines(final String str, final char additionCharacter, final int additions) {
 		return appendCharacterAfter(str, newLineCharacter, additionCharacter, additions);
 	}
 
@@ -110,7 +118,7 @@ public class FormattingUtil {
 	 * @param additions         The number of times to add the addition character to each new line.
 	 * @return The string with the character inserted after each new line character.
 	 */
-	public static String addCharacterToNewLines(String str, String additionCharacter, int additions) {
+	public static String addCharacterToNewLines(final String str, final String additionCharacter, final int additions) {
 		return appendCharacterAfter(str, newLine, additionCharacter, additions);
 	}
 
@@ -121,7 +129,7 @@ public class FormattingUtil {
 	 * @param tabs The number of tabs to add to each new line.
 	 * @return The string with the character inserted after each new line character.
 	 */
-	public static String addTabsToNewLines(String str, int tabs) {
+	public static String addTabsToNewLines(final String str, final int tabs) {
 		return addCharacterToNewLines(str, tab, tabs);
 	}
 
@@ -132,21 +140,18 @@ public class FormattingUtil {
 	 * @return The given String in lower case with the first character capitalized.
 	 */
 	public static String capitalizeFirstCharacter(String str) {
-		if (str == null)
+		if (str == null) {
 			throw new IllegalArgumentException("Parameter 'str' cannot be null!");
+		}
 
-		if (str.length() <= 0)
+		if (str.length() <= 0) {
 			return "";
+		}
 
 		str = str.toLowerCase();
 
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(Character.toUpperCase(str.charAt(0)));
-
-		sb.append(str.substring(1));
-
-		return sb.toString();
+		return String.valueOf(Character.toUpperCase(str.charAt(0))) +
+				str.substring(1);
 	}
 
 	/**
@@ -159,11 +164,11 @@ public class FormattingUtil {
 	public static String formatTimeRemaining(final String formatLine, final int seconds) {
 		Validate.notNull(formatLine, "The format line cannot be null!");
 		// Convert the seconds to hours and drop the remainder.
-		int hours = TimeUtil.getHours(seconds);
+		final int hours = TimeUtil.getHours(seconds);
 		int remainingSeconds = seconds % TimeUtil.secondsPerHour;
 
 		// Convert the seconds to minutes and drop the remainder.
-		int minutes = TimeUtil.getMinutes(remainingSeconds);
+		final int minutes = TimeUtil.getMinutes(remainingSeconds);
 		remainingSeconds = remainingSeconds % TimeUtil.secondsPerMinute;
 
 		String line = formatLine.replaceAll("%h", ChatColor.GOLD + Integer.toString(hours) + ChatColor.WHITE);

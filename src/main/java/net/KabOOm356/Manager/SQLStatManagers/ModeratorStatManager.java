@@ -25,7 +25,7 @@ public class ModeratorStatManager extends SQLStatManager {
 	 *
 	 * @param database The database where the statistics are being stored.
 	 */
-	public ModeratorStatManager(ExtendedDatabaseHandler database) {
+	public ModeratorStatManager(final ExtendedDatabaseHandler database) {
 		super(database, tableName, indexColumn, secondaryIndexColumn);
 	}
 
@@ -73,7 +73,7 @@ public class ModeratorStatManager extends SQLStatManager {
 		 * @param name       The name of the statistic.
 		 * @param columnName The case-sensitive column name of the statistic.
 		 */
-		protected ModeratorStat(String name, String columnName) {
+		protected ModeratorStat(final String name, final String columnName) {
 			super(name, columnName);
 		}
 	}

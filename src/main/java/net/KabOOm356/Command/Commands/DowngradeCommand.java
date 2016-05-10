@@ -30,7 +30,7 @@ public class DowngradeCommand extends ReporterCommand {
 	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public DowngradeCommand(ReporterCommandManager manager) {
+	public DowngradeCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 
 		updateDocumentation();
@@ -55,25 +55,29 @@ public class DowngradeCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args) {
+	public void execute(final CommandSender sender, final ArrayList<String> args) {
 		try {
-			if (!hasRequiredPermission(sender))
+			if (!hasRequiredPermission(sender)) {
 				return;
+			}
 
 			int index = Util.parseInt(args.get(0));
 
 			if (args.get(0).equalsIgnoreCase("last")) {
-				if (!hasRequiredLastViewed(sender))
+				if (!hasRequiredLastViewed(sender)) {
 					return;
+				}
 
 				index = getLastViewed(sender);
 			}
 
-			if (!getManager().isReportIndexValid(sender, index))
+			if (!getManager().isReportIndexValid(sender, index)) {
 				return;
+			}
 
-			if (!getManager().canAlterReport(sender, index))
+			if (!getManager().canAlterReport(sender, index)) {
 				return;
+			}
 
 			final ModLevel newPriority = getNextLowestPriorityLevel(index);
 			if (newPriority == ModLevel.UNKNOWN) {
@@ -91,8 +95,8 @@ public class DowngradeCommand extends ReporterCommand {
 		}
 	}
 
-	private ModLevel getNextLowestPriorityLevel(int index) throws ClassNotFoundException, SQLException, InterruptedException {
-		String query = "SELECT Priority FROM Reports WHERE ID=" + index;
+	private ModLevel getNextLowestPriorityLevel(final int index) throws ClassNotFoundException, SQLException, InterruptedException {
+		final String query = "SELECT Priority FROM Reports WHERE ID=" + index;
 
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId;
@@ -107,11 +111,11 @@ public class DowngradeCommand extends ReporterCommand {
 			throw e;
 		}
 		try {
-			SQLResultSet result = database.sqlQuery(connectionId, query);
-			int currentPriorityLevel = result.getInt("Priority");
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
+			final int currentPriorityLevel = result.getInt("Priority");
 			return ModLevel.getByLevel(currentPriorityLevel - 1);
 		} catch (final SQLException e) {
-			log.error(String.format("Failed to get the next lowest priorirty on connection [%d]!", connectionId));
+			log.error(String.format("Failed to get the next lowest priority on connection [%d]!", connectionId));
 			throw e;
 		} finally {
 			database.closeConnection(connectionId);

@@ -48,7 +48,7 @@ public class DatabaseTableMigratorTest extends PowerMockitoTest {
 	}
 
 	@Test(expected = InterruptedException.class)
-	public void testMigrageInterruptedException() throws InterruptedException, SQLException, ClassNotFoundException {
+	public void testMigrateInterruptedException() throws InterruptedException, SQLException, ClassNotFoundException {
 		doThrow(new InterruptedException("Test Exception")).when(databaseTableVersionMigrator).migrate();
 		databaseTableMigrator.migrate();
 	}

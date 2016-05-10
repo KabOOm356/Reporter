@@ -21,7 +21,7 @@ public class LocaleInfo extends LocaleEntry {
 	 * @param path The path to the entry.
 	 * @param def  The default for the entry.
 	 */
-	public LocaleInfo(String path, String def) {
+	public LocaleInfo(final String path, final String def) {
 		super(prefix + path, def);
 	}
 }

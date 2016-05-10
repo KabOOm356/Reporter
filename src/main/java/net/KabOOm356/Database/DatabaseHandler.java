@@ -42,13 +42,13 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 	 * @param connectionPoolConfig The configuration for the connection pool.
 	 * @throws IOException
 	 */
-	public DatabaseHandler(DatabaseType type, String path, String name, final ConnectionPoolConfig connectionPoolConfig) throws IOException {
+	public DatabaseHandler(final DatabaseType type, final String path, String name, final ConnectionPoolConfig connectionPoolConfig) throws IOException {
 		if (name.contains("/") || name.contains("\\")) {
-			name = name.substring(name.lastIndexOf("\\"));
-			name = name.substring(name.lastIndexOf("/"));
+			name = name.substring(name.lastIndexOf('\\'));
+			name = name.substring(name.lastIndexOf('/'));
 		}
 
-		File SQLFile = new File(path, name);
+		final File SQLFile = new File(path, name);
 
 		SQLFile.createNewFile();
 
@@ -62,7 +62,7 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 	 *
 	 * @param database The {@link Database} to be used.
 	 */
-	public DatabaseHandler(Database database) {
+	public DatabaseHandler(final Database database) {
 		this.database = database;
 	}
 
@@ -107,17 +107,17 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 	}
 
 	@Override
-	public boolean checkTable(String table) throws ClassNotFoundException, SQLException, InterruptedException {
+	public boolean checkTable(final String table) throws ClassNotFoundException, SQLException, InterruptedException {
 		return database.checkTable(table);
 	}
 
 	@Override
-	public void updateQuery(String query) throws ClassNotFoundException, SQLException, InterruptedException {
+	public void updateQuery(final String query) throws ClassNotFoundException, SQLException, InterruptedException {
 		database.updateQuery(query);
 	}
 
 	@Override
-	public ArrayList<String> getColumnNames(String table) throws SQLException, ClassNotFoundException, InterruptedException {
+	public ArrayList<String> getColumnNames(final String table) throws SQLException, ClassNotFoundException, InterruptedException {
 		return database.getColumnNames(table);
 	}
 
@@ -127,22 +127,22 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 	}
 
 	@Override
-	public ResultSet getColumnMetaData(String table) throws ClassNotFoundException, SQLException, InterruptedException {
+	public ResultSet getColumnMetaData(final String table) throws ClassNotFoundException, SQLException, InterruptedException {
 		return database.getColumnMetaData(table);
 	}
 
 	@Override
-	public ResultSet query(String query) throws ClassNotFoundException, SQLException, InterruptedException {
+	public ResultSet query(final String query) throws ClassNotFoundException, SQLException, InterruptedException {
 		return database.query(query);
 	}
 
 	@Override
-	public ResultSet preparedQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
+	public ResultSet preparedQuery(final String query, final ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
 		return database.preparedQuery(query, params);
 	}
 
 	@Override
-	public void preparedUpdateQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
+	public void preparedUpdateQuery(final String query, final ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
 		database.preparedUpdateQuery(query, params);
 	}
 
@@ -152,7 +152,7 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(String query) throws ClassNotFoundException, SQLException, InterruptedException {
+	public PreparedStatement prepareStatement(final String query) throws ClassNotFoundException, SQLException, InterruptedException {
 		return database.prepareStatement(query);
 	}
 
@@ -174,57 +174,57 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 	}
 
 	@Override
-	public void closeConnection(Integer connectionId) {
+	public void closeConnection(final Integer connectionId) {
 		database.closeConnection(connectionId);
 	}
 
 	@Override
-	public ResultSet query(Integer connectionId, String query) throws SQLException {
+	public ResultSet query(final Integer connectionId, final String query) throws SQLException {
 		return database.query(connectionId, query);
 	}
 
 	@Override
-	public void updateQuery(Integer connectionId, String query) throws SQLException {
+	public void updateQuery(final Integer connectionId, final String query) throws SQLException {
 		database.updateQuery(connectionId, query);
 	}
 
 	@Override
-	public ResultSet preparedQuery(Integer connectionId, String query, ArrayList<String> params) throws SQLException {
+	public ResultSet preparedQuery(final Integer connectionId, final String query, final ArrayList<String> params) throws SQLException {
 		return database.preparedQuery(connectionId, query, params);
 	}
 
 	@Override
-	public void preparedUpdateQuery(Integer connectionId, String query, ArrayList<String> params) throws SQLException {
+	public void preparedUpdateQuery(final Integer connectionId, final String query, final ArrayList<String> params) throws SQLException {
 		database.preparedUpdateQuery(connectionId, query, params);
 	}
 
 	@Override
-	public boolean checkTable(Integer connectionId, String table) throws SQLException {
+	public boolean checkTable(final Integer connectionId, final String table) throws SQLException {
 		return database.checkTable(connectionId, table);
 	}
 
 	@Override
-	public ArrayList<String> getColumnNames(Integer connectionId, String table) throws SQLException {
+	public ArrayList<String> getColumnNames(final Integer connectionId, final String table) throws SQLException {
 		return database.getColumnNames(connectionId, table);
 	}
 
 	@Override
-	public DatabaseMetaData getMetaData(Integer connectionId) throws SQLException {
+	public DatabaseMetaData getMetaData(final Integer connectionId) throws SQLException {
 		return database.getMetaData(connectionId);
 	}
 
 	@Override
-	public ResultSet getColumnMetaData(Integer connectionId, String table) throws SQLException {
+	public ResultSet getColumnMetaData(final Integer connectionId, final String table) throws SQLException {
 		return database.getColumnMetaData(connectionId, table);
 	}
 
 	@Override
-	public Statement createStatement(Integer connectionId) throws SQLException {
+	public Statement createStatement(final Integer connectionId) throws SQLException {
 		return database.createStatement(connectionId);
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(Integer connectionId, String query) throws SQLException {
+	public PreparedStatement prepareStatement(final Integer connectionId, final String query) throws SQLException {
 		return database.prepareStatement(connectionId, query);
 	}
 }

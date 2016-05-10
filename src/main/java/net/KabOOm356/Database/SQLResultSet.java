@@ -33,17 +33,17 @@ public class SQLResultSet extends ArrayList<ResultRow> {
 	/**
 	 * Constructor.
 	 *
-	 * @param resultSet The {@link ResultSet} to initialize this {@link SQLResultSet} to.
+	 * @param resultSet The {@link ResultSet} to initialize this to.
 	 * @throws SQLException
 	 */
-	public SQLResultSet(ResultSet resultSet) throws SQLException {
+	public SQLResultSet(final ResultSet resultSet) throws SQLException {
 		super();
 
 		set(resultSet);
 	}
 
 	/**
-	 * Sets the contents of this {@link SQLResultSet} to the contents of the given ResultSet.
+	 * Sets the contents of this to the contents of the given ResultSet.
 	 * <br /><br />
 	 * <b>NOTE:</b> The internal cursor of the given {@link ResultSet} should be set to just before the first element.
 	 *
@@ -60,8 +60,9 @@ public class SQLResultSet extends ArrayList<ResultRow> {
 			// The SQLite driver will always throw an exception.
 		}
 
-		while (resultSet.next())
+		while (resultSet.next()) {
 			add(new ResultRow(resultSet));
+		}
 	}
 
 	/**
@@ -71,7 +72,7 @@ public class SQLResultSet extends ArrayList<ResultRow> {
 	 * @param colName The column name to cast.
 	 * @return The contents of the given column cast to a String.
 	 */
-	public String getString(int row, String colName) {
+	public String getString(final int row, final String colName) {
 		return get(row).getString(colName);
 	}
 
@@ -82,7 +83,7 @@ public class SQLResultSet extends ArrayList<ResultRow> {
 	 * @return The contents of the first row cast to a String.
 	 * @see SQLResultSet#FIRSTROW
 	 */
-	public String getString(String colName) {
+	public String getString(final String colName) {
 		return getString(FIRSTROW, colName);
 	}
 
@@ -93,7 +94,7 @@ public class SQLResultSet extends ArrayList<ResultRow> {
 	 * @param colName The column name to cast.
 	 * @return The contents of the given column cast to a Boolean.
 	 */
-	public Boolean getBoolean(int row, String colName) {
+	public Boolean getBoolean(final int row, final String colName) {
 		return get(row).getBoolean(colName);
 	}
 
@@ -104,7 +105,7 @@ public class SQLResultSet extends ArrayList<ResultRow> {
 	 * @return The contents of the first row cast to a Boolean.
 	 * @see SQLResultSet#FIRSTROW
 	 */
-	public Boolean getBoolean(String colName) {
+	public Boolean getBoolean(final String colName) {
 		return getBoolean(FIRSTROW, colName);
 	}
 
@@ -115,7 +116,7 @@ public class SQLResultSet extends ArrayList<ResultRow> {
 	 * @param colName The column name to cast.
 	 * @return The contents of the given column cast to an Integer.
 	 */
-	public Integer getInt(int row, String colName) {
+	public Integer getInt(final int row, final String colName) {
 		return get(row).getInt(colName);
 	}
 
@@ -126,7 +127,7 @@ public class SQLResultSet extends ArrayList<ResultRow> {
 	 * @return The contents of the first row cast to an Integer.
 	 * @see SQLResultSet#FIRSTROW
 	 */
-	public Integer getInt(String colName) {
+	public Integer getInt(final String colName) {
 		return getInt(FIRSTROW, colName);
 	}
 
@@ -137,7 +138,7 @@ public class SQLResultSet extends ArrayList<ResultRow> {
 	 * @param colName The column name to cast.
 	 * @return The contents of the given column cast to a Double.
 	 */
-	public Double getDouble(int row, String colName) {
+	public Double getDouble(final int row, final String colName) {
 		return get(row).getDouble(colName);
 	}
 
@@ -148,18 +149,18 @@ public class SQLResultSet extends ArrayList<ResultRow> {
 	 * @return The contents of the first row cast to a Double.
 	 * @see SQLResultSet#FIRSTROW
 	 */
-	public Double getDouble(String colName) {
+	public Double getDouble(final String colName) {
 		return getDouble(FIRSTROW, colName);
 	}
 
 	/**
-	 * Checks if this {@link SQLResultSet} contains the given value in the given column.
+	 * Checks if this contains the given value in the given column.
 	 *
 	 * @param colName The name of the column to check.
 	 * @param value   The value of the column.
 	 * @return True if the value is present in the given column, otherwise false.
 	 */
-	public boolean contains(String colName, Object value) {
+	public boolean contains(final String colName, final Object value) {
 		return this.get(colName, value) != null;
 	}
 
@@ -171,9 +172,9 @@ public class SQLResultSet extends ArrayList<ResultRow> {
 	 * @return If the given value exists in the given column a
 	 * {@link ResultRow} is returned, otherwise null is returned.
 	 */
-	public ResultRow get(String colName, Object value) {
-		for (ResultRow row : this) {
-			Object rowValue = row.get(colName);
+	public ResultRow get(final String colName, final Object value) {
+		for (final ResultRow row : this) {
+			final Object rowValue = row.get(colName);
 
 			if (rowValue != null && rowValue.equals(value)) {
 				return row;
@@ -188,14 +189,14 @@ public class SQLResultSet extends ArrayList<ResultRow> {
 	 *
 	 * @param colName The name of the column.
 	 * @param value   The value.
-	 * @return Returns an {@link SQLResultSet} containing all {@link ResultRow}s
+	 * @return Returns an  containing all {@link ResultRow}s
 	 * where the given column equals the given value.
 	 */
-	public SQLResultSet getAll(String colName, Object value) {
-		SQLResultSet set = new SQLResultSet();
+	public SQLResultSet getAll(final String colName, final Object value) {
+		final SQLResultSet set = new SQLResultSet();
 
-		for (ResultRow row : this) {
-			Object rowValue = row.get(colName);
+		for (final ResultRow row : this) {
+			final Object rowValue = row.get(colName);
 
 			if (rowValue != null && rowValue.equals(value)) {
 				set.add(row);

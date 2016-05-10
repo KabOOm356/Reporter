@@ -20,7 +20,7 @@ public class ReporterMessage extends Message {
 	 *
 	 * @param message The initial message.
 	 */
-	public ReporterMessage(String message) {
+	public ReporterMessage(final String message) {
 		super(message);
 
 		indexes = new ArrayList<Integer>();
@@ -31,7 +31,7 @@ public class ReporterMessage extends Message {
 	 *
 	 * @param message An initial message.
 	 */
-	public ReporterMessage(Message message) {
+	public ReporterMessage(final Message message) {
 		super(message.getMessage());
 
 		indexes = new ArrayList<Integer>();
@@ -43,7 +43,7 @@ public class ReporterMessage extends Message {
 	 * @param message The message.
 	 * @param index   An index associated with this message
 	 */
-	public ReporterMessage(String message, int index) {
+	public ReporterMessage(final String message, final int index) {
 		super(message);
 
 		indexes = new ArrayList<Integer>();
@@ -66,7 +66,7 @@ public class ReporterMessage extends Message {
 	public String getMessage() {
 		String message = super.getMessage();
 
-		String indexString = ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
+		final String indexString = ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
 
 		message = message.replaceAll("%i", indexString);
 
@@ -87,9 +87,10 @@ public class ReporterMessage extends Message {
 	 *
 	 * @param message The message to add the indexes from.
 	 */
-	public void addIndexes(ReporterMessage message) {
-		if (messagesEqual(message))
+	public void addIndexes(final ReporterMessage message) {
+		if (messagesEqual(message)) {
 			addIndexes(message.getIndexes());
+		}
 	}
 
 	/**
@@ -97,9 +98,10 @@ public class ReporterMessage extends Message {
 	 *
 	 * @param index The index to add.
 	 */
-	public void addIndex(int index) {
-		if (!indexes.contains(index))
+	public void addIndex(final int index) {
+		if (!indexes.contains(index)) {
 			indexes.add(index);
+		}
 	}
 
 	/**
@@ -107,9 +109,10 @@ public class ReporterMessage extends Message {
 	 *
 	 * @param indexes The indexes to add.
 	 */
-	public void addIndexes(ArrayList<Integer> indexes) {
-		for (int index : indexes)
+	public void addIndexes(final ArrayList<Integer> indexes) {
+		for (final int index : indexes) {
 			addIndex(index);
+		}
 	}
 
 	/**
@@ -117,17 +120,18 @@ public class ReporterMessage extends Message {
 	 *
 	 * @param index The index to remove.
 	 */
-	public void removeIndex(int index) {
+	public void removeIndex(final int index) {
 		int LCV = 0;
 
 		while (LCV < indexes.size()) {
-			if (indexes.get(LCV) == index)
+			if (indexes.get(LCV) == index) {
 				indexes.remove(LCV);
-			else if (indexes.get(LCV) > index) {
+			} else if (indexes.get(LCV) > index) {
 				indexes.set(LCV, indexes.get(LCV) - 1);
 				LCV++;
-			} else
+			} else {
 				LCV++;
+			}
 		}
 	}
 
@@ -136,15 +140,16 @@ public class ReporterMessage extends Message {
 	 *
 	 * @param remainingIndexes The remaining indexes after a batch deletion.
 	 */
-	public void reindex(ArrayList<Integer> remainingIndexes) {
+	public void reindex(final ArrayList<Integer> remainingIndexes) {
 		int LCV = 0;
 
 		while (LCV < indexes.size()) {
 			if (remainingIndexes.contains(indexes.get(LCV))) {
 				indexes.set(LCV, remainingIndexes.indexOf(indexes.get(LCV)) + 1);
 				LCV++;
-			} else
+			} else {
 				indexes.remove(LCV);
+			}
 		}
 	}
 
@@ -154,7 +159,7 @@ public class ReporterMessage extends Message {
 	 * @param message The message to compare this to.
 	 * @return True if this and the given message are equal, otherwise false.
 	 */
-	public boolean messagesEqual(ReporterMessage message) {
+	public boolean messagesEqual(final ReporterMessage message) {
 		return getRawMessage().equalsIgnoreCase(message.getRawMessage());
 	}
 
@@ -165,16 +170,10 @@ public class ReporterMessage extends Message {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(super.toString());
-
-		sb.append("\nIndexes: ");
-
-		sb.append(ArrayUtil.indexesToString(indexes) + "\n");
-
-		sb.append("Full Message: " + this.getMessage());
-
-		return FormattingUtil.addTabsToNewLines(sb.toString(), 1);
+		final String sb = super.toString() +
+				"\nIndexes: " +
+				ArrayUtil.indexesToString(indexes) + '\n' +
+				"Full Message: " + this.getMessage();
+		return FormattingUtil.addTabsToNewLines(sb, 1);
 	}
 }

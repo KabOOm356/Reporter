@@ -37,6 +37,7 @@ public class SQLStatManager {
 	 * The case-sensitive column name that should be used as a secondary index.
 	 */
 	private final String secondaryIndexColumn;
+
 	/**
 	 * Constructor.
 	 *
@@ -139,7 +140,7 @@ public class SQLStatManager {
 	 * @param decrement The value to decrement the statistic by.
 	 * @throws IllegalArgumentException If the decrement value is less than one (1).
 	 */
-	public void decrementStat(final OfflinePlayer player, final SQLStat stat, int decrement) {
+	public void decrementStat(final OfflinePlayer player, final SQLStat stat, final int decrement) {
 		if (decrement < 1) {
 			throw new IllegalArgumentException("'decrement' cannot be less than one (1)!");
 		}
@@ -224,7 +225,7 @@ public class SQLStatManager {
 	 * An empty {@link ResultRow} is returned if there is not an entry for the given player.
 	 * If an exception is thrown while querying the database, null is returned.
 	 */
-	public ResultRow getStat(OfflinePlayer player, SQLStat stat) {
+	public ResultRow getStat(final OfflinePlayer player, final SQLStat stat) {
 		final String statColumn = stat.getColumnName();
 
 		final StringBuilder query = new StringBuilder();
@@ -306,10 +307,9 @@ public class SQLStatManager {
 		}
 		try {
 			if (rs.isEmpty()) {
-				final StringBuilder query = new StringBuilder();
-				query.append("INSERT INTO ").append(tableName).append(' ');
-				query.append('(').append(indexColumn).append(',').append(secondaryIndexColumn).append(')');
-				query.append("VALUES (?,?)");
+				final String query = "INSERT INTO " + tableName + ' ' +
+						'(' + indexColumn + ',' + secondaryIndexColumn + ')' +
+						"VALUES (?,?)";
 
 				final ArrayList<String> params = new ArrayList<String>();
 
@@ -321,7 +321,7 @@ public class SQLStatManager {
 
 				params.add(player.getName());
 
-				getDatabase().preparedUpdateQuery(connectionId, query.toString(), params);
+				getDatabase().preparedUpdateQuery(connectionId, query, params);
 			}
 		} catch (final SQLException e) {
 			log.warn(String.format("Failed to insert new SQL stat row for player [%s]!", BukkitUtil.formatPlayerName(player)));
@@ -410,7 +410,7 @@ public class SQLStatManager {
 		 * @param name       The name of the statistic.
 		 * @param columnName The case-sensitive column name of the statistic.
 		 */
-		protected SQLStat(String name, String columnName) {
+		protected SQLStat(final String name, final String columnName) {
 			this.name = name;
 			this.columnName = columnName;
 		}
@@ -421,14 +421,14 @@ public class SQLStatManager {
 		 * @param name The name of the {@link SQLStat} to return.
 		 * @return An {@link SQLStat} if one matches the given name, otherwise null.
 		 */
-		public static SQLStat getByName(String name) {
+		public static SQLStat getByName(final String name) {
 			if (name.equalsIgnoreCase("all")) {
 				return SQLStat.ALL;
 			} else {
-				ArrayList<SQLStat> stats = SQLStat.getAll(ModeratorStat.class);
+				final ArrayList<SQLStat> stats = SQLStat.getAll(ModeratorStat.class);
 				stats.addAll(SQLStat.getAll(PlayerStat.class));
 
-				for (SQLStat stat : stats) {
+				for (final SQLStat stat : stats) {
 					if (name.equalsIgnoreCase(stat.getName())) {
 						return stat;
 					}
@@ -444,14 +444,14 @@ public class SQLStatManager {
 		 * @param clazz The Class to get the static {@link SQLStat} fields from.
 		 * @return An {@link ArrayList} containing all the {@link SQLStat}s from the given class.
 		 */
-		public static <T extends SQLStat> ArrayList<SQLStat> getAll(Class<T> clazz) {
-			ArrayList<SQLStat> stats = new ArrayList<SQLStat>();
+		public static <T extends SQLStat> ArrayList<SQLStat> getAll(final Class<T> clazz) {
+			final ArrayList<SQLStat> stats = new ArrayList<SQLStat>();
 
-			for (Field f : clazz.getDeclaredFields()) {
+			for (final Field f : clazz.getDeclaredFields()) {
 				try {
 					// Only care if the field is static and an instance of a SQLStat.
 					if (Modifier.isStatic(f.getModifiers()) && f.get(null) instanceof SQLStat) {
-						SQLStat stat = (SQLStat) f.get(null);
+						final SQLStat stat = (SQLStat) f.get(null);
 
 						stats.add(stat);
 					}

@@ -14,7 +14,6 @@ import java.sql.SQLException;
 
 import static org.mockito.Mockito.atLeastOnce;
 import static org.powermock.api.mockito.PowerMockito.*;
-import static org.powermock.api.support.membermodification.MemberMatcher.method;
 
 @PrepareForTest(DatabaseTableVersionMigrator.class)
 public class DatabaseTableVersionMigratorTest extends PowerMockitoTest {

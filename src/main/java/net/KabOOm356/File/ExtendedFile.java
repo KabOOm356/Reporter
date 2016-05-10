@@ -20,7 +20,7 @@ public class ExtendedFile {
 	 * @param parent The Java {@link File} that will be the parent or directory.
 	 * @param child  The name of this ExtendedFile.
 	 */
-	public ExtendedFile(File parent, String child) {
+	public ExtendedFile(final File parent, final String child) {
 		file = new File(parent, child);
 	}
 
@@ -30,7 +30,7 @@ public class ExtendedFile {
 	 * @param parent The path that will be the parent or directory.
 	 * @param child  The name of this ExtendedFile.
 	 */
-	public ExtendedFile(String parent, String child) {
+	public ExtendedFile(final String parent, final String child) {
 		file = new File(parent, child);
 	}
 
@@ -39,7 +39,7 @@ public class ExtendedFile {
 	 *
 	 * @param file The name of this ExtendedFile.
 	 */
-	public ExtendedFile(String file) {
+	public ExtendedFile(final String file) {
 		this.file = new File(file);
 	}
 
@@ -48,7 +48,7 @@ public class ExtendedFile {
 	 *
 	 * @param parent The new parent location.
 	 */
-	public void setParent(File parent) {
+	public void setParent(final File parent) {
 		file = new File(parent, file.getName());
 	}
 
@@ -73,7 +73,7 @@ public class ExtendedFile {
 	/**
 	 * @see File#renameTo(File)
 	 */
-	public boolean renameTo(File dest) {
+	public boolean renameTo(final File dest) {
 		return file.renameTo(dest);
 	}
 
@@ -103,20 +103,16 @@ public class ExtendedFile {
 	 *
 	 * @param child The new name of this ExtendedFile.
 	 */
-	public void setName(String child) {
-		String parent = file.getParent();
+	public void setName(final String child) {
+		final String parent = file.getParent();
 
-		if (parent != null)
+		if (parent != null) {
 			file = new File(file.getParent(), child);
-		else
+		} else {
 			file = new File(child);
+		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		String str = "Current File: " + file.getAbsolutePath();

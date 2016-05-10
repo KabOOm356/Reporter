@@ -27,7 +27,7 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	 * @param group   Initial group.
 	 * @param message Initial message.
 	 */
-	public GroupMessages(Group group, Message message) {
+	public GroupMessages(final Group group, final Message message) {
 		super();
 
 		put(group, message);
@@ -39,7 +39,7 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	 * @param group    Initial group.
 	 * @param messages Initial messages.
 	 */
-	public GroupMessages(Group group, ArrayList<Message> messages) {
+	public GroupMessages(final Group group, final ArrayList<Message> messages) {
 		super();
 
 		put(group, messages);
@@ -51,11 +51,12 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	 * @param group   The group to add the message to.
 	 * @param message The message to add to the group.
 	 */
-	public void put(Group group, Message message) {
-		if (!containsKey(group))
+	public void put(final Group group, final Message message) {
+		if (!containsKey(group)) {
 			put(group, new PendingMessages(message));
-		else
+		} else {
 			get(group).add(message);
+		}
 	}
 
 	/**
@@ -64,9 +65,10 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	 * @param group    The group to add the messages to.
 	 * @param messages The messages to add to the group.
 	 */
-	public void put(Group group, ArrayList<Message> messages) {
-		for (Message message : messages)
+	public void put(final Group group, final ArrayList<Message> messages) {
+		for (final Message message : messages) {
 			put(group, message);
+		}
 	}
 
 	/**
@@ -74,9 +76,9 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	 *
 	 * @param remainingIndexes The remaining indexes after a batch deletion.
 	 */
-	public void reindexMessages(ArrayList<Integer> remainingIndexes) {
-		for (Entry<Group, PendingMessages> messages : entrySet()) {
-			PendingMessages pendingMessage = messages.getValue();
+	public void reindexMessages(final ArrayList<Integer> remainingIndexes) {
+		for (final Entry<Group, PendingMessages> messages : entrySet()) {
+			final PendingMessages pendingMessage = messages.getValue();
 
 			pendingMessage.reindexMessages(remainingIndexes);
 		}
@@ -85,8 +87,8 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	}
 
 	@Override
-	public PendingMessages remove(Object key) {
-		PendingMessages removed = super.remove(key);
+	public PendingMessages remove(final Object key) {
+		final PendingMessages removed = super.remove(key);
 
 		removeEmpty();
 
@@ -98,9 +100,10 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	 *
 	 * @param message The message to remove.
 	 */
-	public void remove(Message message) {
-		for (PendingMessages messages : this.values())
+	public void remove(final Message message) {
+		for (final PendingMessages messages : this.values()) {
 			messages.remove(message);
+		}
 
 		removeEmpty();
 	}
@@ -110,9 +113,10 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	 *
 	 * @param index The index to remove.
 	 */
-	public void removeIndex(int index) {
-		for (PendingMessages messages : this.values())
+	public void removeIndex(final int index) {
+		for (final PendingMessages messages : this.values()) {
 			messages.removeIndex(index);
+		}
 
 		removeEmpty();
 	}
@@ -121,23 +125,26 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	 * Removes the empty items from this structure.
 	 */
 	private void removeEmpty() {
-		ArrayList<Group> removalKeys = new ArrayList<Group>();
+		final ArrayList<Group> removalKeys = new ArrayList<Group>();
 
-		for (Entry<Group, PendingMessages> messages : entrySet()) {
-			if (messages.getValue().isEmpty())
+		for (final Entry<Group, PendingMessages> messages : entrySet()) {
+			if (messages.getValue().isEmpty()) {
 				removalKeys.add(messages.getKey());
+			}
 		}
 
-		for (Group key : removalKeys)
+		for (final Group key : removalKeys) {
 			this.remove(key);
+		}
 	}
 
 	@Override
 	public boolean isEmpty() {
 		if (!super.isEmpty()) {
-			for (PendingMessages message : values()) {
-				if (!message.isEmpty())
+			for (final PendingMessages message : values()) {
+				if (!message.isEmpty()) {
 					return false;
+				}
 			}
 		}
 

@@ -70,7 +70,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 		}
 		localConnectionId = openPooledConnection();
 		if (log.isDebugEnabled()) {
-			log.debug("New non-pooled connection created with id [" + localConnectionId + "]");
+			log.debug("New non-pooled connection created with id [" + localConnectionId + ']');
 		}
 	}
 
@@ -81,7 +81,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 
 	private boolean isConnectionSlotAvailable() {
 		// A connection slot is available if the size of the pool is less than the max number of connections allowed
-		boolean isConnectionSlotAvailable = connectionPool.size() < connectionPoolConfig.getMaxConnections();
+		final boolean isConnectionSlotAvailable = connectionPool.size() < connectionPoolConfig.getMaxConnections();
 		if (log.isDebugEnabled()) {
 			if (isConnectionSlotAvailable) {
 				log.debug("New connection slot is available in the connection pool");
@@ -109,7 +109,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 		}
 		localConnectionId = openPooledConnection(username, password);
 		if (log.isDebugEnabled()) {
-			log.debug("New non-pooled connection created with id [" + localConnectionId + "]");
+			log.debug("New non-pooled connection created with id [" + localConnectionId + ']');
 		}
 	}
 
@@ -126,7 +126,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	protected synchronized int openPooledConnection(final String username, final String password) throws ClassNotFoundException, SQLException, InterruptedException {
 		try {
 			synchronized (connectionPool) {
-				long startWaitTime = System.currentTimeMillis();
+				final long startWaitTime = System.currentTimeMillis();
 				boolean isWaiting = false;
 				int updateCount = 0;
 				long currentWaitTime = 0;
@@ -143,7 +143,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 						}
 						if (connectionPoolConfig.isConnectionPoolLimited() && updateCount >= connectionPoolConfig.getMaxAttemptsForConnection()) {
 							log.warn("Thread has reached the max number of updates! Cancelling operation!");
-							throw new InterruptedException(String.format("Thead has reached the cycle limit [%d] after waiting for [%dms] for a new connection!", connectionPoolConfig.getMaxAttemptsForConnection(), currentWaitTime));
+							throw new InterruptedException(String.format("Thread has reached the cycle limit [%d] after waiting for [%dms] for a new connection!", connectionPoolConfig.getMaxAttemptsForConnection(), currentWaitTime));
 						}
 					}
 					connectionPool.wait(connectionPoolConfig.getWaitTimeBeforeUpdate());
@@ -176,8 +176,8 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 			final ConnectionWrapper ConnectionWrapper = new AlertingPooledConnection(this, connectionId, connection);
 			connectionPool.put(connectionId, ConnectionWrapper);
 			if (log.isDebugEnabled()) {
-				log.debug("New pooled connection created with id [" + connectionId + "]");
-				log.debug("Connection pool size [" + connectionPool.size() + "]");
+				log.debug("New pooled connection created with id [" + connectionId + ']');
+				log.debug("Connection pool size [" + connectionPool.size() + ']');
 			}
 			return connectionId;
 		} catch (final ClassNotFoundException e) {
@@ -245,7 +245,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	public void closeConnection() {
 		if (localConnectionId != null) {
 			if (log.isDebugEnabled()) {
-				log.debug("Closing non-pooled connection with id [" + localConnectionId + "]");
+				log.debug("Closing non-pooled connection with id [" + localConnectionId + ']');
 			}
 			closeConnection(localConnectionId);
 			localConnectionId = null;
@@ -259,7 +259,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 			try {
 				if (!connection.isClosed()) {
 					if (log.isDebugEnabled()) {
-						log.debug("Closing pooled connection with id [" + connectionId + "]");
+						log.debug("Closing pooled connection with id [" + connectionId + ']');
 					}
 					connection.close();
 				}
@@ -314,7 +314,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	@Override
 	public void connectionClosed(final Integer connectionId) {
 		if (log.isDebugEnabled()) {
-			log.debug("Connection close detected for connection with id [" + connectionId + "]");
+			log.debug("Connection close detected for connection with id [" + connectionId + ']');
 		}
 		removeConnectionFromPool(connectionId);
 	}
@@ -346,31 +346,28 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 			}
 		} finally {
 			try {
-				statement.close();
+				if (statement != null) {
+					statement.close();
+				}
 			} catch (final Exception e) {
 				if (log.isDebugEnabled()) {
 					log.log(Level.WARN, "Failed to close statement!", e);
 				}
 			}
-
-			try {
-				closeConnection(connectionId);
-			} catch (final Exception e) {
-			}
+			closeConnection(connectionId);
 		}
 	}
 
 	@Override
 	public ResultSet preparedQuery(final Integer connectionId, final String query, final ArrayList<String> params) throws SQLException {
-		final int numberOfOccurences = Util.countOccurrences(query, '?');
+		final int numberOfOccurrences = Util.countOccurrences(query, '?');
 
-		if (params.size() != numberOfOccurences) {
-			final StringBuilder builder = new StringBuilder();
-			builder.append("Required number of parameters: ");
-			builder.append(params.size());
-			builder.append(" got: ");
-			builder.append(Integer.toString(numberOfOccurences));
-			final IllegalArgumentException e = new IllegalArgumentException(builder.toString());
+		if (params.size() != numberOfOccurrences) {
+			final String builder = "Required number of parameters: " +
+					params.size() +
+					" got: " +
+					Integer.toString(numberOfOccurrences);
+			final IllegalArgumentException e = new IllegalArgumentException(builder);
 			if (log.isDebugEnabled()) {
 				log.throwing(Level.WARN, e);
 			}
@@ -401,8 +398,8 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 
 	@Override
 	public void preparedUpdateQuery(final Integer connectionId, final String query, final ArrayList<String> params) throws SQLException {
-		final int numberOfOccurences = Util.countOccurrences(query, '?');
-		if (params.size() == numberOfOccurences) {
+		final int numberOfOccurrences = Util.countOccurrences(query, '?');
+		if (params.size() == numberOfOccurrences) {
 			PreparedStatement preparedStatement = null;
 			try {
 				preparedStatement = prepareStatement(connectionId, query);
@@ -421,13 +418,15 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 					preparedStatement.executeUpdate();
 				} catch (final SQLException e) {
 					if (log.isDebugEnabled()) {
-						log.log(Level.WARN, "Failed to excecute prepared query!");
+						log.log(Level.WARN, "Failed to execute prepared query!");
 					}
 					throw e;
 				}
 			} finally {
 				try {
-					preparedStatement.close();
+					if (preparedStatement != null) {
+						preparedStatement.close();
+					}
 				} catch (final Exception e) {
 					if (log.isDebugEnabled()) {
 						log.log(Level.WARN, "Failed to close prepared statement!", e);
@@ -436,12 +435,11 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 				closeConnection(connectionId);
 			}
 		} else {
-			final StringBuilder builder = new StringBuilder();
-			builder.append("Required number of parameters: ");
-			builder.append(params.size());
-			builder.append(" got: ");
-			builder.append(Integer.toString(numberOfOccurences));
-			final IllegalArgumentException e = new IllegalArgumentException(builder.toString());
+			final String builder = "Required number of parameters: " +
+					params.size() +
+					" got: " +
+					Integer.toString(numberOfOccurrences);
+			final IllegalArgumentException e = new IllegalArgumentException(builder);
 			if (log.isDebugEnabled()) {
 				log.throwing(Level.WARN, e);
 			}
@@ -542,7 +540,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	}
 
 	@Override
-	public Statement createStatement(Integer connectionId) throws SQLException {
+	public Statement createStatement(final Integer connectionId) throws SQLException {
 		final Connection connection = getConnection(connectionId);
 		try {
 			return connection.createStatement();
@@ -555,7 +553,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(Integer connectionId, String query) throws SQLException {
+	public PreparedStatement prepareStatement(final Integer connectionId, final String query) throws SQLException {
 		final Connection connection = getConnection(connectionId);
 		try {
 			return connection.prepareStatement(query);
@@ -592,7 +590,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 			connectionPool.notify();
 		}
 		if (log.isDebugEnabled()) {
-			log.debug("Current connection pool size [" + connectionPool.size() + "]");
+			log.debug("Current connection pool size [" + connectionPool.size() + ']');
 		}
 	}
 
@@ -604,13 +602,12 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 
 	@Override
 	public String toString() {
-		final StringBuilder toString = new StringBuilder();
-		toString.append("Database Type: ").append(databaseType.toString());
-		toString.append("\nDatabase Driver: ").append(databaseDriver);
-		toString.append("\nConnection URL: ").append(connectionURL);
-		toString.append("\nConnection Pool Size: ").append(connectionPool.size());
-		toString.append("\nConnection Pool: ");
-		toString.append("\n").append(ArrayUtil.indexesToString(connectionPool.keySet()));
-		return FormattingUtil.addTabsToNewLines(toString.toString(), 1);
+		final String toString = "Database Type: " + databaseType.toString() +
+				"\nDatabase Driver: " + databaseDriver +
+				"\nConnection URL: " + connectionURL +
+				"\nConnection Pool Size: " + connectionPool.size() +
+				"\nConnection Pool: " +
+				'\n' + ArrayUtil.indexesToString(connectionPool.keySet());
+		return FormattingUtil.addTabsToNewLines(toString, 1);
 	}
 }

@@ -17,7 +17,7 @@ import java.util.Locale;
 /**
  * A class to help with {@link URL} based input/output operations.
  */
-public class UrlIO {
+public final class UrlIO {
 	/**
 	 * The Date format to use.
 	 */
@@ -30,6 +30,9 @@ public class UrlIO {
 	public static final String BETA = "beta";
 	public static final String RELEASE_CANDIDATE = "rc";
 	private static final Logger log = LogManager.getLogger(UrlIO.class);
+
+	private UrlIO() {
+	}
 
 	/**
 	 * Returns the response code from the given URLConnection.
@@ -134,7 +137,7 @@ public class UrlIO {
 		} else if (fileName.contains(" V")) {
 			return fileName.substring(fileName.lastIndexOf(" V") + 2);
 		} else if (fileName.contains(" ")) {
-			final int lastIndex = fileName.lastIndexOf(" ");
+			final int lastIndex = fileName.lastIndexOf(' ');
 			String version = fileName.substring(lastIndex + 1);
 			fileName = fileName.substring(0, lastIndex);
 			
@@ -143,7 +146,7 @@ public class UrlIO {
 			 * append it to the numeral version and re-parse for a space.
 			 */
 			if (version.equalsIgnoreCase(ALPHA) || version.equalsIgnoreCase(BETA) || version.equalsIgnoreCase(RELEASE_CANDIDATE)) {
-				version = getVersion(fileName + "-" + version);
+				version = getVersion(fileName + '-' + version);
 			}
 
 			return version;

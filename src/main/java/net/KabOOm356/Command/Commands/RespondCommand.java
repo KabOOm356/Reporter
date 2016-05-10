@@ -39,7 +39,7 @@ public class RespondCommand extends ReporterCommand {
 	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public RespondCommand(ReporterCommandManager manager) {
+	public RespondCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 
 		updateDocumentation();
@@ -63,53 +63,55 @@ public class RespondCommand extends ReporterCommand {
 		return permissionNode;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args) {
+	public void execute(final CommandSender sender, final ArrayList<String> args) {
 		try {
-			if (!hasRequiredPermission(sender))
+			if (!hasRequiredPermission(sender)) {
 				return;
+			}
 
 			// Cast the sender to type Player or tell the sender they must be a player
 			Player player = null;
-			if (BukkitUtil.isPlayer(sender))
+			if (BukkitUtil.isPlayer(sender)) {
 				player = (Player) sender;
-			else {
+			} else {
 				sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.RED + "You must be a player to use this command!");
 				return;
 			}
 
-			int index;
+			final int index;
 
 			// Get the report index
 			if (args.get(0).equalsIgnoreCase("last")) {
-				if (!hasRequiredLastViewed(sender))
+				if (!hasRequiredLastViewed(sender)) {
 					return;
+				}
 
 				index = getLastViewed(sender);
-			} else
+			} else {
 				index = Util.parseInt(args.get(0));
+			}
 
-			if (!getManager().isReportIndexValid(sender, index))
+			if (!getManager().isReportIndexValid(sender, index)) {
 				return;
+			}
 
-			if (args.size() == 1)
+			if (args.size() == 1) {
 				teleportToReport(player, index, "reported");
-			else if (args.size() >= 2)
+			} else if (args.size() >= 2) {
 				teleportToReport(player, index, args.get(1));
+			}
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to respond to report!", e);
 			sender.sendMessage(getErrorMessage());
 		}
 	}
 
-	private void teleportToReport(Player player, int index, String playerLoc) throws ClassNotFoundException, SQLException, InterruptedException {
-		if (!playerLoc.equalsIgnoreCase("sender") && !playerLoc.equalsIgnoreCase("reported"))
+	private void teleportToReport(final Player player, final int index, final String playerLoc) throws ClassNotFoundException, SQLException, InterruptedException {
+		if (!playerLoc.equalsIgnoreCase("sender") && !playerLoc.equalsIgnoreCase("reported")) {
 			player.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.RED + BukkitUtil.colorCodeReplaceAll(getUsage()));
-		else {
-			boolean requestedToReported = playerLoc.equalsIgnoreCase("reported");
+		} else {
+			final boolean requestedToReported = playerLoc.equalsIgnoreCase("reported");
 			boolean sendToReported = requestedToReported;
 
 			int id = -1;
@@ -119,11 +121,11 @@ public class RespondCommand extends ReporterCommand {
 			final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 			final int connectionId = database.openPooledConnection();
 			try {
-				String query = "SELECT ID, ReportedUUID, Reported, SenderUUID, Sender, Details, SenderX, SenderY, SenderZ, SenderWorld, ReportedX, ReportedY, ReportedZ, ReportedWorld " +
+				final String query = "SELECT ID, ReportedUUID, Reported, SenderUUID, Sender, Details, SenderX, SenderY, SenderZ, SenderWorld, ReportedX, ReportedY, ReportedZ, ReportedWorld " +
 						"FROM Reports " +
 						"WHERE ID=" + index;
 
-				SQLResultSet result = database.sqlQuery(connectionId, query);
+				final SQLResultSet result = database.sqlQuery(connectionId, query);
 
 				for (int LCV = 0; LCV < 2; LCV++) {
 					if (sendToReported) {
@@ -138,13 +140,14 @@ public class RespondCommand extends ReporterCommand {
 						World = result.getString("SenderWorld");
 					}
 
-					if (X == 0.0 && Y == 0.0 && Z == 0.0 || World == null || World.equals(""))
+					if (X == 0.0 && Y == 0.0 && Z == 0.0 || World == null || World.isEmpty()) {
 						sendToReported = !sendToReported;
-					else
+					} else {
 						break;
+					}
 				}
 
-				if (X == 0.0 && Y == 0.0 && Z == 0.0 || World == null || World.equals("")) {
+				if (X == 0.0 && Y == 0.0 && Z == 0.0 || World == null || World.isEmpty()) {
 					player.sendMessage(ChatColor.RED + getManager().getLocale().getString(RespondPhrases.bothPlayerLocNF));
 
 					player.sendMessage(ChatColor.RED + getManager().getLocale().getString(RespondPhrases.teleAbort));
@@ -154,9 +157,9 @@ public class RespondCommand extends ReporterCommand {
 				id = result.getInt("ID");
 
 				if (!result.getString("ReportedUUID").isEmpty()) {
-					UUID uuid = UUID.fromString(result.getString("ReportedUUID"));
+					final UUID uuid = UUID.fromString(result.getString("ReportedUUID"));
 
-					OfflinePlayer reportedPlayer = Bukkit.getOfflinePlayer(uuid);
+					final OfflinePlayer reportedPlayer = Bukkit.getOfflinePlayer(uuid);
 
 					reported = BukkitUtil.formatPlayerName(reportedPlayer);
 				} else {
@@ -164,9 +167,9 @@ public class RespondCommand extends ReporterCommand {
 				}
 
 				if (!result.getString("SenderUUID").isEmpty()) {
-					UUID uuid = UUID.fromString(result.getString("SenderUUID"));
+					final UUID uuid = UUID.fromString(result.getString("SenderUUID"));
 
-					OfflinePlayer senderPlayer = Bukkit.getOfflinePlayer(uuid);
+					final OfflinePlayer senderPlayer = Bukkit.getOfflinePlayer(uuid);
 
 					sender = BukkitUtil.formatPlayerName(senderPlayer);
 				} else {
@@ -226,7 +229,7 @@ public class RespondCommand extends ReporterCommand {
 
 			player.sendMessage(ChatColor.WHITE + reportInfoDetails);
 
-			Location loc = new Location(Bukkit.getWorld(World), X, Y, Z);
+			final Location loc = new Location(Bukkit.getWorld(World), X, Y, Z);
 
 			player.teleport(loc);
 

@@ -15,7 +15,7 @@ public class UpdateSite extends NetworkFile {
 	 * @param url  The URL location of this file on the network.
 	 * @param type The {@link Type} of this UpdateSite.
 	 */
-	public UpdateSite(String url, Type type) {
+	public UpdateSite(final String url, final Type type) {
 		super(url);
 
 		this.type = type;
@@ -28,9 +28,6 @@ public class UpdateSite extends NetworkFile {
 		return type;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public String toString() {
 		String string = super.toString();
@@ -54,7 +51,7 @@ public class UpdateSite extends NetworkFile {
 
 		private final String name;
 
-		Type(String name) {
+		Type(final String name) {
 			this.name = name;
 		}
 

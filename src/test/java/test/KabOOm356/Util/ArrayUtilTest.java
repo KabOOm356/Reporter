@@ -19,12 +19,12 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testArrayToArrayList() {
-		Integer[] emptyIntArray = new Integer[0];
-		ArrayList<Integer> intList = new ArrayList<Integer>();
+		final Integer[] emptyIntArray = new Integer[0];
+		final ArrayList<Integer> intList = new ArrayList<Integer>();
 
 		assertEquals(intList, ArrayUtil.arrayToArrayList(emptyIntArray));
 
-		Integer[] oneIntArray = {2};
+		final Integer[] oneIntArray = {2};
 		intList.add(2);
 		assertEquals(intList, ArrayUtil.arrayToArrayList(oneIntArray));
 
@@ -32,7 +32,7 @@ public class ArrayUtilTest {
 		intList.add(5);
 		assertNotEquals(intList, ArrayUtil.arrayToArrayList(oneIntArray));
 
-		Integer[] intArray = {1, 2, 3, 4, 5};
+		final Integer[] intArray = {1, 2, 3, 4, 5};
 		intList.clear();
 		intList.add(1);
 		intList.add(2);
@@ -66,12 +66,12 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testArrayToSet() {
-		Integer[] emptyIntArray = new Integer[0];
-		HashSet<Integer> intSet = new HashSet<Integer>();
+		final Integer[] emptyIntArray = new Integer[0];
+		final HashSet<Integer> intSet = new HashSet<Integer>();
 
 		assertEquals(intSet, ArrayUtil.arrayToSet(emptyIntArray));
 
-		Integer[] oneIntArray = {2};
+		final Integer[] oneIntArray = {2};
 		intSet.add(2);
 		assertEquals(intSet, ArrayUtil.arrayToSet(oneIntArray));
 
@@ -79,7 +79,7 @@ public class ArrayUtilTest {
 		intSet.add(5);
 		assertNotEquals(intSet, ArrayUtil.arrayToSet(oneIntArray));
 
-		Integer[] intArray = {1, 2, 3, 4, 5};
+		final Integer[] intArray = {1, 2, 3, 4, 5};
 		intSet.clear();
 		intSet.add(1);
 		intSet.add(2);
@@ -123,7 +123,7 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testIndexesToString() {
-		ArrayList<Integer> list = new ArrayList<Integer>();
+		final ArrayList<Integer> list = new ArrayList<Integer>();
 
 		String value = ArrayUtil.indexesToString(list);
 		assertEquals("", value);
@@ -224,7 +224,7 @@ public class ArrayUtilTest {
 		assertEquals(expected, returned);
 
 		returned = ArrayUtil.indexesToString(resultSet, "TestColumn", ChatColor.RED, ChatColor.WHITE);
-		expected = ChatColor.RED + "1" + ChatColor.WHITE + ", " + ChatColor.RED + "3" + ChatColor.WHITE + ", " + ChatColor.RED + "LastValue";
+		expected = ChatColor.RED + "1" + ChatColor.WHITE + ", " + ChatColor.RED + '3' + ChatColor.WHITE + ", " + ChatColor.RED + "LastValue";
 		assertEquals(expected, returned);
 	}
 }

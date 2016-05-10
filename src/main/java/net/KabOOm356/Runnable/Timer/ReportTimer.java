@@ -39,6 +39,7 @@ public class ReportTimer extends Thread implements Comparable<ReportTimer> {
 	 * When this thread should *Hopefully* be executed by the thread manager.
 	 */
 	private long executionTime;
+
 	/**
 	 * Constructor.
 	 */
@@ -62,11 +63,6 @@ public class ReportTimer extends Thread implements Comparable<ReportTimer> {
 		this.isFinished = false;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @see java.lang.Thread#run()
-	 */
 	@Override
 	public void run() {
 		this.isFinished = true;
@@ -106,14 +102,14 @@ public class ReportTimer extends Thread implements Comparable<ReportTimer> {
 	 * @return The amount of time, in seconds, until this timer expires.
 	 */
 	public int getTimeRemaining() {
-		long executionTime = getExecutionTime();
-		long currentTime = Calendar.getInstance().getTimeInMillis();
+		final long executionTime = getExecutionTime();
+		final long currentTime = Calendar.getInstance().getTimeInMillis();
 
 		return (int) ((executionTime - currentTime) / 1000);
 	}
 
 	@Override
-	public int compareTo(ReportTimer arg0) {
+	public int compareTo(final ReportTimer arg0) {
 		return compareByTimeRemaining.compare(this, arg0);
 	}
 
@@ -122,7 +118,7 @@ public class ReportTimer extends Thread implements Comparable<ReportTimer> {
 	 */
 	public static class CompareByTimeRemaining implements Comparator<ReportTimer> {
 		@Override
-		public int compare(ReportTimer arg0, ReportTimer arg1) {
+		public int compare(final ReportTimer arg0, final ReportTimer arg1) {
 			return arg0.getTimeRemaining() - arg1.getTimeRemaining();
 		}
 	}

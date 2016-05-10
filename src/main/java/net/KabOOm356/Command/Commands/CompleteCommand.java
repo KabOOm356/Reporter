@@ -41,7 +41,7 @@ public class CompleteCommand extends ReporterCommand {
 	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public CompleteCommand(ReporterCommandManager manager) {
+	public CompleteCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 
 		super.getAliases().add("Finish");
@@ -70,39 +70,41 @@ public class CompleteCommand extends ReporterCommand {
 		return permissionNode;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args) {
+	public void execute(final CommandSender sender, final ArrayList<String> args) {
 		try {
-			if (!hasRequiredPermission(sender))
+			if (!hasRequiredPermission(sender)) {
 				return;
+			}
 
 			int index = Util.parseInt(args.get(0));
 
 			if (args.get(0).equalsIgnoreCase("last")) {
-				if (!hasRequiredLastViewed(sender))
+				if (!hasRequiredLastViewed(sender)) {
 					return;
+				}
 
 				index = getLastViewed(sender);
 			}
 
-			if (!getManager().isReportIndexValid(sender, index))
+			if (!getManager().isReportIndexValid(sender, index)) {
 				return;
+			}
 
-			if (!getManager().canAlterReport(sender, index))
+			if (!getManager().canAlterReport(sender, index)) {
 				return;
+			}
 
-			String summary = "";
+			final StringBuilder summaryBuilder = new StringBuilder();
+			for (int LCV = 1; LCV < args.size(); LCV++) {
+				summaryBuilder.append(' ').append(args.get(LCV));
+			}
 
-			for (int LCV = 1; LCV < args.size(); LCV++)
-				summary = summary + " " + args.get(LCV);
+			final String summary = summaryBuilder.toString().trim();
 
-			summary = summary.trim();
-
-			if (!isSummaryValid(sender, summary))
+			if (!isSummaryValid(sender, summary)) {
 				return;
+			}
 
 			completeReport(sender, index, summary);
 			broadcastCompletedMessage(index);
@@ -112,8 +114,8 @@ public class CompleteCommand extends ReporterCommand {
 		}
 	}
 
-	private void completeReport(CommandSender sender, int index, String summary) throws ClassNotFoundException, SQLException, InterruptedException {
-		ArrayList<String> params = new ArrayList<String>(5);
+	private void completeReport(final CommandSender sender, final int index, final String summary) throws ClassNotFoundException, SQLException, InterruptedException {
+		final ArrayList<String> params = new ArrayList<String>(5);
 		params.add(0, "1");
 		params.add(BukkitUtil.getUUIDString(sender));
 		params.add(2, sender.getName());
@@ -121,7 +123,7 @@ public class CompleteCommand extends ReporterCommand {
 		params.add(4, summary);
 		params.add(5, Integer.toString(index));
 
-		String query = "UPDATE Reports " +
+		final String query = "UPDATE Reports " +
 				"SET CompletionStatus=?, " +
 				"CompletedByUUID=?, " +
 				"CompletedBy=?, " +
@@ -145,15 +147,16 @@ public class CompleteCommand extends ReporterCommand {
 				getManager().getLocale().getString(CompletePhrases.playerComplete)));
 
 		if (BukkitUtil.isOfflinePlayer(sender)) {
-			OfflinePlayer senderPlayer = (OfflinePlayer) sender;
+			final OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 
 			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.COMPLETED);
 		}
 	}
 
-	private boolean isSummaryValid(CommandSender sender, String summary) {
-		if (!summary.equalsIgnoreCase("") || getManager().getConfig().getBoolean("general.canCompleteWithoutSummary", false))
+	private boolean isSummaryValid(final CommandSender sender, final String summary) {
+		if (!summary.equalsIgnoreCase("") || getManager().getConfig().getBoolean("general.canCompleteWithoutSummary", false)) {
 			return true;
+		}
 
 		sender.sendMessage(ChatColor.RED +
 				getManager().getLocale().getString(CompletePhrases.completeNoSummary));
@@ -161,7 +164,7 @@ public class CompleteCommand extends ReporterCommand {
 		return false;
 	}
 
-	private void broadcastCompletedMessage(int index) {
+	private void broadcastCompletedMessage(final int index) {
 		final Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
 
 		String reportCompleted = BukkitUtil.colorCodeReplaceAll(
@@ -180,14 +183,14 @@ public class CompleteCommand extends ReporterCommand {
 			try {
 				connectionId = database.openPooledConnection();
 
-				String query = "SELECT SenderUUID, Sender FROM Reports WHERE ID=" + Integer.toString(index);
+				final String query = "SELECT SenderUUID, Sender FROM Reports WHERE ID=" + Integer.toString(index);
 
-				SQLResultSet result = database.sqlQuery(connectionId, query);
+				final SQLResultSet result = database.sqlQuery(connectionId, query);
 
-				String uuidString = result.getString("SenderUUID");
+				final String uuidString = result.getString("SenderUUID");
 
 				if (!uuidString.isEmpty()) {
-					UUID uuid = UUID.fromString(uuidString);
+					final UUID uuid = UUID.fromString(uuidString);
 					sender = Bukkit.getOfflinePlayer(uuid);
 					playerName = sender.getName();
 				} else {
@@ -219,12 +222,12 @@ public class CompleteCommand extends ReporterCommand {
 		}
 
 		if (sendMessage && !isReporterOnline) {
-			String message = ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE +
+			final String message = ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE +
 					getManager().getLocale().getString(CompletePhrases.yourReportsCompleted);
 
 			if (sender != null) {
 				getManager().getMessageManager().addMessage(sender.getUniqueId().toString(), messageGroup, message, index);
-			} else if (playerName != null && !playerName.equals("")) {
+			} else if (playerName != null && !playerName.isEmpty()) {
 				getManager().getMessageManager().addMessage(playerName, messageGroup, message, index);
 			}
 		}

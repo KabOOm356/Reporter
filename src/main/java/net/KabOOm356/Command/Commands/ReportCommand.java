@@ -41,7 +41,7 @@ public class ReportCommand extends ReporterCommand {
 	 *
 	 * @param manager The {@link ReporterCommandManager} managing this Command.
 	 */
-	public ReportCommand(ReporterCommandManager manager) {
+	public ReportCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 
 		updateDocumentation();
@@ -65,24 +65,25 @@ public class ReportCommand extends ReporterCommand {
 		return permissionNode;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void execute(CommandSender sender, ArrayList<String> args) {
-		if (!hasRequiredPermission(sender))
+	public void execute(final CommandSender sender, final ArrayList<String> args) {
+		if (!hasRequiredPermission(sender)) {
 			return;
+		}
 
-		OfflinePlayer reported = getManager().getPlayer(args.get(0));
+		final OfflinePlayer reported = getManager().getPlayer(args.get(0));
 
-		if (!playerExists(sender, reported))
+		if (!playerExists(sender, reported)) {
 			return;
+		}
 
-		if (!canReport(sender))
+		if (!canReport(sender)) {
 			return;
+		}
 
-		if (!canReport(sender, reported))
+		if (!canReport(sender, reported)) {
 			return;
+		}
 
 		try {
 			reportCommand(sender, reported, getDetails(args));
@@ -92,7 +93,7 @@ public class ReportCommand extends ReporterCommand {
 		}
 	}
 
-	private boolean playerExists(CommandSender sender, OfflinePlayer player) {
+	private boolean playerExists(final CommandSender sender, final OfflinePlayer player) {
 		if (player == null) {
 			sender.sendMessage(ChatColor.RED + BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(GeneralPhrases.playerDoesNotExist)));
@@ -102,9 +103,9 @@ public class ReportCommand extends ReporterCommand {
 		return true;
 	}
 
-	private void reportCommand(CommandSender sender, OfflinePlayer reported, String details) throws ClassNotFoundException, SQLException, InterruptedException {
-		ArrayList<String> params = new ArrayList<String>();
-		int count = getManager().getCount();
+	private void reportCommand(final CommandSender sender, final OfflinePlayer reported, final String details) throws ClassNotFoundException, SQLException, InterruptedException {
+		final ArrayList<String> params = new ArrayList<String>();
+		final int count = getManager().getCount();
 		Location reportedLoc = null;
 
 		if (count != -1) {
@@ -116,7 +117,7 @@ public class ReportCommand extends ReporterCommand {
 			params.add(3, BukkitUtil.getUUIDString(reported));
 
 			if (reported.isOnline()) {
-				Player reportedPlayer = reported.getPlayer();
+				final Player reportedPlayer = reported.getPlayer();
 
 				reportedLoc = reportedPlayer.getLocation();
 			}
@@ -127,7 +128,7 @@ public class ReportCommand extends ReporterCommand {
 			params.add(6, Reporter.getDateformat().format(new Date()));
 
 			if (BukkitUtil.isPlayer(sender)) {
-				Player player = (Player) sender;
+				final Player player = (Player) sender;
 
 				params.add(7, player.getLocation().getWorld().getName());
 				params.add(8, Double.toString(player.getLocation().getX()));
@@ -158,7 +159,7 @@ public class ReportCommand extends ReporterCommand {
 			final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 			final int connectionId = database.openPooledConnection();
 			try {
-				String query =
+				final String query =
 						"INSERT INTO Reports " +
 								"(ID, SenderUUID, Sender, ReportedUUID, Reported, Details, Date, SenderWorld, SenderX, SenderY, SenderZ, ReportedWorld, ReportedX, ReportedY, ReportedZ, CompletionStatus, ClaimStatus) " +
 								"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -178,21 +179,21 @@ public class ReportCommand extends ReporterCommand {
 
 			getManager().getReportLimitManager().hasReported(sender, reported);
 
-			PlayerStatManager stats = getManager().getPlayerStatsManager();
+			final PlayerStatManager stats = getManager().getPlayerStatsManager();
 
-			String date = Reporter.getDateformat().format(new Date());
+			final String date = Reporter.getDateformat().format(new Date());
 
 			if (BukkitUtil.isPlayer(sender)) {
-				Player senderPlayer = (Player) sender;
+				final Player senderPlayer = (Player) sender;
 
 				stats.incrementStat(senderPlayer, PlayerStat.REPORTCOUNT);
 				stats.setStat(senderPlayer, PlayerStat.LASTREPORTDATE, date);
 
-				ResultRow result = stats.getStat(senderPlayer, PlayerStat.FIRSTREPORTDATE);
+				final ResultRow result = stats.getStat(senderPlayer, PlayerStat.FIRSTREPORTDATE);
 
-				String firstReportDate = result.getString(PlayerStat.FIRSTREPORTDATE.getColumnName());
+				final String firstReportDate = result.getString(PlayerStat.FIRSTREPORTDATE.getColumnName());
 
-				if (firstReportDate.equals("")) {
+				if (firstReportDate.isEmpty()) {
 					stats.setStat(senderPlayer, PlayerStat.FIRSTREPORTDATE, date);
 				}
 			}
@@ -200,26 +201,27 @@ public class ReportCommand extends ReporterCommand {
 			stats.incrementStat(reported, PlayerStat.REPORTED);
 			stats.setStat(reported, PlayerStat.LASTREPORTEDDATE, date);
 
-			ResultRow result = stats.getStat(reported, PlayerStat.FIRSTREPORTEDDATE);
+			final ResultRow result = stats.getStat(reported, PlayerStat.FIRSTREPORTEDDATE);
 
-			String firstReportedDate = result.getString(PlayerStat.FIRSTREPORTEDDATE.getColumnName());
+			final String firstReportedDate = result.getString(PlayerStat.FIRSTREPORTEDDATE.getColumnName());
 
-			if (firstReportedDate.equals("")) {
+			if (firstReportedDate.isEmpty()) {
 				stats.setStat(reported, PlayerStat.FIRSTREPORTEDDATE, date);
 			}
 
 			// Alert the player when they reach their reporting limit
 			canReport(sender);
 			canReport(sender, reported);
-		} else
+		} else {
 			sender.sendMessage(getErrorMessage());
+		}
 	}
 
-	private boolean canReport(CommandSender sender, OfflinePlayer reported) {
+	private boolean canReport(final CommandSender sender, final OfflinePlayer reported) {
 		if (!getManager().getReportLimitManager().canReport(sender, reported)) {
 			String output = getManager().getLocale().getString(ReportPhrases.reachedReportingLimitAgaintPlayer);
 
-			String reportedNameFormatted = BukkitUtil.formatPlayerName(reported);
+			final String reportedNameFormatted = BukkitUtil.formatPlayerName(reported);
 
 			output = output.replaceAll("%r", ChatColor.BLUE + reportedNameFormatted + ChatColor.WHITE);
 
@@ -234,7 +236,7 @@ public class ReportCommand extends ReporterCommand {
 		return true;
 	}
 
-	private boolean canReport(CommandSender sender) {
+	private boolean canReport(final CommandSender sender) {
 		if (!getManager().getReportLimitManager().canReport(sender)) {
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
 					ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
@@ -248,37 +250,36 @@ public class ReportCommand extends ReporterCommand {
 		return true;
 	}
 
-	private String getTimeRemaining(CommandSender sender, OfflinePlayer reported) {
+	private String getTimeRemaining(final CommandSender sender, final OfflinePlayer reported) {
 		String timeRemaining = getManager().getLocale().getString(ReportPhrases.remainingTimeToReportPlayer);
 
-		String reportedNameFormatted = BukkitUtil.formatPlayerName(reported);
+		final String reportedNameFormatted = BukkitUtil.formatPlayerName(reported);
 
 		timeRemaining = timeRemaining.replaceAll("%r", ChatColor.BLUE + reportedNameFormatted + ChatColor.WHITE);
 
-		int seconds = getManager().getReportLimitManager().getRemainingTime(sender, reported);
+		final int seconds = getManager().getReportLimitManager().getRemainingTime(sender, reported);
 
 		return FormattingUtil.formatTimeRemaining(timeRemaining, seconds);
 	}
 
-	private String getTimeRemaining(CommandSender sender) {
-		String timeRemaining = BukkitUtil.colorCodeReplaceAll(
+	private String getTimeRemaining(final CommandSender sender) {
+		final String timeRemaining = BukkitUtil.colorCodeReplaceAll(
 				getManager().getLocale().getString(ReportPhrases.remainingTimeForReport));
 
-		int seconds = getManager().getReportLimitManager().getRemainingTime(sender);
+		final int seconds = getManager().getReportLimitManager().getRemainingTime(sender);
 
 		return FormattingUtil.formatTimeRemaining(timeRemaining, seconds);
 	}
 
-	private String getDetails(ArrayList<String> args) {
-		String details = "";
-
-		for (int LCV = 1; LCV < args.size(); LCV++)
-			details = details + args.get(LCV) + " ";
-
-		return details;
+	private String getDetails(final ArrayList<String> args) {
+		final StringBuilder details = new StringBuilder();
+		for (int LCV = 1; LCV < args.size(); LCV++) {
+			details.append(args.get(LCV)).append(' ');
+		}
+		return details.toString().trim();
 	}
 
-	private void broadcastSubmittedMessage(int index) {
+	private void broadcastSubmittedMessage(final int index) {
 		final Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
 
 		String reportSubmitted = BukkitUtil.colorCodeReplaceAll(

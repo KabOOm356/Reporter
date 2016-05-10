@@ -15,8 +15,11 @@ import java.util.Date;
 /**
  * A class to help with initializing and updating the Reporter configuration file.
  */
-public class ReporterConfigurationUtil {
+public final class ReporterConfigurationUtil {
 	private static final Logger log = LogManager.getLogger(ReporterConfigurationUtil.class);
+
+	private ReporterConfigurationUtil() {
+	}
 
 	/**
 	 * Initializes the Reporter configuration file by extracting the file if it does not exist and then attempts to load it.
@@ -106,7 +109,7 @@ public class ReporterConfigurationUtil {
 		boolean updated = false;
 
 		// Version 1
-		updated = set(configuration, "database.type", "sqlite") || updated;
+		updated = set(configuration, "database.type", "sqlite");
 		updated = set(configuration, "database.host", "localhost:3306") || updated;
 		updated = set(configuration, "database.database", "Reporter") || updated;
 		updated = set(configuration, "database.username", "root") || updated;
@@ -145,7 +148,7 @@ public class ReporterConfigurationUtil {
 
 		// Version 7
 		updated = set(configuration, "general.messaging.listOnLogin.listOnLogin", configuration.getBoolean("general.messaging.listOnLogin", true)) || updated;
-		updated = set(configuration, "eneral.messaging.listOnLogin.useDelay", true) || updated;
+		updated = set(configuration, "general.messaging.listOnLogin.useDelay", true) || updated;
 		updated = set(configuration, "general.messaging.listOnLogin.delay", 5) || updated;
 
 		// Version 8
@@ -223,8 +226,8 @@ public class ReporterConfigurationUtil {
 
 		if (updated) {
 			configuration.options().header("Reporter Configuration File\n" +
-					"Plugin Version: " + Reporter.getVersion() + "\n" +
-					"Config Version: " + Reporter.getConfigurationVersion() + "\n" +
+					"Plugin Version: " + Reporter.getVersion() + '\n' +
+					"Config Version: " + Reporter.getConfigurationVersion() + '\n' +
 					Reporter.getDateformat().format(new Date()));
 
 			log.log(Level.INFO, Reporter.getDefaultConsolePrefix() +

@@ -60,7 +60,7 @@ public class ReporterCommandManager implements CommandExecutor {
 	 *
 	 * @param plugin The current instance of {@link Reporter} running.
 	 */
-	public ReporterCommandManager(Reporter plugin) {
+	public ReporterCommandManager(final Reporter plugin) {
 		this.plugin = plugin;
 
 		limitManager = new ReportLimitManager(plugin);
@@ -76,8 +76,9 @@ public class ReporterCommandManager implements CommandExecutor {
 
 		lastViewed.put(plugin.getServer().getConsoleSender(), -1);
 
-		for (Player player : Bukkit.getOnlinePlayers())
+		for (final Player player : Bukkit.getOnlinePlayers()) {
 			lastViewed.put(player, -1);
+		}
 	}
 
 	private void initCommands() {
@@ -117,13 +118,14 @@ public class ReporterCommandManager implements CommandExecutor {
 	 * <br /><br />
 	 * This also adds all the aliases to be executed.
 	 *
-	 * @param command
+	 * @param command The command to initialize as a Report command.
 	 */
-	private void initReportCommand(ReporterCommand command) {
+	private void initReportCommand(final ReporterCommand command) {
 		reportCommands.put(command.getName(), command);
 
-		for (String alias : command.getAliases())
+		for (final String alias : command.getAliases()) {
 			aliasReportCommands.put(alias, command.getName());
+		}
 	}
 
 	/**
@@ -131,25 +133,24 @@ public class ReporterCommandManager implements CommandExecutor {
 	 * <br /><br />
 	 * This also adds all the aliases to be executed.
 	 *
-	 * @param command
+	 * @param command The command to initialize as a Respond command.
 	 */
-	private void initRespondCommand(ReporterCommand command) {
+	private void initRespondCommand(final ReporterCommand command) {
 		respondCommands.put(command.getName(), command);
 
-		for (String alias : command.getAliases())
+		for (final String alias : command.getAliases()) {
 			aliasRespondCommands.put(alias, command.getName());
+		}
 	}
 
-	/**
-	 * @see org.bukkit.command.CommandExecutor#onCommand(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
-	 */
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	public boolean onCommand(final CommandSender sender, final Command cmd, final String label, final String[] args) {
 		if (args == null || args.length == 0) {
-			if (label.equalsIgnoreCase("respond") || label.equalsIgnoreCase("resp") || label.equalsIgnoreCase("rrespond"))
+			if (label.equalsIgnoreCase("respond") || label.equalsIgnoreCase("resp") || label.equalsIgnoreCase("rrespond")) {
 				sender.sendMessage(ChatColor.RED + plugin.getLocale().getString(GeneralPhrases.tryRespondHelp));
-			else
+			} else {
 				sender.sendMessage(ChatColor.RED + plugin.getLocale().getString(GeneralPhrases.tryReportHelp));
+			}
 
 			return true;
 		}
@@ -160,7 +161,7 @@ public class ReporterCommandManager implements CommandExecutor {
 			return true;
 		}
 
-		ArrayList<String> arguments = ArrayUtil.arrayToArrayList(args);
+		final ArrayList<String> arguments = ArrayUtil.arrayToArrayList(args);
 		net.KabOOm356.Command.Command command;
 
 		// Begin Respond Command
@@ -172,8 +173,9 @@ public class ReporterCommandManager implements CommandExecutor {
 				int page = 1;
 
 				if (arguments.size() >= 2) {
-					if (Util.isInteger(arguments.get(1)))
+					if (Util.isInteger(arguments.get(1))) {
 						page = Util.parseInt(arguments.get(1));
+					}
 				}
 
 				HelpCommand.respondHelp(this, sender, page);
@@ -187,11 +189,12 @@ public class ReporterCommandManager implements CommandExecutor {
 					final net.KabOOm356.Command.Command commandToRun = command.getRunnableClone(sender, arguments);
 					Bukkit.getScheduler().runTaskAsynchronously(plugin, commandToRun);
 					return true;
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					log.error("Failed to run Respond command!", e);
 				}
-			} else
+			} else {
 				sender.sendMessage(ChatColor.RED + command.getUsage());
+			}
 
 			sender.sendMessage(ChatColor.RED + plugin.getLocale().getString(GeneralPhrases.tryRespondHelp));
 
@@ -199,7 +202,7 @@ public class ReporterCommandManager implements CommandExecutor {
 		}
 		// Begin Report Commands
 		else if (label.equalsIgnoreCase("report") || label.equalsIgnoreCase("rreport") || label.equalsIgnoreCase("rep")) {
-			String subcommand = arguments.remove(0);
+			final String subcommand = arguments.remove(0);
 
 			command = getCommand(FormattingUtil.capitalizeFirstCharacter(subcommand));
 
@@ -208,8 +211,9 @@ public class ReporterCommandManager implements CommandExecutor {
 				int page = 1;
 
 				if (arguments.size() >= 1) {
-					if (Util.isInteger(arguments.get(0)))
+					if (Util.isInteger(arguments.get(0))) {
 						page = Util.parseInt(arguments.get(0));
+					}
 				}
 
 				HelpCommand.reportHelp(this, sender, page);
@@ -223,12 +227,13 @@ public class ReporterCommandManager implements CommandExecutor {
 						final net.KabOOm356.Command.Command commandToRun = command.getRunnableClone(sender, arguments);
 						Bukkit.getScheduler().runTaskAsynchronously(plugin, commandToRun);
 						return true;
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						log.error("Failed to run Report command!", e);
 					}
 
-				} else
+				} else {
 					sender.sendMessage(ChatColor.RED + BukkitUtil.colorCodeReplaceAll(command.getUsage()));
+				}
 			} else // Reporting a player
 			{
 				command = getCommand(ReportCommand.getCommandName());
@@ -240,11 +245,12 @@ public class ReporterCommandManager implements CommandExecutor {
 						final net.KabOOm356.Command.Command commandToRun = command.getRunnableClone(sender, arguments);
 						Bukkit.getScheduler().runTaskAsynchronously(plugin, commandToRun);
 						return true;
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						log.error("Failed to Report!", e);
 					}
-				} else
+				} else {
 					sender.sendMessage(ChatColor.RED + BukkitUtil.colorCodeReplaceAll(command.getUsage()));
+				}
 			}
 
 			sender.sendMessage(ChatColor.RED + plugin.getLocale().getString(GeneralPhrases.tryReportHelp));
@@ -259,11 +265,13 @@ public class ReporterCommandManager implements CommandExecutor {
 	 * This should be called after the locale has changed.
 	 */
 	public void updateDocumentation() {
-		for (Entry<String, ReporterCommand> e : reportCommands.entrySet())
+		for (final Entry<String, ReporterCommand> e : reportCommands.entrySet()) {
 			e.getValue().updateDocumentation();
+		}
 
-		for (Entry<String, ReporterCommand> e : respondCommands.entrySet())
+		for (final Entry<String, ReporterCommand> e : respondCommands.entrySet()) {
 			e.getValue().updateDocumentation();
+		}
 	}
 
 	/**
@@ -274,11 +282,9 @@ public class ReporterCommandManager implements CommandExecutor {
 	 * @return True if the given {@link Player} has the permission node or is OP, otherwise false.
 	 * @see ReporterPermissionManager#hasPermission(Player, String)
 	 */
-	public boolean hasPermission(Player player, String permission) {
-		if (getConfig().getBoolean("general.permissions.opsHaveAllPermissions", true) && player.isOp())
-			return true;
+	public boolean hasPermission(final Player player, final String permission) {
+		return getConfig().getBoolean("general.permissions.opsHaveAllPermissions", true) && player.isOp() || permissionManager.hasPermission(player, permission);
 
-		return permissionManager.hasPermission(player, permission);
 	}
 
 	/**
@@ -292,11 +298,12 @@ public class ReporterCommandManager implements CommandExecutor {
 	 * @return True if the given {@link CommandSender} is not a player or has the permission node, otherwise false.
 	 * @see ReporterPermissionManager#hasPermission(Player, String)
 	 */
-	public boolean hasPermission(CommandSender sender, String permission) {
+	public boolean hasPermission(final CommandSender sender, final String permission) {
 		if (BukkitUtil.isPlayer(sender)) {
-			Player player = (Player) sender;
-			if (!hasPermission(player, permission))
+			final Player player = (Player) sender;
+			if (!hasPermission(player, permission)) {
 				return false;
+			}
 		}
 		return true;
 	}
@@ -315,12 +322,12 @@ public class ReporterCommandManager implements CommandExecutor {
 	 * @return An {@link ArrayList} of integers that contains all the report indexes the {@link CommandSender} can view.
 	 * @throws Exception
 	 */
-	public ArrayList<Integer> getViewableReports(CommandSender sender) throws Exception {
+	public ArrayList<Integer> getViewableReports(final CommandSender sender) throws Exception {
 		String query = null;
-		ArrayList<String> params = new ArrayList<String>();
+		final ArrayList<String> params = new ArrayList<String>();
 
 		if (BukkitUtil.isPlayer(sender)) {
-			OfflinePlayer player = (OfflinePlayer) sender;
+			final OfflinePlayer player = (OfflinePlayer) sender;
 
 			query = "SELECT ID FROM Reports WHERE SenderUUID=?";
 
@@ -330,15 +337,16 @@ public class ReporterCommandManager implements CommandExecutor {
 			params.add(sender.getName());
 		}
 
-		ArrayList<Integer> indexes = new ArrayList<Integer>();
+		final ArrayList<Integer> indexes = new ArrayList<Integer>();
 		final ExtendedDatabaseHandler database = getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 
 		try {
-			SQLResultSet result = database.preparedSQLQuery(connectionId, query, params);
+			final SQLResultSet result = database.preparedSQLQuery(connectionId, query, params);
 
-			for (ResultRow row : result)
+			for (final ResultRow row : result) {
 				indexes.add(row.getInt("ID"));
+			}
 		} catch (final Exception e) {
 			log.warn("Failed to get viewable reports!");
 			throw e;
@@ -395,10 +403,10 @@ public class ReporterCommandManager implements CommandExecutor {
 	public int getIncompleteReports() throws ClassNotFoundException, SQLException, InterruptedException {
 		try {
 			return getIncompleteReportIndexes().size();
-		} catch (ClassNotFoundException e) {
+		} catch (final ClassNotFoundException e) {
 			log.warn("Failed to get the number of incomplete reports!");
 			throw e;
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			log.warn("Failed to get the number of incomplete reports!");
 			throw e;
 		} catch (final InterruptedException e) {
@@ -505,7 +513,7 @@ public class ReporterCommandManager implements CommandExecutor {
 			final SQLResultSet result = database.sqlQuery(connectionId, query);
 
 			return result.getInt("Count");
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			log.warn("Failed to get total report count!");
 			throw e;
 		} finally {
@@ -800,14 +808,14 @@ public class ReporterCommandManager implements CommandExecutor {
 	 * @throws ClassNotFoundException
 	 * @throws InterruptedException
 	 */
-	public int getNumberOfPriority(ModLevel level) throws SQLException, ClassNotFoundException, InterruptedException {
-		String query = "SELECT COUNT(*) AS Count FROM Reports WHERE Priority = " + level.getLevel();
+	public int getNumberOfPriority(final ModLevel level) throws SQLException, ClassNotFoundException, InterruptedException {
+		final String query = "SELECT COUNT(*) AS Count FROM Reports WHERE Priority = " + level.getLevel();
 		int count = 0;
 
 		final ExtendedDatabaseHandler database = getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			SQLResultSet result = database.sqlQuery(connectionId, query);
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 
 			count = result.getInt("Count");
 		} finally {
@@ -826,17 +834,18 @@ public class ReporterCommandManager implements CommandExecutor {
 	 * @throws SQLException
 	 * @throws InterruptedException
 	 */
-	public ArrayList<Integer> getIndexesOfPriority(ModLevel level) throws ClassNotFoundException, SQLException, InterruptedException {
-		ArrayList<Integer> indexes = new ArrayList<Integer>();
-		String query = "SELECT ID FROM Reports WHERE Priority = " + level.getLevel();
+	public ArrayList<Integer> getIndexesOfPriority(final ModLevel level) throws ClassNotFoundException, SQLException, InterruptedException {
+		final ArrayList<Integer> indexes = new ArrayList<Integer>();
+		final String query = "SELECT ID FROM Reports WHERE Priority = " + level.getLevel();
 
 		final ExtendedDatabaseHandler database = getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			SQLResultSet result = database.sqlQuery(connectionId, query);
+			final SQLResultSet result = database.sqlQuery(connectionId, query);
 
-			for (ResultRow row : result)
+			for (final ResultRow row : result) {
 				indexes.add(row.getInt("ID"));
+			}
 		} finally {
 			database.closeConnection(connectionId);
 		}
@@ -849,22 +858,22 @@ public class ReporterCommandManager implements CommandExecutor {
 	 *
 	 * @param sender The {@link CommandSender} to display their {@link ModLevel} to.
 	 */
-	public void displayModLevel(CommandSender sender) {
+	public void displayModLevel(final CommandSender sender) {
 		String output = getLocale().getString(GeneralPhrases.displayModLevel);
 
-		ModLevel level = getModLevel(sender);
+		final ModLevel level = getModLevel(sender);
 
 		output = output.replaceAll("%m", level.getColor() + level.getName() + ChatColor.WHITE);
 
 		sender.sendMessage(ChatColor.WHITE + output);
 	}
 
-	public void displayModLevel(CommandSender sender, CommandSender player) {
-		String playerName = BukkitUtil.formatPlayerName(player);
+	public void displayModLevel(final CommandSender sender, final CommandSender player) {
+		final String playerName = BukkitUtil.formatPlayerName(player);
 
 		String output = getLocale().getString(GeneralPhrases.displayOtherModLevel);
 
-		ModLevel level = getModLevel(player);
+		final ModLevel level = getModLevel(player);
 
 		output = output.replaceAll("%p", ChatColor.BLUE + playerName + ChatColor.WHITE);
 		output = output.replaceAll("%m", level.getColor() + level.getName() + ChatColor.WHITE);
@@ -900,17 +909,18 @@ public class ReporterCommandManager implements CommandExecutor {
 		return aliasRespondCommands;
 	}
 
-	public ReporterCommand getCommand(String commandName) {
+	public ReporterCommand getCommand(final String commandName) {
 		ReporterCommand command = null;
 
-		if (reportCommands.containsKey(commandName))
+		if (reportCommands.containsKey(commandName)) {
 			command = reportCommands.get(commandName);
-		else if (respondCommands.containsKey(commandName))
+		} else if (respondCommands.containsKey(commandName)) {
 			command = respondCommands.get(commandName);
-		else if (aliasReportCommands.containsKey(commandName))
+		} else if (aliasReportCommands.containsKey(commandName)) {
 			command = reportCommands.get(aliasReportCommands.get(commandName));
-		else if (aliasRespondCommands.containsKey(commandName))
+		} else if (aliasRespondCommands.containsKey(commandName)) {
 			command = respondCommands.get(aliasRespondCommands.get(commandName));
+		}
 
 		return command;
 	}

@@ -3,7 +3,7 @@ package net.KabOOm356.Util;
 /**
  * Utility class to handle time conversions.
  */
-public class TimeUtil {
+public final class TimeUtil {
 	public static final int secondsPerMinute = 60;
 	public static final int secondsPerHour = 3600;
 

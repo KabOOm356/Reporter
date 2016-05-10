@@ -26,15 +26,11 @@ public class DelayedMessage implements Runnable {
 		this.message = message;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @see java.lang.Runnable#run()
-	 */
 	@Override
 	public void run() {
-		if (player.isOnline())
+		if (player.isOnline()) {
 			player.sendMessage(message);
+		}
 	}
 
 	/**

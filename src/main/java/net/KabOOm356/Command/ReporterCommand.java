@@ -13,12 +13,12 @@ public abstract class ReporterCommand extends Command {
 	 * @see Command#Command(ReporterCommandManager, String, String, String, String, int)
 	 */
 	protected ReporterCommand(
-			ReporterCommandManager manager,
-			String commandName,
-			String commandUsage,
-			String commandDescription,
-			String commandPermissionNode,
-			int minimumNumberOfArguments) {
+			final ReporterCommandManager manager,
+			final String commandName,
+			final String commandUsage,
+			final String commandDescription,
+			final String commandPermissionNode,
+			final int minimumNumberOfArguments) {
 		super(manager, commandName, commandUsage, commandDescription, commandPermissionNode, minimumNumberOfArguments);
 	}
 
@@ -26,10 +26,10 @@ public abstract class ReporterCommand extends Command {
 	 * @see Command#Command(ReporterCommandManager, String, String, int)
 	 */
 	protected ReporterCommand(
-			ReporterCommandManager manager,
-			String commandName,
-			String commandPermissionNode,
-			int minimumNumberOfArguments) {
+			final ReporterCommandManager manager,
+			final String commandName,
+			final String commandPermissionNode,
+			final int minimumNumberOfArguments) {
 		super(manager, commandName, commandPermissionNode, minimumNumberOfArguments);
 	}
 
@@ -39,7 +39,7 @@ public abstract class ReporterCommand extends Command {
 	 * @param sender The {@link CommandSender} to get the last viewed report index for.
 	 * @return The last viewed report index of the given {@link CommandSender}.
 	 */
-	public int getLastViewed(CommandSender sender) {
+	public int getLastViewed(final CommandSender sender) {
 		return getManager().getLastViewed().get(sender);
 	}
 
@@ -52,7 +52,7 @@ public abstract class ReporterCommand extends Command {
 	 * @return True if the {@link CommandSender} has a last viewed report, otherwise false.
 	 * @see #hasLastViewed(CommandSender)
 	 */
-	public boolean hasRequiredLastViewed(CommandSender sender) {
+	public boolean hasRequiredLastViewed(final CommandSender sender) {
 		if (!hasLastViewed(sender)) {
 			sender.sendMessage(ChatColor.RED + BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(GeneralPhrases.noLastReport)));
@@ -72,7 +72,7 @@ public abstract class ReporterCommand extends Command {
 	 * @return True if the {@link CommandSender} has a last viewed report, otherwise false.
 	 * @see #hasRequiredLastViewed(CommandSender)
 	 */
-	public boolean hasLastViewed(CommandSender sender) {
+	public boolean hasLastViewed(final CommandSender sender) {
 		return getManager().getLastViewed().get(sender) != -1;
 	}
 

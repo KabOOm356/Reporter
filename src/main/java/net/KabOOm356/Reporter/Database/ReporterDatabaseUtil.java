@@ -20,8 +20,11 @@ import java.sql.SQLException;
 /**
  * A class to help initialize and update Reporter's database.
  */
-public class ReporterDatabaseUtil {
+public final class ReporterDatabaseUtil {
 	private static final Logger log = LogManager.getLogger(ReporterDatabaseUtil.class);
+
+	private ReporterDatabaseUtil() {
+	}
 
 	/**
 	 * Initializes the database.

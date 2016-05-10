@@ -9,7 +9,7 @@ public abstract class AbstractFile {
 	/**
 	 * The default character set.
 	 */
-	public static String defaultCharset = "UTF-8";
+	public static final String defaultCharset = "UTF-8";
 
 	/**
 	 * The name of the file.
@@ -37,7 +37,7 @@ public abstract class AbstractFile {
 	 *
 	 * @param fileName The file name of the file.
 	 */
-	public AbstractFile(String fileName) {
+	public AbstractFile(final String fileName) {
 		this.name = AbstractFile.getName(fileName);
 		this.extension = AbstractFile.getExtension(fileName);
 		this.fileName = fileName;
@@ -51,7 +51,7 @@ public abstract class AbstractFile {
 	 * @param fileName The file name of the file.
 	 * @param encoding The encoding of the file.
 	 */
-	public AbstractFile(String fileName, String encoding) {
+	public AbstractFile(final String fileName, final String encoding) {
 		this.name = AbstractFile.getName(fileName);
 		this.extension = AbstractFile.getExtension(fileName);
 		this.fileName = fileName;
@@ -66,7 +66,7 @@ public abstract class AbstractFile {
 	 * @param extension The extension of the file.
 	 * @param fileName  The file name of the file.
 	 */
-	public AbstractFile(String name, String extension, String fileName) {
+	public AbstractFile(final String name, final String extension, final String fileName) {
 		this.name = name;
 		this.encoding = defaultCharset;
 		this.extension = extension;
@@ -82,7 +82,7 @@ public abstract class AbstractFile {
 	 * @param fileName  The file name of the file.
 	 * @param encoding  The encoding of the file.
 	 */
-	public AbstractFile(String name, String extension, String fileName, String encoding) {
+	public AbstractFile(final String name, final String extension, final String fileName, final String encoding) {
 		this.name = name;
 		this.encoding = encoding;
 		this.extension = extension;
@@ -98,7 +98,7 @@ public abstract class AbstractFile {
 	 * @param fileName         The file name of the file.
 	 * @param modificationDate The last time the file was modified.
 	 */
-	public AbstractFile(String name, String extension, String fileName, Date modificationDate) {
+	public AbstractFile(final String name, final String extension, final String fileName, final Date modificationDate) {
 		this.name = name;
 		this.extension = extension;
 		this.encoding = defaultCharset;
@@ -115,7 +115,7 @@ public abstract class AbstractFile {
 	 * @param encoding         The encoding of the file.
 	 * @param modificationDate The last time the file was modified.
 	 */
-	public AbstractFile(String name, String extension, String fileName, String encoding, Date modificationDate) {
+	public AbstractFile(final String name, final String extension, final String fileName, final String encoding, final Date modificationDate) {
 		this.name = name;
 		this.extension = extension;
 		this.fileName = fileName;
@@ -129,10 +129,11 @@ public abstract class AbstractFile {
 	 * @param fileName The file name to get the name of.
 	 * @return The name from the file name given.
 	 */
-	private static String getName(String fileName) {
-		int index = fileName.lastIndexOf(".");
-		if (index != -1)
+	private static String getName(final String fileName) {
+		final int index = fileName.lastIndexOf('.');
+		if (index != -1) {
 			return fileName.substring(0, index);
+		}
 		return fileName;
 	}
 
@@ -142,10 +143,11 @@ public abstract class AbstractFile {
 	 * @param fileName The file name to get the extension of.
 	 * @return The extension from the file name given.
 	 */
-	private static String getExtension(String fileName) {
-		int index = fileName.lastIndexOf(".");
-		if (index != -1 && index + 1 < fileName.length())
+	private static String getExtension(final String fileName) {
+		final int index = fileName.lastIndexOf('.');
+		if (index != -1 && index + 1 < fileName.length()) {
 			return fileName.substring(index + 1, fileName.length());
+		}
 		return "";
 	}
 
@@ -168,7 +170,7 @@ public abstract class AbstractFile {
 	 *
 	 * @param modificationDate The date this file was last modified.
 	 */
-	public void setModificationDate(Date modificationDate) {
+	public void setModificationDate(final Date modificationDate) {
 		this.modificationDate = modificationDate;
 	}
 
@@ -193,9 +195,6 @@ public abstract class AbstractFile {
 		return encoding;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public String toString() {
 		String string = "Name: " + getName();

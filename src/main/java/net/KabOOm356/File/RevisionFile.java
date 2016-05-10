@@ -20,17 +20,18 @@ public class RevisionFile extends ExtendedFile {
 	private int revision;
 
 	/**
-	 * Constructs a {@link RevisionFile} object.
+	 * Constructor.
 	 *
 	 * @param parent   The parent abstract pathname.
 	 * @param child    The child pathname string.
 	 * @param revision The starting revision.
 	 */
-	public RevisionFile(File parent, String child, int revision) {
+	public RevisionFile(final File parent, final String child, final int revision) {
 		super(parent, child);
 
-		if (revision < 0)
+		if (revision < 0) {
 			throw new IllegalArgumentException("Revision number must be greater than zero!");
+		}
 
 		this.name = child;
 
@@ -40,12 +41,12 @@ public class RevisionFile extends ExtendedFile {
 	}
 
 	/**
-	 * Constructs a {@link RevisionFile} object.
+	 * Constructor.
 	 *
 	 * @param parent The parent abstract pathname.
 	 * @param child  The child pathname string.
 	 */
-	public RevisionFile(File parent, String child) {
+	public RevisionFile(final File parent, final String child) {
 		super(parent, child);
 
 		this.name = child;
@@ -56,12 +57,12 @@ public class RevisionFile extends ExtendedFile {
 	}
 
 	/**
-	 * Constructs a {@link RevisionFile} object.
+	 * Constructor.
 	 *
 	 * @param parent The parent abstract pathname.
 	 * @param child  The child pathname string.
 	 */
-	public RevisionFile(String parent, String child) {
+	public RevisionFile(final String parent, final String child) {
 		super(parent, child);
 
 		this.name = child;
@@ -72,11 +73,11 @@ public class RevisionFile extends ExtendedFile {
 	}
 
 	/**
-	 * Constructors a {@link RevisionFile} object.
+	 * Constructor.
 	 *
 	 * @param file The name of this RevisionFile.
 	 */
-	public RevisionFile(String file) {
+	public RevisionFile(final String file) {
 		super(file);
 
 		this.name = file;
@@ -98,30 +99,33 @@ public class RevisionFile extends ExtendedFile {
 	/**
 	 * Sets the revision number.
 	 *
-	 * @param revision The revision number to place this {@link RevisionFile} to.
+	 * @param revision The revision number to place this to.
 	 * @return True if the revision exists, otherwise false.
 	 */
-	public boolean setRevision(int revision) {
-		if (revision < 0)
+	public boolean setRevision(final int revision) {
+		if (revision < 0) {
 			throw new IllegalArgumentException("Revision number must be greater than zero!");
+		}
 
 		this.revision = revision;
 
 		if (revision != 0) {
-			int index = name.indexOf(".");
+			final int index = name.indexOf('.');
 
-			if (index != -1)
+			if (index != -1) {
 				this.setName(name.substring(0, index) + Integer.toString(revision) + name.substring(index));
-			else
+			} else {
 				this.setName(name + Integer.toString(revision));
-		} else
+			}
+		} else {
 			this.setName(name);
+		}
 
 		return this.exists();
 	}
 
 	/**
-	 * Sets this {@link RevisionFile} to the next revision.
+	 * Sets this to the next revision.
 	 *
 	 * @return True if the file exists, otherwise false.
 	 */
@@ -131,19 +135,20 @@ public class RevisionFile extends ExtendedFile {
 	}
 
 	/**
-	 * Sets this {@link RevisionFile} to the previous revision.
+	 * Sets this to the previous revision.
 	 *
 	 * @return True if the file exists, otherwise false.
 	 */
 	public boolean decrementRevision() {
-		if (this.revision != 0)
+		if (this.revision != 0) {
 			this.setRevision(revision - 1);
+		}
 
 		return super.exists();
 	}
 
 	/**
-	 * Sets this {@link RevisionFile} to the latest revision.
+	 * Sets this to the latest revision.
 	 */
 	public void incrementToLatestRevision() {
 		this.incrementToNextRevision();
@@ -151,15 +156,18 @@ public class RevisionFile extends ExtendedFile {
 	}
 
 	/**
-	 * Sets this {@link RevisionFile} to the next available revision.
+	 * Sets this to the next available revision.
 	 */
 	public void incrementToNextRevision() {
-		if (this.exists())
-			while (this.incrementRevision()) ;
+		if (this.exists()) {
+			//noinspection StatementWithEmptyBody
+			while (this.incrementRevision()) {
+			}
+		}
 	}
 
 	/**
-	 * Sets this {@link RevisionFile} to the base revision.
+	 * Sets this to the base revision.
 	 */
 	public void toBaseRevision() {
 		this.setRevision(0);
@@ -185,13 +193,11 @@ public class RevisionFile extends ExtendedFile {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		String str = super.toString() + "\n";
+		String str = super.toString() + '\n';
 		str += "Revision of file: " + name;
 		str += "\nRevision Number: " + revision;
 		return str;

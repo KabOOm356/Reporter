@@ -9,7 +9,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -29,25 +28,18 @@ import static org.powermock.api.mockito.PowerMockito.*;
 @PrepareForTest(ReporterPlayerListener.class)
 public class ReporterPlayerListenerTest extends PowerMockitoTest {
 	private static final String playerName = "playerName";
-
+	@Spy
+	private final HashMap<CommandSender, Integer> lastViewed = new HashMap<CommandSender, Integer>();
 	@Mock
 	private Player player;
-
 	@Mock
 	private Reporter reporter;
-
 	@Mock
 	private ReporterCommandManager reporterCommandManager;
-
 	@Mock
 	private MessageManager messageManager;
-
 	@Mock
 	private YamlConfiguration configuration;
-
-	@Spy
-	private HashMap<CommandSender, Integer> lastViewed = new HashMap<CommandSender, Integer>();
-
 	private PlayerJoinEvent joinEvent;
 	private PlayerQuitEvent quitEvent;
 	private ReporterPlayerListener listener;

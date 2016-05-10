@@ -275,7 +275,7 @@ public abstract class ViewPhrases {
 	/**
 	 * Report Priority:
 	 */
-	public static LocalePhrase viewPriority = new LocalePhrase(
+	public static final LocalePhrase viewPriority = new LocalePhrase(
 			"viewPriority",
 			"Report Priority:");
 }

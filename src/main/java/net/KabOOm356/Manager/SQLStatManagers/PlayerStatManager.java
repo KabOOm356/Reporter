@@ -25,7 +25,7 @@ public class PlayerStatManager extends SQLStatManager {
 	 *
 	 * @param database The database where the statistics are being stored.
 	 */
-	public PlayerStatManager(ExtendedDatabaseHandler database) {
+	public PlayerStatManager(final ExtendedDatabaseHandler database) {
 		super(database, tableName, indexColumn, secondaryIndexColumn);
 	}
 
@@ -64,7 +64,7 @@ public class PlayerStatManager extends SQLStatManager {
 		 * @param name       The name of the statistic.
 		 * @param columnName The case-sensitive column name of the statistic.
 		 */
-		protected PlayerStat(String name, String columnName) {
+		protected PlayerStat(final String name, final String columnName) {
 			super(name, columnName);
 		}
 	}

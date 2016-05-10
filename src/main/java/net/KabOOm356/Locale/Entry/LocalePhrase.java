@@ -15,7 +15,7 @@ public class LocalePhrase extends LocaleEntry {
 	 * @param path The path to the entry.
 	 * @param def  The default for the entry.
 	 */
-	public LocalePhrase(String path, String def) {
+	public LocalePhrase(final String path, final String def) {
 		super(prefix + path, def);
 	}
 }

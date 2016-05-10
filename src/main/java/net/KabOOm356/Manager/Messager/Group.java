@@ -16,7 +16,7 @@ public class Group {
 	 *
 	 * @param groupName The name of this Group.
 	 */
-	public Group(String groupName) {
+	public Group(final String groupName) {
 		this.groupName = groupName;
 	}
 
@@ -37,7 +37,7 @@ public class Group {
 	 * @param group The group to compare to.
 	 * @return True if both group names are equal, otherwise false.
 	 */
-	public boolean equals(Group group) {
+	public boolean equals(final Group group) {
 		return this.getName().equalsIgnoreCase(group.getName());
 	}
 

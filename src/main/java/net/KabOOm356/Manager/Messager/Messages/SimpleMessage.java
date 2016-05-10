@@ -9,7 +9,7 @@ public class SimpleMessage extends Message {
 	 *
 	 * @param message The message.
 	 */
-	public SimpleMessage(String message) {
+	public SimpleMessage(final String message) {
 		super(message);
 	}
 
