@@ -256,8 +256,6 @@ public class Reporter extends JavaPlugin {
 		log.info(Reporter.getDefaultConsolePrefix() + "Language: " + locale.getString(LocaleInfo.language)
 				+ " v" + locale.getString(LocaleInfo.version)
 				+ " By " + locale.getString(LocaleInfo.author));
-
-		updateDocumentation();
 	}
 
 	private boolean setLocaleDefaults(final Locale locale) {
@@ -278,11 +276,6 @@ public class Reporter extends JavaPlugin {
 		}
 
 		return false;
-	}
-
-	private void updateDocumentation() {
-		// Update the documentation for all the commands
-		commandManager.updateDocumentation();
 	}
 
 	public Locale getLocale() {

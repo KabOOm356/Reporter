@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.KabOOm356.PowerMockitoTest;
+import test.test.PowerMockitoTest;
 
 import java.util.UUID;
 

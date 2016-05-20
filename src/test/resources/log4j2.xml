@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" packages="net.KabOOm356">
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%d{HH:mm:ss.SSS}] [%t::%location] %level :: %msg%n"/>
+        </Console>
+    </Appenders>
     <Loggers>
-        <Root level="ALL">
-            <filters>
-                <MarkerFilter marker="NETWORK_PACKETS" onMatch="DENY" onMismatch="NEUTRAL"/>
-            </filters>
-        </Root>
+        <Logger name="test" level="WARN" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Root level="OFF"/>
     </Loggers>
 </Configuration>

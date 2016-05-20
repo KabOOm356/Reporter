@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -10,7 +11,6 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.RequestPhrases;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
-import net.KabOOm356.Util.ObjectPair;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +21,8 @@ import org.bukkit.command.CommandSender;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -33,6 +35,12 @@ public class RequestCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.request";
 
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{
+			new Usage(RequestPhrases.requestHelp, RequestPhrases.requestHelpDetails),
+			new Usage("/report request most", RequestPhrases.requestMostHelpDetails)
+	}));
+	private static final List<String> aliases = Collections.emptyList();
+
 	/**
 	 * Constructor.
 	 *
@@ -40,8 +48,6 @@ public class RequestCommand extends ReporterCommand {
 	 */
 	public RequestCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-
-		updateDocumentation();
 	}
 
 	/**
@@ -76,6 +82,16 @@ public class RequestCommand extends ReporterCommand {
 			log.log(Level.ERROR, "Failed to request!", e);
 			sender.sendMessage(getErrorMessage());
 		}
+	}
+
+	@Override
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
 	}
 
 	private void requestMostReported(final CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException {
@@ -192,28 +208,5 @@ public class RequestCommand extends ReporterCommand {
 
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + out);
 		}
-	}
-
-	/**
-	 * Updates the documentation for the command.
-	 * <br/>
-	 * This should be called after the locale has changed.
-	 */
-	@Override
-	public void updateDocumentation() {
-		final ArrayList<ObjectPair<String, String>> usages = super.getUsages();
-		usages.clear();
-
-		String usage = getManager().getLocale().getString(RequestPhrases.requestHelp);
-		String description = getManager().getLocale().getString(RequestPhrases.requestHelpDetails);
-
-		ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
-
-		usage = "/report request most";
-		description = getManager().getLocale().getString(RequestPhrases.requestMostHelpDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
 	}
 }

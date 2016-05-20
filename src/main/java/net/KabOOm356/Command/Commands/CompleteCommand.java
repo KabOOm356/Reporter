@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -8,6 +9,7 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.CompletePhrases;
 import net.KabOOm356.Manager.Messager.Group;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.Level;
@@ -20,10 +22,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * A {@link ReporterCommand} that will handle completing reports.
@@ -34,6 +33,8 @@ public class CompleteCommand extends ReporterCommand {
 	private static final String name = "Complete";
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.complete";
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(CompletePhrases.completeHelp, CompletePhrases.completeHelpDetails)}));
+	private static final List<String> aliases = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new String[]{"Finish"}));
 	private final boolean sendMessage;
 
 	/**
@@ -44,12 +45,8 @@ public class CompleteCommand extends ReporterCommand {
 	public CompleteCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 
-		super.getAliases().add("Finish");
-
 		sendMessage = getManager().getConfig().getBoolean(
 				"general.messaging.completedMessageOnLogin.completedMessageOnLogin", true);
-
-		updateDocumentation();
 	}
 
 	/**
@@ -112,6 +109,16 @@ public class CompleteCommand extends ReporterCommand {
 			log.log(Level.ERROR, "Failed to complete report!", e);
 			sender.sendMessage(getErrorMessage());
 		}
+	}
+
+	@Override
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
 	}
 
 	private void completeReport(final CommandSender sender, final int index, final String summary) throws ClassNotFoundException, SQLException, InterruptedException {
@@ -231,17 +238,5 @@ public class CompleteCommand extends ReporterCommand {
 				getManager().getMessageManager().addMessage(playerName, messageGroup, message, index);
 			}
 		}
-	}
-
-	/**
-	 * Updates the documentation for the command.
-	 * <br/>
-	 * This should be called after the locale has changed.
-	 */
-	@Override
-	public void updateDocumentation() {
-		super.updateDocumentation(
-				getManager().getLocale().getString(CompletePhrases.completeHelp),
-				getManager().getLocale().getString(CompletePhrases.completeHelpDetails));
 	}
 }

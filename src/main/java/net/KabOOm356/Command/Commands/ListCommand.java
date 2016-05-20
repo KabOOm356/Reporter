@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -9,7 +10,6 @@ import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
-import net.KabOOm356.Util.ObjectPair;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +19,8 @@ import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A {@link ReporterCommand} that will handle listing reports.
@@ -30,6 +32,14 @@ public class ListCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 0;
 	private final static String permissionNode = "reporter.list";
 
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{
+			new Usage("/report list [indexes]", ListPhrases.listHelpDetails),
+			new Usage("/report list priority [indexes]", ListPhrases.listHelpPriorityDetails),
+			new Usage("/report list claimed [indexes]", ListPhrases.listHelpClaimedDetails),
+			new Usage("/report list claimed priority [indexes]", ListPhrases.listHelpClaimedPriorityDetails)
+	}));
+	private static final List<String> aliases = Collections.emptyList();
+
 	/**
 	 * Constructor.
 	 *
@@ -37,8 +47,6 @@ public class ListCommand extends ReporterCommand {
 	 */
 	public ListCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-
-		updateDocumentation();
 	}
 
 	/**
@@ -115,6 +123,16 @@ public class ListCommand extends ReporterCommand {
 		} else {
 			sender.sendMessage(getFailedPermissionsMessage());
 		}
+	}
+
+	@Override
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
 	}
 
 	private void listClaimed(final CommandSender sender) throws ClassNotFoundException, SQLException, InterruptedException {
@@ -443,42 +461,5 @@ public class ListCommand extends ReporterCommand {
 		out = out.replaceAll("%i", incomplete);
 
 		sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + out);
-	}
-
-	/**
-	 * Updates the documentation for the command.
-	 * <br/>
-	 * This should be called after the locale has changed.
-	 */
-	@Override
-	public void updateDocumentation() {
-		final ArrayList<ObjectPair<String, String>> usages = super.getUsages();
-
-		usages.clear();
-
-		String usage = "/report list [indexes]";
-		String description = getManager().getLocale().getString(ListPhrases.listHelpDetails);
-
-		ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
-
-		usages.add(entry);
-
-		usage = "/report list priority [indexes]";
-		description = getManager().getLocale().getString(ListPhrases.listHelpPriorityDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
-
-		usage = "/report list claimed [indexes]";
-		description = getManager().getLocale().getString(ListPhrases.listHelpClaimedDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
-
-		usage = "/report list claimed priority [indexes]";
-		description = getManager().getLocale().getString(ListPhrases.listHelpClaimedPriorityDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
 	}
 }

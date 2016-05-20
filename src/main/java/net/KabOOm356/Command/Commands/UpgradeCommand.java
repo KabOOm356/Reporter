@@ -1,11 +1,13 @@
 package net.KabOOm356.Command.Commands;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.UpgradePhrases;
 import net.KabOOm356.Permission.ModLevel;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,6 +16,8 @@ import org.bukkit.command.CommandSender;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A {@link ReporterCommand} that will handle upgrading a report's priority.
@@ -25,6 +29,9 @@ public class UpgradeCommand extends ReporterCommand {
 	private final static String permissionNode = "reporter.move";
 	private static final int minimumNumberOfArguments = 1;
 
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(UpgradePhrases.upgradeHelp, UpgradePhrases.upgradeHelpDetails)}));
+	private static final List<String> aliases = Collections.emptyList();
+
 	/**
 	 * Constructor.
 	 *
@@ -32,8 +39,6 @@ public class UpgradeCommand extends ReporterCommand {
 	 */
 	public UpgradeCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-
-		updateDocumentation();
 	}
 
 	/**
@@ -96,6 +101,16 @@ public class UpgradeCommand extends ReporterCommand {
 		}
 	}
 
+	@Override
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
+	}
+
 	private ModLevel getNextPriorityLevel(final int index) throws ClassNotFoundException, SQLException, InterruptedException {
 		final String query = "SELECT Priority FROM Reports WHERE ID=" + index;
 
@@ -120,12 +135,5 @@ public class UpgradeCommand extends ReporterCommand {
 		} finally {
 			database.closeConnection(connectionId);
 		}
-	}
-
-	@Override
-	public void updateDocumentation() {
-		super.updateDocumentation(
-				getManager().getLocale().getString(UpgradePhrases.upgradeHelp),
-				getManager().getLocale().getString(UpgradePhrases.upgradeHelpDetails));
 	}
 }

@@ -1,11 +1,13 @@
 package net.KabOOm356.Command.Commands;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ClaimPhrases;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.Level;
@@ -17,7 +19,9 @@ import org.bukkit.command.CommandSender;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * A {@link ReporterCommand} to handle players claiming reports.
@@ -29,6 +33,9 @@ public class ClaimCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.claim";
 
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(ClaimPhrases.claimHelp, ClaimPhrases.claimHelpDetails)}));
+	private static final List<String> aliases = Collections.emptyList();
+
 	/**
 	 * Constructor.
 	 *
@@ -36,8 +43,6 @@ public class ClaimCommand extends ReporterCommand {
 	 */
 	public ClaimCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-
-		updateDocumentation();
 	}
 
 	/**
@@ -89,6 +94,16 @@ public class ClaimCommand extends ReporterCommand {
 		}
 	}
 
+	@Override
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
+	}
+
 	private void claimReport(final CommandSender sender, final int index) throws ClassNotFoundException, SQLException, InterruptedException {
 		final ArrayList<String> params = new ArrayList<String>();
 
@@ -124,17 +139,5 @@ public class ClaimCommand extends ReporterCommand {
 
 			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.CLAIMED);
 		}
-	}
-
-	/**
-	 * Updates the documentation for the command.
-	 * <br/>
-	 * This should be called after the locale has changed.
-	 */
-	@Override
-	public void updateDocumentation() {
-		super.updateDocumentation(
-				getManager().getLocale().getString(ClaimPhrases.claimHelp),
-				getManager().getLocale().getString(ClaimPhrases.claimHelpDetails));
 	}
 }

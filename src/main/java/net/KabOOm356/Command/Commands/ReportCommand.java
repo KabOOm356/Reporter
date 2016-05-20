@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -9,6 +10,7 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.ReportPhrases;
 import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager;
 import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager.PlayerStat;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.FormattingUtil;
 import org.apache.logging.log4j.Level;
@@ -22,9 +24,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 /**
  * A {@link ReporterCommand} that will handle users submitting reports.
@@ -36,6 +36,9 @@ public class ReportCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 2;
 	private final static String permissionNode = "reporter.report";
 
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(ReportPhrases.reportHelp, ReportPhrases.reportHelpDetails)}));
+	private static final List<String> aliases = Collections.emptyList();
+
 	/**
 	 * Constructor.
 	 *
@@ -43,8 +46,6 @@ public class ReportCommand extends ReporterCommand {
 	 */
 	public ReportCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-
-		updateDocumentation();
 	}
 
 	/**
@@ -91,6 +92,16 @@ public class ReportCommand extends ReporterCommand {
 			log.error("Failed to report!", e);
 			sender.sendMessage(getErrorMessage());
 		}
+	}
+
+	@Override
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
 	}
 
 	private boolean playerExists(final CommandSender sender, final OfflinePlayer player) {
@@ -292,17 +303,5 @@ public class ReportCommand extends ReporterCommand {
 				player.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + reportSubmitted);
 			}
 		}
-	}
-
-	/**
-	 * Updates the documentation for the command.
-	 * <br/>
-	 * This should be called after the locale has changed.
-	 */
-	@Override
-	public void updateDocumentation() {
-		super.updateDocumentation(
-				getManager().getLocale().getString(ReportPhrases.reportHelp),
-				getManager().getLocale().getString(ReportPhrases.reportHelpDetails));
 	}
 }

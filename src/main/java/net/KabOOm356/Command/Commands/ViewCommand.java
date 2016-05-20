@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -11,7 +12,6 @@ import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
-import net.KabOOm356.Util.ObjectPair;
 import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -23,6 +23,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -35,6 +37,19 @@ public class ViewCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 1;
 	private static final String permissionNode = "reporter.view";
 
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{
+			new Usage(ViewPhrases.viewHelp, ViewPhrases.viewHelpDetails),
+			new Usage("/report view all [name]", ViewPhrases.viewHelpAllDetails),
+			new Usage("/report view completed|finished [name]", ViewPhrases.viewHelpCompletedDetails),
+			new Usage("/report view incomplete|unfinished [name]", ViewPhrases.viewHelpIncompleteDetails),
+			new Usage("/report view priority [name]", ViewPhrases.viewHelpPriorityDetails),
+			new Usage(ViewPhrases.viewHelpGivenPriority, ViewPhrases.viewHelpGivenPriorityDetails),
+			new Usage("/report view claimed [name]", ViewPhrases.viewHelpClaimedDetails),
+			new Usage("/report view claimed priority [name]", ViewPhrases.viewHelpClaimedPriorityDetails),
+			new Usage(ViewPhrases.viewHelpClaimedGivenPriority, ViewPhrases.viewHelpClaimedPriorityDetails)
+	}));
+	private static final List<String> aliases = Collections.emptyList();
+
 	/**
 	 * Constructor.
 	 *
@@ -42,8 +57,6 @@ public class ViewCommand extends ReporterCommand {
 	 */
 	public ViewCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-
-		updateDocumentation();
 	}
 
 	private static String[] readQuickData(final ResultRow row, final boolean displayRealName) {
@@ -169,6 +182,16 @@ public class ViewCommand extends ReporterCommand {
 			log.error("Failed to view report!", e);
 			sender.sendMessage(getErrorMessage());
 		}
+	}
+
+	@Override
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
 	}
 
 	private void viewPriority(final CommandSender sender, final boolean displayRealName) throws Exception {
@@ -746,66 +769,5 @@ public class ViewCommand extends ReporterCommand {
 						locale.getString(ViewPhrases.viewNoSummary)));
 			}
 		}
-	}
-
-	@Override
-	public void updateDocumentation() {
-		final Locale locale = getManager().getLocale();
-		final ArrayList<ObjectPair<String, String>> usages = super.getUsages();
-		usages.clear();
-
-		String usage = locale.getString(ViewPhrases.viewHelp);
-		String description = locale.getString(ViewPhrases.viewHelpDetails);
-
-		ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
-
-		usage = "/report view all [name]";
-		description = locale.getString(ViewPhrases.viewHelpAllDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
-
-		usage = "/report view completed|finished [name]";
-		description = locale.getString(ViewPhrases.viewHelpCompletedDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
-
-		usage = "/report view incomplete|unfinished [name]";
-		description = locale.getString(ViewPhrases.viewHelpIncompleteDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
-
-		usage = "/report view priority [name]";
-		description = locale.getString(ViewPhrases.viewHelpPriorityDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
-
-		usage = locale.getString(ViewPhrases.viewHelpGivenPriority);
-		description = locale.getString(ViewPhrases.viewHelpGivenPriorityDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
-
-		usage = "/report view claimed [name]";
-		description = locale.getString(ViewPhrases.viewHelpClaimedDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
-
-		usage = "/report view claimed priority [name]";
-		description = locale.getString(ViewPhrases.viewHelpClaimedPriorityDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
-
-		usage = locale.getString(ViewPhrases.viewHelpClaimedGivenPriority);
-		description = locale.getString(ViewPhrases.viewHelpClaimedPriorityDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-		usages.add(entry);
 	}
 }

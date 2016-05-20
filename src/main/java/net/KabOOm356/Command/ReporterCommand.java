@@ -10,19 +10,6 @@ import org.bukkit.command.CommandSender;
  */
 public abstract class ReporterCommand extends Command {
 	/**
-	 * @see Command#Command(ReporterCommandManager, String, String, String, String, int)
-	 */
-	protected ReporterCommand(
-			final ReporterCommandManager manager,
-			final String commandName,
-			final String commandUsage,
-			final String commandDescription,
-			final String commandPermissionNode,
-			final int minimumNumberOfArguments) {
-		super(manager, commandName, commandUsage, commandDescription, commandPermissionNode, minimumNumberOfArguments);
-	}
-
-	/**
 	 * @see Command#Command(ReporterCommandManager, String, String, int)
 	 */
 	protected ReporterCommand(
@@ -75,11 +62,4 @@ public abstract class ReporterCommand extends Command {
 	public boolean hasLastViewed(final CommandSender sender) {
 		return getManager().getLastViewed().get(sender) != -1;
 	}
-
-	/**
-	 * Updates the documentation for the command.
-	 * <br/>
-	 * This should be called after the locale has changed.
-	 */
-	public abstract void updateDocumentation();
 }

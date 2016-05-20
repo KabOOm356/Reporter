@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.KabOOm356.PowerMockitoTest;
+import test.test.PowerMockitoTest;
 
 import java.sql.SQLException;
 

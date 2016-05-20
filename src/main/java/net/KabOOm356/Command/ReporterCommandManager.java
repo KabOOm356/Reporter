@@ -1,11 +1,14 @@
 package net.KabOOm356.Command;
 
 import net.KabOOm356.Command.Commands.*;
+import net.KabOOm356.Command.Help.HelpCommand;
+import net.KabOOm356.Command.Help.HelpCommandDisplay;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ClaimPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
+import net.KabOOm356.Locale.Entry.LocalePhrases.HelpPhrases;
 import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Manager.MessageManager;
 import net.KabOOm356.Manager.ReportLimitManager;
@@ -34,7 +37,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 /**
@@ -50,6 +52,8 @@ public class ReporterCommandManager implements CommandExecutor {
 	private final ReportLimitManager limitManager;
 	private final ModeratorStatManager modStatsManager;
 	private final PlayerStatManager playerStatsManager;
+	private final HelpCommand reportHelp;
+	private final HelpCommand respondHelp;
 	private LinkedHashMap<String, ReporterCommand> reportCommands;
 	private HashMap<String, String> aliasReportCommands;
 	private LinkedHashMap<String, ReporterCommand> respondCommands;
@@ -73,6 +77,21 @@ public class ReporterCommandManager implements CommandExecutor {
 		playerStatsManager = new PlayerStatManager(plugin.getDatabaseHandler());
 
 		initCommands();
+
+		final HelpCommandDisplay.Builder reportHelpDisplayBuilder = new HelpCommandDisplay.Builder();
+		reportHelpDisplayBuilder.setHeader(HelpPhrases.reportHelpHeader)
+				.setAlias(HelpPhrases.reportHelpAliases)
+				.setNext(HelpPhrases.nextReportHelpPage)
+				.setHint(GeneralPhrases.tryReportHelp);
+		final HelpCommandDisplay reportHelpDisplay = reportHelpDisplayBuilder.build();
+		reportHelp = new HelpCommand(getLocale(), getReportCommands().values(), reportHelpDisplay);
+		final HelpCommandDisplay.Builder respondHelpDisplayBuilder = new HelpCommandDisplay.Builder();
+		respondHelpDisplayBuilder.setHeader(HelpPhrases.respondHelpHeader)
+				.setAlias(HelpPhrases.respondHelpAliases)
+				.setNext(HelpPhrases.nextRespondHelpPage)
+				.setHint(GeneralPhrases.tryRespondHelp);
+		final HelpCommandDisplay respondHelpDisplay = respondHelpDisplayBuilder.build();
+		respondHelp = new HelpCommand(getLocale(), getRespondCommands().values(), respondHelpDisplay);
 
 		lastViewed.put(plugin.getServer().getConsoleSender(), -1);
 
@@ -178,7 +197,7 @@ public class ReporterCommandManager implements CommandExecutor {
 					}
 				}
 
-				HelpCommand.respondHelp(this, sender, page);
+				respondHelp.printHelp(sender, page);
 
 				return true;
 			}
@@ -216,7 +235,7 @@ public class ReporterCommandManager implements CommandExecutor {
 					}
 				}
 
-				HelpCommand.reportHelp(this, sender, page);
+				reportHelp.printHelp(sender, page);
 
 				return true;
 			}
@@ -257,21 +276,6 @@ public class ReporterCommandManager implements CommandExecutor {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Updates the documentation for all the commands.
-	 * <br/>
-	 * This should be called after the locale has changed.
-	 */
-	public void updateDocumentation() {
-		for (final Entry<String, ReporterCommand> e : reportCommands.entrySet()) {
-			e.getValue().updateDocumentation();
-		}
-
-		for (final Entry<String, ReporterCommand> e : respondCommands.entrySet()) {
-			e.getValue().updateDocumentation();
-		}
 	}
 
 	/**

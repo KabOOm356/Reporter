@@ -5,7 +5,7 @@ import net.KabOOm356.Database.Database;
 import net.KabOOm356.Database.DatabaseType;
 import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.KabOOm356.PowerMockitoTest;
+import test.test.PowerMockitoTest;
 
 import java.sql.SQLException;
 

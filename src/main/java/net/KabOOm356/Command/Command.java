@@ -1,11 +1,11 @@
 package net.KabOOm356.Command;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Runnable.RunnableWithState;
 import net.KabOOm356.Runnable.TimedRunnable;
 import net.KabOOm356.Util.BukkitUtil;
-import net.KabOOm356.Util.ObjectPair;
 import org.apache.commons.lang.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Abstract Command class.
@@ -25,8 +26,6 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	private final ReporterCommandManager manager;
 	private final String name;
 	private final String permissionNode;
-	private final ArrayList<String> aliases;
-	private final ArrayList<ObjectPair<String, String>> usages;
 	private final int minimumNumberOfArguments;
 	private boolean isRunning = false;
 	private boolean isPendingToRun = false;
@@ -39,39 +38,6 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 *
 	 * @param manager                  The {@link ReporterCommandManager} that is managing this command.
 	 * @param commandName              The name of the command.
-	 * @param commandUsage             The usage of the command.
-	 * @param commandDescription       A description of the command.
-	 * @param commandPermissionNode    The permission node required to run this command.
-	 * @param minimumNumberOfArguments The minimum number of required arguments to run this command.
-	 */
-	protected Command(
-			final ReporterCommandManager manager,
-			final String commandName,
-			final String commandUsage,
-			final String commandDescription,
-			final String commandPermissionNode,
-			final int minimumNumberOfArguments) {
-		this.manager = manager;
-
-		this.name = commandName;
-		this.permissionNode = commandPermissionNode;
-
-		this.minimumNumberOfArguments = minimumNumberOfArguments;
-
-		this.aliases = new ArrayList<String>();
-
-		this.usages = new ArrayList<ObjectPair<String, String>>();
-
-		final ObjectPair<String, String> entry = new ObjectPair<String, String>(commandUsage, commandDescription);
-
-		updateDocumentation(entry);
-	}
-
-	/**
-	 * Constructor.
-	 *
-	 * @param manager                  The {@link ReporterCommandManager} that is managing this command.
-	 * @param commandName              The name of the command.
 	 * @param commandPermissionNode    The permission node required to run this command.
 	 * @param minimumNumberOfArguments The minimum number of required arguments to run this command.
 	 */
@@ -86,10 +52,6 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 		this.permissionNode = commandPermissionNode;
 
 		this.minimumNumberOfArguments = minimumNumberOfArguments;
-
-		this.aliases = new ArrayList<String>();
-
-		this.usages = new ArrayList<ObjectPair<String, String>>();
 	}
 
 	/**
@@ -99,35 +61,6 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 * @param args   The given arguments from the {@link CommandSender}.
 	 */
 	public abstract void execute(CommandSender sender, ArrayList<String> args);
-
-	/**
-	 * Updates the documentation for the command.
-	 * <br/>
-	 * This should be called after the locale has changed.
-	 *
-	 * @param usage       The usage of the command.
-	 * @param description A description of the command.
-	 */
-	protected void updateDocumentation(final String usage, final String description) {
-		this.usages.clear();
-
-		final ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
-
-		this.usages.add(entry);
-	}
-
-	/**
-	 * Updates the documentation for the command.
-	 * <br/>
-	 * This should be called after the locale has changed.
-	 *
-	 * @param usage The usage and description for the command.
-	 */
-	protected void updateDocumentation(final ObjectPair<String, String> usage) {
-		this.usages.clear();
-
-		this.usages.add(usage);
-	}
 
 	/**
 	 * Checks if the given {@link Player} has permission to run this command, or is OP.
@@ -192,20 +125,26 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 		return permissionNode;
 	}
 
-	public ArrayList<String> getAliases() {
-		return aliases;
-	}
+	/**
+	 * Gets all usages for this command.
+	 *
+	 * @return An {@link List} of {@link Usage}s.
+	 */
+	public abstract List<Usage> getUsages();
 
-	public ArrayList<ObjectPair<String, String>> getUsages() {
-		return usages;
-	}
+	/**
+	 * Gets all aliases for this command.
+	 *
+	 * @return An {@link List} of Strings.
+	 */
+	public abstract List<String> getAliases();
 
 	public String getUsage() {
-		return usages.get(0).getKey();
+		return getManager().getLocale().getString(getUsages().get(0).getKey());
 	}
 
 	public String getDescription() {
-		return usages.get(0).getValue();
+		return getManager().getLocale().getString(getUsages().get(0).getValue());
 	}
 
 	public String getErrorMessage() {
@@ -290,9 +229,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	@Override
 	public String toString() {
 		return "Command Name: " + name + '\n' +
-				"Aliases: " + aliases + '\n' +
 				"Permission Node: " + permissionNode + '\n' +
-				"Minimum Number of Arguments: " + minimumNumberOfArguments + '\n' +
-				"Usages: " + usages;
+				"Minimum Number of Arguments: " + minimumNumberOfArguments;
 	}
 }

@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -8,6 +9,7 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.MovePhrases;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.Level;
@@ -21,6 +23,8 @@ import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -33,6 +37,9 @@ public class MoveCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 2;
 	private final static String permissionNode = "reporter.move";
 
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(MovePhrases.moveHelp, MovePhrases.moveHelpDetails)}));
+	private static final List<String> aliases = Collections.emptyList();
+
 	/**
 	 * Constructor.
 	 *
@@ -40,8 +47,6 @@ public class MoveCommand extends ReporterCommand {
 	 */
 	public MoveCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-
-		updateDocumentation();
 	}
 
 	/**
@@ -97,6 +102,16 @@ public class MoveCommand extends ReporterCommand {
 			log.error("Failed to execute move command!", e);
 			sender.sendMessage(getErrorMessage());
 		}
+	}
+
+	@Override
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
 	}
 
 	protected void moveReport(final CommandSender sender, final int index, final ModLevel level) throws ClassNotFoundException, SQLException, InterruptedException {
@@ -177,12 +192,5 @@ public class MoveCommand extends ReporterCommand {
 
 			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.MOVED);
 		}
-	}
-
-	@Override
-	public void updateDocumentation() {
-		super.updateDocumentation(
-				getManager().getLocale().getString(MovePhrases.moveHelp),
-				getManager().getLocale().getString(MovePhrases.moveHelpDetails));
 	}
 }

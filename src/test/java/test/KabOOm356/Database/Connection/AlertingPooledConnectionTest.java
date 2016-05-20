@@ -5,7 +5,7 @@ import net.KabOOm356.Database.Connection.ConnectionPoolManager;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.KabOOm356.PowerMockitoTest;
+import test.test.PowerMockitoTest;
 
 import java.sql.Connection;
 

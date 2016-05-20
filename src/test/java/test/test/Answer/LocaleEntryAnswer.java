@@ -1,0 +1,29 @@
+package test.test.Answer;
+
+import net.KabOOm356.Locale.Entry.Entry;
+import org.apache.commons.lang.Validate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+public class LocaleEntryAnswer implements Answer<String> {
+	public static final LocaleEntryAnswer instance = new LocaleEntryAnswer();
+	private static final Logger log = LogManager.getLogger(LocaleEntryAnswer.class);
+
+	private LocaleEntryAnswer() {
+	}
+
+	@Override
+	public String answer(final InvocationOnMock invocationOnMock) throws Throwable {
+		Validate.notEmpty(invocationOnMock.getArguments());
+		String answer = "";
+		if (invocationOnMock.getArguments()[0] instanceof Entry) {
+			final Entry entry = Entry.class.cast(invocationOnMock.getArguments()[0]);
+			answer = entry.getDefault();
+		} else {
+			log.warn("First parameter was not a LocaleEntry! Returning an empty string!", invocationOnMock.getArguments());
+		}
+		return answer;
+	}
+}

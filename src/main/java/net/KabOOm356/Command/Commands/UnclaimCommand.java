@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -7,6 +8,7 @@ import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.UnclaimPhrases;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.Level;
@@ -20,6 +22,8 @@ import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -32,6 +36,9 @@ public class UnclaimCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.claim";
 
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(UnclaimPhrases.unclaimHelp, UnclaimPhrases.unclaimHelpDetails)}));
+	private static final List<String> aliases = Collections.emptyList();
+
 	/**
 	 * Constructor.
 	 *
@@ -39,8 +46,6 @@ public class UnclaimCommand extends ReporterCommand {
 	 */
 	public UnclaimCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-
-		updateDocumentation();
 	}
 
 	/**
@@ -89,6 +94,16 @@ public class UnclaimCommand extends ReporterCommand {
 			log.log(Level.ERROR, "Failed to unclaim report!", e);
 			sender.sendMessage(getErrorMessage());
 		}
+	}
+
+	@Override
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
 	}
 
 	private boolean canUnclaimReport(final CommandSender sender, final int index) throws ClassNotFoundException, SQLException, InterruptedException {
@@ -186,17 +201,5 @@ public class UnclaimCommand extends ReporterCommand {
 
 			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.UNCLAIMED);
 		}
-	}
-
-	/**
-	 * Updates the documentation for the command.
-	 * <br/>
-	 * This should be called after the locale has changed.
-	 */
-	@Override
-	public void updateDocumentation() {
-		super.updateDocumentation(
-				getManager().getLocale().getString(UnclaimPhrases.unclaimHelp),
-				getManager().getLocale().getString(UnclaimPhrases.unclaimHelpDetails));
 	}
 }

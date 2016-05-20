@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -7,6 +8,7 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.AssignPhrases;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.Level;
@@ -20,7 +22,9 @@ import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * A {@link ReporterCommand} to handle assigning players to reports.
@@ -32,6 +36,9 @@ public class AssignCommand extends ReporterCommand {
 	private final static int minimumNumberOfArguments = 2;
 	private final static String permissionNode = "reporter.assign";
 
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(AssignPhrases.assignHelp, AssignPhrases.assignHelpDetails)}));
+	private static final List<String> aliases = Collections.emptyList();
+
 	/**
 	 * Constructor.
 	 *
@@ -39,8 +46,6 @@ public class AssignCommand extends ReporterCommand {
 	 */
 	public AssignCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-
-		updateDocumentation();
 	}
 
 	/**
@@ -198,9 +203,12 @@ public class AssignCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void updateDocumentation() {
-		super.updateDocumentation(
-				getManager().getLocale().getString(AssignPhrases.assignHelp),
-				getManager().getLocale().getString(AssignPhrases.assignHelpDetails));
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
 	}
 }

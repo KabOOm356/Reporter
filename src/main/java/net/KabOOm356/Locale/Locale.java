@@ -1,8 +1,6 @@
 package net.KabOOm356.Locale;
 
-import net.KabOOm356.Locale.Entry.LocaleEntry;
-import net.KabOOm356.Locale.Entry.LocaleInfo;
-import net.KabOOm356.Locale.Entry.LocalePhrase;
+import net.KabOOm356.Locale.Entry.*;
 import net.KabOOm356.Util.Initializable;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -18,8 +16,23 @@ public class Locale extends YamlConfiguration implements Initializable {
 	 * @param entry The entry to get.
 	 * @return The line in the locale if it exists, or the entry's default line if it does not exist.
 	 */
-	public String getString(final LocaleEntry entry) {
+	public String getString(final Entry entry) {
+		if (entry instanceof ConstantEntry) {
+			final ConstantEntry constantEntry = ConstantEntry.class.cast(entry);
+			return getString(constantEntry);
+		}
 		return getString(entry.getPath(), entry.getDefault());
+	}
+
+	/**
+	 * Returns the given entry's default, because it is constant.
+	 *
+	 * @param entry The entry to get.
+	 * @return The
+	 */
+	public String getString(final ConstantEntry entry) {
+		// No need to look up the entry.  It is constant.
+		return entry.getDefault();
 	}
 
 	/**

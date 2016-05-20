@@ -1,10 +1,11 @@
 package net.KabOOm356.Locale.Entry.LocalePhrases;
 
+import net.KabOOm356.Command.Help.HelpCommand;
 import net.KabOOm356.Locale.Entry.LocalePhrase;
 
 /**
  * Class containing static {@link LocalePhrase}s that are used by
- * {@link net.KabOOm356.Command.Commands.HelpCommand}.
+ * {@link HelpCommand}.
  */
 public abstract class HelpPhrases {
 	/**

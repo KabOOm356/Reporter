@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -8,6 +9,7 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.RespondPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ViewPhrases;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.Level;
@@ -22,6 +24,8 @@ import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -34,6 +38,9 @@ public class RespondCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.respond";
 
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(RespondPhrases.respondHelp, RespondPhrases.respondHelpDetails)}));
+	private static final List<String> aliases = Collections.emptyList();
+
 	/**
 	 * Constructor.
 	 *
@@ -41,8 +48,6 @@ public class RespondCommand extends ReporterCommand {
 	 */
 	public RespondCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-
-		updateDocumentation();
 	}
 
 	/**
@@ -105,6 +110,16 @@ public class RespondCommand extends ReporterCommand {
 			log.log(Level.ERROR, "Failed to respond to report!", e);
 			sender.sendMessage(getErrorMessage());
 		}
+	}
+
+	@Override
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
 	}
 
 	private void teleportToReport(final Player player, final int index, final String playerLoc) throws ClassNotFoundException, SQLException, InterruptedException {
@@ -235,17 +250,5 @@ public class RespondCommand extends ReporterCommand {
 
 			getManager().getModStatsManager().incrementStat(player, ModeratorStat.RESPONDED);
 		}
-	}
-
-	/**
-	 * Updates the documentation for the command.
-	 * <br/>
-	 * This should be called after the locale has changed.
-	 */
-	@Override
-	public void updateDocumentation() {
-		super.updateDocumentation(
-				getManager().getLocale().getString(RespondPhrases.respondHelp),
-				getManager().getLocale().getString(RespondPhrases.respondHelpDetails));
 	}
 }

@@ -5,7 +5,7 @@ import net.KabOOm356.Database.DatabaseType;
 import net.KabOOm356.Util.DatabaseUtil;
 import org.junit.Test;
 import org.mockito.Mock;
-import test.KabOOm356.PowerMockitoTest;
+import test.test.PowerMockitoTest;
 
 import static org.junit.Assert.*;
 import static org.powermock.api.mockito.PowerMockito.when;

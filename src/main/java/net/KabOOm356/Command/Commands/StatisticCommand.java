@@ -1,33 +1,39 @@
 package net.KabOOm356.Command.Commands;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.StatisticPhrases;
-import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Manager.SQLStatManager.SQLStat;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager.PlayerStat;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
-import net.KabOOm356.Util.ObjectPair;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class StatisticCommand extends ReporterCommand {
 	private final static String name = "Statistic";
 	private final static int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.statistic.*";
 
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{
+			new Usage(StatisticPhrases.statisticHelp, StatisticPhrases.statisticHelpDetails),
+			new Usage("/report statistic/stat list", StatisticPhrases.statisticListHelpDetails),
+			new Usage("/report statistic/stat <Player Name> all", StatisticPhrases.statisticAllHelpDetails),
+			new Usage("/report statistic/stat <Player Name> all mod|player", StatisticPhrases.statisticAllModPlayerHelpDetails)
+	}));
+	private static final List<String> aliases = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new String[]{"Stat"}));
+
 	public StatisticCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-
-		super.getAliases().add("Stat");
-
-		updateDocumentation();
 	}
 
 	private static String getStatisticNameString(final ArrayList<SQLStat> stats) {
@@ -127,6 +133,16 @@ public class StatisticCommand extends ReporterCommand {
 		}
 	}
 
+	@Override
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
+	}
+
 	private void displayStatistic(final CommandSender sender, final OfflinePlayer player,
 								  final SQLStat statistic) {
 		final ResultRow result = this.getStatistic(player, statistic);
@@ -202,41 +218,5 @@ public class StatisticCommand extends ReporterCommand {
 		}
 
 		return null;
-	}
-
-	@Override
-	public void updateDocumentation() {
-		final Locale locale = getManager().getLocale();
-		final ArrayList<ObjectPair<String, String>> usages = super.getUsages();
-
-		usages.clear();
-
-		String usage = locale.getString(StatisticPhrases.statisticHelp);
-		String description = locale.getString(StatisticPhrases.statisticHelpDetails);
-
-		ObjectPair<String, String> entry = new ObjectPair<String, String>(usage, description);
-
-		usages.add(entry);
-
-		usage = "/report statistic/stat list";
-		description = locale.getString(StatisticPhrases.statisticListHelpDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-
-		usages.add(entry);
-
-		usage = "/report statistic/stat <Player Name> all";
-		description = locale.getString(StatisticPhrases.statisticAllHelpDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-
-		usages.add(entry);
-
-		usage = "/report statistic/stat <Player Name> all mod|player";
-		description = locale.getString(StatisticPhrases.statisticAllModPlayerHelpDetails);
-
-		entry = new ObjectPair<String, String>(usage, description);
-
-		usages.add(entry);
 	}
 }

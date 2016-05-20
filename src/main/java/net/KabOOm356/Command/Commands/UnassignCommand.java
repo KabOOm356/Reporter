@@ -1,5 +1,6 @@
 package net.KabOOm356.Command.Commands;
 
+import net.KabOOm356.Command.Help.Usage;
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
@@ -7,6 +8,7 @@ import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.UnassignPhrases;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.LogManager;
@@ -18,6 +20,8 @@ import org.bukkit.command.CommandSender;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -30,6 +34,9 @@ public class UnassignCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 1;
 	private static final String permissionNode = "reporter.unassign";
 
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(UnassignPhrases.unassignHelp, UnassignPhrases.unassignHelpDetails)}));
+	private static final List<String> aliases = Collections.emptyList();
+
 	/**
 	 * Constructor.
 	 *
@@ -37,8 +44,6 @@ public class UnassignCommand extends ReporterCommand {
 	 */
 	public UnassignCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
-
-		updateDocumentation();
 	}
 
 	/**
@@ -89,6 +94,16 @@ public class UnassignCommand extends ReporterCommand {
 			log.error("Failed to unassign report!", e);
 			sender.sendMessage(getErrorMessage());
 		}
+	}
+
+	@Override
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
 	}
 
 	private void unassignReport(final CommandSender sender, final int index) throws ClassNotFoundException, SQLException, InterruptedException {
@@ -152,12 +167,5 @@ public class UnassignCommand extends ReporterCommand {
 
 			claimingPlayer.getPlayer().sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.RED + output);
 		}
-	}
-
-	@Override
-	public void updateDocumentation() {
-		super.updateDocumentation(
-				getManager().getLocale().getString(UnassignPhrases.unassignHelp),
-				getManager().getLocale().getString(UnassignPhrases.unassignHelpDetails));
 	}
 }
