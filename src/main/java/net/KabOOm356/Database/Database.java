@@ -2,8 +2,8 @@ package net.KabOOm356.Database;
 
 import net.KabOOm356.Database.Connection.*;
 import net.KabOOm356.Util.ArrayUtil;
+import net.KabOOm356.Util.DatabaseUtil;
 import net.KabOOm356.Util.FormattingUtil;
-import net.KabOOm356.Util.Util;
 import org.apache.commons.lang.Validate;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -360,88 +361,54 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 
 	@Override
 	public ResultSet preparedQuery(final Integer connectionId, final String query, final ArrayList<String> params) throws SQLException {
-		final int numberOfOccurrences = Util.countOccurrences(query, '?');
+		final PreparedStatement preparedStatement = prepareStatement(connectionId, query);
+		bindParametersToPreparedStatement(preparedStatement, query, params);
 
-		if (params.size() != numberOfOccurrences) {
-			final String builder = "Required number of parameters: " +
-					params.size() +
-					" got: " +
-					Integer.toString(numberOfOccurrences);
-			final IllegalArgumentException e = new IllegalArgumentException(builder);
+		try {
+			return preparedStatement.executeQuery();
+		} catch (final SQLException e) {
 			if (log.isDebugEnabled()) {
-				log.throwing(Level.WARN, e);
+				log.log(Level.WARN, "Failed to execute query!");
 			}
 			throw e;
-		} else {
-			final PreparedStatement preparedStatement = prepareStatement(connectionId, query);
-			try {
-				for (int LCV = 0; LCV < params.size(); LCV++) {
-					preparedStatement.setString(LCV + 1, params.get(LCV));
-				}
-			} catch (final SQLException e) {
-				if (log.isDebugEnabled()) {
-					log.log(Level.WARN, "Failed to set parameter to prepared query!");
-				}
-				throw e;
-			}
-
-			try {
-				return preparedStatement.executeQuery();
-			} catch (final SQLException e) {
-				if (log.isDebugEnabled()) {
-					log.log(Level.WARN, "Failed to execute query!");
-				}
-				throw e;
-			}
 		}
 	}
 
 	@Override
 	public void preparedUpdateQuery(final Integer connectionId, final String query, final ArrayList<String> params) throws SQLException {
-		final int numberOfOccurrences = Util.countOccurrences(query, '?');
-		if (params.size() == numberOfOccurrences) {
-			PreparedStatement preparedStatement = null;
-			try {
-				preparedStatement = prepareStatement(connectionId, query);
-				try {
-					for (int LCV = 0; LCV < params.size(); LCV++) {
-						preparedStatement.setString(LCV + 1, params.get(LCV));
-					}
-				} catch (final SQLException e) {
-					if (log.isDebugEnabled()) {
-						log.log(Level.WARN, "Failed to set parameter to prepared query!");
-					}
-					throw e;
-				}
+		PreparedStatement preparedStatement = null;
+		try {
+			preparedStatement = prepareStatement(connectionId, query);
+			bindParametersToPreparedStatement(preparedStatement, query, params);
 
-				try {
-					preparedStatement.executeUpdate();
-				} catch (final SQLException e) {
-					if (log.isDebugEnabled()) {
-						log.log(Level.WARN, "Failed to execute prepared query!");
-					}
-					throw e;
+			try {
+				preparedStatement.executeUpdate();
+			} catch (final SQLException e) {
+				if (log.isDebugEnabled()) {
+					log.log(Level.WARN, "Failed to execute prepared query!");
 				}
-			} finally {
-				try {
-					if (preparedStatement != null) {
-						preparedStatement.close();
-					}
-				} catch (final Exception e) {
-					if (log.isDebugEnabled()) {
-						log.log(Level.WARN, "Failed to close prepared statement!", e);
-					}
-				}
-				closeConnection(connectionId);
+				throw e;
 			}
-		} else {
-			final String builder = "Required number of parameters: " +
-					params.size() +
-					" got: " +
-					Integer.toString(numberOfOccurrences);
-			final IllegalArgumentException e = new IllegalArgumentException(builder);
+		} finally {
+			try {
+				if (preparedStatement != null) {
+					preparedStatement.close();
+				}
+			} catch (final Exception e) {
+				if (log.isDebugEnabled()) {
+					log.log(Level.WARN, "Failed to close prepared statement!", e);
+				}
+			}
+			closeConnection(connectionId);
+		}
+	}
+
+	private void bindParametersToPreparedStatement(final PreparedStatement preparedStatement, final String query, final List<String> parameters) throws SQLException {
+		try {
+			DatabaseUtil.bindParametersToPreparedStatement(preparedStatement, query, parameters);
+		} catch (final SQLException e) {
 			if (log.isDebugEnabled()) {
-				log.throwing(Level.WARN, e);
+				log.warn("Failed to bind parameters to prepared statement!");
 			}
 			throw e;
 		}
