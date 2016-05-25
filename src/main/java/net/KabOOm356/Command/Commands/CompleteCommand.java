@@ -161,7 +161,7 @@ public class CompleteCommand extends ReporterCommand {
 	}
 
 	private boolean isSummaryValid(final CommandSender sender, final String summary) {
-		if (!summary.equalsIgnoreCase("") || getManager().getConfig().getBoolean("general.canCompleteWithoutSummary", false)) {
+		if (!summary.isEmpty() || getManager().getConfig().getBoolean("general.canCompleteWithoutSummary", false)) {
 			return true;
 		}
 
