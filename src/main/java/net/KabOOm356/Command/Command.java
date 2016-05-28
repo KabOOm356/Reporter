@@ -5,6 +5,7 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Runnable.RunnableWithState;
 import net.KabOOm356.Runnable.TimedRunnable;
+import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.BukkitUtil;
 import org.apache.commons.lang.Validate;
 import org.apache.logging.log4j.LogManager;
@@ -60,7 +61,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 * @param sender The {@link CommandSender} whom is executing this command.
 	 * @param args   The given arguments from the {@link CommandSender}.
 	 */
-	public abstract void execute(CommandSender sender, ArrayList<String> args);
+	public abstract void execute(CommandSender sender, ArrayList<String> args) throws NoLastViewedReportException;
 
 	/**
 	 * Checks if the given {@link Player} has permission to run this command, or is OP.
@@ -198,6 +199,9 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 			start();
 			isRunning = true;
 			execute(sender, arguments);
+		} catch (final NoLastViewedReportException e) {
+			final String message = getManager().getLocale().getString(GeneralPhrases.noLastReport);
+			sender.sendMessage(message);
 		} finally {
 			isRunning = false;
 			isPendingToRun = false;

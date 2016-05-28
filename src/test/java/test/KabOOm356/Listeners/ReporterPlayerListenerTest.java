@@ -2,9 +2,9 @@ package test.KabOOm356.Listeners;
 
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Listeners.ReporterPlayerListener;
+import net.KabOOm356.Manager.LastViewedReportManager;
 import net.KabOOm356.Manager.MessageManager;
 import net.KabOOm356.Reporter.Reporter;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -12,11 +12,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import test.test.PowerMockitoTest;
 
-import java.util.HashMap;
 import java.util.UUID;
 
 import static org.mockito.Matchers.anyBoolean;
@@ -28,8 +26,8 @@ import static org.powermock.api.mockito.PowerMockito.*;
 @PrepareForTest(ReporterPlayerListener.class)
 public class ReporterPlayerListenerTest extends PowerMockitoTest {
 	private static final String playerName = "playerName";
-	@Spy
-	private final HashMap<CommandSender, Integer> lastViewed = new HashMap<CommandSender, Integer>();
+	@Mock
+	private LastViewedReportManager lastViewedReportManager;
 	@Mock
 	private Player player;
 	@Mock
@@ -52,7 +50,7 @@ public class ReporterPlayerListenerTest extends PowerMockitoTest {
 		joinEvent = spy(new PlayerJoinEvent(player, "JoinTest"));
 		quitEvent = spy(new PlayerQuitEvent(player, "QuitTest"));
 		when(messageManager.hasMessages(anyString())).thenReturn(false);
-		when(reporterCommandManager.getLastViewed()).thenReturn(lastViewed);
+		when(reporterCommandManager.getLastViewedReportManager()).thenReturn(lastViewedReportManager);
 		when(reporterCommandManager.getMessageManager()).thenReturn(messageManager);
 		when(reporter.getCommandManager()).thenReturn(reporterCommandManager);
 		when(configuration.getBoolean(anyString(), anyBoolean())).thenReturn(false);
@@ -61,17 +59,10 @@ public class ReporterPlayerListenerTest extends PowerMockitoTest {
 	}
 
 	@Test
-	public void testOnPlayerJoin() {
-		listener.onPlayerJoin(joinEvent);
-		verify(lastViewed).put(player, -1);
-	}
-
-	@Test
 	public void testOnPlayerJoinListOnLogin() throws Exception {
 		when(configuration.getBoolean("general.messaging.listOnLogin.listOnLogin", true)).thenReturn(true);
 		doNothing().when(listener, "listOnLogin", player);
 		listener.onPlayerJoin(joinEvent);
-		verify(lastViewed).put(player, -1);
 		verifyPrivate(listener).invoke("listOnLogin", player);
 	}
 
@@ -80,7 +71,6 @@ public class ReporterPlayerListenerTest extends PowerMockitoTest {
 		when(messageManager.hasMessages(player.getUniqueId().toString())).thenReturn(true);
 		doNothing().when(listener, "sendMessages", player);
 		listener.onPlayerJoin(joinEvent);
-		verify(lastViewed).put(player, -1);
 		verifyPrivate(listener).invoke("sendMessages", player);
 	}
 
@@ -89,7 +79,6 @@ public class ReporterPlayerListenerTest extends PowerMockitoTest {
 		when(messageManager.hasMessages(player.getName())).thenReturn(true);
 		doNothing().when(listener, "sendMessages", player);
 		listener.onPlayerJoin(joinEvent);
-		verify(lastViewed).put(player, -1);
 		verifyPrivate(listener).invoke("sendMessages", player);
 	}
 
@@ -97,7 +86,6 @@ public class ReporterPlayerListenerTest extends PowerMockitoTest {
 	public void testOnPlayerJoinAlertEnabled() {
 		when(configuration.getBoolean("general.messaging.alerts.reportedPlayerLogin.enabled", true)).thenReturn(true);
 		listener.onPlayerJoin(joinEvent);
-		verify(lastViewed).put(player, -1);
 	}
 
 	@Test
@@ -107,7 +95,6 @@ public class ReporterPlayerListenerTest extends PowerMockitoTest {
 		doReturn(true).when(listener, "isPlayerReported", player);
 		doNothing().when(listener, "alertThatReportedPlayerLogin", player);
 		listener.onPlayerJoin(joinEvent);
-		verify(lastViewed).put(player, -1);
 		verifyPrivate(listener).invoke("isPlayerReported", player);
 		verifyPrivate(listener).invoke("alertThatReportedPlayerLogin", player);
 	}
@@ -119,7 +106,6 @@ public class ReporterPlayerListenerTest extends PowerMockitoTest {
 		doReturn(true).when(listener, "isPlayerReported", player);
 		doNothing().when(listener, "alertThatReportedPlayerLogin", player);
 		listener.onPlayerJoin(joinEvent);
-		verify(lastViewed).put(player, -1);
 		verifyPrivate(listener).invoke("isPlayerReported", player);
 		verifyPrivate(listener).invoke("alertThatReportedPlayerLogin", player);
 	}
@@ -130,7 +116,6 @@ public class ReporterPlayerListenerTest extends PowerMockitoTest {
 		when(configuration.getBoolean("general.messaging.alerts.reportedPlayerLogin.toPlayer", true)).thenReturn(true);
 		when(configuration.getBoolean("general.messaging.alerts.reportedPlayerLogin.toConsole", true)).thenReturn(true);
 		listener.onPlayerJoin(joinEvent);
-		verify(lastViewed).put(player, -1);
 		verifyPrivate(listener, never()).invoke("isPlayerReported", player);
 		verifyPrivate(listener, never()).invoke("alertThatReportedPlayerLogin", player);
 	}
@@ -142,7 +127,6 @@ public class ReporterPlayerListenerTest extends PowerMockitoTest {
 		when(configuration.getBoolean("general.messaging.alerts.reportedPlayerLogin.toConsole", true)).thenReturn(true);
 		doReturn(false).when(listener, "isPlayerReported", player);
 		listener.onPlayerJoin(joinEvent);
-		verify(lastViewed).put(player, -1);
 		verifyPrivate(listener).invoke("isPlayerReported", player);
 		verifyPrivate(listener, never()).invoke("alertThatReportedPlayerLogin", player);
 	}
@@ -150,6 +134,6 @@ public class ReporterPlayerListenerTest extends PowerMockitoTest {
 	@Test
 	public void testOnPlayerQuit() {
 		listener.onPlayerQuit(quitEvent);
-		verify(lastViewed).remove(player);
+		verify(lastViewedReportManager).removeLastViewedReport(player);
 	}
 }

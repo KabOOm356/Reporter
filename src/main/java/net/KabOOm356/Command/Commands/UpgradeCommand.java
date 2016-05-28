@@ -7,8 +7,8 @@ import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.UpgradePhrases;
 import net.KabOOm356.Permission.ModLevel;
+import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.ArrayUtil;
-import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
@@ -60,21 +60,13 @@ public class UpgradeCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) {
+	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;
 			}
 
-			int index = Util.parseInt(args.get(0));
-
-			if (args.get(0).equalsIgnoreCase("last")) {
-				if (!hasRequiredLastViewed(sender)) {
-					return;
-				}
-
-				index = getLastViewed(sender);
-			}
+			final int index = getManager().getLastViewedReportManager().getIndexOrLastViewedReport(sender, args.get(0));
 
 			if (!getManager().isReportIndexValid(sender, index)) {
 				return;

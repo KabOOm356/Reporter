@@ -10,6 +10,7 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.ClaimPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.HelpPhrases;
 import net.KabOOm356.Locale.Locale;
+import net.KabOOm356.Manager.LastViewedReportManager;
 import net.KabOOm356.Manager.MessageManager;
 import net.KabOOm356.Manager.ReportLimitManager;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager;
@@ -46,12 +47,12 @@ public class ReporterCommandManager implements CommandExecutor {
 	private static final Logger log = LogManager.getLogger(ReporterCommandManager.class);
 
 	private final Reporter plugin;
-	private final HashMap<CommandSender, Integer> lastViewed = new HashMap<CommandSender, Integer>();
 	private final MessageManager messageManager;
 	private final ReporterPermissionManager permissionManager;
 	private final ReportLimitManager limitManager;
 	private final ModeratorStatManager modStatsManager;
 	private final PlayerStatManager playerStatsManager;
+	private final LastViewedReportManager lastViewedReportManager;
 	private final HelpCommand reportHelp;
 	private final HelpCommand respondHelp;
 	private LinkedHashMap<String, ReporterCommand> reportCommands;
@@ -76,6 +77,8 @@ public class ReporterCommandManager implements CommandExecutor {
 		modStatsManager = new ModeratorStatManager(plugin.getDatabaseHandler());
 		playerStatsManager = new PlayerStatManager(plugin.getDatabaseHandler());
 
+		lastViewedReportManager = new LastViewedReportManager();
+
 		initCommands();
 
 		final HelpCommandDisplay.Builder reportHelpDisplayBuilder = new HelpCommandDisplay.Builder();
@@ -92,12 +95,6 @@ public class ReporterCommandManager implements CommandExecutor {
 				.setHint(GeneralPhrases.tryRespondHelp);
 		final HelpCommandDisplay respondHelpDisplay = respondHelpDisplayBuilder.build();
 		respondHelp = new HelpCommand(getLocale(), getRespondCommands().values(), respondHelpDisplay);
-
-		lastViewed.put(plugin.getServer().getConsoleSender(), -1);
-
-		for (final Player player : Bukkit.getOnlinePlayers()) {
-			lastViewed.put(player, -1);
-		}
 	}
 
 	private void initCommands() {
@@ -937,8 +934,8 @@ public class ReporterCommandManager implements CommandExecutor {
 		return limitManager;
 	}
 
-	public HashMap<CommandSender, Integer> getLastViewed() {
-		return lastViewed;
+	public LastViewedReportManager getLastViewedReportManager() {
+		return lastViewedReportManager;
 	}
 
 	public MessageManager getMessageManager() {

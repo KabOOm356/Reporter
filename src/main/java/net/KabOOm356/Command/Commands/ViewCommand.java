@@ -10,9 +10,9 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.ListPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ViewPhrases;
 import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Permission.ModLevel;
+import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
-import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -103,7 +103,7 @@ public class ViewCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) {
+	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException {
 		try {
 			if (hasPermission(sender)) {
 				if (args.get(0).equalsIgnoreCase("all")) {
@@ -131,19 +131,9 @@ public class ViewCommand extends ReporterCommand {
 						viewClaimed(sender, displayRealName(args, 1));
 					}
 				} else {
-					final int index;
-
-					if (args.get(0).equalsIgnoreCase("last")) {
-						if (!hasRequiredLastViewed(sender)) {
-							return;
-						}
-						index = getLastViewed(sender);
-					} else {
-						index = Util.parseInt(args.get(0));
-
-						if (!getManager().isReportIndexValid(sender, index)) {
-							return;
-						}
+					final int index = getManager().getLastViewedReportManager().getIndexOrLastViewedReport(sender, args.get(0));
+					if (!getManager().isReportIndexValid(sender, index)) {
+						return;
 					}
 					viewReport(sender, index, displayRealName(args, 1));
 				}
@@ -156,18 +146,10 @@ public class ViewCommand extends ReporterCommand {
 					throw e;
 				}
 
-				final int index;
+				final int index = getManager().getLastViewedReportManager().getIndexOrLastViewedReport(sender, args.get(0));
 
-				if (args.get(0).equalsIgnoreCase("last")) {
-					if (!hasRequiredLastViewed(sender)) {
-						return;
-					}
-					index = getLastViewed(sender);
-				} else {
-					index = Util.parseInt(args.get(0));
-					if (!getManager().isReportIndexValid(sender, index)) {
-						return;
-					}
+				if (!getManager().isReportIndexValid(sender, index)) {
+					return;
 				}
 
 				if (indexes.contains(index)) {
@@ -615,7 +597,7 @@ public class ViewCommand extends ReporterCommand {
 				completionStatus,
 				completedBy, completionDate, summaryDetails);
 
-		getManager().getLastViewed().put(sender, index);
+		getManager().getLastViewedReportManager().playerViewed(sender, index);
 	}
 
 	private void quickViewCompleted(final CommandSender sender, final String[][] reports) {

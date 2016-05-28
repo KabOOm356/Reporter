@@ -53,8 +53,6 @@ public class ReporterPlayerListener implements Listener {
 	public void onPlayerJoin(final PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
 
-		plugin.getCommandManager().getLastViewed().put(player, -1);
-
 		final MessageManager messageManager = plugin.getCommandManager().getMessageManager();
 
 		if (messageManager.hasMessages(player.getUniqueId().toString()) || messageManager.hasMessages(player.getName())) {
@@ -84,7 +82,7 @@ public class ReporterPlayerListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerQuit(final PlayerQuitEvent event) {
-		plugin.getCommandManager().getLastViewed().remove(event.getPlayer());
+		plugin.getCommandManager().getLastViewedReportManager().removeLastViewedReport(event.getPlayer());
 	}
 
 	private void listOnLogin(final Player player) {

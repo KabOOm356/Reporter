@@ -12,6 +12,7 @@ import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
@@ -29,7 +30,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map.Entry;
 
 /**
  * A {@link ReporterCommand} that will handle deleting reports.
@@ -80,7 +80,7 @@ public class DeleteCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) {
+	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;
@@ -95,16 +95,7 @@ public class DeleteCommand extends ReporterCommand {
 				deletionCount = deleteReportBatch(sender, BatchDeletionType.INCOMPLETE);
 			} else {
 				if (Util.isInteger(args.get(0)) || args.get(0).equalsIgnoreCase("last")) {
-					final int index;
-
-					if (args.get(0).equalsIgnoreCase("last")) {
-						if (!hasRequiredLastViewed(sender)) {
-							return;
-						}
-						index = getLastViewed(sender);
-					} else {
-						index = Util.parseInt(args.get(0));
-					}
+					final int index = getManager().getLastViewedReportManager().getIndexOrLastViewedReport(sender, args.get(0));
 
 					if (!getManager().isReportIndexValid(sender, index)) {
 						return;
@@ -535,23 +526,11 @@ public class DeleteCommand extends ReporterCommand {
 	}
 
 	private void updateLastViewed(final int removedIndex) {
-		for (final Entry<CommandSender, Integer> e : getManager().getLastViewed().entrySet()) {
-			if (e.getValue() == removedIndex) {
-				e.setValue(-1);
-			} else if (e.getValue() > removedIndex) {
-				e.setValue(e.getValue() - 1);
-			}
-		}
+		getManager().getLastViewedReportManager().deleteIndex(removedIndex);
 	}
 
 	private void updateLastViewed(final ArrayList<Integer> remainingIndexes) {
-		for (final Entry<CommandSender, Integer> e : getManager().getLastViewed().entrySet()) {
-			if (remainingIndexes.contains(e.getValue())) {
-				e.setValue(remainingIndexes.indexOf(e.getValue()) + 1);
-			} else {
-				e.setValue(-1);
-			}
-		}
+		getManager().getLastViewedReportManager().deleteBatch(remainingIndexes);
 	}
 
 	private void reformatTables(final CommandSender sender, final ArrayList<Integer> remainingIndexes) throws Exception {
