@@ -9,7 +9,7 @@ import net.KabOOm356.Util.FormattingUtil;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Handler for a {@link Database}.
@@ -117,7 +117,7 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 	}
 
 	@Override
-	public ArrayList<String> getColumnNames(final String table) throws SQLException, ClassNotFoundException, InterruptedException {
+	public List<String> getColumnNames(final String table) throws SQLException, ClassNotFoundException, InterruptedException {
 		return database.getColumnNames(table);
 	}
 
@@ -137,12 +137,12 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 	}
 
 	@Override
-	public ResultSet preparedQuery(final String query, final ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
+	public ResultSet preparedQuery(final String query, final List<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
 		return database.preparedQuery(query, params);
 	}
 
 	@Override
-	public void preparedUpdateQuery(final String query, final ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
+	public void preparedUpdateQuery(final String query, final List<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
 		database.preparedUpdateQuery(query, params);
 	}
 
@@ -189,12 +189,12 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 	}
 
 	@Override
-	public ResultSet preparedQuery(final Integer connectionId, final String query, final ArrayList<String> params) throws SQLException {
+	public ResultSet preparedQuery(final Integer connectionId, final String query, final List<String> params) throws SQLException {
 		return database.preparedQuery(connectionId, query, params);
 	}
 
 	@Override
-	public void preparedUpdateQuery(final Integer connectionId, final String query, final ArrayList<String> params) throws SQLException {
+	public void preparedUpdateQuery(final Integer connectionId, final String query, final List<String> params) throws SQLException {
 		database.preparedUpdateQuery(connectionId, query, params);
 	}
 
@@ -204,7 +204,7 @@ public class DatabaseHandler implements DatabaseInterface, ConnectionPooledDatab
 	}
 
 	@Override
-	public ArrayList<String> getColumnNames(final Integer connectionId, final String table) throws SQLException {
+	public List<String> getColumnNames(final Integer connectionId, final String table) throws SQLException {
 		return database.getColumnNames(connectionId, table);
 	}
 

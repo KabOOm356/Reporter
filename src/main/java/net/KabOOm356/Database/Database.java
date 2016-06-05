@@ -207,13 +207,13 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	}
 
 	@Override
-	public ResultSet preparedQuery(final String query, final ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
+	public ResultSet preparedQuery(final String query, final List<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
 		openNonPooledConnection();
 		return preparedQuery(localConnectionId, query, params);
 	}
 
 	@Override
-	public void preparedUpdateQuery(final String query, final ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
+	public void preparedUpdateQuery(final String query, final List<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
 		openNonPooledConnection();
 		preparedUpdateQuery(localConnectionId, query, params);
 	}
@@ -225,7 +225,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	}
 
 	@Override
-	public ArrayList<String> getColumnNames(final String table) throws SQLException, ClassNotFoundException, InterruptedException {
+	public List<String> getColumnNames(final String table) throws SQLException, ClassNotFoundException, InterruptedException {
 		openNonPooledConnection();
 		return getColumnNames(localConnectionId, table);
 	}
@@ -360,7 +360,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	}
 
 	@Override
-	public ResultSet preparedQuery(final Integer connectionId, final String query, final ArrayList<String> params) throws SQLException {
+	public ResultSet preparedQuery(final Integer connectionId, final String query, final List<String> params) throws SQLException {
 		final PreparedStatement preparedStatement = prepareStatement(connectionId, query);
 		bindParametersToPreparedStatement(preparedStatement, query, params);
 
@@ -375,7 +375,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	}
 
 	@Override
-	public void preparedUpdateQuery(final Integer connectionId, final String query, final ArrayList<String> params) throws SQLException {
+	public void preparedUpdateQuery(final Integer connectionId, final String query, final List<String> params) throws SQLException {
 		PreparedStatement preparedStatement = null;
 		try {
 			preparedStatement = prepareStatement(connectionId, query);
@@ -459,8 +459,8 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	}
 
 	@Override
-	public ArrayList<String> getColumnNames(final Integer connectionId, final String table) throws SQLException {
-		final ArrayList<String> col = new ArrayList<String>();
+	public List<String> getColumnNames(final Integer connectionId, final String table) throws SQLException {
+		final List<String> col = new ArrayList<String>();
 		ResultSet rs = null;
 		try {
 			rs = getColumnMetaData(connectionId, table);

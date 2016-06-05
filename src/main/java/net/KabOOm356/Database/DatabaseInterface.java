@@ -1,7 +1,7 @@
 package net.KabOOm356.Database;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.List;
 
 public interface DatabaseInterface {
 	void openConnection() throws ClassNotFoundException, SQLException, InterruptedException;
@@ -42,7 +42,7 @@ public interface DatabaseInterface {
 	 * @throws InterruptedException
 	 * @throws IllegalArgumentException If the number of parameters given do not match the number of parameters required.
 	 */
-	ResultSet preparedQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException;
+	ResultSet preparedQuery(String query, List<String> params) throws ClassNotFoundException, SQLException, InterruptedException;
 
 	/**
 	 * Attempts to perform a query on the database that returns no data.
@@ -54,7 +54,7 @@ public interface DatabaseInterface {
 	 * @throws InterruptedException
 	 * @throws IllegalArgumentException If the number of parameters given do not match the number of parameters required.
 	 */
-	void preparedUpdateQuery(String query, ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException;
+	void preparedUpdateQuery(String query, List<String> params) throws ClassNotFoundException, SQLException, InterruptedException;
 
 	/**
 	 * Checks the database if a table exists.
@@ -71,12 +71,12 @@ public interface DatabaseInterface {
 	 * Returns the columns in a table.
 	 *
 	 * @param table The name of the table to get the columns from.
-	 * @return An {@link ArrayList} containing the names of the columns.
+	 * @return A {@link List} containing the names of the columns.
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
 	 * @throws InterruptedException
 	 */
-	ArrayList<String> getColumnNames(String table) throws SQLException, ClassNotFoundException, InterruptedException;
+	List<String> getColumnNames(String table) throws SQLException, ClassNotFoundException, InterruptedException;
 
 	/**
 	 * Returns the database's meta data.

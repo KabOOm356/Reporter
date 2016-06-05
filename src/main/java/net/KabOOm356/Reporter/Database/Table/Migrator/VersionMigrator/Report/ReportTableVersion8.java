@@ -14,7 +14,7 @@ import org.bukkit.OfflinePlayer;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 public class ReportTableVersion8 extends DatabaseTableVersionMigrator {
 	private static final Logger log = LogManager.getLogger(ReportTableVersion8.class);
@@ -97,7 +97,7 @@ public class ReportTableVersion8 extends DatabaseTableVersionMigrator {
 		startTransaction();
 		final Integer connectionId = getConnectionId();
 		if (getDatabase().checkTable(connectionId, "Reports")) {
-			final ArrayList<String> columns = getDatabase().getColumnNames(connectionId, "Reports");
+			final List<String> columns = getDatabase().getColumnNames(connectionId, "Reports");
 
 			return !columns.contains("SenderUUID") &&
 					!columns.contains("ReportedUUID") &&

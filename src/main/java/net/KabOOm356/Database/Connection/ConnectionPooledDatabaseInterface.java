@@ -1,7 +1,7 @@
 package net.KabOOm356.Database.Connection;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A database that can have multiple connections in use at the same time.
@@ -56,7 +56,7 @@ public interface ConnectionPooledDatabaseInterface {
 	 * @throws SQLException
 	 * @throws IllegalArgumentException If the number of parameters given do not match the number of parameters required.
 	 */
-	ResultSet preparedQuery(Integer connectionId, String query, ArrayList<String> params) throws SQLException;
+	ResultSet preparedQuery(Integer connectionId, String query, List<String> params) throws SQLException;
 
 	/**
 	 * Attempts to perform a query on the database that returns no data.
@@ -67,7 +67,7 @@ public interface ConnectionPooledDatabaseInterface {
 	 * @throws SQLException
 	 * @throws IllegalArgumentException If the number of parameters given do not match the number of parameters required.
 	 */
-	void preparedUpdateQuery(Integer connectionId, String query, ArrayList<String> params) throws SQLException;
+	void preparedUpdateQuery(Integer connectionId, String query, List<String> params) throws SQLException;
 
 	/**
 	 * Checks the database if a table exists.
@@ -84,10 +84,10 @@ public interface ConnectionPooledDatabaseInterface {
 	 *
 	 * @param connectionId The id of the connection to execute on.
 	 * @param table        The name of the table to get the columns from.
-	 * @return An {@link ArrayList} containing the names of the columns.
+	 * @return A {@link List} containing the names of the columns.
 	 * @throws SQLException
 	 */
-	ArrayList<String> getColumnNames(Integer connectionId, String table) throws SQLException;
+	List<String> getColumnNames(Integer connectionId, String table) throws SQLException;
 
 	/**
 	 * Returns the database's meta data.

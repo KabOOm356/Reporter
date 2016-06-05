@@ -5,7 +5,7 @@ import net.KabOOm356.Database.Table.DatabaseTableCreator;
 import net.KabOOm356.Database.Table.Version.DatabaseTableVersionMigrator;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 public class ReportTableVersion7 extends DatabaseTableVersionMigrator {
 	private static final String version = "7";
@@ -63,7 +63,7 @@ public class ReportTableVersion7 extends DatabaseTableVersionMigrator {
 	public boolean needsMigration() throws ClassNotFoundException, SQLException, InterruptedException {
 		startTransaction();
 		if (getDatabase().checkTable(getConnectionId(), "reports")) {
-			final ArrayList<String> columnNames = getDatabase().getColumnNames(getConnectionId(), "reports");
+			final List<String> columnNames = getDatabase().getColumnNames(getConnectionId(), "reports");
 
 			return !columnNames.contains("ClaimStatus") &&
 					!columnNames.contains("ClaimDate") &&

@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An class that extends the functionality of {@link DatabaseHandler}.
@@ -87,10 +87,9 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 * @throws InterruptedException
-	 * @see net.KabOOm356.Database.DatabaseHandler#preparedQuery(String,
-	 * ArrayList)
+	 * @see net.KabOOm356.Database.DatabaseHandler#preparedQuery(String, List)
 	 */
-	public SQLResultSet preparedSQLQuery(final String query, final ArrayList<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
+	public SQLResultSet preparedSQLQuery(final String query, final List<String> params) throws ClassNotFoundException, SQLException, InterruptedException {
 		ResultSet resultSet = null;
 
 		try {
@@ -117,8 +116,7 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 	 * Returns the {@link Database}'s column meta data.
 	 *
 	 * @param table The name of the table to get the meta data for.
-	 * @return An {@link SQLResultSet} containing the database's column meta
-	 * data.
+	 * @return An {@link SQLResultSet} containing the database's column meta data.
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 * @throws InterruptedException
@@ -186,10 +184,9 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 	 * @param params       The parameters of the query.
 	 * @return A {@link SQLResultSet} containing the results
 	 * @throws SQLException
-	 * @see net.KabOOm356.Database.DatabaseHandler#preparedQuery(Integer, String,
-	 * ArrayList)
+	 * @see net.KabOOm356.Database.DatabaseHandler#preparedQuery(Integer, String, List)
 	 */
-	public SQLResultSet preparedSQLQuery(final int connectionId, final String query, final ArrayList<String> params) throws SQLException {
+	public SQLResultSet preparedSQLQuery(final int connectionId, final String query, final List<String> params) throws SQLException {
 		ResultSet resultSet = null;
 		try {
 			resultSet = super.preparedQuery(connectionId, query, params);
@@ -215,8 +212,7 @@ public class ExtendedDatabaseHandler extends DatabaseHandler {
 	 *
 	 * @param connectionId The id of the connection to execute on.
 	 * @param table        The name of the table to get the meta data for.
-	 * @return An {@link SQLResultSet} containing the database's column meta
-	 * data.
+	 * @return An {@link SQLResultSet} containing the database's column meta data.
 	 * @throws SQLException
 	 */
 	public SQLResultSet getSQLColumnMetaData(final int connectionId, final String table) throws SQLException {
