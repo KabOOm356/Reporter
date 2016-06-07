@@ -1,4 +1,4 @@
-package net.KabOOm356.Manager;
+package net.KabOOm356.Service;
 
 import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.BukkitUtil;
@@ -6,31 +6,32 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Spy;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.test.PowerMockitoTest;
+import test.test.service.ServiceTest;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.powermock.api.mockito.PowerMockito.*;
 
-@PrepareForTest({LastViewedReportManager.class, BukkitUtil.class, Bukkit.class})
-public class LastViewedReportManagerTest extends PowerMockitoTest {
-	private static final int noLastViewedIndex = LastViewedReportManager.noLastViewedIndex;
-	private static final String lastViewedIndex = LastViewedReportManager.lastViewedIndex;
-	@Spy
-	private final HashMap<CommandSender, Integer> lastViewed = new HashMap<CommandSender, Integer>();
-	private LastViewedReportManager manager;
+@PrepareForTest({LastViewedReportService.class, BukkitUtil.class, Bukkit.class})
+public class LastViewedReportServiceTest extends ServiceTest {
+	private static final int noLastViewedIndex = LastViewedReportService.noLastViewedIndex;
+	private static final String lastViewedIndex = LastViewedReportService.lastViewedIndex;
+	private Map<CommandSender, Integer> lastViewed;
+	private LastViewedReportService manager;
 
+	@Override
 	@Before
 	public void setupMocks() throws Exception {
+		super.setupMocks();
+
 		mockStatic(Bukkit.class);
 		mockStatic(BukkitUtil.class);
-		whenNew(HashMap.class).withAnyArguments().thenReturn(lastViewed);
-		manager = spy(new LastViewedReportManager());
+		lastViewed = super.getLastViewedHandler();
+		manager = spy(new LastViewedReportService(getModule()));
 	}
 
 	@Test
@@ -311,7 +312,7 @@ public class LastViewedReportManagerTest extends PowerMockitoTest {
 
 	/**
 	 * Method to help verify if the sender has a last viewed report.
-	 * The logic of the should match or be similar to the logic in {@link LastViewedReportManager#hasLastViewed(CommandSender)}.
+	 * The logic of the should match or be similar to the logic in {@link LastViewedReportService#hasLastViewed(CommandSender)}.
 	 * But for testing purposes we should not rely on the manager logic.
 	 */
 	private boolean hasLastViewed(final CommandSender sender) {

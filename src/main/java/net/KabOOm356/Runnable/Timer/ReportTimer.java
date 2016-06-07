@@ -1,6 +1,6 @@
 package net.KabOOm356.Runnable.Timer;
 
-import net.KabOOm356.Manager.ReportLimitManager;
+import net.KabOOm356.Service.ReportLimitService;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -12,7 +12,7 @@ import java.util.Comparator;
  * <br /><br />
  * This class helps with the report limiting of {@link Player}.
  *
- * @see ReportLimitManager
+ * @see ReportLimitService
  */
 public class ReportTimer extends Thread implements Comparable<ReportTimer> {
 	/**
@@ -26,7 +26,7 @@ public class ReportTimer extends Thread implements Comparable<ReportTimer> {
 	/**
 	 * The manager that will be reported to when this thread 'expires'.
 	 */
-	private ReportLimitManager manager;
+	private ReportLimitService manager;
 	/**
 	 * The {@link Player} that has submitted a report.
 	 */
@@ -51,11 +51,11 @@ public class ReportTimer extends Thread implements Comparable<ReportTimer> {
 	/**
 	 * Initializes values for this thread.
 	 *
-	 * @param manager       The {@link ReportLimitManager} to report to when finished.
+	 * @param manager       The {@link ReportLimitService} to report to when finished.
 	 * @param player        The {@link Player} that has submitted a report that is being tracked.
 	 * @param executionTime When this thread should *Hopefully* be executed by the thread manager.
 	 */
-	public void init(final ReportLimitManager manager, final Player player, final OfflinePlayer reported, final long executionTime) {
+	public void init(final ReportLimitService manager, final Player player, final OfflinePlayer reported, final long executionTime) {
 		this.manager = manager;
 		this.player = player;
 		this.reported = reported;

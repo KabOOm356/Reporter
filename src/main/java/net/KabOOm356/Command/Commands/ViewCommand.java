@@ -10,6 +10,8 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.ListPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ViewPhrases;
 import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Permission.ModLevel;
+import net.KabOOm356.Throwable.IndexNotANumberException;
+import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
@@ -103,7 +105,7 @@ public class ViewCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException {
+	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (hasPermission(sender)) {
 				if (args.get(0).equalsIgnoreCase("all")) {
@@ -131,14 +133,14 @@ public class ViewCommand extends ReporterCommand {
 						viewClaimed(sender, displayRealName(args, 1));
 					}
 				} else {
-					final int index = getManager().getLastViewedReportManager().getIndexOrLastViewedReport(sender, args.get(0));
+					final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 					if (!getManager().isReportIndexValid(sender, index)) {
 						return;
 					}
 					viewReport(sender, index, displayRealName(args, 1));
 				}
 			} else if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true)) {
-				ArrayList<Integer> indexes = null;
+				List<Integer> indexes = null;
 				try {
 					indexes = getManager().getViewableReports(sender);
 				} catch (final Exception e) {
@@ -146,7 +148,7 @@ public class ViewCommand extends ReporterCommand {
 					throw e;
 				}
 
-				final int index = getManager().getLastViewedReportManager().getIndexOrLastViewedReport(sender, args.get(0));
+				final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
 				if (!getManager().isReportIndexValid(sender, index)) {
 					return;
@@ -369,7 +371,7 @@ public class ViewCommand extends ReporterCommand {
 		return displayRealName;
 	}
 
-	private void displayAvailableReports(final CommandSender sender, final ArrayList<Integer> indexes) {
+	private void displayAvailableReports(final CommandSender sender, final List<Integer> indexes) {
 		final String indexesString = ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE);
 		final Locale locale = getManager().getLocale();
 
@@ -597,7 +599,7 @@ public class ViewCommand extends ReporterCommand {
 				completionStatus,
 				completedBy, completionDate, summaryDetails);
 
-		getManager().getLastViewedReportManager().playerViewed(sender, index);
+		getManager().getLastViewedReportService().playerViewed(sender, index);
 	}
 
 	private void quickViewCompleted(final CommandSender sender, final String[][] reports) {

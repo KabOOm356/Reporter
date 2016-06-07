@@ -1,4 +1,4 @@
-package net.KabOOm356.Manager;
+package net.KabOOm356.Service;
 
 import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.BukkitUtil;
@@ -6,15 +6,16 @@ import net.KabOOm356.Util.Util;
 import org.apache.commons.lang.Validate;
 import org.bukkit.command.CommandSender;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LastViewedReportManager {
+public class LastViewedReportService extends Service {
 	public static final int noLastViewedIndex = -1;
 	public static final String lastViewedIndex = "last";
 
-	private final Map<CommandSender, Integer> lastViewed = new HashMap<CommandSender, Integer>();
+	protected LastViewedReportService(final ServiceModule module) {
+		super(module);
+	}
 
 	private static int getIndex(final String index) {
 		return Util.parseInt(index);
@@ -114,6 +115,6 @@ public class LastViewedReportManager {
 	}
 
 	private Map<CommandSender, Integer> getLastViewed() {
-		return lastViewed;
+		return getStore().getLastViewedStore().get();
 	}
 }

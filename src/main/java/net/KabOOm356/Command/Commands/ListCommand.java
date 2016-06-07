@@ -99,7 +99,7 @@ public class ListCommand extends ReporterCommand {
 				sender.sendMessage(getErrorMessage());
 			}
 		} else if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true)) {
-			ArrayList<Integer> indexes = null;
+			final List<Integer> indexes;
 			try {
 				indexes = getManager().getViewableReports(sender);
 			} catch (final Exception e) {
@@ -351,10 +351,10 @@ public class ListCommand extends ReporterCommand {
 	}
 
 	private void listPriorityIndexes(final CommandSender sender) {
-		final ArrayList<Integer> noPriorityIndexes;
-		final ArrayList<Integer> lowPriorityIndexes;
-		final ArrayList<Integer> normalPriorityIndexes;
-		final ArrayList<Integer> highPriorityIndexes;
+		final List<Integer> noPriorityIndexes;
+		final List<Integer> lowPriorityIndexes;
+		final List<Integer> normalPriorityIndexes;
+		final List<Integer> highPriorityIndexes;
 
 		try {
 			noPriorityIndexes = getManager().getIndexesOfPriority(ModLevel.NONE);
@@ -373,7 +373,7 @@ public class ListCommand extends ReporterCommand {
 		printPriorityIndexes(sender, ModLevel.HIGH, highPriorityIndexes);
 	}
 
-	private void printPriorityIndexes(final CommandSender sender, final ModLevel level, final ArrayList<Integer> indexes) {
+	private void printPriorityIndexes(final CommandSender sender, final ModLevel level, final List<Integer> indexes) {
 		final String format;
 		String output;
 
@@ -422,8 +422,8 @@ public class ListCommand extends ReporterCommand {
 	}
 
 	private void listIndexes(final CommandSender sender) {
-		final ArrayList<Integer> completeIndexes;
-		final ArrayList<Integer> incompleteIndexes;
+		final List<Integer> completeIndexes;
+		final List<Integer> incompleteIndexes;
 		try {
 			completeIndexes = getManager().getCompletedReportIndexes();
 			incompleteIndexes = getManager().getIncompleteReportIndexes();

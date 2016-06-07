@@ -5,6 +5,8 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Runnable.RunnableWithState;
 import net.KabOOm356.Runnable.TimedRunnable;
+import net.KabOOm356.Throwable.IndexNotANumberException;
+import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.BukkitUtil;
 import org.apache.commons.lang.Validate;
@@ -61,7 +63,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 * @param sender The {@link CommandSender} whom is executing this command.
 	 * @param args   The given arguments from the {@link CommandSender}.
 	 */
-	public abstract void execute(CommandSender sender, ArrayList<String> args) throws NoLastViewedReportException;
+	public abstract void execute(CommandSender sender, ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException;
 
 	/**
 	 * Checks if the given {@link Player} has permission to run this command, or is OP.
@@ -201,6 +203,12 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 			execute(sender, arguments);
 		} catch (final NoLastViewedReportException e) {
 			final String message = getManager().getLocale().getString(GeneralPhrases.noLastReport);
+			sender.sendMessage(message);
+		} catch (final IndexNotANumberException e) {
+			final String message = getManager().getLocale().getString(GeneralPhrases.indexInt);
+			sender.sendMessage(message);
+		} catch (final IndexOutOfRangeException e) {
+			final String message = getManager().getLocale().getString(GeneralPhrases.indexRange);
 			sender.sendMessage(message);
 		} finally {
 			isRunning = false;

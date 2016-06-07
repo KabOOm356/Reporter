@@ -5,6 +5,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.IllegalPluginAccessException;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -15,6 +18,7 @@ import java.util.UUID;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.*;
 
 @SuppressWarnings("deprecation")
@@ -521,5 +525,37 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		assertNull(BukkitUtil.matchOfflinePlayer("no player"));
 		assertNull(BukkitUtil.matchOfflinePlayer("test player"));
 		assertNull(BukkitUtil.matchOfflinePlayer("player test"));
+	}
+
+	@Test
+	public void testGetPlugin() {
+		final String pluginName = "Test plugin";
+		final PluginManager pluginManager = mock(PluginManager.class);
+		final Plugin testPlugin = mock(Plugin.class);
+		when(pluginManager.isPluginEnabled(pluginName)).thenReturn(true);
+		when(pluginManager.getPlugin(pluginName)).thenReturn(testPlugin);
+		mockStatic(Bukkit.class);
+		when(Bukkit.getPluginManager()).thenReturn(pluginManager);
+
+		assertEquals(testPlugin, BukkitUtil.getPlugin(pluginName));
+		verify(pluginManager).isPluginEnabled(pluginName);
+		verify(pluginManager).getPlugin(pluginName);
+		verifyStatic();
+	}
+
+	@Test(expected = IllegalPluginAccessException.class)
+	public void testGetPluginNotFound() {
+		final String pluginName = "Test plugin";
+		final PluginManager pluginManager = mock(PluginManager.class);
+		when(pluginManager.isPluginEnabled(pluginName)).thenReturn(false);
+		mockStatic(Bukkit.class);
+		when(Bukkit.getPluginManager()).thenReturn(pluginManager);
+
+		try {
+			BukkitUtil.getPlugin(pluginName);
+		} finally {
+			verify(pluginManager).isPluginEnabled(pluginName);
+			verifyStatic();
+		}
 	}
 }

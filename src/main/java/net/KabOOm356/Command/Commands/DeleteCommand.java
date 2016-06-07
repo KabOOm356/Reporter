@@ -9,9 +9,11 @@ import net.KabOOm356.Database.SQL.QueryType;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.DeletePhrases;
 import net.KabOOm356.Locale.Locale;
-import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
+import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Throwable.IndexNotANumberException;
+import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
@@ -80,7 +82,7 @@ public class DeleteCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException {
+	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;
@@ -95,7 +97,7 @@ public class DeleteCommand extends ReporterCommand {
 				deletionCount = deleteReportBatch(sender, BatchDeletionType.INCOMPLETE);
 			} else {
 				if (Util.isInteger(args.get(0)) || args.get(0).equalsIgnoreCase("last")) {
-					final int index = getManager().getLastViewedReportManager().getIndexOrLastViewedReport(sender, args.get(0));
+					final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
 					if (!getManager().isReportIndexValid(sender, index)) {
 						return;
@@ -142,7 +144,7 @@ public class DeleteCommand extends ReporterCommand {
 	private void incrementStatistic(final CommandSender sender, final int count) {
 		if (BukkitUtil.isOfflinePlayer(sender)) {
 			final OfflinePlayer player = (OfflinePlayer) sender;
-			getManager().getModStatsManager().incrementStat(player, statistic, count);
+			getManager().getModStatsService().incrementStat(player, statistic, count);
 		}
 	}
 
@@ -157,7 +159,7 @@ public class DeleteCommand extends ReporterCommand {
 			reformatTables(sender, index);
 			updateLastViewed(index);
 
-			getManager().getMessageManager().removeMessage(index);
+			getManager().getMessageService().removeMessage(index);
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to delete single report!");
 			throw e;
@@ -223,7 +225,7 @@ public class DeleteCommand extends ReporterCommand {
 
 			updateLastViewed(remainingIndexes);
 
-			getManager().getMessageManager().reindexMessages(remainingIndexes);
+			getManager().getMessageService().reindexMessages(remainingIndexes);
 			return totalDeleted;
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to delete reports for a player!");
@@ -350,7 +352,7 @@ public class DeleteCommand extends ReporterCommand {
 			deleteBatch(sender, deletion);
 			reformatTables(sender, remainingIndexes);
 			updateLastViewed(remainingIndexes);
-			getManager().getMessageManager().reindexMessages(remainingIndexes);
+			getManager().getMessageService().reindexMessages(remainingIndexes);
 
 			final Locale locale = getManager().getLocale();
 			String message = "";
@@ -526,11 +528,11 @@ public class DeleteCommand extends ReporterCommand {
 	}
 
 	private void updateLastViewed(final int removedIndex) {
-		getManager().getLastViewedReportManager().deleteIndex(removedIndex);
+		getManager().getLastViewedReportService().deleteIndex(removedIndex);
 	}
 
 	private void updateLastViewed(final ArrayList<Integer> remainingIndexes) {
-		getManager().getLastViewedReportManager().deleteBatch(remainingIndexes);
+		getManager().getLastViewedReportService().deleteBatch(remainingIndexes);
 	}
 
 	private void reformatTables(final CommandSender sender, final ArrayList<Integer> remainingIndexes) throws Exception {

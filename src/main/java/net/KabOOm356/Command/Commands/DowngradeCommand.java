@@ -7,6 +7,8 @@ import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.DowngradePhrases;
 import net.KabOOm356.Permission.ModLevel;
+import net.KabOOm356.Throwable.IndexNotANumberException;
+import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.ArrayUtil;
 import org.apache.logging.log4j.LogManager;
@@ -60,13 +62,13 @@ public class DowngradeCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException {
+	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;
 			}
 
-			final int index = getManager().getLastViewedReportManager().getIndexOrLastViewedReport(sender, args.get(0));
+			final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
 			if (!getManager().isReportIndexValid(sender, index)) {
 				return;

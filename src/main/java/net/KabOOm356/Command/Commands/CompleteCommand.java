@@ -6,9 +6,11 @@ import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.CompletePhrases;
-import net.KabOOm356.Manager.Messager.Group;
-import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
+import net.KabOOm356.Service.Messager.Group;
+import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Throwable.IndexNotANumberException;
+import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
@@ -68,13 +70,13 @@ public class CompleteCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException {
+	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;
 			}
 
-			final int index = getManager().getLastViewedReportManager().getIndexOrLastViewedReport(sender, args.get(0));
+			final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
 			if (!getManager().isReportIndexValid(sender, index)) {
 				return;
@@ -148,7 +150,7 @@ public class CompleteCommand extends ReporterCommand {
 		if (BukkitUtil.isOfflinePlayer(sender)) {
 			final OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 
-			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.COMPLETED);
+			getManager().getModStatsService().incrementStat(senderPlayer, ModeratorStat.COMPLETED);
 		}
 	}
 
@@ -225,9 +227,9 @@ public class CompleteCommand extends ReporterCommand {
 					getManager().getLocale().getString(CompletePhrases.yourReportsCompleted);
 
 			if (sender != null) {
-				getManager().getMessageManager().addMessage(sender.getUniqueId().toString(), messageGroup, message, index);
+				getManager().getMessageService().addMessage(sender.getUniqueId().toString(), messageGroup, message, index);
 			} else if (playerName != null && !playerName.isEmpty()) {
-				getManager().getMessageManager().addMessage(playerName, messageGroup, message, index);
+				getManager().getMessageService().addMessage(playerName, messageGroup, message, index);
 			}
 		}
 	}

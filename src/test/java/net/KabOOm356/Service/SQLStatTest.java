@@ -1,8 +1,8 @@
-package net.KabOOm356.Manager;
+package net.KabOOm356.Service;
 
-import net.KabOOm356.Manager.SQLStatManager.SQLStat;
-import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
-import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager.PlayerStat;
+import net.KabOOm356.Service.SQLStatService.SQLStat;
+import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
+import net.KabOOm356.Service.SQLStatServices.PlayerStatService.PlayerStat;
 import org.junit.Test;
 
 import java.util.ArrayList;

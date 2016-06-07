@@ -6,6 +6,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.IllegalPluginAccessException;
+import org.bukkit.plugin.Plugin;
 
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -412,5 +414,18 @@ public final class BukkitUtil {
 			}
 		}
 		return player;
+	}
+
+	/**
+	 * Gets a Bukkit plugin.
+	 *
+	 * @param plugin The name of the plugin to get.
+	 * @return A Bukkit plugin.
+	 */
+	public static Plugin getPlugin(final String plugin) {
+		if (!Bukkit.getPluginManager().isPluginEnabled(plugin)) {
+			throw new IllegalPluginAccessException(String.format("The plugin [%s] is not enabled!", plugin));
+		}
+		return Bukkit.getPluginManager().getPlugin(plugin);
 	}
 }

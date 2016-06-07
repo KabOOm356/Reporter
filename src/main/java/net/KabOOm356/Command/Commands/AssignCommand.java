@@ -5,9 +5,11 @@ import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Locale.Entry.LocalePhrases.AssignPhrases;
-import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
+import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Throwable.IndexNotANumberException;
+import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
@@ -67,13 +69,13 @@ public class AssignCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException {
+	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;
 			}
 
-			final int index = getManager().getLastViewedReportManager().getIndexOrLastViewedReport(sender, args.get(0));
+			final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
 			if (!getManager().isReportIndexValid(sender, index)) {
 				return;
@@ -139,7 +141,7 @@ public class AssignCommand extends ReporterCommand {
 		if (BukkitUtil.isOfflinePlayer(sender)) {
 			final OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 
-			getManager().getModStatsManager().incrementStat(senderPlayer, ModeratorStat.ASSIGNED);
+			getManager().getModStatsService().incrementStat(senderPlayer, ModeratorStat.ASSIGNED);
 		}
 	}
 

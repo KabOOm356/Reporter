@@ -7,8 +7,10 @@ import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.RespondPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ViewPhrases;
-import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
+import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Throwable.IndexNotANumberException;
+import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
@@ -69,7 +71,7 @@ public class RespondCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException {
+	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;
@@ -84,7 +86,7 @@ public class RespondCommand extends ReporterCommand {
 				return;
 			}
 
-			final int index = getManager().getLastViewedReportManager().getIndexOrLastViewedReport(sender, args.get(0));
+			final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
 			if (!getManager().isReportIndexValid(sender, index)) {
 				return;
@@ -237,7 +239,7 @@ public class RespondCommand extends ReporterCommand {
 
 			player.teleport(loc);
 
-			getManager().getModStatsManager().incrementStat(player, ModeratorStat.RESPONDED);
+			getManager().getModStatsService().incrementStat(player, ModeratorStat.RESPONDED);
 		}
 	}
 }

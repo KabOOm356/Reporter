@@ -6,9 +6,9 @@ import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.StatisticPhrases;
-import net.KabOOm356.Manager.SQLStatManager.SQLStat;
-import net.KabOOm356.Manager.SQLStatManagers.ModeratorStatManager.ModeratorStat;
-import net.KabOOm356.Manager.SQLStatManagers.PlayerStatManager.PlayerStat;
+import net.KabOOm356.Service.SQLStatService.SQLStat;
+import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
+import net.KabOOm356.Service.SQLStatServices.PlayerStatService.PlayerStat;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import org.bukkit.ChatColor;
@@ -212,9 +212,9 @@ public class StatisticCommand extends ReporterCommand {
 
 	private ResultRow getStatistic(final OfflinePlayer player, final SQLStat statistic) {
 		if (statistic instanceof ModeratorStat) {
-			return getManager().getModStatsManager().getStat(player, statistic);
+			return getManager().getModStatsService().getStat(player, statistic);
 		} else if (statistic instanceof PlayerStat) {
-			return getManager().getPlayerStatsManager().getStat(player, statistic);
+			return getManager().getPlayerStatsService().getStat(player, statistic);
 		}
 
 		return null;

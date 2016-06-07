@@ -7,13 +7,16 @@ import net.KabOOm356.File.AbstractFiles.VersionedNetworkFile.ReleaseLevel;
 import net.KabOOm356.Listeners.ReporterPlayerListener;
 import net.KabOOm356.Locale.Entry.LocaleInfo;
 import net.KabOOm356.Locale.Locale;
+import net.KabOOm356.Service.Messager.PlayerMessages;
+import net.KabOOm356.Service.ServiceModule;
+import net.KabOOm356.Service.Store.StoreModule;
+import net.KabOOm356.Permission.PermissionHandler;
 import net.KabOOm356.Reporter.Configuration.ReporterConfigurationUtil;
 import net.KabOOm356.Reporter.Database.ReporterDatabaseUtil;
 import net.KabOOm356.Reporter.Locale.ReporterLocaleInitializer;
 import net.KabOOm356.Reporter.Metrics.MetricsInitializer;
 import net.KabOOm356.Updater.PluginUpdater;
 import net.KabOOm356.Util.ArrayUtil;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -28,7 +31,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The main Reporter class.
@@ -51,7 +56,9 @@ public class Reporter extends JavaPlugin {
 	private static String versionString;
 	private final Locale locale = new Locale();
 	private ExtendedDatabaseHandler databaseHandler;
+	private PermissionHandler permissionHandler;
 	private ReporterPlayerListener playerListener;
+	private ServiceModule serviceModule;
 	private ReporterCommandManager commandManager;
 
 	public Reporter() {
@@ -114,14 +121,17 @@ public class Reporter extends JavaPlugin {
 		}
 
 		checkForPluginUpdate();
-
 		initializeLocale();
-
 		initializeDatabase();
-
+		initializePermissions();
 		initializeStatistics();
 
 		playerListener = new ReporterPlayerListener(this);
+
+		final Map<CommandSender, Integer> lastViewed = new HashMap<CommandSender, Integer>();
+		final PlayerMessages playerMessages = new PlayerMessages();
+		final StoreModule storeModule = new StoreModule(getConfig(), getDatabaseHandler(), getLocale(), getPermissionHandler(), lastViewed, playerMessages);
+		serviceModule = new ServiceModule(storeModule);
 		commandManager = new ReporterCommandManager(this);
 
 		setupCommands();
@@ -157,14 +167,14 @@ public class Reporter extends JavaPlugin {
 			if (cmd != null) {
 				cmd.setExecutor(commandManager);
 			} else {
-				log.log(Level.ERROR, defaultConsolePrefix + "Unable to set executor for " + currentCmd + " command!");
+				log.error(defaultConsolePrefix + "Unable to set executor for " + currentCmd + " command!");
 				error = true;
 			}
 		}
 
 		if (error) {
-			log.log(Level.WARN, defaultConsolePrefix + "plugin.yml may have been altered!");
-			log.log(Level.WARN, defaultConsolePrefix + "Please re-download the plugin from BukkitDev.");
+			log.warn(defaultConsolePrefix + "plugin.yml may have been altered!");
+			log.warn(defaultConsolePrefix + "Please re-download the plugin from BukkitDev.");
 		}
 	}
 
@@ -180,7 +190,7 @@ public class Reporter extends JavaPlugin {
 
 				connection = url.openConnection();
 			} catch (final IOException e) {
-				log.log(Level.WARN, Reporter.getDefaultConsolePrefix() +
+				log.warn(Reporter.getDefaultConsolePrefix() +
 						"Could not open a connection to the ServerMods API to check for plugin updates!", e);
 				return;
 			}
@@ -235,9 +245,14 @@ public class Reporter extends JavaPlugin {
 		}
 
 		if (databaseHandler == null) {
-			log.log(Level.FATAL, Reporter.getDefaultConsolePrefix() + "Disabling plugin!");
+			log.fatal(Reporter.getDefaultConsolePrefix() + "Disabling plugin!");
 			getServer().getPluginManager().disablePlugin(this);
 		}
+	}
+
+
+	private void initializePermissions() {
+		permissionHandler = new PermissionHandler();
 	}
 
 	private void initializeStatistics() {
@@ -284,6 +299,14 @@ public class Reporter extends JavaPlugin {
 
 	public ExtendedDatabaseHandler getDatabaseHandler() {
 		return databaseHandler;
+	}
+
+	public PermissionHandler getPermissionHandler() {
+		return permissionHandler;
+	}
+
+	public ServiceModule getServiceModule() {
+		return serviceModule;
 	}
 
 	public ReporterCommandManager getCommandManager() {
