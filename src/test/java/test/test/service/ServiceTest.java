@@ -7,6 +7,8 @@ import net.KabOOm356.Permission.PermissionHandler;
 import net.KabOOm356.Service.Messager.PlayerMessages;
 import net.KabOOm356.Service.ServiceModule;
 import net.KabOOm356.Service.Store.StoreModule;
+import net.KabOOm356.Service.Store.type.LastViewed;
+import net.KabOOm356.Service.Store.type.PlayerReport;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.junit.Before;
@@ -40,17 +42,20 @@ public abstract class ServiceTest extends PowerMockitoTest {
 	private PermissionHandler permissionHandler;
 
 	@Spy
-	private Map<CommandSender, Integer> lastViewed = new HashMap<CommandSender, Integer>();
+	private LastViewed lastViewed = new LastViewed();
 
 	@Spy
 	private PlayerMessages playerMessages = new PlayerMessages();
+
+	@Spy
+	private PlayerReport playerReport = new PlayerReport();
 
 	@Mock
 	private Locale locale;
 
 	@Before
 	public void setupMocks() throws Exception {
-		final StoreModule store = new StoreModule(configuration, databaseHandler, locale, permissionHandler, lastViewed, playerMessages);
+		final StoreModule store = new StoreModule(configuration, databaseHandler, locale, permissionHandler, lastViewed, playerMessages, playerReport);
 		doReturn(store).when(module, getStore).withNoArguments();
 		when(locale.getString(any(LocalePhrase.class))).thenAnswer(LocaleEntryAnswer.instance);
 	}
@@ -71,12 +76,16 @@ public abstract class ServiceTest extends PowerMockitoTest {
 		return permissionHandler;
 	}
 
-	public Map<CommandSender, Integer> getLastViewedHandler() {
+	public LastViewed getLastViewedHandler() {
 		return lastViewed;
 	}
 
 	public PlayerMessages getPlayerMessages() {
 		return playerMessages;
+	}
+
+	public PlayerReport getPlayerReport() {
+		return playerReport;
 	}
 
 	public Locale getLocale() {

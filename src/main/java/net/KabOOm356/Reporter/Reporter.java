@@ -15,6 +15,8 @@ import net.KabOOm356.Reporter.Configuration.ReporterConfigurationUtil;
 import net.KabOOm356.Reporter.Database.ReporterDatabaseUtil;
 import net.KabOOm356.Reporter.Locale.ReporterLocaleInitializer;
 import net.KabOOm356.Reporter.Metrics.MetricsInitializer;
+import net.KabOOm356.Service.Store.type.LastViewed;
+import net.KabOOm356.Service.Store.type.PlayerReport;
 import net.KabOOm356.Updater.PluginUpdater;
 import net.KabOOm356.Util.ArrayUtil;
 import org.apache.logging.log4j.LogManager;
@@ -128,9 +130,10 @@ public class Reporter extends JavaPlugin {
 
 		playerListener = new ReporterPlayerListener(this);
 
-		final Map<CommandSender, Integer> lastViewed = new HashMap<CommandSender, Integer>();
+		final LastViewed lastViewed = new LastViewed();
 		final PlayerMessages playerMessages = new PlayerMessages();
-		final StoreModule storeModule = new StoreModule(getConfig(), getDatabaseHandler(), getLocale(), getPermissionHandler(), lastViewed, playerMessages);
+		final PlayerReport playerReport = new PlayerReport();
+		final StoreModule storeModule = new StoreModule(getConfig(), getDatabaseHandler(), getLocale(), getPermissionHandler(), lastViewed, playerMessages, playerReport);
 		serviceModule = new ServiceModule(storeModule);
 		commandManager = new ReporterCommandManager(this);
 

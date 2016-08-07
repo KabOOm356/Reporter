@@ -5,6 +5,8 @@ import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Reporter.Configuration.Entry.ConfigurationEntries;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Runnable.Timer.ReportTimer;
+import net.KabOOm356.Service.Store.type.PlayerReport;
+import net.KabOOm356.Service.Store.type.PlayerReportQueue;
 import net.KabOOm356.Util.BukkitUtil;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -13,14 +15,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * A class to manage reporting limits.
@@ -32,12 +30,6 @@ public class ReportLimitService extends Service {
 	 * An instance of the main class.
 	 */
 	private final Plugin plugin;
-	/**
-	 * A {@link HashMap} that holds all the players who have reported.
-	 * The key has to be a string because if the player logs off then logs
-	 * in again the Player object has a different hash.
-	 */
-	private final HashMap<String, HashMap<String, PriorityQueue<ReportTimer>>> playerReports;
 
 	/**
 	 * Constructor
@@ -46,7 +38,6 @@ public class ReportLimitService extends Service {
 		super(module);
 
 		this.plugin = BukkitUtil.getPlugin(Reporter.class.getSimpleName());
-		this.playerReports = new HashMap<String, HashMap<String, PriorityQueue<ReportTimer>>>();
 	}
 
 	/**
@@ -176,26 +167,26 @@ public class ReportLimitService extends Service {
 	 * @param timer  The {@link ReportTimer}.
 	 */
 	private void addReportToPlayer(final CommandSender sender, final ReportTimer timer) {
-		HashMap<String, PriorityQueue<ReportTimer>> entry;
+		PlayerReportQueue entry;
 
 		if (BukkitUtil.isPlayer(sender)) {
 			final Player player = (Player) sender;
 
-			if (!playerReports.containsKey(player.getUniqueId().toString())) {
-				entry = new HashMap<String, PriorityQueue<ReportTimer>>();
+			if (!getPlayerReports().containsKey(player.getUniqueId().toString())) {
+				entry = new PlayerReportQueue();
 
-				playerReports.put(player.getUniqueId().toString(), entry);
+				getPlayerReports().put(player.getUniqueId().toString(), entry);
 			}
 
-			entry = playerReports.get(player.getUniqueId().toString());
+			entry = getPlayerReports().get(player.getUniqueId().toString());
 		} else {
-			if (!playerReports.containsKey(sender.getName())) {
-				entry = new HashMap<String, PriorityQueue<ReportTimer>>();
+			if (!getPlayerReports().containsKey(sender.getName())) {
+				entry = new  PlayerReportQueue();
 
-				playerReports.put(sender.getName(), entry);
+				getPlayerReports().put(sender.getName(), entry);
 			}
 
-			entry = playerReports.get(sender.getName());
+			entry = getPlayerReports().get(sender.getName());
 		}
 
 		boolean containsReported = entry.containsKey(timer.getReported().getName());
@@ -348,15 +339,15 @@ public class ReportLimitService extends Service {
 		final HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers =
 				new HashMap<String, PriorityQueue<ReportTimer>>();
 
-		if (playerReports.get(sender.getName()) != null) {
-			reportedPlayers.putAll(playerReports.get(sender.getName()));
+		if (getPlayerReports().get(sender.getName()) != null) {
+			reportedPlayers.putAll(getPlayerReports().get(sender.getName()));
 		}
 
 		if (BukkitUtil.isPlayer(sender)) {
 			final Player player = (Player) sender;
 
-			if (playerReports.get(player.getUniqueId().toString()) != null) {
-				reportedPlayers.putAll(playerReports.get(player.getUniqueId().toString()));
+			if (getPlayerReports().get(player.getUniqueId().toString()) != null) {
+				reportedPlayers.putAll(getPlayerReports().get(player.getUniqueId().toString()));
 			}
 		}
 
@@ -426,5 +417,9 @@ public class ReportLimitService extends Service {
 
 	private boolean hasPermission(final Player player, final String permission) {
 		return getModule().getPermissionService().hasPermission(player, permission);
+	}
+	
+	private PlayerReport getPlayerReports() {
+		return getStore().getPlayerReportStore().get();
 	}
 }

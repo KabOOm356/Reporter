@@ -4,12 +4,11 @@ import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Permission.PermissionHandler;
 import net.KabOOm356.Service.Messager.PlayerMessages;
+import net.KabOOm356.Service.Store.type.LastViewed;
+import net.KabOOm356.Service.Store.type.PlayerReport;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
-
-import java.util.Map;
 
 public class StoreModule {
 	private static final Logger log = LogManager.getLogger(StoreModule.class);
@@ -18,10 +17,11 @@ public class StoreModule {
 	private final Store<ExtendedDatabaseHandler> databaseStore;
 	private final Store<Locale> localeStore;
 	private final Store<PermissionHandler> permissionStore;
-	private final Store<Map<CommandSender, Integer>> lastViewedStore;
+	private final Store<LastViewed> lastViewedStore;
 	private final Store<PlayerMessages> playerMessagesStore;
+	private final Store<PlayerReport> playerReportStore;
 
-	public StoreModule(final Configuration configuration, final ExtendedDatabaseHandler database, final Locale locale, final PermissionHandler permission, final Map<CommandSender, Integer> lastViewed, final PlayerMessages playerMessages) {
+	public StoreModule(final Configuration configuration, final ExtendedDatabaseHandler database, final Locale locale, final PermissionHandler permission, final LastViewed lastViewed, final PlayerMessages playerMessages, final PlayerReport playerReport) {
 		if (log.isDebugEnabled()) {
 			log.info("Initializing service store...");
 		}
@@ -29,8 +29,9 @@ public class StoreModule {
 		databaseStore = new Store<ExtendedDatabaseHandler>(database);
 		localeStore = new Store<Locale>(locale);
 		permissionStore = new Store<PermissionHandler>(permission);
-		lastViewedStore = new Store<Map<CommandSender, Integer>>(lastViewed);
+		lastViewedStore = new Store<LastViewed>(lastViewed);
 		playerMessagesStore = new Store<PlayerMessages>(playerMessages);
+		playerReportStore = new Store<PlayerReport>(playerReport);
 	}
 
 	public Store<Configuration> getConfigurationStore() {
@@ -49,11 +50,15 @@ public class StoreModule {
 		return permissionStore;
 	}
 
-	public Store<Map<CommandSender, Integer>> getLastViewedStore() {
+	public Store<LastViewed> getLastViewedStore() {
 		return lastViewedStore;
 	}
 
 	public Store<PlayerMessages> getPlayerMessagesStore() {
 		return playerMessagesStore;
+	}
+
+	public Store<PlayerReport> getPlayerReportStore() {
+		return playerReportStore;
 	}
 }
