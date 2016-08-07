@@ -2,6 +2,7 @@ package net.KabOOm356.Service;
 
 import net.KabOOm356.Locale.Entry.LocalePhrases.ReportPhrases;
 import net.KabOOm356.Locale.Locale;
+import net.KabOOm356.Reporter.Configuration.Entry.ConfigurationEntries;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Runnable.Timer.ReportTimer;
 import net.KabOOm356.Util.BukkitUtil;
@@ -37,67 +38,6 @@ public class ReportLimitService extends Service {
 	 * in again the Player object has a different hash.
 	 */
 	private final HashMap<String, HashMap<String, PriorityQueue<ReportTimer>>> playerReports;
-	/**
-	 * If the configuration is set to limit the number of reports.
-	 */
-	private boolean limitReports = true;
-	/**
-	 * The number of reports allowed within a certain amount of time.
-	 */
-	private int reportLimit = 5;
-	/**
-	 * The time that it takes before the player can report again.
-	 */
-	private int limitTime = 600;
-	/**
-	 * If the configuration is set to limit the number
-	 * of reports against another player.
-	 */
-	private boolean limitReportsAgainstPlayers = false;
-
-	/**
-	 * The number of reports allowed against another player.
-	 */
-	private int reportLimitAgainstPlayers = 2;
-	/**
-	 * If the configuration is set to alert the
-	 * console when a player reaches their reporting limit.
-	 */
-	private boolean alertConsoleWhenLimitReached = true;
-
-	/**
-	 * If the configuration is set to alert the
-	 * console when a player is allowed to report again
-	 * after reaching their limit.
-	 */
-	private boolean alertConsoleWhenAllowedToReportAgain = true;
-
-	/**
-	 * If the configuration is set to alert the
-	 * console when a player reaches their reporting limit
-	 * against another player.
-	 */
-	private boolean alertConsoleWhenLimitAgainstPlayerReached = true;
-
-	/**
-	 * If the configuration is set to alert the
-	 * console when a player is allowed to report another
-	 * player again after reaching their limit.
-	 */
-	private boolean alertConsoleWhenAllowedToReportPlayerAgain = true;
-
-	/**
-	 * If the configuration is set to alert the
-	 * player when they are allowed to report again.
-	 */
-	private boolean alertPlayerWhenAllowedToReportAgain = true;
-
-	/**
-	 * If the configuration is set to alert the
-	 * player when they are allowed to report
-	 * another player again.
-	 */
-	private boolean alertPlayerWhenAllowedToReportPlayerAgain = true;
 
 	/**
 	 * Constructor
@@ -106,51 +46,6 @@ public class ReportLimitService extends Service {
 		super(module);
 
 		this.plugin = BukkitUtil.getPlugin(Reporter.class.getSimpleName());
-
-		this.limitReports = getConfig().getBoolean(
-				"general.reporting.limitNumberOfReports",
-				limitReports);
-
-		this.limitReportsAgainstPlayers = getConfig().getBoolean(
-				"general.reporting.limitReportsAgainstPlayers",
-				limitReportsAgainstPlayers);
-
-		this.reportLimit = getConfig().getInt(
-				"general.reporting.limitNumber",
-				reportLimit);
-
-		this.reportLimitAgainstPlayers = getConfig().getInt(
-				"general.reporting.limitNumberAgainstPlayers",
-				reportLimitAgainstPlayers);
-
-		this.limitTime = getConfig().getInt(
-				"general.reporting.limitTime",
-				limitTime);
-
-		this.alertConsoleWhenLimitReached = getConfig().getBoolean(
-				"general.reporting.alerts.toConsole.limitReached",
-				alertConsoleWhenLimitReached);
-
-		this.alertConsoleWhenLimitAgainstPlayerReached = getConfig().getBoolean(
-				"general.reporting.alerts.toConsole.limitAgainstPlayerReached",
-				alertConsoleWhenLimitAgainstPlayerReached);
-
-		this.alertConsoleWhenAllowedToReportAgain = getConfig().getBoolean(
-				"general.reporting.alerts.toConsole.allowedToReportAgain",
-				alertConsoleWhenAllowedToReportAgain);
-
-		this.alertConsoleWhenAllowedToReportPlayerAgain = getConfig().getBoolean(
-				"general.reporting.alerts.toConsole.allowedToReportPlayerAgain",
-				alertConsoleWhenAllowedToReportPlayerAgain);
-
-		this.alertPlayerWhenAllowedToReportAgain = getConfig().getBoolean(
-				"general.reporting.alerts.toPlayer.allowedToReportAgain",
-				alertPlayerWhenAllowedToReportAgain);
-
-		this.alertPlayerWhenAllowedToReportPlayerAgain = getConfig().getBoolean(
-				"general.reporting.alerts.toPlayer.allowedToReportPlayerAgain",
-				alertPlayerWhenAllowedToReportPlayerAgain);
-
 		this.playerReports = new HashMap<String, HashMap<String, PriorityQueue<ReportTimer>>>();
 	}
 
@@ -170,7 +65,7 @@ public class ReportLimitService extends Service {
 
 			final boolean hasReported = !this.getReportedPlayers(sender).isEmpty();
 
-			if (limitReports && hasReported) {
+			if (getConfigurationService().get(ConfigurationEntries.limitReports) && hasReported) {
 				final boolean override = hasPermission(player, "reporter.report.nolimit");
 
 				if (override) {
@@ -179,7 +74,7 @@ public class ReportLimitService extends Service {
 
 				final int numberOfReports = this.getAllReportTimers(sender).size();
 
-				return numberOfReports < reportLimit;
+				return numberOfReports < getConfigurationService().get(ConfigurationEntries.reportLimit);
 			}
 		}
 		return true;
@@ -203,7 +98,7 @@ public class ReportLimitService extends Service {
 
 			final boolean hasReported = !this.getReportedPlayers(sender).isEmpty();
 
-			if (limitReportsAgainstPlayers && hasReported) {
+			if (getConfigurationService().get(ConfigurationEntries.limitReportsAgainstPlayers) && hasReported) {
 				final boolean override = hasPermission(player, "reporter.report.nolimit");
 
 				if (override) {
@@ -212,7 +107,7 @@ public class ReportLimitService extends Service {
 
 				final Queue<ReportTimer> timers = this.getAllReportTimers(sender, reported);
 
-				return timers.size() < reportLimitAgainstPlayers;
+				return timers.size() < getConfigurationService().get(ConfigurationEntries.reportLimitAgainstPlayers);
 			}
 		}
 		return true;
@@ -226,8 +121,8 @@ public class ReportLimitService extends Service {
 	 */
 	public void hasReported(final CommandSender sender, final OfflinePlayer reportedPlayer) {
 		final boolean isPlayer = BukkitUtil.isPlayer(sender);
-		final boolean canReport = limitReports && canReport(sender);
-		final boolean canReportPlayer = limitReportsAgainstPlayers && canReport(sender, reportedPlayer);
+		final boolean canReport = getConfigurationService().get(ConfigurationEntries.limitReports) && canReport(sender);
+		final boolean canReportPlayer = getConfigurationService().get(ConfigurationEntries.limitReportsAgainstPlayers) && canReport(sender, reportedPlayer);
 
 		if (isPlayer && (canReport || canReportPlayer)) {
 			final Player player = (Player) sender;
@@ -237,21 +132,21 @@ public class ReportLimitService extends Service {
 				final ReportTimer timer = new ReportTimer();
 
 				final Calendar executionTime = Calendar.getInstance();
-				executionTime.add(Calendar.SECOND, limitTime);
+				executionTime.add(Calendar.SECOND, getConfigurationService().get(ConfigurationEntries.limitTime));
 
 				timer.init(this, player, reportedPlayer, executionTime.getTimeInMillis());
 
 				// Convert from seconds to bukkit ticks
-				final long bukkitTicks = limitTime * 20;
+				final long bukkitTicks = getConfigurationService().get(ConfigurationEntries.limitTime) * 20;
 
 				Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, timer, bukkitTicks);
 
 				addReportToPlayer(sender, timer);
 
-				boolean alert = limitReports && !canReport(sender);
+				boolean alert = getConfigurationService().get(ConfigurationEntries.limitReports) && !canReport(sender);
 
 				// Alert the console if the player has reached their limit in total number of reports.
-				if (alertConsoleWhenLimitReached && alert) {
+				if (getConfigurationService().get(ConfigurationEntries.alertConsoleWhenLimitReached) && alert) {
 					String output = "%p has reached their reporting limit!";
 
 					output = output.replaceAll("%p", player.getName());
@@ -259,10 +154,10 @@ public class ReportLimitService extends Service {
 					log.log(Level.INFO, Reporter.getLogPrefix() + output);
 				}
 
-				alert = limitReportsAgainstPlayers && !canReport(sender, reportedPlayer);
+				alert = getConfigurationService().get(ConfigurationEntries.limitReportsAgainstPlayers) && !canReport(sender, reportedPlayer);
 
 				// Alert the console if the player has reached their limit for reporting another player.
-				if (alertConsoleWhenLimitAgainstPlayerReached && alert) {
+				if (getConfigurationService().get(ConfigurationEntries.alertConsoleWhenLimitAgainstPlayerReached) && alert) {
 					String output = "%p has reached their reporting limit for reporting %r!";
 
 					output = output.replaceAll("%p", player.getName());
@@ -311,7 +206,7 @@ public class ReportLimitService extends Service {
 
 		if (!containsReported) {
 			final PriorityQueue<ReportTimer> queue = new PriorityQueue<ReportTimer>(
-					reportLimitAgainstPlayers,
+					getConfigurationService().get(ConfigurationEntries.reportLimitAgainstPlayers),
 					ReportTimer.compareByTimeRemaining);
 
 			if (BukkitUtil.isPlayerValid(timer.getReported())) {
@@ -395,22 +290,22 @@ public class ReportLimitService extends Service {
 	public void limitExpired(final ReportTimer expired) {
 		if (!canReport(expired.getPlayer())) {
 			// Alert player they can report again
-			if (alertPlayerWhenAllowedToReportAgain) {
+			if (getConfigurationService().get(ConfigurationEntries.alertPlayerWhenAllowedToReportAgain)) {
 				expired.getPlayer().sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE +
 						getLocale().getString(ReportPhrases.allowedToReportAgain));
 			}
 
 			// Alert console if configured to
-			if (alertConsoleWhenAllowedToReportAgain) {
+			if (getConfigurationService().get(ConfigurationEntries.alertConsoleWhenAllowedToReportAgain)) {
 				log.log(Level.INFO, Reporter.getLogPrefix() +
 						expired.getPlayer().getName() + " is now allowed to report again!");
 			}
 		}
 
-		if (limitReportsAgainstPlayers && !canReport(expired.getPlayer(), expired.getReported())) {
+		if (getConfigurationService().get(ConfigurationEntries.limitReportsAgainstPlayers) && !canReport(expired.getPlayer(), expired.getReported())) {
 			String output;
 
-			if (this.alertPlayerWhenAllowedToReportPlayerAgain) {
+			if (getConfigurationService().get(ConfigurationEntries.alertPlayerWhenAllowedToReportPlayerAgain)) {
 				output = getLocale().getString(ReportPhrases.allowedToReportPlayerAgain);
 				final String reportedNameFormatted = BukkitUtil.formatPlayerName(expired.getReported());
 
@@ -420,7 +315,7 @@ public class ReportLimitService extends Service {
 								ChatColor.WHITE + output);
 			}
 
-			if (alertConsoleWhenAllowedToReportPlayerAgain) {
+			if (getConfigurationService().get(ConfigurationEntries.alertConsoleWhenAllowedToReportPlayerAgain)) {
 				output = "%p is now allowed to report %r again!";
 
 				output = output.replaceAll("%p", BukkitUtil.formatPlayerName(expired.getPlayer()));
@@ -521,8 +416,8 @@ public class ReportLimitService extends Service {
 		return timers;
 	}
 
-	private Configuration getConfig() {
-		return getStore().getConfigurationStore().get();
+	private ConfigurationService getConfigurationService() {
+		return getModule().getConfigurationService();
 	}
 
 	private Locale getLocale() {

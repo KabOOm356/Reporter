@@ -1,9 +1,11 @@
 package net.KabOOm356.Locale.Entry;
 
+import net.KabOOm356.Configuration.Entry;
+
 /**
  * An entry in the locale.
  */
-public class LocaleEntry extends Entry {
+public class LocaleEntry extends Entry<String> {
 	/**
 	 * The prefix of the path.
 	 */

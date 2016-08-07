@@ -1,6 +1,6 @@
-package net.KabOOm356.Locale.Entry;
+package net.KabOOm356.Configuration;
 
-public abstract class Entry {
+public class Entry<T> {
 	/**
 	 * The complete path to the entry.
 	 */
@@ -9,9 +9,9 @@ public abstract class Entry {
 	/**
 	 * The default value to use if the entry is not present.
 	 */
-	private final String def;
+	private final T def;
 
-	public Entry(final String path, final String def) {
+	public Entry(final String path, final T def) {
 		this.path = path;
 		this.def = def;
 	}
@@ -30,7 +30,7 @@ public abstract class Entry {
 	 *
 	 * @return The default value for this entry.
 	 */
-	public String getDefault() {
+	public T getDefault() {
 		return def;
 	}
 
@@ -39,3 +39,4 @@ public abstract class Entry {
 		return "Path: " + getPath() + "\nDefault: " + getDefault();
 	}
 }
+

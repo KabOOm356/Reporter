@@ -22,6 +22,7 @@ public class ServiceModule {
 	private final ReportLimitService limitService;
 	private final ModeratorStatService modStatsService;
 	private final PlayerStatService playerStatsService;
+	private final ConfigurationService configurationService;
 
 	public ServiceModule(final StoreModule storeModule) {
 		if (log.isDebugEnabled()) {
@@ -37,6 +38,7 @@ public class ServiceModule {
 		reportValidatorService = new ReportValidatorService(this);
 		reportInformationService = new ReportInformationService(this);
 		reportPermissionService = new ReportPermissionService(this);
+		configurationService = new ConfigurationService(this);
 
 		limitService = new ReportLimitService(this);
 		modStatsService = new ModeratorStatService(this);
@@ -89,5 +91,9 @@ public class ServiceModule {
 
 	public PlayerStatService getPlayerStatsService() {
 		return playerStatsService;
+	}
+
+	public ConfigurationService getConfigurationService() {
+		return configurationService;
 	}
 }

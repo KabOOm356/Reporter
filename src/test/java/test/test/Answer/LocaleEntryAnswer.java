@@ -1,6 +1,6 @@
 package test.test.Answer;
 
-import net.KabOOm356.Locale.Entry.Entry;
+import net.KabOOm356.Configuration.Entry;
 import org.apache.commons.lang.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,9 +20,9 @@ public class LocaleEntryAnswer implements Answer<String> {
 		String answer = "";
 		if (invocationOnMock.getArguments()[0] instanceof Entry) {
 			final Entry entry = Entry.class.cast(invocationOnMock.getArguments()[0]);
-			answer = entry.getDefault();
+			answer = entry.getDefault().toString();
 		} else {
-			log.warn("First parameter was not a LocaleEntry! Returning an empty string!", invocationOnMock.getArguments());
+			log.warn("First parameter was not an Entry! Returning an empty string!", invocationOnMock.getArguments());
 		}
 		return answer;
 	}
