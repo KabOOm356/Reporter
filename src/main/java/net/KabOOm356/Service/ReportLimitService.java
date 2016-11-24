@@ -18,7 +18,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * A class to manage reporting limits.
@@ -49,23 +51,15 @@ public class ReportLimitService extends Service {
 	 * @return True if the {@link CommandSender} can submit a report, otherwise false.
 	 */
 	public boolean canReport(final CommandSender sender) {
-		final boolean isPlayer = BukkitUtil.isPlayer(sender);
-
-		if (isPlayer) {
-			final Player player = (Player) sender;
-
-			final boolean hasReported = !this.getReportedPlayers(sender).isEmpty();
-
-			if (getConfigurationService().get(ConfigurationEntries.limitReports) && hasReported) {
-				final boolean override = hasPermission(player, "reporter.report.nolimit");
-
-				if (override) {
-					return true;
+		if (getConfigurationService().get(ConfigurationEntries.limitReports)) {
+			int numberOfReports = 0;
+			final PlayerReportQueue playerReportQueue = getPlayerReports().get(sender);
+			if (playerReportQueue != null) {
+				for (final PriorityQueue<ReportTimer> queue : playerReportQueue.values()) {
+					numberOfReports += queue.size();
 				}
-
-				final int numberOfReports = this.getAllReportTimers(sender).size();
-
-				return numberOfReports < getConfigurationService().get(ConfigurationEntries.reportLimit);
+				final int limit = getConfigurationService().get(ConfigurationEntries.reportLimit);
+				return canReport(sender, limit, numberOfReports);
 			}
 		}
 		return true;
@@ -82,23 +76,15 @@ public class ReportLimitService extends Service {
 	 * the given {@link OfflinePlayer}, otherwise false.
 	 */
 	public boolean canReport(final CommandSender sender, final OfflinePlayer reported) {
-		final boolean isPlayer = BukkitUtil.isPlayer(sender);
-
-		if (isPlayer) {
-			final Player player = (Player) sender;
-
-			final boolean hasReported = !this.getReportedPlayers(sender).isEmpty();
-
-			if (getConfigurationService().get(ConfigurationEntries.limitReportsAgainstPlayers) && hasReported) {
-				final boolean override = hasPermission(player, "reporter.report.nolimit");
-
-				if (override) {
-					return true;
+		if (getConfigurationService().get(ConfigurationEntries.limitReportsAgainstPlayers)) {
+			final PlayerReportQueue playerReportQueue = getPlayerReports().get(sender);
+			if (playerReportQueue != null) {
+				final PriorityQueue<ReportTimer> queue = playerReportQueue.get(reported);
+				if (queue != null) {
+					final int numberOfReports = playerReportQueue.get(reported).size();
+					final int limit = getConfigurationService().get(ConfigurationEntries.reportLimitAgainstPlayers);
+					return canReport(sender, limit, numberOfReports);
 				}
-
-				final Queue<ReportTimer> timers = this.getAllReportTimers(sender, reported);
-
-				return timers.size() < getConfigurationService().get(ConfigurationEntries.reportLimitAgainstPlayers);
 			}
 		}
 		return true;
@@ -112,11 +98,11 @@ public class ReportLimitService extends Service {
 	 */
 	public void hasReported(final CommandSender sender, final OfflinePlayer reportedPlayer) {
 		final boolean isPlayer = BukkitUtil.isPlayer(sender);
-		final boolean canReport = getConfigurationService().get(ConfigurationEntries.limitReports) && canReport(sender);
-		final boolean canReportPlayer = getConfigurationService().get(ConfigurationEntries.limitReportsAgainstPlayers) && canReport(sender, reportedPlayer);
+		final boolean canReport = canReport(sender);
+		final boolean canReportPlayer = canReport(sender, reportedPlayer);
 
-		if (isPlayer && (canReport || canReportPlayer)) {
-			final Player player = (Player) sender;
+		if (isPlayer && canReport && canReportPlayer) {
+			final Player player = Player.class.cast(sender);
 			final boolean noLimit = hasPermission(player, "reporter.report.nolimit");
 
 			if (!noLimit) {
@@ -128,89 +114,27 @@ public class ReportLimitService extends Service {
 				timer.init(this, player, reportedPlayer, executionTime.getTimeInMillis());
 
 				// Convert from seconds to bukkit ticks
-				final long bukkitTicks = getConfigurationService().get(ConfigurationEntries.limitTime) * 20;
+				final long bukkitTicks = BukkitUtil.convertSecondsToServerTicks(getConfigurationService().get(ConfigurationEntries.limitTime));
 
 				Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, timer, bukkitTicks);
 
-				addReportToPlayer(sender, timer);
-
-				boolean alert = getConfigurationService().get(ConfigurationEntries.limitReports) && !canReport(sender);
+				getPlayerReports().put(sender, reportedPlayer, timer);
 
 				// Alert the console if the player has reached their limit in total number of reports.
-				if (getConfigurationService().get(ConfigurationEntries.alertConsoleWhenLimitReached) && alert) {
-					String output = "%p has reached their reporting limit!";
-
-					output = output.replaceAll("%p", player.getName());
-
+				if (getConfigurationService().get(ConfigurationEntries.alertConsoleWhenLimitReached) && !canReport(sender)) {
+					final String output = "%p has reached their reporting limit!"
+							.replaceAll("%p", player.getName());
 					log.log(Level.INFO, Reporter.getLogPrefix() + output);
 				}
-
-				alert = getConfigurationService().get(ConfigurationEntries.limitReportsAgainstPlayers) && !canReport(sender, reportedPlayer);
 
 				// Alert the console if the player has reached their limit for reporting another player.
-				if (getConfigurationService().get(ConfigurationEntries.alertConsoleWhenLimitAgainstPlayerReached) && alert) {
-					String output = "%p has reached their reporting limit for reporting %r!";
-
-					output = output.replaceAll("%p", player.getName());
-					output = output.replaceAll("%r", BukkitUtil.formatPlayerName(reportedPlayer));
-
+				if (getConfigurationService().get(ConfigurationEntries.alertConsoleWhenLimitAgainstPlayerReached) && !canReport(sender, reportedPlayer)) {
+					final String output = "%p has reached their reporting limit for reporting %r!"
+							.replaceAll("%p", player.getName())
+							.replaceAll("%r", BukkitUtil.formatPlayerName(reportedPlayer));
 					log.log(Level.INFO, Reporter.getLogPrefix() + output);
 				}
 			}
-		}
-	}
-
-	/**
-	 * Stores the given {@link ReportTimer} for the {@link CommandSender}.
-	 *
-	 * @param sender The {@link CommandSender}.
-	 * @param timer  The {@link ReportTimer}.
-	 */
-	private void addReportToPlayer(final CommandSender sender, final ReportTimer timer) {
-		PlayerReportQueue entry;
-
-		if (BukkitUtil.isPlayer(sender)) {
-			final Player player = (Player) sender;
-
-			if (!getPlayerReports().containsKey(player.getUniqueId().toString())) {
-				entry = new PlayerReportQueue();
-
-				getPlayerReports().put(player.getUniqueId().toString(), entry);
-			}
-
-			entry = getPlayerReports().get(player.getUniqueId().toString());
-		} else {
-			if (!getPlayerReports().containsKey(sender.getName())) {
-				entry = new  PlayerReportQueue();
-
-				getPlayerReports().put(sender.getName(), entry);
-			}
-
-			entry = getPlayerReports().get(sender.getName());
-		}
-
-		boolean containsReported = entry.containsKey(timer.getReported().getName());
-
-		if (BukkitUtil.isPlayerValid(timer.getReported())) {
-			containsReported = containsReported || entry.containsKey(timer.getReported().getUniqueId().toString());
-		}
-
-		if (!containsReported) {
-			final PriorityQueue<ReportTimer> queue = new PriorityQueue<ReportTimer>(
-					getConfigurationService().get(ConfigurationEntries.reportLimitAgainstPlayers),
-					ReportTimer.compareByTimeRemaining);
-
-			if (BukkitUtil.isPlayerValid(timer.getReported())) {
-				entry.put(timer.getReported().getUniqueId().toString(), queue);
-			} else {
-				entry.put(timer.getReported().getName(), queue);
-			}
-		}
-
-		if (BukkitUtil.isPlayerValid(timer.getReported())) {
-			entry.get(timer.getReported().getUniqueId().toString()).add(timer);
-		} else {
-			entry.get(timer.getReported().getName()).add(timer);
 		}
 	}
 
@@ -219,58 +143,41 @@ public class ReportLimitService extends Service {
 	 *
 	 * @param sender   The sender to get the remaining time for.
 	 * @param reported The reported player to get the remaining time for.
-	 * @return The seconds remaining before the sender can report the given player again.
+	 * @return The seconds remaining before the sender can report the given player again, if the sender has reported the player.  Otherwise, null.
 	 */
 	public int getRemainingTime(final CommandSender sender, final OfflinePlayer reported) {
-		final Queue<ReportTimer> timers = this.getAllReportTimers(sender, reported);
-
-		if (timers == null || timers.peek() == null) {
-			return Integer.MAX_VALUE;
+		final PlayerReportQueue playerReports = getPlayerReports().get(sender);
+		if (playerReports != null) {
+			final Queue<ReportTimer> timers = playerReports.get(reported);
+			if (timers != null && timers.peek() != null) {
+				return timers.peek().getTimeRemaining();
+			}
 		}
-
-		return timers.peek().getTimeRemaining();
-	}
-
-	/**
-	 * Returns the remaining time before the sender can report the given player again (in Seconds).
-	 *
-	 * @param sender The sender to get the remaining time for.
-	 * @param key    The key to the reported player to get the remaining time for.
-	 * @return The seconds remaining before the sender can report the given player again.
-	 */
-	private int getRemainingTime(final CommandSender sender, final String key) {
-		final HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers = getReportedPlayers(sender);
-
-		final Queue<ReportTimer> timers = reportedPlayers.get(key);
-
-		if (timers == null || timers.peek() == null) {
-			return Integer.MAX_VALUE;
-		}
-
-		return timers.peek().getTimeRemaining();
+		return 0;
 	}
 
 	/**
 	 * Returns the remaining time before the sender can report again (in Seconds).
 	 *
 	 * @param sender The sender to get the remaining time for.
-	 * @return The seconds remaining before the sender can report again.
+	 * @return The seconds remaining before the sender can report again, if the sender has reported.  Otherwise, zero (0).
 	 */
 	public int getRemainingTime(final CommandSender sender) {
-		final HashMap<String, PriorityQueue<ReportTimer>> entry = getReportedPlayers(sender);
-
-		int time = Integer.MAX_VALUE;
-
-		// Find the timer that will expire next.
-		for (final String key : entry.keySet()) {
-			final int current = getRemainingTime(sender, key);
-
-			if (current < time) {
-				time = current;
+		final PlayerReportQueue entry = getPlayerReports().get(sender);
+		Integer time = null;
+		if (entry != null) {
+			// Find the timer that will expire next.
+			for (final PriorityQueue<ReportTimer> timers : entry.values()) {
+				final ReportTimer timer = timers.peek();
+				if (timer != null) {
+					if (time == null || timer.getTimeRemaining() < time) {
+						time = timer.getTimeRemaining();
+					}
+				}
 			}
 		}
 
-		return time;
+		return (time != null) ? time : 0;
 	}
 
 	/**
@@ -279,132 +186,62 @@ public class ReportLimitService extends Service {
 	 * @param expired The expiring {@link ReportTimer}.
 	 */
 	public void limitExpired(final ReportTimer expired) {
-		if (!canReport(expired.getPlayer())) {
+		final Player player = expired.getPlayer();
+		final OfflinePlayer reported = expired.getReported();
+
+		if (!canReport(player)) {
 			// Alert player they can report again
 			if (getConfigurationService().get(ConfigurationEntries.alertPlayerWhenAllowedToReportAgain)) {
-				expired.getPlayer().sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE +
+				player.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE +
 						getLocale().getString(ReportPhrases.allowedToReportAgain));
 			}
 
 			// Alert console if configured to
 			if (getConfigurationService().get(ConfigurationEntries.alertConsoleWhenAllowedToReportAgain)) {
 				log.log(Level.INFO, Reporter.getLogPrefix() +
-						expired.getPlayer().getName() + " is now allowed to report again!");
+						player.getName() + " is now allowed to report again!");
 			}
 		}
 
-		if (getConfigurationService().get(ConfigurationEntries.limitReportsAgainstPlayers) && !canReport(expired.getPlayer(), expired.getReported())) {
-			String output;
-
+		if (getConfigurationService().get(ConfigurationEntries.limitReportsAgainstPlayers) && !canReport(player, reported)) {
 			if (getConfigurationService().get(ConfigurationEntries.alertPlayerWhenAllowedToReportPlayerAgain)) {
-				output = getLocale().getString(ReportPhrases.allowedToReportPlayerAgain);
-				final String reportedNameFormatted = BukkitUtil.formatPlayerName(expired.getReported());
-
-				output = output.replaceAll("%r", ChatColor.BLUE + reportedNameFormatted + ChatColor.WHITE);
-				expired.getPlayer().sendMessage(
-						ChatColor.BLUE + Reporter.getLogPrefix() +
-								ChatColor.WHITE + output);
+				final String output = getLocale().getString(ReportPhrases.allowedToReportPlayerAgain)
+						.replaceAll("%r", ChatColor.BLUE + BukkitUtil.formatPlayerName(reported) + ChatColor.WHITE);
+				player.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.WHITE + output);
 			}
 
 			if (getConfigurationService().get(ConfigurationEntries.alertConsoleWhenAllowedToReportPlayerAgain)) {
-				output = "%p is now allowed to report %r again!";
-
-				output = output.replaceAll("%p", BukkitUtil.formatPlayerName(expired.getPlayer()));
-				output = output.replaceAll("%r", BukkitUtil.formatPlayerName(expired.getReported()));
-
-				log.log(Level.INFO, Reporter.getLogPrefix() + output);
+				log.log(Level.INFO, Reporter.getLogPrefix() +
+						String.format("%s is now allowed to report %s again!",
+								BukkitUtil.formatPlayerName(player),
+								BukkitUtil.formatPlayerName(reported)));
 			}
 		}
-
-		final Player player = expired.getPlayer();
-		final OfflinePlayer reported = expired.getReported();
 
 		// Remove the expired report from the player reports queue.
-		final HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers = getReportedPlayers(player);
-
-		if (BukkitUtil.isPlayerValid(reported)) {
-			reportedPlayers.get(reported.getUniqueId().toString()).remove(expired);
-		} else {
-			reportedPlayers.get(reported.getName()).remove(expired);
-		}
+		getPlayerReports().remove(player, reported, expired);
 	}
 
-	/**
-	 * Returns all the players the given {@link CommandSender} has reported.
-	 *
-	 * @param sender The {@link CommandSender}.
-	 * @return A HashMap containing all the players the {@link CommandSender} has reported.
-	 */
-	private HashMap<String, PriorityQueue<ReportTimer>> getReportedPlayers(final CommandSender sender) {
-		final HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers =
-				new HashMap<String, PriorityQueue<ReportTimer>>();
+	private boolean hasReported(final CommandSender sender) {
+		return !getPlayerReports().get(sender).isEmpty();
+	}
 
-		if (getPlayerReports().get(sender.getName()) != null) {
-			reportedPlayers.putAll(getPlayerReports().get(sender.getName()));
-		}
+	private boolean isPlayerAndHasReported(final CommandSender sender) {
+		return BukkitUtil.isPlayer(sender) && hasReported(sender);
+	}
 
-		if (BukkitUtil.isPlayer(sender)) {
-			final Player player = (Player) sender;
-
-			if (getPlayerReports().get(player.getUniqueId().toString()) != null) {
-				reportedPlayers.putAll(getPlayerReports().get(player.getUniqueId().toString()));
+	private boolean canReport(final CommandSender sender, final int limit, final int numberOfReports) {
+		if (isPlayerAndHasReported(sender)) {
+			final Player player = Player.class.cast(sender);
+			if (!hasLimitOverride(player)) {
+				return numberOfReports < limit;
 			}
 		}
-
-		return reportedPlayers;
+		return true;
 	}
 
-	/**
-	 * Gets all {@link ReportTimer}s where the given player is reported.
-	 *
-	 * @param reported        The player.
-	 * @param reportedPlayers A HashMap containing all the players reported by a certain sender.
-	 * @return All {@link ReportTimer}s where the given player is reported.
-	 */
-	private PriorityQueue<ReportTimer> getTimers(final OfflinePlayer reported, final HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers) {
-		final PriorityQueue<ReportTimer> timers = new PriorityQueue<ReportTimer>();
-
-		if (reportedPlayers.get(reported.getName()) != null) {
-			timers.addAll(reportedPlayers.get(reported.getName()));
-		}
-
-		if (reportedPlayers.get(reported.getUniqueId().toString()) != null) {
-			timers.addAll(reportedPlayers.get(reported.getUniqueId().toString()));
-		}
-
-		return timers;
-	}
-
-	/**
-	 * Gets all the {@link ReportTimer}s where the given {@link CommandSender} has reported the given {@link OfflinePlayer}.
-	 *
-	 * @param sender   The {@link CommandSender}.
-	 * @param reported The {@link OfflinePlayer}.
-	 * @return A {@link PriorityQueue} containing {@link ReportTimer}s where the given
-	 * {@link CommandSender} has reported the given {@link OfflinePlayer}.
-	 */
-	private PriorityQueue<ReportTimer> getAllReportTimers(final CommandSender sender, final OfflinePlayer reported) {
-		final HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers = this.getReportedPlayers(sender);
-
-		return this.getTimers(reported, reportedPlayers);
-	}
-
-	/**
-	 * Gets all the report timers for all players reported by the given {@link CommandSender}.
-	 *
-	 * @param sender The {@link CommandSender}.
-	 * @return A {@link PriorityQueue} containing {@link ReportTimer}s the given {@link CommandSender} has created.
-	 */
-	private PriorityQueue<ReportTimer> getAllReportTimers(final CommandSender sender) {
-		final HashMap<String, PriorityQueue<ReportTimer>> reportedPlayers = this.getReportedPlayers(sender);
-
-		final PriorityQueue<ReportTimer> timers = new PriorityQueue<ReportTimer>();
-
-		for (final PriorityQueue<ReportTimer> e : reportedPlayers.values()) {
-			timers.addAll(e);
-		}
-
-		return timers;
+	private boolean hasLimitOverride(final Player player) {
+		return hasPermission(player, "reporter.report.nolimit");
 	}
 
 	private ConfigurationService getConfigurationService() {
@@ -418,7 +255,7 @@ public class ReportLimitService extends Service {
 	private boolean hasPermission(final Player player, final String permission) {
 		return getModule().getPermissionService().hasPermission(player, permission);
 	}
-	
+
 	private PlayerReport getPlayerReports() {
 		return getStore().getPlayerReportStore().get();
 	}

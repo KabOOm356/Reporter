@@ -558,4 +558,14 @@ public class BukkitUtilTest extends PowerMockitoTest {
 			verifyStatic();
 		}
 	}
+
+	@Test
+	public void testConvertSecondsToServerTicks() {
+		assertTrue(BukkitUtil.convertSecondsToServerTicks(1) > 1);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testConvertSecondsToServerTicksNegative() {
+		BukkitUtil.convertSecondsToServerTicks(-1);
+	}
 }

@@ -6,9 +6,9 @@ import net.KabOOm356.Command.Commands.ViewCommand;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.AlertPhrases;
-import net.KabOOm356.Service.PlayerMessageService;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Runnable.DelayedMessage;
+import net.KabOOm356.Service.PlayerMessageService;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import org.apache.logging.log4j.LogManager;
@@ -31,7 +31,6 @@ import java.util.UUID;
  */
 public class ReporterPlayerListener implements Listener {
 	private static final Logger log = LogManager.getLogger(ReporterPlayerListener.class);
-	private static final long serverTicksPerSecond = 20L;
 
 	private final Reporter plugin;
 
@@ -92,7 +91,7 @@ public class ReporterPlayerListener implements Listener {
 			listCommand.setArguments(new ArrayList<String>());
 			if (plugin.getConfig().getBoolean("general.messaging.listOnLogin.useDelay", true)) {
 				final int delay = plugin.getConfig().getInt("general.messaging.listOnLogin.delay", 5);
-				Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, listCommand, serverTicksPerSecond * delay);
+				Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, listCommand, BukkitUtil.convertSecondsToServerTicks(delay));
 			} else {
 				Bukkit.getScheduler().runTaskAsynchronously(plugin, listCommand);
 			}
@@ -124,9 +123,8 @@ public class ReporterPlayerListener implements Listener {
 				final int delayTimeInSeconds = plugin.getConfig().getInt("general.messaging.completedMessageOnLogin.delay", 5);
 
 				while (!messages.isEmpty()) {
-					// Calculate the delay time in bukkit ticks.
-					// (20 bukkit ticks per second * user specified delay time in seconds) * message group number.
-					delayTime = (serverTicksPerSecond * delayTimeInSeconds) * messageGroup;
+					// Calculate the delay time in bukkit ticks and the offset for the message group.
+					delayTime = BukkitUtil.convertSecondsToServerTicks(delayTimeInSeconds) * messageGroup;
 
 					final String output = messages.remove(0);
 

@@ -1,6 +1,7 @@
 package net.KabOOm356.Util;
 
 import com.google.common.base.Charsets;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -30,6 +31,7 @@ public final class BukkitUtil {
 	public static final String BUKKIT_COLOR_CODE_REPLACEMENT = "\u00A7$2";
 	public static final OfflinePlayer anonymousPlayer = Bukkit.getOfflinePlayer("* (Anonymous)");
 
+	private static final long serverTicksPerSecond = 20L;
 	private static final String realPlayerNameFormat = "%s " + ChatColor.GOLD + "(%s)";
 
 	private BukkitUtil() {
@@ -427,5 +429,16 @@ public final class BukkitUtil {
 			throw new IllegalPluginAccessException(String.format("The plugin [%s] is not enabled!", plugin));
 		}
 		return Bukkit.getPluginManager().getPlugin(plugin);
+	}
+
+	/**
+	 * Converts seconds to server ticks.
+	 *
+	 * @param seconds The number of seconds.
+	 * @return The number of server ticks.
+	 */
+	public static Long convertSecondsToServerTicks(final int seconds) {
+		Validate.isTrue(seconds >= 0, "Number of seconds must be positive!");
+		return seconds * serverTicksPerSecond;
 	}
 }
