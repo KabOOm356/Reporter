@@ -101,7 +101,7 @@ public class ListCommand extends ReporterCommand {
 		} else if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true)) {
 			final List<Integer> indexes;
 			try {
-				indexes = getManager().getViewableReports(sender);
+				indexes = getServiceModule().getReportInformationService().getViewableReports(sender);
 			} catch (final Exception e) {
 				sender.sendMessage(getErrorMessage());
 				log.log(Level.ERROR, "Failed to list submitted reports!", e);
@@ -325,10 +325,10 @@ public class ListCommand extends ReporterCommand {
 		int highPriorityCount = 0;
 
 		try {
-			noPriorityCount = getManager().getNumberOfPriority(ModLevel.NONE);
-			lowPriorityCount = getManager().getNumberOfPriority(ModLevel.LOW);
-			normalPriorityCount = getManager().getNumberOfPriority(ModLevel.NORMAL);
-			highPriorityCount = getManager().getNumberOfPriority(ModLevel.HIGH);
+			noPriorityCount = getServiceModule().getReportCountService().getNumberOfPriority(ModLevel.NONE);
+			lowPriorityCount = getServiceModule().getReportCountService().getNumberOfPriority(ModLevel.LOW);
+			normalPriorityCount = getServiceModule().getReportCountService().getNumberOfPriority(ModLevel.NORMAL);
+			highPriorityCount = getServiceModule().getReportCountService().getNumberOfPriority(ModLevel.HIGH);
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to list reports by priority!", e);
 			sender.sendMessage(getErrorMessage());
@@ -357,10 +357,10 @@ public class ListCommand extends ReporterCommand {
 		final List<Integer> highPriorityIndexes;
 
 		try {
-			noPriorityIndexes = getManager().getIndexesOfPriority(ModLevel.NONE);
-			lowPriorityIndexes = getManager().getIndexesOfPriority(ModLevel.LOW);
-			normalPriorityIndexes = getManager().getIndexesOfPriority(ModLevel.NORMAL);
-			highPriorityIndexes = getManager().getIndexesOfPriority(ModLevel.HIGH);
+			noPriorityIndexes = getServiceModule().getReportInformationService().getIndexesOfPriority(ModLevel.NONE);
+			lowPriorityIndexes = getServiceModule().getReportInformationService().getIndexesOfPriority(ModLevel.LOW);
+			normalPriorityIndexes = getServiceModule().getReportInformationService().getIndexesOfPriority(ModLevel.NORMAL);
+			highPriorityIndexes = getServiceModule().getReportInformationService().getIndexesOfPriority(ModLevel.HIGH);
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to list report indexes by priority!", e);
 			sender.sendMessage(getErrorMessage());
@@ -398,8 +398,8 @@ public class ListCommand extends ReporterCommand {
 		final int incompleteReports;
 		final int completeReports;
 		try {
-			incompleteReports = getManager().getIncompleteReports();
-			completeReports = getManager().getCompletedReports();
+			incompleteReports = getServiceModule().getReportCountService().getIncompleteReports();
+			completeReports = getServiceModule().getReportCountService().getCompletedReports();
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to get number of complete and incomplete reports!", e);
 			sender.sendMessage(getErrorMessage());
@@ -425,8 +425,8 @@ public class ListCommand extends ReporterCommand {
 		final List<Integer> completeIndexes;
 		final List<Integer> incompleteIndexes;
 		try {
-			completeIndexes = getManager().getCompletedReportIndexes();
-			incompleteIndexes = getManager().getIncompleteReportIndexes();
+			completeIndexes = getServiceModule().getReportInformationService().getCompletedReportIndexes();
+			incompleteIndexes = getServiceModule().getReportInformationService().getIncompleteReportIndexes();
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to get number of complete and incomplete reports!", e);
 			sender.sendMessage(getErrorMessage());

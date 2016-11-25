@@ -67,7 +67,7 @@ public class StatisticCommand extends ReporterCommand {
 	@Override
 	public void execute(final CommandSender sender, final ArrayList<String> args) {
 		if (args.get(0).equalsIgnoreCase("list")) {
-			if (getManager().hasPermission(sender, "reporter.statistic.list")) {
+			if (getServiceModule().getPermissionService().hasPermission(sender, "reporter.statistic.list")) {
 				listStatistics(sender);
 			} else {
 				sender.sendMessage(ChatColor.RED +
@@ -97,14 +97,14 @@ public class StatisticCommand extends ReporterCommand {
 			if (statistic == SQLStat.ALL) {
 				if (args.size() >= 3) {
 					if (args.get(2).equalsIgnoreCase("mod")) {
-						if (getManager().hasPermission(sender, "reporter.statistic.read.mod")) {
+						if (getServiceModule().getPermissionService().hasPermission(sender, "reporter.statistic.read.mod")) {
 							displayAllModStatistics(sender, player);
 						} else {
 							sender.sendMessage(ChatColor.RED +
 									getManager().getLocale().getString(GeneralPhrases.failedPermissions));
 						}
 					} else if (args.get(2).equalsIgnoreCase("player")) {
-						if (getManager().hasPermission(sender, "reporter.statistic.read.player")) {
+						if (getServiceModule().getPermissionService().hasPermission(sender, "reporter.statistic.read.player")) {
 							displayAllPlayerStatistics(sender, player);
 						} else {
 							sender.sendMessage(ChatColor.RED +
@@ -121,7 +121,7 @@ public class StatisticCommand extends ReporterCommand {
 				// Check the permission for the individual statistic.
 				final String permission = getStatisticPermission(statistic);
 
-				if (!getManager().hasPermission(sender, permission)) {
+				if (!getServiceModule().getPermissionService().hasPermission(sender, permission)) {
 					sender.sendMessage(ChatColor.RED + getManager().getLocale().getString(GeneralPhrases.failedPermissions));
 					return;
 				}
@@ -171,7 +171,7 @@ public class StatisticCommand extends ReporterCommand {
 	}
 
 	private void displayAllModStatistics(final CommandSender sender, final OfflinePlayer player) {
-		if (!getManager().hasPermission(sender, "reporter.statistic.read.mod")) {
+		if (!getServiceModule().getPermissionService().hasPermission(sender, "reporter.statistic.read.mod")) {
 			return;
 		}
 
@@ -183,7 +183,7 @@ public class StatisticCommand extends ReporterCommand {
 	}
 
 	private void displayAllPlayerStatistics(final CommandSender sender, final OfflinePlayer player) {
-		if (!getManager().hasPermission(sender, "reporter.statistic.read.player")) {
+		if (!getServiceModule().getPermissionService().hasPermission(sender, "reporter.statistic.read.player")) {
 			return;
 		}
 
@@ -212,9 +212,9 @@ public class StatisticCommand extends ReporterCommand {
 
 	private ResultRow getStatistic(final OfflinePlayer player, final SQLStat statistic) {
 		if (statistic instanceof ModeratorStat) {
-			return getManager().getModStatsService().getStat(player, statistic);
+			return getServiceModule().getModStatsService().getStat(player, statistic);
 		} else if (statistic instanceof PlayerStat) {
-			return getManager().getPlayerStatsService().getStat(player, statistic);
+			return getServiceModule().getPlayerStatsService().getStat(player, statistic);
 		}
 
 		return null;

@@ -6,8 +6,8 @@ import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.UnassignPhrases;
-import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
@@ -73,13 +73,13 @@ public class UnassignCommand extends ReporterCommand {
 				return;
 			}
 
-			final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
+			final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
-			if (!getManager().isReportIndexValid(sender, index)) {
+			if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
 				return;
 			}
 
-			if (!getManager().canAlterReport(sender, index)) {
+			if (!getServiceModule().getReportPermissionService().canAlterReport(sender, index)) {
 				return;
 			}
 
@@ -148,7 +148,7 @@ public class UnassignCommand extends ReporterCommand {
 		if (BukkitUtil.isOfflinePlayer(sender)) {
 			final OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 
-			getManager().getModStatsService().incrementStat(senderPlayer, ModeratorStat.UNASSIGNED);
+			getServiceModule().getModStatsService().incrementStat(senderPlayer, ModeratorStat.UNASSIGNED);
 		}
 
 		if (claimingPlayer != null && claimingPlayer.isOnline()) {

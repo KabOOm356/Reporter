@@ -133,8 +133,8 @@ public class ViewCommand extends ReporterCommand {
 						viewClaimed(sender, displayRealName(args, 1));
 					}
 				} else {
-					final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
-					if (!getManager().isReportIndexValid(sender, index)) {
+					final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
+					if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
 						return;
 					}
 					viewReport(sender, index, displayRealName(args, 1));
@@ -142,15 +142,15 @@ public class ViewCommand extends ReporterCommand {
 			} else if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true)) {
 				List<Integer> indexes = null;
 				try {
-					indexes = getManager().getViewableReports(sender);
+					indexes = getServiceModule().getReportInformationService().getViewableReports(sender);
 				} catch (final Exception e) {
 					log.log(Level.ERROR, "Failed to view submitted report!");
 					throw e;
 				}
 
-				final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
+				final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
-				if (!getManager().isReportIndexValid(sender, index)) {
+				if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
 					return;
 				}
 
@@ -193,7 +193,7 @@ public class ViewCommand extends ReporterCommand {
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			final int numberOfReports = getManager().getNumberOfPriority(level);
+			final int numberOfReports = getServiceModule().getReportCountService().getNumberOfPriority(level);
 
 			final String[][] reports = new String[numberOfReports][4];
 
@@ -391,8 +391,8 @@ public class ViewCommand extends ReporterCommand {
 		String[][] notCompleted = null;
 		String[][] completed = null;
 		try {
-			notCompleted = new String[getManager().getIncompleteReports()][4];
-			completed = new String[getManager().getCompletedReports()][4];
+			notCompleted = new String[getServiceModule().getReportCountService().getIncompleteReports()][4];
+			completed = new String[getServiceModule().getReportCountService().getCompletedReports()][4];
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to initialize report arrays!");
 			throw e;
@@ -437,7 +437,7 @@ public class ViewCommand extends ReporterCommand {
 
 		String[][] reports = null;
 		try {
-			reports = new String[getManager().getCompletedReports()][4];
+			reports = new String[getServiceModule().getReportCountService().getCompletedReports()][4];
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to initialize completed report array!");
 			throw e;
@@ -475,7 +475,7 @@ public class ViewCommand extends ReporterCommand {
 
 		String[][] reports = null;
 		try {
-			reports = new String[getManager().getIncompleteReports()][4];
+			reports = new String[getServiceModule().getReportCountService().getIncompleteReports()][4];
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to initialize unfinished report array!");
 			throw e;
@@ -599,7 +599,7 @@ public class ViewCommand extends ReporterCommand {
 				completionStatus,
 				completedBy, completionDate, summaryDetails);
 
-		getManager().getLastViewedReportService().playerViewed(sender, index);
+		getServiceModule().getLastViewedReportService().playerViewed(sender, index);
 	}
 
 	private void quickViewCompleted(final CommandSender sender, final String[][] reports) {

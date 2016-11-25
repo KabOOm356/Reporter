@@ -7,8 +7,8 @@ import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.RespondPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ViewPhrases;
-import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
@@ -86,9 +86,9 @@ public class RespondCommand extends ReporterCommand {
 				return;
 			}
 
-			final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
+			final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
-			if (!getManager().isReportIndexValid(sender, index)) {
+			if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
 				return;
 			}
 
@@ -239,7 +239,7 @@ public class RespondCommand extends ReporterCommand {
 
 			player.teleport(loc);
 
-			getManager().getModStatsService().incrementStat(player, ModeratorStat.RESPONDED);
+			getServiceModule().getModStatsService().incrementStat(player, ModeratorStat.RESPONDED);
 		}
 	}
 }

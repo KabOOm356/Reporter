@@ -1,9 +1,10 @@
 package net.KabOOm356.Listeners;
 
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Service.LastViewedReportService;
 import net.KabOOm356.Service.PlayerMessageService;
-import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Service.ServiceModule;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -49,8 +50,10 @@ public class ReporterPlayerListenerTest extends PowerMockitoTest {
 		joinEvent = spy(new PlayerJoinEvent(player, "JoinTest"));
 		quitEvent = spy(new PlayerQuitEvent(player, "QuitTest"));
 		when(playerMessageService.hasMessages(anyString())).thenReturn(false);
-		when(reporterCommandManager.getLastViewedReportService()).thenReturn(lastViewedReportService);
-		when(reporterCommandManager.getMessageService()).thenReturn(playerMessageService);
+		final ServiceModule serviceModule = mock(ServiceModule.class);
+		when(reporterCommandManager.getServiceModule()).thenReturn(serviceModule);
+		when(serviceModule.getLastViewedReportService()).thenReturn(lastViewedReportService);
+		when(serviceModule.getPlayerMessageService()).thenReturn(playerMessageService);
 		when(reporter.getCommandManager()).thenReturn(reporterCommandManager);
 		when(configuration.getBoolean(anyString(), anyBoolean())).thenReturn(false);
 		doReturn(configuration).when(reporter).getConfig();

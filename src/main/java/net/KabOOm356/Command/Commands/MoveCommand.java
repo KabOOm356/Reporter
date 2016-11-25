@@ -6,9 +6,9 @@ import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.MovePhrases;
-import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
@@ -76,17 +76,17 @@ public class MoveCommand extends ReporterCommand {
 				return;
 			}
 
-			final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
+			final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
-			if (!getManager().isReportIndexValid(sender, index)) {
+			if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
 				return;
 			}
 
-			if (!getManager().canAlterReport(sender, index)) {
+			if (!getServiceModule().getReportPermissionService().canAlterReport(sender, index)) {
 				return;
 			}
 
-			if (!getManager().requireModLevelInBounds(sender, args.get(1))) {
+			if (!getServiceModule().getPlayerService().requireModLevelInBounds(sender, args.get(1))) {
 				return;
 			}
 
@@ -184,7 +184,7 @@ public class MoveCommand extends ReporterCommand {
 		if (BukkitUtil.isOfflinePlayer(sender)) {
 			final OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 
-			getManager().getModStatsService().incrementStat(senderPlayer, ModeratorStat.MOVED);
+			getServiceModule().getModStatsService().incrementStat(senderPlayer, ModeratorStat.MOVED);
 		}
 	}
 }

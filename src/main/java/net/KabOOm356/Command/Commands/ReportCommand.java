@@ -7,9 +7,9 @@ import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ReportPhrases;
+import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Service.SQLStatServices.PlayerStatService;
 import net.KabOOm356.Service.SQLStatServices.PlayerStatService.PlayerStat;
-import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.FormattingUtil;
@@ -116,7 +116,7 @@ public class ReportCommand extends ReporterCommand {
 
 	private void reportCommand(final CommandSender sender, final OfflinePlayer reported, final String details) throws ClassNotFoundException, SQLException, InterruptedException {
 		final ArrayList<String> params = new ArrayList<String>();
-		final int count = getManager().getCount();
+		final int count = getServiceModule().getReportCountService().getCount();
 		Location reportedLoc = null;
 
 		if (count != -1) {
@@ -186,11 +186,11 @@ public class ReportCommand extends ReporterCommand {
 					ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(ReportPhrases.playerReport)));
 
-			broadcastSubmittedMessage(getManager().getCount());
+			broadcastSubmittedMessage(getServiceModule().getReportCountService().getCount());
 
-			getManager().getReportLimitService().hasReported(sender, reported);
+			getServiceModule().getReportLimitService().hasReported(sender, reported);
 
-			final PlayerStatService stats = getManager().getPlayerStatsService();
+			final PlayerStatService stats = getServiceModule().getPlayerStatsService();
 
 			final String date = Reporter.getDateformat().format(new Date());
 
@@ -229,7 +229,7 @@ public class ReportCommand extends ReporterCommand {
 	}
 
 	private boolean canReport(final CommandSender sender, final OfflinePlayer reported) {
-		if (!getManager().getReportLimitService().canReport(sender, reported)) {
+		if (!getServiceModule().getReportLimitService().canReport(sender, reported)) {
 			String output = getManager().getLocale().getString(ReportPhrases.reachedReportingLimitAgaintPlayer);
 
 			final String reportedNameFormatted = BukkitUtil.formatPlayerName(reported);
@@ -248,7 +248,7 @@ public class ReportCommand extends ReporterCommand {
 	}
 
 	private boolean canReport(final CommandSender sender) {
-		if (!getManager().getReportLimitService().canReport(sender)) {
+		if (!getServiceModule().getReportLimitService().canReport(sender)) {
 			sender.sendMessage(ChatColor.BLUE + Reporter.getLogPrefix() +
 					ChatColor.WHITE + BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(ReportPhrases.reachedReportingLimit)));
@@ -268,7 +268,7 @@ public class ReportCommand extends ReporterCommand {
 
 		timeRemaining = timeRemaining.replaceAll("%r", ChatColor.BLUE + reportedNameFormatted + ChatColor.WHITE);
 
-		final int seconds = getManager().getReportLimitService().getRemainingTime(sender, reported);
+		final int seconds = getServiceModule().getReportLimitService().getRemainingTime(sender, reported);
 
 		return FormattingUtil.formatTimeRemaining(timeRemaining, seconds);
 	}
@@ -277,7 +277,7 @@ public class ReportCommand extends ReporterCommand {
 		final String timeRemaining = BukkitUtil.colorCodeReplaceAll(
 				getManager().getLocale().getString(ReportPhrases.remainingTimeForReport));
 
-		final int seconds = getManager().getReportLimitService().getRemainingTime(sender);
+		final int seconds = getServiceModule().getReportLimitService().getRemainingTime(sender);
 
 		return FormattingUtil.formatTimeRemaining(timeRemaining, seconds);
 	}

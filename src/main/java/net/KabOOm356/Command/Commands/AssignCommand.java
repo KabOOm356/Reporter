@@ -5,9 +5,9 @@ import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Locale.Entry.LocalePhrases.AssignPhrases;
-import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
@@ -75,13 +75,13 @@ public class AssignCommand extends ReporterCommand {
 				return;
 			}
 
-			final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
+			final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
-			if (!getManager().isReportIndexValid(sender, index)) {
+			if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
 				return;
 			}
 
-			if (!getManager().canAlterReport(sender, index)) {
+			if (!getServiceModule().getReportPermissionService().canAlterReport(sender, index)) {
 				return;
 			}
 
@@ -104,7 +104,7 @@ public class AssignCommand extends ReporterCommand {
 		params.add(1, Reporter.getDateformat().format(new Date()));
 		params.add(2, player.getName());
 		params.add(3, player.getUniqueId().toString());
-		params.add(4, Integer.toString(getManager().getModLevel(player).getLevel()));
+		params.add(4, Integer.toString(getServiceModule().getPlayerService().getModLevel(player).getLevel()));
 		params.add(5, Integer.toString(index));
 
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
@@ -141,7 +141,7 @@ public class AssignCommand extends ReporterCommand {
 		if (BukkitUtil.isOfflinePlayer(sender)) {
 			final OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 
-			getManager().getModStatsService().incrementStat(senderPlayer, ModeratorStat.ASSIGNED);
+			getServiceModule().getModStatsService().incrementStat(senderPlayer, ModeratorStat.ASSIGNED);
 		}
 	}
 
@@ -163,7 +163,7 @@ public class AssignCommand extends ReporterCommand {
 			return false;
 		}
 
-		if (!getManager().canAlterReport(sender, index, player)) {
+		if (!getServiceModule().getReportPermissionService().canAlterReport(sender, index, player)) {
 			return false;
 		}
 
@@ -174,8 +174,8 @@ public class AssignCommand extends ReporterCommand {
 			return false;
 		}
 
-		final ModLevel senderLevel = getManager().getModLevel(sender);
-		final ModLevel playerLevel = getManager().getModLevel(player);
+		final ModLevel senderLevel = getServiceModule().getPlayerService().getModLevel(sender);
+		final ModLevel playerLevel = getServiceModule().getPlayerService().getModLevel(player);
 
 		final boolean senderHasLowerModLevel = senderLevel.getLevel() <= playerLevel.getLevel();
 		final boolean senderIsConsoleOrOp = sender.isOp() || sender instanceof ConsoleCommandSender;
@@ -188,12 +188,12 @@ public class AssignCommand extends ReporterCommand {
 			output = output.replaceAll("%p", ChatColor.BLUE + BukkitUtil.formatPlayerName(player) + ChatColor.WHITE);
 			output = output.replaceAll("%m", playerLevel.getColor() + playerLevel.getName() + ChatColor.WHITE);
 			sender.sendMessage(ChatColor.WHITE + output);
-			getManager().displayModLevel(sender);
+			getServiceModule().getPlayerService().displayModLevel(sender);
 
 			return false;
 		}
 
-		return getManager().requirePriority(sender, index, player);
+		return getServiceModule().getReportPermissionService().requirePriority(sender, index, player);
 	}
 
 	@Override

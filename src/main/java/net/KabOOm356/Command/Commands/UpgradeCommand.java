@@ -68,13 +68,13 @@ public class UpgradeCommand extends ReporterCommand {
 				return;
 			}
 
-			final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
+			final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
-			if (!getManager().isReportIndexValid(sender, index)) {
+			if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
 				return;
 			}
 
-			if (!getManager().canAlterReport(sender, index)) {
+			if (!getServiceModule().getReportPermissionService().canAlterReport(sender, index)) {
 				return;
 			}
 

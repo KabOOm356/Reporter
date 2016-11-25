@@ -6,9 +6,9 @@ import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.CompletePhrases;
+import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Service.Messager.Group;
 import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
-import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
@@ -76,13 +76,13 @@ public class CompleteCommand extends ReporterCommand {
 				return;
 			}
 
-			final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
+			final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
-			if (!getManager().isReportIndexValid(sender, index)) {
+			if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
 				return;
 			}
 
-			if (!getManager().canAlterReport(sender, index)) {
+			if (!getServiceModule().getReportPermissionService().canAlterReport(sender, index)) {
 				return;
 			}
 
@@ -150,7 +150,7 @@ public class CompleteCommand extends ReporterCommand {
 		if (BukkitUtil.isOfflinePlayer(sender)) {
 			final OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 
-			getManager().getModStatsService().incrementStat(senderPlayer, ModeratorStat.COMPLETED);
+			getServiceModule().getModStatsService().incrementStat(senderPlayer, ModeratorStat.COMPLETED);
 		}
 	}
 
@@ -227,9 +227,9 @@ public class CompleteCommand extends ReporterCommand {
 					getManager().getLocale().getString(CompletePhrases.yourReportsCompleted);
 
 			if (sender != null) {
-				getManager().getMessageService().addMessage(sender.getUniqueId().toString(), messageGroup, message, index);
+				getServiceModule().getPlayerMessageService().addMessage(sender.getUniqueId().toString(), messageGroup, message, index);
 			} else if (playerName != null && !playerName.isEmpty()) {
-				getManager().getMessageService().addMessage(playerName, messageGroup, message, index);
+				getServiceModule().getPlayerMessageService().addMessage(playerName, messageGroup, message, index);
 			}
 		}
 	}

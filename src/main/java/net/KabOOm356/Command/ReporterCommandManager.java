@@ -7,16 +7,8 @@ import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.HelpPhrases;
 import net.KabOOm356.Locale.Locale;
-import net.KabOOm356.Service.LastViewedReportService;
-import net.KabOOm356.Service.ServiceModule;
-import net.KabOOm356.Service.PlayerMessageService;
-import net.KabOOm356.Service.ReportLimitService;
-import net.KabOOm356.Service.SQLStatServices.ModeratorStatService;
-import net.KabOOm356.Service.SQLStatServices.PlayerStatService;
-import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
-import net.KabOOm356.Throwable.IndexNotANumberException;
-import net.KabOOm356.Throwable.IndexOutOfRangeException;
+import net.KabOOm356.Service.ServiceModule;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.FormattingUtil;
@@ -30,13 +22,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 /**
  * A Command Service and Command Executor for all the Reporter Commands.
@@ -312,131 +301,7 @@ public class ReporterCommandManager implements CommandExecutor {
 		return plugin.getConfig();
 	}
 
-	public ReportLimitService getReportLimitService() {
-		return getModule().getLimitService();
-	}
-
-	public LastViewedReportService getLastViewedReportService() {
-		return getModule().getLastViewedReportService();
-	}
-
-	public PlayerMessageService getMessageService() {
-		return getModule().getPlayerMessageService();
-	}
-
-	public ModeratorStatService getModStatsService() {
-		return getModule().getModStatsService();
-	}
-
-	public PlayerStatService getPlayerStatsService() {
-		return getModule().getPlayerStatsService();
-	}
-
-	private ServiceModule getModule() {
+	public ServiceModule getServiceModule() {
 		return getPlugin().getServiceModule();
-	}
-
-	// This is only here for backwards compatibility as things get porter to the service module. It wil be removed!
-	@Deprecated
-	public boolean isReportIndexValid(final CommandSender sender, final int index) throws ClassNotFoundException, SQLException, IndexNotANumberException, InterruptedException, IndexOutOfRangeException {
-		getModule().getReportValidatorService().requireReportIndexValid(index);
-		// If we didn't throw by this point the index is in range.
-		return true;
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public int getCount() throws InterruptedException, SQLException, ClassNotFoundException {
-		return getModule().getReportCountService().getCount();
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public List<Integer> getViewableReports(final CommandSender sender) throws InterruptedException, SQLException, ClassNotFoundException {
-		return getModule().getReportInformationService().getViewableReports(sender);
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public int getIncompleteReports() throws InterruptedException, SQLException, ClassNotFoundException {
-		return getModule().getReportCountService().getIncompleteReports();
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public int getCompletedReports() throws InterruptedException, SQLException, ClassNotFoundException {
-		return getModule().getReportCountService().getCompletedReports();
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public List<Integer> getCompletedReportIndexes() throws InterruptedException, SQLException, ClassNotFoundException {
-		return getModule().getReportInformationService().getCompletedReportIndexes();
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public List<Integer> getIncompleteReportIndexes() throws InterruptedException, SQLException, ClassNotFoundException {
-		return getModule().getReportInformationService().getIncompleteReportIndexes();
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public int getNumberOfPriority(final ModLevel level) throws InterruptedException, SQLException, ClassNotFoundException {
-		return getModule().getReportCountService().getNumberOfPriority(level);
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public List<Integer> getIndexesOfPriority(final ModLevel level) throws InterruptedException, SQLException, ClassNotFoundException {
-		return getModule().getReportInformationService().getIndexesOfPriority(level);
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public boolean hasPermission(final CommandSender sender, final String permission) {
-		return getModule().getPermissionService().hasPermission(sender, permission);
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public boolean hasPermission(final Player player, final String permission) {
-		return getModule().getPermissionService().hasPermission(player, permission);
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public boolean canAlterReport(final CommandSender sender, final int index) throws InterruptedException, SQLException, ClassNotFoundException {
-		return getModule().getReportPermissionService().canAlterReport(sender, index);
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public boolean requireModLevelInBounds(final CommandSender sender, final String modLevel) {
-		return getModule().getPlayerService().requireModLevelInBounds(sender, modLevel);
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public ModLevel getModLevel(final CommandSender sender) {
-		return getModule().getPlayerService().getModLevel(sender);
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public boolean canAlterReport(final CommandSender sender, final int index, final Player player) throws InterruptedException, SQLException, ClassNotFoundException {
-		return getModule().getReportPermissionService().canAlterReport(sender, index, player);
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public void displayModLevel(final CommandSender sender) {
-		getModule().getPlayerService().displayModLevel(sender);
-	}
-
-	// This is only here for backwards compatibility as things get ported to the service module.  It will be removed!
-	@Deprecated
-	public boolean requirePriority(final CommandSender sender, final int index, final Player player) throws InterruptedException, SQLException, ClassNotFoundException {
-		return getModule().getReportPermissionService().requirePriority(sender, index, player);
 	}
 }

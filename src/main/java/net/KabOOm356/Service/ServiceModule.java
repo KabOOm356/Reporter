@@ -19,7 +19,7 @@ public class ServiceModule {
 	private final ReportInformationService reportInformationService;
 	private final ReportPermissionService reportPermissionService;
 	private final PermissionService permissionService;
-	private final ReportLimitService limitService;
+	private final ReportLimitService reportLimitService;
 	private final ModeratorStatService modStatsService;
 	private final PlayerStatService playerStatsService;
 	private final ConfigurationService configurationService;
@@ -40,7 +40,7 @@ public class ServiceModule {
 		reportPermissionService = new ReportPermissionService(this);
 		configurationService = new ConfigurationService(this);
 
-		limitService = new ReportLimitService(this);
+		reportLimitService = new ReportLimitService(this);
 		modStatsService = new ModeratorStatService(this);
 		playerStatsService = new PlayerStatService(this);
 	}
@@ -81,8 +81,8 @@ public class ServiceModule {
 		return playerMessageService;
 	}
 
-	public ReportLimitService getLimitService() {
-		return limitService;
+	public ReportLimitService getReportLimitService() {
+		return reportLimitService;
 	}
 
 	public ModeratorStatService getModStatsService() {

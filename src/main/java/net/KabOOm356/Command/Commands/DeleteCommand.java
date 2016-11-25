@@ -9,9 +9,9 @@ import net.KabOOm356.Database.SQL.QueryType;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.DeletePhrases;
 import net.KabOOm356.Locale.Locale;
-import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
@@ -97,13 +97,13 @@ public class DeleteCommand extends ReporterCommand {
 				deletionCount = deleteReportBatch(sender, BatchDeletionType.INCOMPLETE);
 			} else {
 				if (Util.isInteger(args.get(0)) || args.get(0).equalsIgnoreCase("last")) {
-					final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
+					final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
-					if (!getManager().isReportIndexValid(sender, index)) {
+					if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
 						return;
 					}
 
-					if (!getManager().canAlterReport(sender, index)) {
+					if (!getServiceModule().getReportPermissionService().canAlterReport(sender, index)) {
 						return;
 					}
 
@@ -144,7 +144,7 @@ public class DeleteCommand extends ReporterCommand {
 	private void incrementStatistic(final CommandSender sender, final int count) {
 		if (BukkitUtil.isOfflinePlayer(sender)) {
 			final OfflinePlayer player = (OfflinePlayer) sender;
-			getManager().getModStatsService().incrementStat(player, statistic, count);
+			getServiceModule().getModStatsService().incrementStat(player, statistic, count);
 		}
 	}
 
@@ -159,7 +159,7 @@ public class DeleteCommand extends ReporterCommand {
 			reformatTables(sender, index);
 			updateLastViewed(index);
 
-			getManager().getMessageService().removeMessage(index);
+			getServiceModule().getPlayerMessageService().removeMessage(index);
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to delete single report!");
 			throw e;
@@ -180,7 +180,7 @@ public class DeleteCommand extends ReporterCommand {
 	private int deletePlayer(final CommandSender sender, final PlayerDeletionType deletion, final OfflinePlayer player) throws Exception {
 		String query = getQuery(sender, player, QueryType.SELECT, deletion);
 
-		final int count = getManager().getCount();
+		final int count = getServiceModule().getReportCountService().getCount();
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
@@ -225,7 +225,7 @@ public class DeleteCommand extends ReporterCommand {
 
 			updateLastViewed(remainingIndexes);
 
-			getManager().getMessageService().reindexMessages(remainingIndexes);
+			getServiceModule().getPlayerMessageService().reindexMessages(remainingIndexes);
 			return totalDeleted;
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to delete reports for a player!");
@@ -244,7 +244,7 @@ public class DeleteCommand extends ReporterCommand {
 	private String getSelectQuery(final CommandSender sender, final OfflinePlayer player, final PlayerDeletionType deletion) {
 		final StringBuilder query = new StringBuilder();
 		query.append("SELECT ID FROM Reports WHERE ");
-		final ModLevel level = getManager().getModLevel(sender);
+		final ModLevel level = getServiceModule().getPlayerService().getModLevel(sender);
 
 		if (sender.isOp() || sender instanceof ConsoleCommandSender) {
 			if (player.getName().equalsIgnoreCase("* (Anonymous)")) {
@@ -294,7 +294,7 @@ public class DeleteCommand extends ReporterCommand {
 	private String getDeleteQuery(final CommandSender sender, final OfflinePlayer player, final PlayerDeletionType deletion) {
 		final StringBuilder query = new StringBuilder();
 		query.append("DELETE FROM Reports WHERE ");
-		final ModLevel level = getManager().getModLevel(sender);
+		final ModLevel level = getServiceModule().getPlayerService().getModLevel(sender);
 
 		if (sender.isOp() || sender instanceof ConsoleCommandSender) {
 			if (player.getName().equals("* (Anonymous)")) {
@@ -344,7 +344,7 @@ public class DeleteCommand extends ReporterCommand {
 
 	private int deleteReportBatch(final CommandSender sender, final BatchDeletionType deletion) throws Exception {
 		try {
-			final int beforeDeletion = getManager().getCount();
+			final int beforeDeletion = getServiceModule().getReportCountService().getCount();
 			final ArrayList<Integer> remainingIndexes = getRemainingIndexes(sender, deletion);
 			final int afterDeletion = remainingIndexes.size();
 			final int totalDeleted = beforeDeletion - afterDeletion;
@@ -352,7 +352,7 @@ public class DeleteCommand extends ReporterCommand {
 			deleteBatch(sender, deletion);
 			reformatTables(sender, remainingIndexes);
 			updateLastViewed(remainingIndexes);
-			getManager().getMessageService().reindexMessages(remainingIndexes);
+			getServiceModule().getPlayerMessageService().reindexMessages(remainingIndexes);
 
 			final Locale locale = getManager().getLocale();
 			String message = "";
@@ -410,7 +410,7 @@ public class DeleteCommand extends ReporterCommand {
 				query.append("CompletionStatus = 1");
 			}
 		} else {
-			final ModLevel level = getManager().getModLevel(sender);
+			final ModLevel level = getServiceModule().getPlayerService().getModLevel(sender);
 			
 			/*
 			 * Reports will be deleted (not remain) if:
@@ -466,7 +466,7 @@ public class DeleteCommand extends ReporterCommand {
 				query.append("CompletionStatus = 0");
 			}
 		} else {
-			final ModLevel level = getManager().getModLevel(sender);
+			final ModLevel level = getServiceModule().getPlayerService().getModLevel(sender);
 			
 			/*
 			 * Reports will be deleted (not remain) if:
@@ -528,11 +528,11 @@ public class DeleteCommand extends ReporterCommand {
 	}
 
 	private void updateLastViewed(final int removedIndex) {
-		getManager().getLastViewedReportService().deleteIndex(removedIndex);
+		getServiceModule().getLastViewedReportService().deleteIndex(removedIndex);
 	}
 
 	private void updateLastViewed(final ArrayList<Integer> remainingIndexes) {
-		getManager().getLastViewedReportService().deleteBatch(remainingIndexes);
+		getServiceModule().getLastViewedReportService().deleteBatch(remainingIndexes);
 	}
 
 	private void reformatTables(final CommandSender sender, final ArrayList<Integer> remainingIndexes) throws Exception {
@@ -575,7 +575,7 @@ public class DeleteCommand extends ReporterCommand {
 	}
 
 	private void reformatTables(final CommandSender sender, final int removedIndex) throws Exception {
-		final int count = getManager().getCount();
+		final int count = getServiceModule().getReportCountService().getCount();
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		Statement statement = null;

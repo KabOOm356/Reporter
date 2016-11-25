@@ -5,6 +5,7 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Runnable.RunnableWithState;
 import net.KabOOm356.Runnable.TimedRunnable;
+import net.KabOOm356.Service.ServiceModule;
 import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
@@ -83,7 +84,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 * @return True if the {@link Player} has the permission node or is OP, otherwise false.
 	 */
 	public boolean hasPermission(final Player player, final String perm) {
-		return manager.hasPermission(player, perm);
+		return manager.getServiceModule().getPermissionService().hasPermission(player, perm);
 	}
 
 	/**
@@ -118,6 +119,10 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 
 	protected ReporterCommandManager getManager() {
 		return manager;
+	}
+
+	protected ServiceModule getServiceModule() {
+		return getManager().getServiceModule();
 	}
 
 	public String getName() {

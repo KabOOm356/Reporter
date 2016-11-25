@@ -52,7 +52,7 @@ public class ReporterPlayerListener implements Listener {
 	public void onPlayerJoin(final PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
 
-		final PlayerMessageService playerMessageService = plugin.getCommandManager().getMessageService();
+		final PlayerMessageService playerMessageService = plugin.getCommandManager().getServiceModule().getPlayerMessageService();
 
 		if (playerMessageService.hasMessages(player.getUniqueId().toString()) || playerMessageService.hasMessages(player.getName())) {
 			sendMessages(player);
@@ -81,7 +81,7 @@ public class ReporterPlayerListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerQuit(final PlayerQuitEvent event) {
-		plugin.getCommandManager().getLastViewedReportService().removeLastViewedReport(event.getPlayer());
+		plugin.getCommandManager().getServiceModule().getLastViewedReportService().removeLastViewedReport(event.getPlayer());
 	}
 
 	private void listOnLogin(final Player player) {
@@ -100,10 +100,10 @@ public class ReporterPlayerListener implements Listener {
 
 	private void sendMessages(final Player player) {
 		// Players can view a message if they have permission to view all reports or their submitted reports.
-		boolean canView = plugin.getCommandManager().hasPermission(player, ViewCommand.getCommandPermissionNode());
+		boolean canView = plugin.getCommandManager().getServiceModule().getPermissionService().hasPermission(player, ViewCommand.getCommandPermissionNode());
 		canView = canView || plugin.getConfig().getBoolean("general.canViewSubmittedReports", true);
 
-		final PlayerMessageService playerMessageService = plugin.getCommandManager().getMessageService();
+		final PlayerMessageService playerMessageService = plugin.getCommandManager().getServiceModule().getPlayerMessageService();
 
 		// No point to send the message if the player can't view any reports.
 		if (canView) {
@@ -235,7 +235,7 @@ public class ReporterPlayerListener implements Listener {
 
 		for (final Player player : Bukkit.getOnlinePlayers()) {
 			// Send the message to players with the permission to get it.
-			if (plugin.getCommandManager().hasPermission(player, "reporter.alerts.onlogin.reportedPlayerLogin")) {
+			if (plugin.getCommandManager().getServiceModule().getPermissionService().hasPermission(player, "reporter.alerts.onlogin.reportedPlayerLogin")) {
 				player.sendMessage(message);
 			}
 		}

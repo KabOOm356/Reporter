@@ -5,8 +5,8 @@ import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Locale.Entry.LocalePhrases.ClaimPhrases;
-import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
@@ -72,13 +72,13 @@ public class ClaimCommand extends ReporterCommand {
 				return;
 			}
 
-			final int index = getManager().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
+			final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
-			if (!getManager().isReportIndexValid(sender, index)) {
+			if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
 				return;
 			}
 
-			if (!getManager().canAlterReport(sender, index)) {
+			if (!getServiceModule().getReportPermissionService().canAlterReport(sender, index)) {
 				return;
 			}
 
@@ -105,7 +105,7 @@ public class ClaimCommand extends ReporterCommand {
 		params.add("1");
 		params.add(BukkitUtil.getUUIDString(sender));
 		params.add(sender.getName());
-		params.add(Integer.toString(getManager().getModLevel(sender).getLevel()));
+		params.add(Integer.toString(getServiceModule().getPlayerService().getModLevel(sender).getLevel()));
 		params.add(Reporter.getDateformat().format(new Date()));
 		params.add(Integer.toString(index));
 
@@ -132,7 +132,7 @@ public class ClaimCommand extends ReporterCommand {
 		if (BukkitUtil.isOfflinePlayer(sender)) {
 			final OfflinePlayer senderPlayer = (OfflinePlayer) sender;
 
-			getManager().getModStatsService().incrementStat(senderPlayer, ModeratorStat.CLAIMED);
+			getServiceModule().getModStatsService().incrementStat(senderPlayer, ModeratorStat.CLAIMED);
 		}
 	}
 }
