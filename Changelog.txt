@@ -379,6 +379,7 @@ Changelog:
 				Updated Bukkit API to 1.9.2-R0.1-SNAPSHOT.
 				Updated metrics to R8-SNAPSHOT.
 	3.2.7
+				Fixed checking for remote locale files causing an error since Dropbox changed their public folder system.
 				New Configuration Options:
 					general.messaging.alerts.reportedPlayerLogin.enabled - Enable messaging when a reported player logs in.
                     general.messaging.alerts.reportedPlayerLogin.toPlayer - Enable sending messages to player that a reported player logged in.

@@ -7,14 +7,14 @@ import net.KabOOm356.File.AbstractFiles.VersionedNetworkFile.ReleaseLevel;
 import net.KabOOm356.Listeners.ReporterPlayerListener;
 import net.KabOOm356.Locale.Entry.LocaleInfo;
 import net.KabOOm356.Locale.Locale;
-import net.KabOOm356.Service.Messager.PlayerMessages;
-import net.KabOOm356.Service.ServiceModule;
-import net.KabOOm356.Service.Store.StoreModule;
 import net.KabOOm356.Permission.PermissionHandler;
 import net.KabOOm356.Reporter.Configuration.ReporterConfigurationUtil;
 import net.KabOOm356.Reporter.Database.ReporterDatabaseUtil;
 import net.KabOOm356.Reporter.Locale.ReporterLocaleInitializer;
 import net.KabOOm356.Reporter.Metrics.MetricsInitializer;
+import net.KabOOm356.Service.Messager.PlayerMessages;
+import net.KabOOm356.Service.ServiceModule;
+import net.KabOOm356.Service.Store.StoreModule;
 import net.KabOOm356.Service.Store.type.LastViewed;
 import net.KabOOm356.Service.Store.type.PlayerReport;
 import net.KabOOm356.Updater.PluginUpdater;
@@ -33,9 +33,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The main Reporter class.
@@ -51,7 +49,7 @@ public class Reporter extends JavaPlugin {
 	private static final Logger log = LogManager.getLogger(Reporter.class);
 	private static final String logPrefix = "[Reporter] ";
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private static final UpdateSite localeXMLUpdateSite = new UpdateSite("https://dl.dropbox.com/u/21577960/Reporter/Locale%20Files/latest.xml", UpdateSite.Type.XML);
+	private static final UpdateSite localeXMLUpdateSite = new UpdateSite("https://www.dropbox.com/s/m75q8xsvc1swys0/latest.xml?dl=1", UpdateSite.Type.XML);
 	private static final String pluginUpdateAPI = "https://api.curseforge.com/servermods/files?projectIds=31347";
 	private static String version;
 	private static String defaultConsolePrefix;
