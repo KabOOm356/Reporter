@@ -34,12 +34,13 @@ tasks.withType(JavaCompile) {
 repositories {
     mavenCentral()
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
-    maven { url 'http://repo.maven.apache.org/maven2' }
+    maven { url 'http://nexus.hc.to/content/repositories/pub_releases' }
 }
 
 dependencies {
     compileOnly group: 'org.bukkit', name: 'bukkit', version: bukkitVersion
     compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
+    compileOnly group: 'net.milkbowl.vault', name: 'VaultAPI', version: '1.7'
     
     testImplementation group: 'junit', name: 'junit', version: '4.11'
     testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '1.6.2'

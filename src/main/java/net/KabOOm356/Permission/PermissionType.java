@@ -4,7 +4,7 @@ package net.KabOOm356.Permission;
  * Supported permission types
  */
 public enum PermissionType {
-	PermissionsEx("PermissionsEx"),
+	Vault("Vault"),
 	/**
 	 * SuperPerms PermissionType.
 	 */

@@ -3,6 +3,7 @@ author: KabOOm 356
 website: http://dev.bukkit.org/server-mods/reporter/
 main: net.KabOOm356.Reporter.Reporter
 version: 3.2.7.1
+softdepend: [Vault]
 commands:
   report:
     aliases: [rreport, rep]

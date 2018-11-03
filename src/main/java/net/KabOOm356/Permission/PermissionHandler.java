@@ -1,9 +1,12 @@
 package net.KabOOm356.Permission;
 
 import net.KabOOm356.Reporter.Reporter;
+import net.milkbowl.vault.permission.Permission;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class PermissionHandler {
 	private static final Logger log = LogManager.getLogger(PermissionHandler.class);
@@ -11,15 +14,34 @@ public class PermissionHandler {
 	/**
 	 * The type of permissions system being used.
 	 */
-	private PermissionType type;
+	private final PermissionType type;
+
+	private Permission permission;
 
 	public PermissionHandler() {
-		type = PermissionType.SuperPerms;
+		if (setupVault()) {
+			type = PermissionType.Vault;
+		} else {
+			type = PermissionType.SuperPerms;
+		}
 
 		log.info(Reporter.getDefaultConsolePrefix() + type + " support enabled.");
 	}
 
 	public boolean hasPermission(final Player player, final String permission) {
+		if (type == PermissionType.Vault) {
+			return this.permission.has(player, permission);
+		}
 		return player.hasPermission(permission);
+	}
+
+	private boolean setupVault() {
+		final RegisteredServiceProvider<Permission> rsp = Bukkit.getServer().getServicesManager().getRegistration(Permission.class);
+
+		if (rsp != null) {
+			this.permission = rsp.getProvider();
+			return true;
+		}
+		return false;
 	}
 }

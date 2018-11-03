@@ -14,4 +14,4 @@ Bukkit Website: [http://bukkit.org](http://bukkit.org)
 Optional Dependencies
 ----------------------
 
-* [PermissionsEX](http://dev.bukkit.org/bukkit-plugins/permissionsex/)
+* [Vault](https://dev.bukkit.org/projects/vault) - Permission manager
