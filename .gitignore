@@ -3,6 +3,8 @@
 /.settings
 /bin
 /target
+/build
+/.gradle
 .DS_Store
 .idea
 Reporter.iml
