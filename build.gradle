@@ -7,7 +7,7 @@ buildscript {
         javaTargetVersion = JavaVersion.VERSION_1_6
         
         // Dependency
-        bukkitVersion = '1.11-R0.1-SNAPSHOT'
+        bukkitVersion = '1.13.2-R0.1-SNAPSHOT'
         log4jVersion = '2.0-beta9'
     }
 }
