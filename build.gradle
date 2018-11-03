@@ -1,13 +1,27 @@
+buildscript {
+    ext {
+        // Plugin API
+        pluginVersion = '1.10.0-SNAPSHOT'
+        
+        // Java compile
+        javaTargetVersion = JavaVersion.VERSION_1_6
+        
+        // Dependency
+        bukkitVersion = '1.11-R0.1-SNAPSHOT'
+        log4jVersion = '2.0-beta9'
+    }
+}
+
 apply plugin: 'java'
 apply plugin: 'maven'
 
 group = 'net.KabOOm356'
-version = '1.10.0-SNAPSHOT'
+version = pluginVersion
 
 description = """"""
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = javaTargetVersion
+targetCompatibility = javaTargetVersion
 
 task wrapper(type: Wrapper) {
     gradleVersion = '4.10.2'
@@ -19,15 +33,17 @@ tasks.withType(JavaCompile) {
 
 repositories {
     mavenCentral()
-    maven { url "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
-    maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url 'http://repo.maven.apache.org/maven2' }
 }
+
 dependencies {
+    compileOnly group: 'org.bukkit', name: 'bukkit', version: bukkitVersion
+    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
+    
     testImplementation group: 'junit', name: 'junit', version: '4.11'
     testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '1.6.2'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito', version: '1.6.2'
-    testImplementation group: 'org.bukkit', name: 'bukkit', version: '1.11-R0.1-SNAPSHOT'
-    testImplementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.0-beta9'
-    compileOnly group: 'org.bukkit', name: 'bukkit', version: '1.11-R0.1-SNAPSHOT'
-    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.0-beta9'
+    testImplementation group: 'org.bukkit', name: 'bukkit', version: bukkitVersion
+    testImplementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
 }
