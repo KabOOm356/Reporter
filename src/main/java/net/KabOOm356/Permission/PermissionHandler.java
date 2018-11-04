@@ -28,6 +28,10 @@ public class PermissionHandler {
 		log.info(Reporter.getDefaultConsolePrefix() + type + " support enabled.");
 	}
 
+	public PermissionType getPermissionType() {
+		return type;
+	}
+
 	public boolean hasPermission(final Player player, final String permission) {
 		if (type == PermissionType.Vault) {
 			return this.permission.has(player, permission);

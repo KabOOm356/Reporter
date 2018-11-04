@@ -11,6 +11,7 @@ import net.KabOOm356.Permission.PermissionHandler;
 import net.KabOOm356.Reporter.Configuration.ReporterConfigurationUtil;
 import net.KabOOm356.Reporter.Database.ReporterDatabaseUtil;
 import net.KabOOm356.Reporter.Locale.ReporterLocaleInitializer;
+import net.KabOOm356.Reporter.Metrics.MetricsInitializer;
 import net.KabOOm356.Service.Messager.PlayerMessages;
 import net.KabOOm356.Service.ServiceModule;
 import net.KabOOm356.Service.Store.StoreModule;
@@ -123,6 +124,7 @@ public class Reporter extends JavaPlugin {
 		initializeLocale();
 		initializeDatabase();
 		initializePermissions();
+		initializeStatistics();
 
 		playerListener = new ReporterPlayerListener(this);
 
@@ -249,6 +251,13 @@ public class Reporter extends JavaPlugin {
 		}
 	}
 
+	private void initializeStatistics() {
+		if (!getConfig().getBoolean("plugin.statistics.opt-out", false)) {
+			final MetricsInitializer metricsInitializer = new MetricsInitializer(this);
+
+			getServer().getScheduler().runTaskAsynchronously(this, metricsInitializer);
+		}
+	}
 
 	private void initializePermissions() {
 		permissionHandler = new PermissionHandler();
