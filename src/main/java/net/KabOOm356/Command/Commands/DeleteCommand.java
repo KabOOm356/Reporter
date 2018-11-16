@@ -556,16 +556,7 @@ public class DeleteCommand extends ReporterCommand {
 			log.log(Level.ERROR, "Failed reformatting tables after batch delete!");
 			throw e;
 		} finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (final Exception e) {
-				if (log.isDebugEnabled()) {
-					log.warn("Failed to close statement!", e);
-				}
-			}
-
+			closeStatement(stmt);
 			database.closeConnection(connectionId);
 		}
 
@@ -597,16 +588,20 @@ public class DeleteCommand extends ReporterCommand {
 			log.log(Level.ERROR, "Failed to reformat table after single delete!");
 			throw e;
 		} finally {
-			try {
-				if (statement != null) {
-					statement.close();
-				}
-			} catch (final Exception e) {
-				if (log.isDebugEnabled()) {
-					log.warn("Failed to close statement!", e);
-				}
-			}
+			closeStatement(statement);
 			database.closeConnection(connectionId);
+		}
+	}
+
+	private static void closeStatement(final Statement statement) {
+		try {
+			if (statement != null) {
+				statement.close();
+			}
+		} catch (final Exception e) {
+			if (log.isDebugEnabled()) {
+				log.warn("Failed to close statement!", e);
+			}
 		}
 	}
 
