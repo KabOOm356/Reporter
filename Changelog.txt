@@ -391,3 +391,5 @@ Changelog:
                     Use bStats instead of MCStats for plugin statistic collection.
                 Fixes:
                     Fixed the build being broken from a few dependencies that dead and no longer available (PermissionsEx and MCStats).
+    3.3.1   11/16/2018
+                Fixed error when loading permissions when Vault is not provided.
