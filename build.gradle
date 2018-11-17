@@ -1,7 +1,7 @@
 buildscript {
     ext {
         // Plugin API
-        pluginVersion = '1.10.0-SNAPSHOT'
+        pluginVersion = '1.10.0'
         
         // Java compile
         javaTargetVersion = JavaVersion.VERSION_1_6

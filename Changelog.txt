@@ -384,3 +384,10 @@ Changelog:
 					general.messaging.alerts.reportedPlayerLogin.enabled - Enable messaging when a reported player logs in.
                     general.messaging.alerts.reportedPlayerLogin.toPlayer - Enable sending messages to player that a reported player logged in.
                     general.messaging.alerts.reportedPlayerLogin.toConsole - Enable sending messages to the console that a reported player logged in.
+    3.3.0   11/16/2018
+                Updated Bukkit API to 1.13.2-R0.1-SNAPSHOT.
+                Features:
+                    Use Vault instead of PermissionsEx for player permissions.
+                    Use bStats instead of MCStats for plugin statistic collection.
+                Fixes:
+                    Fixed the build being broken from a few dependencies that dead and no longer available (PermissionsEx and MCStats).
