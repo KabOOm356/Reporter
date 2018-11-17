@@ -611,6 +611,10 @@ public class ViewCommand extends ReporterCommand {
 		final String reportHeader = locale.getString(ViewPhrases.viewAllReportHeader);
 		final String reportDetails = locale.getString(ViewPhrases.viewAllReportDetails);
 
+		formatAndSendReport(sender, reports, reportHeader, reportDetails);
+	}
+
+	private static void formatAndSendReport(CommandSender sender, String[][] reports, String reportHeader, String reportDetails) {
 		for (int LCV = 0; LCV < reports.length; LCV++) {
 			String out = reportHeader.replaceAll("%i", ChatColor.GOLD + reports[LCV][0] + ChatColor.WHITE);
 			out = out.replaceAll("%s", ChatColor.BLUE + reports[LCV][1] + ChatColor.WHITE);
@@ -636,18 +640,7 @@ public class ViewCommand extends ReporterCommand {
 		final String reportDetails = BukkitUtil.colorCodeReplaceAll(
 				locale.getString(ViewPhrases.viewAllReportDetails));
 
-		for (int LCV = 0; LCV < reports.length; LCV++) {
-			String out = reportHeader.replaceAll("%i", ChatColor.GOLD + reports[LCV][0] + ChatColor.WHITE);
-			out = out.replaceAll("%s", ChatColor.BLUE + reports[LCV][1] + ChatColor.WHITE);
-			out = out.replaceAll("%r", ChatColor.RED + reports[LCV][2] + ChatColor.WHITE);
-
-			sender.sendMessage(ChatColor.WHITE + out);
-
-			// Fix for replace all error with $
-			reports[LCV][3] = reports[LCV][3].replaceAll("\\$", "\\\\\\$");
-
-			sender.sendMessage(ChatColor.WHITE + reportDetails.replaceAll("%d", ChatColor.GOLD + reports[LCV][3] + ChatColor.WHITE));
-		}
+		formatAndSendReport(sender, reports, reportHeader, reportDetails);
 	}
 
 	private void quickViewAll(final CommandSender sender, final String[][] complete, final String[][] notComplete) {

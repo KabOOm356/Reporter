@@ -251,17 +251,16 @@ public class Reporter extends JavaPlugin {
 		}
 	}
 
-
-	private void initializePermissions() {
-		permissionHandler = new PermissionHandler();
-	}
-
 	private void initializeStatistics() {
 		if (!getConfig().getBoolean("plugin.statistics.opt-out", false)) {
 			final MetricsInitializer metricsInitializer = new MetricsInitializer(this);
 
 			getServer().getScheduler().runTaskAsynchronously(this, metricsInitializer);
 		}
+	}
+
+	private void initializePermissions() {
+		permissionHandler = new PermissionHandler();
 	}
 
 	public void loadLocale() {

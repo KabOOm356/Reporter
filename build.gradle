@@ -1,0 +1,66 @@
+buildscript {
+    ext {
+        // Plugin API
+        pluginVersion = '1.10.0-SNAPSHOT'
+        
+        // Java compile
+        javaTargetVersion = JavaVersion.VERSION_1_6
+        
+        // Dependency
+        bukkitVersion = '1.13.2-R0.1-SNAPSHOT'
+        log4jVersion = '2.0-beta9'
+    }
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.2'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'net.KabOOm356'
+version = pluginVersion
+
+description = """"""
+
+sourceCompatibility = javaTargetVersion
+targetCompatibility = javaTargetVersion
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.10.2'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+shadowJar {
+    relocate 'org.bstats', 'net.KabOOm356.bstats'
+    archiveName = 'Reporter.jar'
+}
+build.dependsOn shadowJar
+
+repositories {
+    mavenCentral()
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url 'http://nexus.hc.to/content/repositories/pub_releases' }
+    maven { url 'https://repo.codemc.org/repository/maven-public' }
+}
+
+dependencies {
+    implementation group: 'org.bstats', name: 'bstats-bukkit', version: '1.4'
+    
+    compileOnly group: 'org.bukkit', name: 'bukkit', version: bukkitVersion
+    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
+    compileOnly group: 'net.milkbowl.vault', name: 'VaultAPI', version: '1.7'
+    
+    testImplementation group: 'junit', name: 'junit', version: '4.11'
+    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '1.6.2'
+    testImplementation group: 'org.powermock', name: 'powermock-api-mockito', version: '1.6.2'
+    testImplementation group: 'org.bukkit', name: 'bukkit', version: bukkitVersion
+    testImplementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
+}

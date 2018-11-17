@@ -1,18 +1,19 @@
 package net.KabOOm356.Reporter.Metrics;
 
+import com.google.common.collect.ImmutableMap;
 import net.KabOOm356.Database.DatabaseType;
 import net.KabOOm356.Locale.Entry.LocaleInfo;
 import net.KabOOm356.Locale.Locale;
-import net.KabOOm356.Metrics.FeaturePlotter;
+import net.KabOOm356.Permission.PermissionType;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Util.FormattingUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.mcstats.Metrics;
-import org.mcstats.Metrics.Graph;
 
-import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * A class to initialize and start plugin metrics reporting.
@@ -23,13 +24,13 @@ public class MetricsInitializer implements Runnable {
 	private final JavaPlugin plugin;
 	private final Locale locale;
 	private final DatabaseType databaseType;
-
-	private Metrics metrics;
+	private final PermissionType permissionType;
 
 	public MetricsInitializer(final Reporter plugin) {
 		this.plugin = plugin;
 		this.locale = plugin.getLocale();
 		this.databaseType = plugin.getDatabaseHandler().getDatabaseType();
+		this.permissionType = plugin.getPermissionHandler().getPermissionType();
 	}
 
 	@Override
@@ -47,41 +48,33 @@ public class MetricsInitializer implements Runnable {
 			}
 		}
 
-		try {
-			// Initialize Metrics.
-			metrics = new Metrics(plugin);
+		// Initialize Metrics.
+		final Metrics metrics = new Metrics(plugin);
 
-			// Create a graph to track the locale language being used.
-			final Graph localeGraph = metrics.createGraph("Locale");
+		// Create a chart to track the locale language and locale version being used.
+		metrics.addCustomChart(new Metrics.DrilldownPie("locale", new Callable<Map<String, Map<String, Integer>>>() {
+			@Override
+			public Map<String, Map<String, Integer>> call() {
+				final String language = FormattingUtil.capitalizeFirstCharacter(locale.getString(LocaleInfo.language));
+				final String version = "Version " + locale.getString(LocaleInfo.version);
+				final Map<String, Integer> versionEntry = ImmutableMap.of(version, 1);
+				return ImmutableMap.of(language, versionEntry);
+			}
+		}));
 
-			String language = locale.getString(LocaleInfo.language);
-			language = FormattingUtil.capitalizeFirstCharacter(language);
+		// Create a chart to track the database engine being used.
+		metrics.addCustomChart(new Metrics.SimplePie("database_engine", new Callable<String>() {
+			@Override
+			public String call() {
+				return databaseType.toString();
+			}
+		}));
 
-			// Increment the language.
-			localeGraph.addPlotter(new FeaturePlotter(language));
-
-			// Create a graph to track the locale version being used.
-			final Graph localeVersionGraph = metrics.createGraph("Locale Version");
-
-			final String localeVersion = "Version " + locale.getString(LocaleInfo.version);
-
-			// Increment the locale version.
-			localeVersionGraph.addPlotter(new FeaturePlotter(localeVersion));
-
-			// Create a graph to track the database engine being used.
-			final Graph databaseEngineGraph = metrics.createGraph("Database Engine");
-
-			final String databaseEngine = databaseType.toString();
-
-			// Increment the database engine.
-			databaseEngineGraph.addPlotter(new FeaturePlotter(databaseEngine));
-
-			metrics.start();
-		} catch (final IOException e) {
-			log.warn(
-					Reporter.getDefaultConsolePrefix() +
-							"Could not enable statistics tracking with MCStats!",
-					e);
-		}
+		metrics.addCustomChart(new Metrics.SimplePie("permission_manager", new Callable<String>() {
+			@Override
+			public String call() {
+				return permissionType.toString();
+			}
+		}));
 	}
 }
