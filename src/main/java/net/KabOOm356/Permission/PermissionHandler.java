@@ -40,7 +40,14 @@ public class PermissionHandler {
 	}
 
 	private boolean setupVault() {
-		final RegisteredServiceProvider<Permission> rsp = Bukkit.getServer().getServicesManager().getRegistration(Permission.class);
+		RegisteredServiceProvider<Permission> rsp = null;
+		try {
+			rsp = Bukkit.getServer().getServicesManager().getRegistration(Permission.class);
+		} catch (final NoClassDefFoundError e) {
+			if (log.isDebugEnabled()) {
+				log.info("Could not enable Vault support", e);
+			}
+		}
 
 		if (rsp != null) {
 			this.permission = rsp.getProvider();
