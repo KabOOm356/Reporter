@@ -1,13 +1,13 @@
 buildscript {
     ext {
         // Plugin API
-        pluginVersion = '1.10.0'
+        pluginVersion = '3.3.2-SNAPSHOT'
         
         // Java compile
         javaTargetVersion = JavaVersion.VERSION_1_6
         
         // Dependency
-        bukkitVersion = '1.13.2-R0.1-SNAPSHOT'
+        bukkitVersion = '1.14.3-R0.1-SNAPSHOT'
         log4jVersion = '2.0-beta9'
     }
     repositories {

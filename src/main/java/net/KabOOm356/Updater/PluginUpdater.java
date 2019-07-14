@@ -1,5 +1,7 @@
 package net.KabOOm356.Updater;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import net.KabOOm356.File.AbstractFiles.VersionedNetworkFile;
 import net.KabOOm356.File.AbstractFiles.VersionedNetworkFile.ReleaseLevel;
 import net.KabOOm356.Reporter.Reporter;
@@ -8,9 +10,6 @@ import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,7 +17,9 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.URLConnection;
+import java.util.List;
 
 /**
  * A {@link Updater} to update the plugin from the ServerMods API.
@@ -77,20 +78,19 @@ public class PluginUpdater extends Updater {
 			}
 		}
 
-		final JSONArray array = (JSONArray) JSONValue.parse(list);
+		final Type listType = new TypeToken<List<PluginUpdateMetadata>>(){}.getType();
+		final List<PluginUpdateMetadata> pluginUpdateMetadataList = new Gson().fromJson(list, listType);
 
 		VersionedNetworkFile latestFile = null;
 
-		for (final Object object : array) {
-			final JSONObject node = (JSONObject) object;
-
-			final String currentName = (String) node.get("name");
+		for (final PluginUpdateMetadata metadata : pluginUpdateMetadataList) {
+			final String currentName = metadata.getName();
 
 			// Check if the current item matches what we are looking for.
 			if (Util.startsWithIgnoreCase(currentName, name)) {
 				// Parse the version from the name of the item.
 				final String version = UrlIO.getVersion(currentName);
-				final String link = (String) node.get("downloadUrl");
+				final String link = metadata.getDownloadUrl();
 
 				final VersionedNetworkFile file = new VersionedNetworkFile(name + PLUGIN_FILE_EXTENSION, version, link);
 

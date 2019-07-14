@@ -393,3 +393,5 @@ Changelog:
                     Fixed the build being broken from a few dependencies that dead and no longer available (PermissionsEx and MCStats).
     3.3.1   11/16/2018
                 Fixed error when loading permissions when Vault is not provided.
+    3.3.2
+                Updated Bukkit API to 1.14.3-R0.1-SNAPSHOT
