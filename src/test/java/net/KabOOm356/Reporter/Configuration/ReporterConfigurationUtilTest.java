@@ -15,8 +15,8 @@ import java.net.URL;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.*;
@@ -89,6 +89,7 @@ public class ReporterConfigurationUtilTest extends PowerMockitoTest {
 		when(configuration.isSet("locale.keepLocaleBackupFile")).thenReturn(false);
 		when(configuration.isSet("general.reporting.alerts.limitReached")).thenReturn(false);
 		when(configuration.isSet("general.reporting.alerts.allowedToReportAgain")).thenReturn(false);
+		when(configuration.isSet("plugin.statistics.opt-out")).thenReturn(false);
 
 		assertFalse(ReporterConfigurationUtil.updateConfiguration(configuration));
 	}
@@ -107,6 +108,7 @@ public class ReporterConfigurationUtilTest extends PowerMockitoTest {
 		when(configuration.isSet("locale.keepLocaleBackupFile")).thenReturn(true);
 		when(configuration.isSet("general.reporting.alerts.limitReached")).thenReturn(true);
 		when(configuration.isSet("general.reporting.alerts.allowedToReportAgain")).thenReturn(true);
+		when(configuration.isSet("plugin.statistics.opt-out")).thenReturn(true);
 
 		when(configuration.options()).thenReturn(mock(FileConfigurationOptions.class));
 

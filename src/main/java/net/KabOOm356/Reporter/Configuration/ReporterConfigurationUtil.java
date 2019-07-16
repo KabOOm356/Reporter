@@ -213,7 +213,7 @@ public final class ReporterConfigurationUtil {
 		updated = set(configuration, "general.matchPartialOfflineUsernames", true) || updated;
 
 		// Version 14
-		updated = set(configuration, "plugin.statistics.opt-out", false) || updated;
+//		updated = set(configuration, "plugin.statistics.opt-out", false) || updated;
 
 		// Version 15 (Database Connection Pooling)
 		updated = set(configuration, "database.connectionPool.enableLimiting", ConnectionPoolConfig.defaultInstance.isConnectionPoolLimited()) || updated;
@@ -223,6 +223,9 @@ public final class ReporterConfigurationUtil {
 		updated = set(configuration, "general.messaging.alerts.reportedPlayerLogin.enabled", true) || updated;
 		updated = set(configuration, "general.messaging.alerts.reportedPlayerLogin.toPlayer", true) || updated;
 		updated = set(configuration, "general.messaging.alerts.reportedPlayerLogin.toConsole", true) || updated;
+
+		// Version 16 (Update Statistics)
+		updated = unset(configuration, "plugin.statistics.opt-out") || updated;
 
 		if (updated) {
 			configuration.options().header("Reporter Configuration File\n" +
@@ -240,6 +243,14 @@ public final class ReporterConfigurationUtil {
 	private static boolean set(final FileConfiguration configuration, final String key, final Object value) {
 		if (!configuration.isSet(key)) {
 			configuration.set(key, value);
+			return true;
+		}
+		return false;
+	}
+
+	private static boolean unset(final FileConfiguration configuration, final String key) {
+		if (configuration.isSet(key)) {
+			configuration.set(key, null);
 			return true;
 		}
 		return false;

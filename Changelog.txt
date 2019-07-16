@@ -395,3 +395,4 @@ Changelog:
                 Fixed error when loading permissions when Vault is not provided.
     3.3.2
                 Updated Bukkit API to 1.14.3-R0.1-SNAPSHOT
+                Fixed issue with initializing metrics on a separate thread.

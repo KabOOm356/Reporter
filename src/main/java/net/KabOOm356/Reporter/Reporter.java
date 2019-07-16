@@ -1,6 +1,7 @@
 package net.KabOOm356.Reporter;
 
 import net.KabOOm356.Command.ReporterCommandManager;
+import net.KabOOm356.Database.DatabaseType;
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.File.AbstractFiles.UpdateSite;
 import net.KabOOm356.File.AbstractFiles.VersionedNetworkFile.ReleaseLevel;
@@ -8,10 +9,10 @@ import net.KabOOm356.Listeners.ReporterPlayerListener;
 import net.KabOOm356.Locale.Entry.LocaleInfo;
 import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Permission.PermissionHandler;
+import net.KabOOm356.Permission.PermissionType;
 import net.KabOOm356.Reporter.Configuration.ReporterConfigurationUtil;
 import net.KabOOm356.Reporter.Database.ReporterDatabaseUtil;
 import net.KabOOm356.Reporter.Locale.ReporterLocaleInitializer;
-import net.KabOOm356.Reporter.Metrics.MetricsInitializer;
 import net.KabOOm356.Service.Messager.PlayerMessages;
 import net.KabOOm356.Service.ServiceModule;
 import net.KabOOm356.Service.Store.StoreModule;
@@ -19,8 +20,10 @@ import net.KabOOm356.Service.Store.type.LastViewed;
 import net.KabOOm356.Service.Store.type.PlayerReport;
 import net.KabOOm356.Updater.PluginUpdater;
 import net.KabOOm356.Util.ArrayUtil;
+import net.KabOOm356.Util.FormattingUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -34,6 +37,7 @@ import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * The main Reporter class.
@@ -42,7 +46,7 @@ import java.util.List;
  */
 public class Reporter extends JavaPlugin {
 	public static final String localeVersion = "11";
-	public static final String configVersion = "15";
+	public static final String configVersion = "16";
 	public static final String databaseVersion = "10";
 	public static final String anonymousPlayerName = "* (Anonymous)";
 	public static final String console = "CONSOLE";
@@ -60,6 +64,7 @@ public class Reporter extends JavaPlugin {
 	private ReporterPlayerListener playerListener;
 	private ServiceModule serviceModule;
 	private ReporterCommandManager commandManager;
+	private Metrics metrics;
 
 	public Reporter() {
 		version = getDescription().getVersion();
@@ -121,10 +126,10 @@ public class Reporter extends JavaPlugin {
 		}
 
 		checkForPluginUpdate();
+		initializeStatistics();
 		initializeLocale();
 		initializeDatabase();
 		initializePermissions();
-		initializeStatistics();
 
 		playerListener = new ReporterPlayerListener(this);
 
@@ -248,25 +253,47 @@ public class Reporter extends JavaPlugin {
 		if (databaseHandler == null) {
 			log.fatal(Reporter.getDefaultConsolePrefix() + "Disabling plugin!");
 			getServer().getPluginManager().disablePlugin(this);
+		} else {
+			// Create a chart to track the database engine being used.
+			final DatabaseType databaseType = databaseHandler.getDatabaseType();
+			metrics.addCustomChart(new Metrics.SimplePie("database_engine", new Callable<String>() {
+				@Override
+				public String call() {
+					return databaseType.toString();
+				}
+			}));
 		}
 	}
 
 	private void initializeStatistics() {
-		if (!getConfig().getBoolean("plugin.statistics.opt-out", false)) {
-			final MetricsInitializer metricsInitializer = new MetricsInitializer(this);
-
-			getServer().getScheduler().runTaskAsynchronously(this, metricsInitializer);
-		}
+		this.metrics = new Metrics(this);
 	}
 
 	private void initializePermissions() {
 		permissionHandler = new PermissionHandler();
+
+		// Create a chart to track the permissions manager being used.
+		final PermissionType permissionType = permissionHandler.getPermissionType();
+		metrics.addCustomChart(new Metrics.SimplePie("permission_manager", new Callable<String>() {
+			@Override
+			public String call() {
+				return permissionType.toString();
+			}
+		}));
 	}
 
 	public void loadLocale() {
 		if (!setLocaleDefaults(locale)) {
 			log.warn(Reporter.getDefaultConsolePrefix() + "Unable to set defaults for the locale!");
 		}
+
+		// Create a chart to track the locale language and locale version being used.
+		metrics.addCustomChart(new Metrics.SimplePie("locale", new Callable<String>() {
+			@Override
+			public String call() {
+				return FormattingUtil.capitalizeFirstCharacter(locale.getString(LocaleInfo.language));
+			}
+		}));
 
 		log.info(Reporter.getDefaultConsolePrefix() + "Language: " + locale.getString(LocaleInfo.language)
 				+ " v" + locale.getString(LocaleInfo.version)

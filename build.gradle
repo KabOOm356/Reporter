@@ -52,7 +52,7 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.bstats', name: 'bstats-bukkit', version: '1.4'
+    implementation group: 'org.bstats', name: 'bstats-bukkit', version: '1.5'
     
     compileOnly group: 'org.bukkit', name: 'bukkit', version: bukkitVersion
     compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
