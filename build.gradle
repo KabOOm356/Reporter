@@ -30,8 +30,9 @@ description = """"""
 sourceCompatibility = javaTargetVersion
 targetCompatibility = javaTargetVersion
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.10.2'
+wrapper {
+    gradleVersion = '6.1.1'
+    distributionType = Wrapper.DistributionType.ALL
 }
 
 tasks.withType(JavaCompile) {
@@ -40,7 +41,7 @@ tasks.withType(JavaCompile) {
 
 shadowJar {
     relocate 'org.bstats', 'net.KabOOm356.bstats'
-    archiveName = 'Reporter.jar'
+    archiveFileName = 'Reporter.jar'
 }
 build.dependsOn shadowJar
 
