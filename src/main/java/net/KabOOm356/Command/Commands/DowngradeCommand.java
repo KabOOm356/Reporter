@@ -112,10 +112,7 @@ public class DowngradeCommand extends ReporterCommand {
 		// Log the error with more detail.
 		try {
 			connectionId = database.openPooledConnection();
-		} catch (final ClassNotFoundException e) {
-			log.error("Failed to open pooled connection to get the next lowest priority!");
-			throw e;
-		} catch (final SQLException e) {
+		} catch (final ClassNotFoundException | SQLException e) {
 			log.error("Failed to open pooled connection to get the next lowest priority!");
 			throw e;
 		}

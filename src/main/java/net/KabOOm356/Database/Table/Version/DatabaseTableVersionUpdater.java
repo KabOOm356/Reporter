@@ -27,22 +27,13 @@ public abstract class DatabaseTableVersionUpdater extends DatabaseTableUpdateHan
 			} else {
 				log.info(String.format(Reporter.getDefaultConsolePrefix() + "Table [%s] is up-to-date with version [%s].", getTableName(), getDatabaseVersion()));
 			}
-		} catch (final InterruptedException e) {
-			log.warn(String.format("Failed to update table [%s] to version [%s]!", getTableName(), getDatabaseVersion()));
-			throw e;
-		} catch (final SQLException e) {
-			log.warn(String.format("Failed to update table [%s] to version [%s]!", getTableName(), getDatabaseVersion()));
-			throw e;
-		} catch (final ClassNotFoundException e) {
+		} catch (final InterruptedException | ClassNotFoundException | SQLException e) {
 			log.warn(String.format("Failed to update table [%s] to version [%s]!", getTableName(), getDatabaseVersion()));
 			throw e;
 		} finally {
 			try {
 				commitTransaction();
-			} catch (final IllegalStateException e) {
-				log.warn(String.format("Failed to commit transaction while updating table [%s] to version [%s]!", getTableName(), getDatabaseVersion()));
-				throw e;
-			} catch (final SQLException e) {
+			} catch (final IllegalStateException | SQLException e) {
 				log.warn(String.format("Failed to commit transaction while updating table [%s] to version [%s]!", getTableName(), getDatabaseVersion()));
 				throw e;
 			}

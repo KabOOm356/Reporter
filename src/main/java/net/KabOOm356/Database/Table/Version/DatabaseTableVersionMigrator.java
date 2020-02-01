@@ -27,25 +27,14 @@ public abstract class DatabaseTableVersionMigrator extends DatabaseTableUpdateHa
 				migrateTable();
 				dropTemporaryTable();
 			}
-		} catch (final InterruptedException e) {
-			log.error(Reporter.getDefaultConsolePrefix() + String.format("An error occurred while migrating the database data of table [%s] to version [%s]!", getTableName(), getDatabaseVersion()));
-			log.error(Reporter.getDefaultConsolePrefix() + "If you receive more errors, you may have to recover or delete your database!");
-			throw e;
-		} catch (final SQLException e) {
-			log.error(Reporter.getDefaultConsolePrefix() + String.format("An error occurred while migrating the database data of table [%s] to version [%s]!", getTableName(), getDatabaseVersion()));
-			log.error(Reporter.getDefaultConsolePrefix() + "If you receive more errors, you may have to recover or delete your database!");
-			throw e;
-		} catch (final ClassNotFoundException e) {
+		} catch (final InterruptedException | ClassNotFoundException | SQLException e) {
 			log.error(Reporter.getDefaultConsolePrefix() + String.format("An error occurred while migrating the database data of table [%s] to version [%s]!", getTableName(), getDatabaseVersion()));
 			log.error(Reporter.getDefaultConsolePrefix() + "If you receive more errors, you may have to recover or delete your database!");
 			throw e;
 		} finally {
 			try {
 				commitTransaction();
-			} catch (final IllegalStateException e) {
-				log.error(String.format("Failed to commit transaction while migrating table [%s] to version [%s]!", getTableName(), getDatabaseVersion()));
-				throw e;
-			} catch (final SQLException e) {
+			} catch (final IllegalStateException | SQLException e) {
 				log.error(String.format("Failed to commit transaction while migrating table [%s] to version [%s]!", getTableName(), getDatabaseVersion()));
 				throw e;
 			}

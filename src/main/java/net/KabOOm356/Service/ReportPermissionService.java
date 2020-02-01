@@ -47,13 +47,7 @@ public class ReportPermissionService extends Service {
 				return false;
 			}
 			return true;
-		} catch (final InterruptedException e) {
-			log.error(String.format("Failed to check if player [%s] could alter report [%d]!", BukkitUtil.formatPlayerName(player), index));
-			throw e;
-		} catch (final SQLException e) {
-			log.error(String.format("Failed to check if player [%s] could alter report [%d]!", BukkitUtil.formatPlayerName(player), index));
-			throw e;
-		} catch (final ClassNotFoundException e) {
+		} catch (final InterruptedException | ClassNotFoundException | SQLException e) {
 			log.error(String.format("Failed to check if player [%s] could alter report [%d]!", BukkitUtil.formatPlayerName(player), index));
 			throw e;
 		}
@@ -125,13 +119,7 @@ public class ReportPermissionService extends Service {
 
 				return false;
 			}
-		} catch (final ClassNotFoundException e) {
-			log.error("Failed to check if report can be altered by player!");
-			throw e;
-		} catch (final InterruptedException e) {
-			log.error("Failed to check if report can be altered by player!");
-			throw e;
-		} catch (final SQLException e) {
+		} catch (final ClassNotFoundException | SQLException | InterruptedException e) {
 			log.error("Failed to check if report can be altered by player!");
 			throw e;
 		} finally {
@@ -160,13 +148,7 @@ public class ReportPermissionService extends Service {
 		try {
 			final ModLevel reportPriority = getReportPriority(index);
 			return reportPriority.getLevel() <= modLevel.getLevel();
-		} catch (final ClassNotFoundException e) {
-			log.error(String.format("Failed to do a priority check for player [%s] on report [%d]", BukkitUtil.formatPlayerName(sender), index));
-			throw e;
-		} catch (final InterruptedException e) {
-			log.error(String.format("Failed to do a priority check for player [%s] on report [%d]", BukkitUtil.formatPlayerName(sender), index));
-			throw e;
-		} catch (final SQLException e) {
+		} catch (final ClassNotFoundException | SQLException | InterruptedException e) {
 			log.error(String.format("Failed to do a priority check for player [%s] on report [%d]", BukkitUtil.formatPlayerName(sender), index));
 			throw e;
 		}
@@ -199,13 +181,7 @@ public class ReportPermissionService extends Service {
 
 				return false;
 			}
-		} catch (final InterruptedException e) {
-			log.error(String.format("Failed to check required priority for report [%d]!", index));
-			throw e;
-		} catch (final SQLException e) {
-			log.error(String.format("Failed to check required priority for report [%d]!", index));
-			throw e;
-		} catch (final ClassNotFoundException e) {
+		} catch (final InterruptedException | ClassNotFoundException | SQLException e) {
 			log.error(String.format("Failed to check required priority for report [%d]!", index));
 			throw e;
 		}

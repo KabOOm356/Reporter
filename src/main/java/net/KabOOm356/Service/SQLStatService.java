@@ -288,13 +288,7 @@ public class SQLStatService extends Service {
 		final int connectionId;
 		try {
 			connectionId = getDatabase().openPooledConnection();
-		} catch (final ClassNotFoundException e) {
-			log.warn(String.format("Failed to open connection to insert new SQL stat row for player [%s]!", BukkitUtil.formatPlayerName(player)));
-			throw e;
-		} catch (final SQLException e) {
-			log.warn(String.format("Failed to open connection to insert new SQL stat row for player [%s]!", BukkitUtil.formatPlayerName(player)));
-			throw e;
-		} catch (final InterruptedException e) {
+		} catch (final ClassNotFoundException | InterruptedException | SQLException e) {
 			log.warn(String.format("Failed to open connection to insert new SQL stat row for player [%s]!", BukkitUtil.formatPlayerName(player)));
 			throw e;
 		}
@@ -337,13 +331,7 @@ public class SQLStatService extends Service {
 		final int connectionId;
 		try {
 			connectionId = getDatabase().openPooledConnection();
-		} catch (final ClassNotFoundException e) {
-			log.warn(String.format("Failed to open connection to get SQL stat index for player [%s]!", BukkitUtil.formatPlayerName(player)));
-			throw e;
-		} catch (final SQLException e) {
-			log.warn(String.format("Failed to open connection to get SQL stat index for player [%s]!", BukkitUtil.formatPlayerName(player)));
-			throw e;
-		} catch (final InterruptedException e) {
+		} catch (final ClassNotFoundException | InterruptedException | SQLException e) {
 			log.warn(String.format("Failed to open connection to get SQL stat index for player [%s]!", BukkitUtil.formatPlayerName(player)));
 			throw e;
 		}

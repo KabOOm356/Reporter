@@ -32,17 +32,7 @@ public abstract class DatabaseTableUpdateHandler {
 			try {
 				connectionId = getDatabase().openPooledConnection();
 				statement = getDatabase().createStatement(connectionId);
-			} catch (final InterruptedException e) {
-				log.warn("Failed to start transaction!");
-				terminateTransaction();
-				endTransaction();
-				throw e;
-			} catch (final SQLException e) {
-				log.warn("Failed to start transaction!");
-				terminateTransaction();
-				endTransaction();
-				throw e;
-			} catch (final ClassNotFoundException e) {
+			} catch (final InterruptedException | ClassNotFoundException | SQLException e) {
 				log.warn("Failed to start transaction!");
 				terminateTransaction();
 				endTransaction();

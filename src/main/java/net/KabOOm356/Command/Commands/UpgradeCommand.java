@@ -112,10 +112,7 @@ public class UpgradeCommand extends ReporterCommand {
 		final int connectionId;
 		try {
 			connectionId = database.openPooledConnection();
-		} catch (final ClassNotFoundException e) {
-			log.error("Failed to open pooled connection to get next highest priority!");
-			throw e;
-		} catch (final SQLException e) {
+		} catch (final ClassNotFoundException | SQLException e) {
 			log.error("Failed to open pooled connection to get next highest priority!");
 			throw e;
 		}

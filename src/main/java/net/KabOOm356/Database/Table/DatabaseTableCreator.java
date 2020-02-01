@@ -23,22 +23,13 @@ public abstract class DatabaseTableCreator extends DatabaseTableUpdateHandler {
 			} else {
 				log.info(Reporter.getDefaultConsolePrefix() + "Using existing " + getTableName() + " table.");
 			}
-		} catch (final InterruptedException e) {
-			log.error(String.format("Failed to create table [%s]!", getTableName()));
-			throw e;
-		} catch (final SQLException e) {
-			log.error(String.format("Failed to create table [%s]!", getTableName()));
-			throw e;
-		} catch (final ClassNotFoundException e) {
+		} catch (final InterruptedException | ClassNotFoundException | SQLException e) {
 			log.error(String.format("Failed to create table [%s]!", getTableName()));
 			throw e;
 		} finally {
 			try {
 				commitTransaction();
-			} catch (final IllegalStateException e) {
-				log.warn(String.format("Failed to commit transaction while creating table [%s]!", getTableName()));
-				throw e;
-			} catch (final SQLException e) {
+			} catch (final IllegalStateException | SQLException e) {
 				log.warn(String.format("Failed to commit transaction while creating table [%s]!", getTableName()));
 				throw e;
 			}

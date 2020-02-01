@@ -20,22 +20,13 @@ public abstract class DatabaseTableUpdater extends DatabaseTableUpdateHandler {
 		try {
 			log.info(Reporter.getDefaultConsolePrefix() + String.format("Updating table [%s]...", getTableName()));
 			updateTable();
-		} catch (final InterruptedException e) {
-			log.warn(String.format("Failed to update table [%s]!", getTableName()));
-			throw e;
-		} catch (final SQLException e) {
-			log.warn(String.format("Failed to update table [%s]!", getTableName()));
-			throw e;
-		} catch (final ClassNotFoundException e) {
+		} catch (final InterruptedException | ClassNotFoundException | SQLException e) {
 			log.warn(String.format("Failed to update table [%s]!", getTableName()));
 			throw e;
 		} finally {
 			try {
 				commitTransaction();
-			} catch (final IllegalStateException e) {
-				log.error("Failed to commit update transaction!");
-				throw e;
-			} catch (final SQLException e) {
+			} catch (final IllegalStateException | SQLException e) {
 				log.error("Failed to commit update transaction!");
 				throw e;
 			}

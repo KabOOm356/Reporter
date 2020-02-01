@@ -16,13 +16,7 @@ public abstract class DatabaseTableInitializer {
 			create();
 			migrate();
 			update();
-		} catch (final InterruptedException e) {
-			log.warn("Failed to initialize table!");
-			throw e;
-		} catch (final SQLException e) {
-			log.warn("Failed to initialize table!");
-			throw e;
-		} catch (final ClassNotFoundException e) {
+		} catch (final InterruptedException | ClassNotFoundException | SQLException e) {
 			log.warn("Failed to initialize table!");
 			throw e;
 		}

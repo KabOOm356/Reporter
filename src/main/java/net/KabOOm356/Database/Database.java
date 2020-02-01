@@ -181,12 +181,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 				log.debug("Connection pool size [" + connectionPool.size() + ']');
 			}
 			return connectionId;
-		} catch (final ClassNotFoundException e) {
-			if (log.isDebugEnabled()) {
-				log.log(Level.WARN, "Failed to open connection to database!");
-			}
-			throw e;
-		} catch (final SQLException e) {
+		} catch (final ClassNotFoundException | SQLException e) {
 			if (log.isDebugEnabled()) {
 				log.log(Level.WARN, "Failed to open connection to database!");
 			}

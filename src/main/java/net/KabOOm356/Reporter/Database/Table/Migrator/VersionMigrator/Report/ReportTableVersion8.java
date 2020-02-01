@@ -122,13 +122,7 @@ public class ReportTableVersion8 extends DatabaseTableVersionMigrator {
 			commitTransaction();
 			convertData();
 			startTransaction();
-		} catch (final InterruptedException e) {
-			log.warn("Failed to populate temporary table!");
-			throw e;
-		} catch (final SQLException e) {
-			log.warn("Failed to populate temporary table!");
-			throw e;
-		} catch (final ClassNotFoundException e) {
+		} catch (final InterruptedException | ClassNotFoundException | SQLException e) {
 			log.warn("Failed to populate temporary table!");
 			throw e;
 		}

@@ -18,13 +18,7 @@ public abstract class DatabaseTableMigrator extends DatabaseTableUpdateHandler {
 	public void migrate() throws InterruptedException, SQLException, ClassNotFoundException {
 		try {
 			migrateTable();
-		} catch (final InterruptedException e) {
-			log.warn(String.format("Failed to migrate table [%s]!", getTableName()));
-			throw e;
-		} catch (final SQLException e) {
-			log.warn(String.format("Failed to migrate table [%s]!", getTableName()));
-			throw e;
-		} catch (final ClassNotFoundException e) {
+		} catch (final InterruptedException | ClassNotFoundException | SQLException e) {
 			log.warn(String.format("Failed to migrate table [%s]!", getTableName()));
 			throw e;
 		}

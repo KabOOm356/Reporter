@@ -92,16 +92,7 @@ public final class ReporterDatabaseUtil {
 			try {
 				databaseHandler = new ExtendedDatabaseHandler(DatabaseType.SQLITE, dataFolder.getPath(), databaseName, connectionPoolConfig);
 				initDatabaseTables(databaseHandler.getDatabase());
-			} catch (final IOException e) {
-				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to initialize an SQLite database!");
-				throw e;
-			} catch (final ClassNotFoundException e) {
-				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to initialize an SQLite database!");
-				throw e;
-			} catch (final SQLException e) {
-				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to initialize an SQLite database!");
-				throw e;
-			} catch (final InterruptedException e) {
+			} catch (final IOException | InterruptedException | SQLException | ClassNotFoundException e) {
 				log.warn(Reporter.getDefaultConsolePrefix() + "Failed to initialize an SQLite database!");
 				throw e;
 			}
@@ -132,13 +123,7 @@ public final class ReporterDatabaseUtil {
 		try {
 			connectionId = database.openPooledConnection();
 			database.checkTable(connectionId, "Reports");
-		} catch (final InterruptedException e) {
-			log.warn("Failed to check connection!");
-			throw e;
-		} catch (final SQLException e) {
-			log.warn("Failed to check connection!");
-			throw e;
-		} catch (final ClassNotFoundException e) {
+		} catch (final InterruptedException | ClassNotFoundException | SQLException e) {
 			log.warn("Failed to check connection!");
 			throw e;
 		} finally {
