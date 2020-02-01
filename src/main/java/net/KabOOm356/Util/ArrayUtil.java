@@ -40,7 +40,7 @@ public final class ArrayUtil {
 	 * Converts an array to a Set.
 	 *
 	 * @param array The array to convert to a Set.
-	 * @return A {@link HashSet} containing the elements of the given array.
+	 * @return A {@link Set} containing the elements of the given array.
 	 */
 	public static <T> Set<T> arrayToSet(final T[] array) {
 		Validate.notNull(array, "Parameter 'array' cannot be null!");

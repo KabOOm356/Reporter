@@ -66,7 +66,7 @@ public class ArrayUtilTest {
 	@Test
 	public void testArrayToSet() {
 		final Integer[] emptyIntArray = new Integer[0];
-		final HashSet<Integer> intSet = new HashSet<>();
+		final Set<Integer> intSet = new HashSet<>();
 
 		assertEquals(intSet, ArrayUtil.arrayToSet(emptyIntArray));
 

@@ -10,10 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * A simple class to handle connections and queries to a database.
@@ -40,7 +37,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 	/**
 	 * The pool of connections.
 	 */
-	private final HashMap<Integer, ConnectionWrapper> connectionPool;
+	private final Map<Integer, ConnectionWrapper> connectionPool;
 	private final ConnectionPoolConfig connectionPoolConfig;
 	/**
 	 * The id of a connection that is being accessed in a non-pooled manner.

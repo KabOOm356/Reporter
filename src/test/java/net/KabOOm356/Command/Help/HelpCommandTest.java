@@ -15,10 +15,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import test.test.Answer.LocaleEntryAnswer;
 import test.test.PowerMockitoTest;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
@@ -44,7 +41,7 @@ public class HelpCommandTest extends PowerMockitoTest {
 
 	@Before
 	public void setupMocks() {
-		final LinkedHashMap<String, ReporterCommand> commands = new LinkedHashMap<>(16, 0.75F, false);
+		final Map<String, ReporterCommand> commands = new LinkedHashMap<>(16, 0.75F, false);
 		for (int commandNumber = 0; commandNumber < numberOfCommands; commandNumber++) {
 			final ReporterCommand command = mock(ReporterCommand.class);
 			final List<Usage> usages = new ArrayList<>();

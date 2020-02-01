@@ -10,8 +10,8 @@ import net.KabOOm356.Service.Messager.PlayerMessages;
 import net.KabOOm356.Util.FormattingUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -141,7 +141,7 @@ public class PlayerMessageService extends Service {
 		final List<String> playerMessages = new ArrayList<>();
 
 		if (getMessages().containsKey(player)) {
-			final HashMap<Group, PendingMessages> groupedMessages = getMessages().get(player);
+			final Map<Group, PendingMessages> groupedMessages = getMessages().get(player);
 
 			if (groupedMessages.containsKey(group)) {
 				for (final Message message : groupedMessages.get(group)) {

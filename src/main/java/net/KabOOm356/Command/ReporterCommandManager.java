@@ -26,6 +26,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A Command Service and Command Executor for all the Reporter Commands.
@@ -36,10 +37,10 @@ public class ReporterCommandManager implements CommandExecutor {
 	private final Reporter plugin;
 	private final HelpCommand reportHelp;
 	private final HelpCommand respondHelp;
-	private LinkedHashMap<String, ReporterCommand> reportCommands;
-	private HashMap<String, String> aliasReportCommands;
-	private LinkedHashMap<String, ReporterCommand> respondCommands;
-	private HashMap<String, String> aliasRespondCommands;
+	private Map<String, ReporterCommand> reportCommands;
+	private Map<String, String> aliasReportCommands;
+	private Map<String, ReporterCommand> respondCommands;
+	private Map<String, String> aliasRespondCommands;
 
 	/**
 	 * Constructor.
@@ -265,19 +266,19 @@ public class ReporterCommandManager implements CommandExecutor {
 		return plugin.getLocale();
 	}
 
-	public HashMap<String, ReporterCommand> getReportCommands() {
+	public Map<String, ReporterCommand> getReportCommands() {
 		return reportCommands;
 	}
 
-	public HashMap<String, String> getAliasReportCommands() {
+	public Map<String, String> getAliasReportCommands() {
 		return aliasReportCommands;
 	}
 
-	public HashMap<String, ReporterCommand> getRespondCommands() {
+	public Map<String, ReporterCommand> getRespondCommands() {
 		return respondCommands;
 	}
 
-	public HashMap<String, String> getAliasRespondCommands() {
+	public Map<String, String> getAliasRespondCommands() {
 		return aliasRespondCommands;
 	}
 
