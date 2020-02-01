@@ -76,7 +76,7 @@ public class PlayerReportQueueTest extends PowerMockitoTest {
 
 	@Test
 	public void testGetUUID() {
-		final PriorityQueue<ReportTimer> priorityQueue = new PriorityQueue<ReportTimer>();
+		final PriorityQueue<ReportTimer> priorityQueue = new PriorityQueue<>();
 		final ReportTimer timer = mock(ReportTimer.class);
 		priorityQueue.add(timer);
 		playerReportQueue.put(playerUUID, priorityQueue);

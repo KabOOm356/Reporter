@@ -98,7 +98,7 @@ public class AssignCommand extends ReporterCommand {
 
 	private void assignReport(final CommandSender sender, final int index, final Player player) throws ClassNotFoundException, SQLException, InterruptedException {
 		final String query = "UPDATE Reports SET ClaimStatus=?, ClaimDate=?, ClaimedBy=?, ClaimedByUUID=?, ClaimPriority=? WHERE ID=?";
-		final ArrayList<String> params = new ArrayList<String>();
+		final ArrayList<String> params = new ArrayList<>();
 
 		params.add(0, "1");
 		params.add(1, Reporter.getDateformat().format(new Date()));

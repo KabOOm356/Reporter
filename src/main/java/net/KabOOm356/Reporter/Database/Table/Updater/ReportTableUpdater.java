@@ -13,7 +13,7 @@ import java.util.List;
 public class ReportTableUpdater extends DatabaseTableUpdater {
 	private static final Logger log = LogManager.getLogger(ReportTableUpdater.class);
 
-	private final List<DatabaseTableVersionUpdater> versionUpdaters = new ArrayList<DatabaseTableVersionUpdater>();
+	private final List<DatabaseTableVersionUpdater> versionUpdaters = new ArrayList<>();
 
 	public ReportTableUpdater(final Database database, final String updateVersion, final String tableName) {
 		super(database, updateVersion, tableName);

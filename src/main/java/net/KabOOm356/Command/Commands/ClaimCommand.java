@@ -100,7 +100,7 @@ public class ClaimCommand extends ReporterCommand {
 	}
 
 	private void claimReport(final CommandSender sender, final int index) throws ClassNotFoundException, SQLException, InterruptedException {
-		final ArrayList<String> params = new ArrayList<String>();
+		final ArrayList<String> params = new ArrayList<>();
 
 		params.add("1");
 		params.add(BukkitUtil.getUUIDString(sender));

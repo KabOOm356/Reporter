@@ -25,13 +25,13 @@ public class StoreModule {
 		if (log.isDebugEnabled()) {
 			log.info("Initializing service store...");
 		}
-		configurationStore = new Store<Configuration>(configuration);
-		databaseStore = new Store<ExtendedDatabaseHandler>(database);
-		localeStore = new Store<Locale>(locale);
-		permissionStore = new Store<PermissionHandler>(permission);
-		lastViewedStore = new Store<LastViewed>(lastViewed);
-		playerMessagesStore = new Store<PlayerMessages>(playerMessages);
-		playerReportStore = new Store<PlayerReport>(playerReport);
+		configurationStore = new Store<>(configuration);
+		databaseStore = new Store<>(database);
+		localeStore = new Store<>(locale);
+		permissionStore = new Store<>(permission);
+		lastViewedStore = new Store<>(lastViewed);
+		playerMessagesStore = new Store<>(playerMessages);
+		playerReportStore = new Store<>(playerReport);
 	}
 
 	public Store<Configuration> getConfigurationStore() {

@@ -110,7 +110,7 @@ public class RequestCommand extends ReporterCommand {
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			final ArrayList<String> players = new ArrayList<String>();
+			final ArrayList<String> players = new ArrayList<>();
 			final SQLResultSet result;
 			int numberOfReports = -1;
 
@@ -166,7 +166,7 @@ public class RequestCommand extends ReporterCommand {
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			final ArrayList<String> params = new ArrayList<String>();
+			final ArrayList<String> params = new ArrayList<>();
 			String query = "SELECT ID FROM Reports WHERE ReportedUUID=?";
 
 			if (!player.getName().equalsIgnoreCase("* (Anonymous)")) {

@@ -143,7 +143,7 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @return An ArrayList of Strings with each version number in an index.
 	 */
 	private static ArrayList<String> separateVersion(final String version) {
-		final ArrayList<String> list = new ArrayList<String>();
+		final ArrayList<String> list = new ArrayList<>();
 		final String[] array = version.split("[\\.]|[-]|[_]|[ ]");
 
 		for (final String str : array) {

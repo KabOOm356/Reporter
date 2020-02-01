@@ -184,7 +184,7 @@ public class DeleteCommand extends ReporterCommand {
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			final ArrayList<Integer> remainingIndexes = new ArrayList<Integer>();
+			final ArrayList<Integer> remainingIndexes = new ArrayList<>();
 			final SQLResultSet result = database.sqlQuery(connectionId, query);
 
 			for (final ResultRow row : result) {
@@ -510,7 +510,7 @@ public class DeleteCommand extends ReporterCommand {
 	}
 
 	private ArrayList<Integer> getRemainingIndexes(final CommandSender sender, final BatchDeletionType deletion) throws ClassNotFoundException, SQLException, InterruptedException {
-		final ArrayList<Integer> remainingIDs = new ArrayList<Integer>();
+		final ArrayList<Integer> remainingIDs = new ArrayList<>();
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {

@@ -125,7 +125,7 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	 * Removes the empty items from this structure.
 	 */
 	private void removeEmpty() {
-		final ArrayList<Group> removalKeys = new ArrayList<Group>();
+		final ArrayList<Group> removalKeys = new ArrayList<>();
 
 		for (final Entry<Group, PendingMessages> messages : entrySet()) {
 			if (messages.getValue().isEmpty()) {

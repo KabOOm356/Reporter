@@ -116,7 +116,7 @@ public class CompleteCommand extends ReporterCommand {
 	}
 
 	private void completeReport(final CommandSender sender, final int index, final String summary) throws ClassNotFoundException, SQLException, InterruptedException {
-		final ArrayList<String> params = new ArrayList<String>(5);
+		final ArrayList<String> params = new ArrayList<>(5);
 		params.add(0, "1");
 		params.add(BukkitUtil.getUUIDString(sender));
 		params.add(2, sender.getName());

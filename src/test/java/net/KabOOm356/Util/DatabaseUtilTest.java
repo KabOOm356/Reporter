@@ -69,13 +69,13 @@ public class DatabaseUtilTest extends PowerMockitoTest {
 
 	@Test
 	public void testCheckPreparedStatementParametersEmpty() {
-		final List<String> parameters = new ArrayList<String>();
+		final List<String> parameters = new ArrayList<>();
 		assertTrue(DatabaseUtil.checkPreparedStatementParameters("", parameters));
 	}
 
 	@Test
 	public void testCheckPreparedStatementParameters() {
-		final List<String> parameters = new ArrayList<String>();
+		final List<String> parameters = new ArrayList<>();
 		parameters.add("param1");
 		parameters.add("param2");
 		assertTrue(DatabaseUtil.checkPreparedStatementParameters(query, parameters));
@@ -83,7 +83,7 @@ public class DatabaseUtilTest extends PowerMockitoTest {
 
 	@Test
 	public void testCheckPreparedStatementParametersInEqual() {
-		final List<String> parameters = new ArrayList<String>();
+		final List<String> parameters = new ArrayList<>();
 		parameters.add("param1");
 		assertFalse(DatabaseUtil.checkPreparedStatementParameters(query, parameters));
 	}
@@ -91,7 +91,7 @@ public class DatabaseUtilTest extends PowerMockitoTest {
 	@Test
 	public void testBindParametersToPreparedStatement() throws SQLException {
 		final PreparedStatement preparedStatement = mock(PreparedStatement.class);
-		final List<String> parameters = new ArrayList<String>();
+		final List<String> parameters = new ArrayList<>();
 		parameters.add("param1");
 		parameters.add("param2");
 		DatabaseUtil.bindParametersToPreparedStatement(preparedStatement, query, parameters);
@@ -102,7 +102,7 @@ public class DatabaseUtilTest extends PowerMockitoTest {
 	@Test(expected = WrongNumberOfSQLParametersException.class)
 	public void testBindParametersToPreparedStatementWrongNumberOfParameters() throws SQLException {
 		final PreparedStatement preparedStatement = mock(PreparedStatement.class);
-		final List<String> parameters = new ArrayList<String>();
+		final List<String> parameters = new ArrayList<>();
 		parameters.add("param1");
 		DatabaseUtil.bindParametersToPreparedStatement(preparedStatement, query, parameters);
 	}
@@ -110,7 +110,7 @@ public class DatabaseUtilTest extends PowerMockitoTest {
 	@Test
 	public void testBindParametersToPreparedStatementSQLException() throws SQLException {
 		final PreparedStatement preparedStatement = mock(PreparedStatement.class);
-		final List<String> parameters = new ArrayList<String>();
+		final List<String> parameters = new ArrayList<>();
 		parameters.add("param1");
 		parameters.add("param2");
 		doThrow(new SQLException("Test Exception")).when(preparedStatement).setString(2, parameters.get(1));

@@ -30,7 +30,7 @@ public final class ArrayUtil {
 			throw new IllegalArgumentException("Parameter 'array' cannot be null!");
 		}
 
-		final ArrayList<T> arrayList = new ArrayList<T>();
+		final ArrayList<T> arrayList = new ArrayList<>();
 		Collections.addAll(arrayList, array);
 
 		return arrayList;
@@ -45,7 +45,7 @@ public final class ArrayUtil {
 	public static <T> Set<T> arrayToSet(final T[] array) {
 		Validate.notNull(array, "Parameter 'array' cannot be null!");
 
-		final Set<T> set = new HashSet<T>();
+		final Set<T> set = new HashSet<>();
 		Collections.addAll(set, array);
 
 		return set;
@@ -148,7 +148,7 @@ public final class ArrayUtil {
 		Validate.notNull(indexColor);
 		Validate.notNull(separatorColor);
 
-		final ArrayList<String> array = new ArrayList<String>();
+		final ArrayList<String> array = new ArrayList<>();
 		for (final ResultRow row : resultSet) {
 			array.add(row.getString(columnName));
 		}

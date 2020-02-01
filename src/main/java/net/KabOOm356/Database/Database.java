@@ -61,7 +61,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 		this.connectionURL = connectionURL;
 		this.connectionPoolConfig = connectionPoolConfig;
 		localConnectionId = null;
-		connectionPool = new HashMap<Integer, ConnectionWrapper>();
+		connectionPool = new HashMap<>();
 	}
 
 	@Override
@@ -460,7 +460,7 @@ public class Database implements DatabaseInterface, ConnectionPooledDatabaseInte
 
 	@Override
 	public List<String> getColumnNames(final Integer connectionId, final String table) throws SQLException {
-		final List<String> col = new ArrayList<String>();
+		final List<String> col = new ArrayList<>();
 		ResultSet rs = null;
 		try {
 			rs = getColumnMetaData(connectionId, table);

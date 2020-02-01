@@ -130,7 +130,7 @@ public class PlayerMessages extends HashMap<String, GroupMessages> {
 	}
 
 	private void removeEmpty() {
-		final ArrayList<String> removalKeys = new ArrayList<String>();
+		final ArrayList<String> removalKeys = new ArrayList<>();
 
 		for (final Entry<String, GroupMessages> messages : entrySet()) {
 			if (messages.getValue().isEmpty()) {

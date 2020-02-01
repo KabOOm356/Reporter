@@ -28,7 +28,7 @@ public class ReportInformationService extends Service {
 	 */
 	public List<Integer> getViewableReports(final CommandSender sender) throws InterruptedException, SQLException, ClassNotFoundException {
 		final String query;
-		final ArrayList<String> params = new ArrayList<String>();
+		final ArrayList<String> params = new ArrayList<>();
 
 		if (BukkitUtil.isPlayer(sender)) {
 			final OfflinePlayer player = OfflinePlayer.class.cast(sender);
@@ -39,7 +39,7 @@ public class ReportInformationService extends Service {
 			params.add(sender.getName());
 		}
 
-		final List<Integer> indexes = new ArrayList<Integer>();
+		final List<Integer> indexes = new ArrayList<>();
 		final ExtendedDatabaseHandler database = getDatabase();
 		final int connectionId = database.openPooledConnection();
 
@@ -65,7 +65,7 @@ public class ReportInformationService extends Service {
 	 * @throws InterruptedException
 	 */
 	public List<Integer> getCompletedReportIndexes() throws SQLException, ClassNotFoundException, InterruptedException {
-		final List<Integer> indexes = new ArrayList<Integer>();
+		final List<Integer> indexes = new ArrayList<>();
 		final ExtendedDatabaseHandler database = getDatabase();
 		final int connectionId = database.openPooledConnection();
 		try {
@@ -91,7 +91,7 @@ public class ReportInformationService extends Service {
 	 * @throws InterruptedException
 	 */
 	public List<Integer> getIncompleteReportIndexes() throws ClassNotFoundException, SQLException, InterruptedException {
-		final List<Integer> indexes = new ArrayList<Integer>();
+		final List<Integer> indexes = new ArrayList<>();
 		final ExtendedDatabaseHandler database = getDatabase();
 		final int connectionId = database.openPooledConnection();
 		try {
@@ -119,7 +119,7 @@ public class ReportInformationService extends Service {
 	 * @throws InterruptedException
 	 */
 	public List<Integer> getIndexesOfPriority(final ModLevel level) throws ClassNotFoundException, SQLException, InterruptedException {
-		final ArrayList<Integer> indexes = new ArrayList<Integer>();
+		final ArrayList<Integer> indexes = new ArrayList<>();
 		final String query = "SELECT ID FROM Reports WHERE Priority = " + level.getLevel();
 
 		final ExtendedDatabaseHandler database = getDatabase();

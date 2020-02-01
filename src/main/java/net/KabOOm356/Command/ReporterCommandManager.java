@@ -75,11 +75,11 @@ public class ReporterCommandManager implements CommandExecutor {
 		 * As outlined here: 
 		 * http://docs.oracle.com/javase/7/docs/api/java/util/LinkedHashMap.html#constructor_summary
 		 */
-		reportCommands = new LinkedHashMap<String, ReporterCommand>(16, 0.75F, false);
-		aliasReportCommands = new HashMap<String, String>();
+		reportCommands = new LinkedHashMap<>(16, 0.75F, false);
+		aliasReportCommands = new HashMap<>();
 
-		respondCommands = new LinkedHashMap<String, ReporterCommand>(16, 0.75F, false);
-		aliasRespondCommands = new HashMap<String, String>();
+		respondCommands = new LinkedHashMap<>(16, 0.75F, false);
+		aliasRespondCommands = new HashMap<>();
 
 		initReportCommand(new AssignCommand(this));
 		initReportCommand(new ClaimCommand(this));

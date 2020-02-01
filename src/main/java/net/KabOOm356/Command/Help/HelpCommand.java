@@ -18,7 +18,7 @@ public final class HelpCommand {
 	private static final float commandsPerPage = 5f;
 	private static final String format = ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.RED + "%usage" + ChatColor.WHITE + " - %description";
 	private final Locale locale;
-	private final ArrayList<ArrayList<Usage>> pages = new ArrayList<ArrayList<Usage>>();
+	private final ArrayList<ArrayList<Usage>> pages = new ArrayList<>();
 	private final HelpCommandDisplay display;
 
 	public HelpCommand(final Locale locale, final Collection<ReporterCommand> commands, final HelpCommandDisplay display) {
@@ -31,7 +31,7 @@ public final class HelpCommand {
 	}
 
 	private static ArrayList<Usage> createPage(final ArrayList<Usage> help, final int pageNumber) {
-		final ArrayList<Usage> page = new ArrayList<Usage>();
+		final ArrayList<Usage> page = new ArrayList<>();
 		final int startIndex = getPageStartIndex(pageNumber);
 		final int endIndex = getPageEndIndex(pageNumber, help.size());
 		for (int index = startIndex; index < endIndex; index++) {
@@ -87,7 +87,7 @@ public final class HelpCommand {
 	}
 
 	private ArrayList<Usage> getHelp(final Collection<ReporterCommand> commands) {
-		final ArrayList<Usage> help = new ArrayList<Usage>();
+		final ArrayList<Usage> help = new ArrayList<>();
 		for (final ReporterCommand command : commands) {
 			help.addAll(command.getUsages());
 		}

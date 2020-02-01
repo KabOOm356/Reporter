@@ -43,10 +43,10 @@ public class HelpCommandTest extends PowerMockitoTest {
 
 	@Before
 	public void setupMocks() {
-		final LinkedHashMap<String, ReporterCommand> commands = new LinkedHashMap<String, ReporterCommand>(16, 0.75F, false);
+		final LinkedHashMap<String, ReporterCommand> commands = new LinkedHashMap<>(16, 0.75F, false);
 		for (int commandNumber = 0; commandNumber < numberOfCommands; commandNumber++) {
 			final ReporterCommand command = mock(ReporterCommand.class);
-			final ArrayList<Usage> usages = new ArrayList<Usage>();
+			final ArrayList<Usage> usages = new ArrayList<>();
 			final int startNumber = commandNumber * numberOfUsagesPerCommand;
 			for (int usageNumber = startNumber + 1; usageNumber <= startNumber + numberOfUsagesPerCommand; usageNumber++) {
 				final Usage usage = new Usage("key:" + usageNumber, "value:" + usageNumber);

@@ -10,14 +10,14 @@ public class Usage extends ObjectPair<Entry<String>, Entry<String>> {
 	}
 
 	public Usage(final String key, final Entry<String> value) {
-		super(new ConstantEntry<String>(key), value);
+		super(new ConstantEntry<>(key), value);
 	}
 
 	public Usage(final Entry<String> key, final String value) {
-		super(key, new ConstantEntry<String>(value));
+		super(key, new ConstantEntry<>(value));
 	}
 
 	public Usage(final String key, final String value) {
-		super(new ConstantEntry<String>(key), new ConstantEntry<String>(value));
+		super(new ConstantEntry<>(key), new ConstantEntry<>(value));
 	}
 }

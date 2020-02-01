@@ -19,7 +19,7 @@ public class ArrayUtilTest {
 	@Test
 	public void testArrayToArrayList() {
 		final Integer[] emptyIntArray = new Integer[0];
-		final ArrayList<Integer> intList = new ArrayList<Integer>();
+		final ArrayList<Integer> intList = new ArrayList<>();
 
 		assertEquals(intList, ArrayUtil.arrayToArrayList(emptyIntArray));
 
@@ -66,7 +66,7 @@ public class ArrayUtilTest {
 	@Test
 	public void testArrayToSet() {
 		final Integer[] emptyIntArray = new Integer[0];
-		final HashSet<Integer> intSet = new HashSet<Integer>();
+		final HashSet<Integer> intSet = new HashSet<>();
 
 		assertEquals(intSet, ArrayUtil.arrayToSet(emptyIntArray));
 
@@ -122,7 +122,7 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testIndexesToString() {
-		final ArrayList<Integer> list = new ArrayList<Integer>();
+		final ArrayList<Integer> list = new ArrayList<>();
 
 		String value = ArrayUtil.indexesToString(list);
 		assertEquals("", value);
@@ -158,14 +158,14 @@ public class ArrayUtilTest {
 		}
 
 		try {
-			ArrayUtil.indexesToString(new HashMap<Object, Object>(), null, "");
+			ArrayUtil.indexesToString(new HashMap<>(), null, "");
 			fail("Expected exception not thrown!");
 		} catch (final IllegalArgumentException e) {
 			// Expected exception
 		}
 
 		try {
-			ArrayUtil.indexesToString(new HashMap<Object, Object>(), "", null);
+			ArrayUtil.indexesToString(new HashMap<>(), "", null);
 			fail("Expected exception not thrown!");
 		} catch (final IllegalArgumentException e) {
 			// Expected exception
@@ -174,12 +174,12 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testIndexesToStringMap() {
-		final Map<String, String> testMap = new LinkedHashMap<String, String>(16, 0.75f, true);
+		final Map<String, String> testMap = new LinkedHashMap<>(16, 0.75f, true);
 		testMap.put("FirstKey", "FirstValue");
 		testMap.put("SecondKey", "SecondValue");
 		testMap.put("LastKey", "LastValue");
 
-		String returned = ArrayUtil.indexesToString(new HashMap<Object, Object>());
+		String returned = ArrayUtil.indexesToString(new HashMap<>());
 		assertEquals("", returned);
 
 		returned = ArrayUtil.indexesToString(testMap);
@@ -191,12 +191,12 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testIndexToStringChatColor() {
-		final ArrayList<String> testArray = new ArrayList<String>();
+		final ArrayList<String> testArray = new ArrayList<>();
 		testArray.add("FirstElement");
 		testArray.add("SecondElement");
 		testArray.add("LastElement");
 
-		String returned = ArrayUtil.indexesToString(new ArrayList<Object>(), ChatColor.RED, ChatColor.WHITE);
+		String returned = ArrayUtil.indexesToString(new ArrayList<>(), ChatColor.RED, ChatColor.WHITE);
 		String expected = "";
 		assertEquals(expected, returned);
 

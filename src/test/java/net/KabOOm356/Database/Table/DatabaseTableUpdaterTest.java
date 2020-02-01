@@ -31,7 +31,7 @@ public class DatabaseTableUpdaterTest extends PowerMockitoTest {
 
 	@Before
 	public void setupMocks() throws Exception {
-		final List<DatabaseTableVersionUpdater> databaseTableVersionUpdaterList = new ArrayList<DatabaseTableVersionUpdater>();
+		final List<DatabaseTableVersionUpdater> databaseTableVersionUpdaterList = new ArrayList<>();
 		databaseTableVersionUpdaterList.add(databaseTableVersionUpdater);
 		databaseTableVersionUpdaterList.add(databaseTableVersionUpdater2);
 		when(databaseTableUpdater.getDatabaseTableVersionUpdaters()).thenReturn(databaseTableVersionUpdaterList);

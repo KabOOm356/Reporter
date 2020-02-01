@@ -51,7 +51,7 @@ public class ReportCountServiceTest extends ServiceTest {
 
 	@Test
 	public void testGetIncompleteReports() throws InterruptedException, SQLException, ClassNotFoundException {
-		final List<Integer> indexes = new ArrayList<Integer>();
+		final List<Integer> indexes = new ArrayList<>();
 		indexes.add(1);
 		indexes.add(3);
 		indexes.add(5);
@@ -61,7 +61,7 @@ public class ReportCountServiceTest extends ServiceTest {
 
 	@Test
 	public void testGetCompleteReports() throws InterruptedException, SQLException, ClassNotFoundException {
-		final List<Integer> indexes = new ArrayList<Integer>();
+		final List<Integer> indexes = new ArrayList<>();
 		indexes.add(1);
 		indexes.add(3);
 		indexes.add(5);
@@ -71,7 +71,7 @@ public class ReportCountServiceTest extends ServiceTest {
 
 	@Test
 	public void testGetNumberOfPriority() throws InterruptedException, SQLException, ClassNotFoundException {
-		final List<Integer> indexes = new ArrayList<Integer>();
+		final List<Integer> indexes = new ArrayList<>();
 		indexes.add(1);
 		indexes.add(3);
 		indexes.add(5);

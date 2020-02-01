@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerStatsTableUpdater extends DatabaseTableUpdater {
-	private final List<DatabaseTableVersionUpdater> versionUpdaters = new ArrayList<DatabaseTableVersionUpdater>();
+	private final List<DatabaseTableVersionUpdater> versionUpdaters = new ArrayList<>();
 
 	public PlayerStatsTableUpdater(final Database database, final String updateVersion, final String tableName) {
 		super(database, updateVersion, tableName);

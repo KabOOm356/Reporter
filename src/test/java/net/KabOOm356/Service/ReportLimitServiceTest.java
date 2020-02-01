@@ -37,7 +37,7 @@ public class ReportLimitServiceTest extends ServiceTest {
 	private final int uuidTimerTime = 125;
 	private final UUID playerUUID = UUID.randomUUID();
 	private final UUID reportedPlayerUUID = UUID.randomUUID();
-	private final PriorityQueue<ReportTimer> timers = new PriorityQueue<ReportTimer>();
+	private final PriorityQueue<ReportTimer> timers = new PriorityQueue<>();
 	private ReportLimitService service;
 	@Mock
 	private Reporter plugin;

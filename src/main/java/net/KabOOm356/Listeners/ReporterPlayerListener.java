@@ -182,8 +182,8 @@ public class ReporterPlayerListener implements Listener {
 
 		final boolean displayAlertToPlayers = plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.toPlayer", true);
 
-		final ArrayList<Integer> consoleIndexes = new ArrayList<Integer>();
-		final ArrayList<Integer> indexes = new ArrayList<Integer>();
+		final ArrayList<Integer> consoleIndexes = new ArrayList<>();
+		final ArrayList<Integer> indexes = new ArrayList<>();
 
 		for (final ResultRow row : result) {
 			consoleIndexes.add(row.getInt("ID"));

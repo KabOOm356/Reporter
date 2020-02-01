@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReportTableMigrator extends DatabaseTableMigrator {
-	private final List<DatabaseTableVersionMigrator> versionMigrators = new ArrayList<DatabaseTableVersionMigrator>();
+	private final List<DatabaseTableVersionMigrator> versionMigrators = new ArrayList<>();
 
 	public ReportTableMigrator(final Database database, final String databaseVersion, final String tableName) {
 		super(database, databaseVersion, tableName);

@@ -118,7 +118,7 @@ public class PendingMessages extends ArrayList<Message> {
 	 * Cleans up this structure, removing messages with no indexes.
 	 */
 	private void removeEmpty() {
-		final ArrayList<Message> deletion = new ArrayList<Message>();
+		final ArrayList<Message> deletion = new ArrayList<>();
 
 		for (final Message message : this) {
 			if (message.isEmpty()) {

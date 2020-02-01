@@ -115,7 +115,7 @@ public class ReportCommand extends ReporterCommand {
 	}
 
 	private void reportCommand(final CommandSender sender, final OfflinePlayer reported, final String details) throws ClassNotFoundException, SQLException, InterruptedException {
-		final ArrayList<String> params = new ArrayList<String>();
+		final ArrayList<String> params = new ArrayList<>();
 		final int count = getServiceModule().getReportCountService().getCount();
 		Location reportedLoc = null;
 

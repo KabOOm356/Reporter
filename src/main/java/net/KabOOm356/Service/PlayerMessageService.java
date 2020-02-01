@@ -115,7 +115,7 @@ public class PlayerMessageService extends Service {
 	 * <br/ >sent since the player has been offline.
 	 */
 	public ArrayList<String> getMessages(final String player) {
-		final ArrayList<String> playerMessages = new ArrayList<String>();
+		final ArrayList<String> playerMessages = new ArrayList<>();
 
 		if (getMessages().containsKey(player)) {
 			for (final Entry<Group, PendingMessages> e : getMessages().get(player).entrySet()) {
@@ -137,7 +137,7 @@ public class PlayerMessageService extends Service {
 	 * <br/ >sent since the player has been offline.
 	 */
 	public ArrayList<String> getMessages(final String player, final Group group) {
-		final ArrayList<String> playerMessages = new ArrayList<String>();
+		final ArrayList<String> playerMessages = new ArrayList<>();
 
 		if (getMessages().containsKey(player)) {
 			final HashMap<Group, PendingMessages> groupedMessages = getMessages().get(player);

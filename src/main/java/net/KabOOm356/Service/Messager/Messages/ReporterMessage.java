@@ -23,7 +23,7 @@ public class ReporterMessage extends Message {
 	public ReporterMessage(final String message) {
 		super(message);
 
-		indexes = new ArrayList<Integer>();
+		indexes = new ArrayList<>();
 	}
 
 	/**
@@ -34,7 +34,7 @@ public class ReporterMessage extends Message {
 	public ReporterMessage(final Message message) {
 		super(message.getMessage());
 
-		indexes = new ArrayList<Integer>();
+		indexes = new ArrayList<>();
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class ReporterMessage extends Message {
 	public ReporterMessage(final String message, final int index) {
 		super(message);
 
-		indexes = new ArrayList<Integer>();
+		indexes = new ArrayList<>();
 
 		indexes.add(index);
 	}

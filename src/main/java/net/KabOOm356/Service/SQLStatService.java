@@ -92,7 +92,7 @@ public class SQLStatService extends Service {
 		query.append("SET ").append(statColumn).append(" = ").append(statColumn).append(" + ").append(increment).append(' ');
 		query.append("WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 
-		final ArrayList<String> params = new ArrayList<String>();
+		final ArrayList<String> params = new ArrayList<>();
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 
@@ -145,7 +145,7 @@ public class SQLStatService extends Service {
 		query.append("SET ").append(statColumn).append(" = ").append(statColumn).append(" - ").append(decrement).append(' ');
 		query.append("WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 
-		final ArrayList<String> params = new ArrayList<String>();
+		final ArrayList<String> params = new ArrayList<>();
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 
@@ -185,7 +185,7 @@ public class SQLStatService extends Service {
 		query.append("SET ").append(statColumn).append(" = ? ");
 		query.append("WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 
-		final ArrayList<String> params = new ArrayList<String>();
+		final ArrayList<String> params = new ArrayList<>();
 		params.add(value);
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
@@ -226,7 +226,7 @@ public class SQLStatService extends Service {
 		query.append(" FROM ").append(tableName);
 		query.append(" WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 
-		final ArrayList<String> params = new ArrayList<String>();
+		final ArrayList<String> params = new ArrayList<>();
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 
@@ -304,7 +304,7 @@ public class SQLStatService extends Service {
 						'(' + indexColumn + ',' + secondaryIndexColumn + ')' +
 						"VALUES (?,?)";
 
-				final ArrayList<String> params = new ArrayList<String>();
+				final ArrayList<String> params = new ArrayList<>();
 
 				if (BukkitUtil.isPlayerValid(player)) {
 					params.add(player.getUniqueId().toString());
@@ -353,7 +353,7 @@ public class SQLStatService extends Service {
 			query.append("FROM ").append(tableName).append(' ');
 			query.append("WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 
-			final ArrayList<String> params = new ArrayList<String>();
+			final ArrayList<String> params = new ArrayList<>();
 
 			params.add(player.getUniqueId().toString());
 			params.add(player.getName());
@@ -438,7 +438,7 @@ public class SQLStatService extends Service {
 		 * @return An {@link ArrayList} containing all the {@link SQLStat}s from the given class.
 		 */
 		public static <T extends SQLStat> ArrayList<SQLStat> getAll(final Class<T> clazz) {
-			final ArrayList<SQLStat> stats = new ArrayList<SQLStat>();
+			final ArrayList<SQLStat> stats = new ArrayList<>();
 
 			for (final Field f : clazz.getDeclaredFields()) {
 				try {

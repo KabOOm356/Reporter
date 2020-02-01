@@ -33,7 +33,7 @@ public class DatabaseTableMigratorTest extends PowerMockitoTest {
 	public void setupMocks() throws Exception {
 		doCallRealMethod().when(databaseTableMigrator).migrate();
 		doCallRealMethod().when(databaseTableMigrator, "migrateTable");
-		final List<DatabaseTableVersionMigrator> databaseTableVersionMigratorList = new ArrayList<DatabaseTableVersionMigrator>();
+		final List<DatabaseTableVersionMigrator> databaseTableVersionMigratorList = new ArrayList<>();
 		databaseTableVersionMigratorList.add(databaseTableVersionMigrator);
 		databaseTableVersionMigratorList.add(databaseTableVersionMigrator2);
 		when(databaseTableMigrator.getDatabaseTableVersionMigrators()).thenReturn(databaseTableVersionMigratorList);

@@ -185,7 +185,7 @@ public class LastViewedReportServiceTest extends ServiceTest {
 		lastViewed.put(sender3, 3);
 		lastViewed.put(sender4, 4);
 
-		final List<Integer> remainingIndexes = new ArrayList<Integer>();
+		final List<Integer> remainingIndexes = new ArrayList<>();
 		remainingIndexes.add(1);
 		remainingIndexes.add(2);
 		remainingIndexes.add(3);
@@ -213,7 +213,7 @@ public class LastViewedReportServiceTest extends ServiceTest {
 		lastViewed.put(sender3, 3);
 		lastViewed.put(sender4, 4);
 
-		final List<Integer> remainingIndexes = new ArrayList<Integer>();
+		final List<Integer> remainingIndexes = new ArrayList<>();
 		remainingIndexes.add(1);
 		remainingIndexes.add(2);
 		remainingIndexes.add(4);
@@ -241,7 +241,7 @@ public class LastViewedReportServiceTest extends ServiceTest {
 		lastViewed.put(sender3, 3);
 		lastViewed.put(sender4, 4);
 
-		final List<Integer> remainingIndexes = new ArrayList<Integer>();
+		final List<Integer> remainingIndexes = new ArrayList<>();
 		remainingIndexes.add(1);
 		remainingIndexes.add(4);
 
@@ -267,7 +267,7 @@ public class LastViewedReportServiceTest extends ServiceTest {
 		lastViewed.put(sender3, 3);
 		lastViewed.put(sender4, 4);
 
-		final List<Integer> remainingIndexes = new ArrayList<Integer>();
+		final List<Integer> remainingIndexes = new ArrayList<>();
 		remainingIndexes.add(2);
 		remainingIndexes.add(3);
 		remainingIndexes.add(4);
@@ -295,7 +295,7 @@ public class LastViewedReportServiceTest extends ServiceTest {
 		lastViewed.put(sender3, 3);
 		lastViewed.put(sender4, 4);
 
-		final List<Integer> remainingIndexes = new ArrayList<Integer>();
+		final List<Integer> remainingIndexes = new ArrayList<>();
 		remainingIndexes.add(2);
 		remainingIndexes.add(4);
 
