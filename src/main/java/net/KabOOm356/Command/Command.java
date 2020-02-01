@@ -18,7 +18,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,7 +34,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	private boolean isPendingToRun = false;
 	private boolean hasRun = false;
 	private CommandSender sender = null;
-	private ArrayList<String> arguments = null;
+	private List<String> arguments = null;
 
 	/**
 	 * Constructor.
@@ -64,7 +63,7 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 	 * @param sender The {@link CommandSender} whom is executing this command.
 	 * @param args   The given arguments from the {@link CommandSender}.
 	 */
-	public abstract void execute(CommandSender sender, ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException;
+	public abstract void execute(CommandSender sender, List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException;
 
 	/**
 	 * Checks if the given {@link Player} has permission to run this command, or is OP.
@@ -176,14 +175,14 @@ public abstract class Command extends TimedRunnable implements RunnableWithState
 		this.sender = sender;
 	}
 
-	public void setArguments(final ArrayList<String> arguments) {
+	public void setArguments(final List<String> arguments) {
 		if (isRunning || isPendingToRun) {
 			throw new IllegalArgumentException("The current command is in-flight and should not be modified!");
 		}
 		this.arguments = arguments;
 	}
 
-	public Command getRunnableClone(final CommandSender sender, final ArrayList<String> arguments) throws Exception {
+	public Command getRunnableClone(final CommandSender sender, final List<String> arguments) throws Exception {
 		try {
 			final Class<? extends Command> clazz = this.getClass();
 			final Constructor<? extends Command> constructor = clazz.getDeclaredConstructor(ReporterCommandManager.class);

@@ -24,7 +24,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +38,7 @@ public class MoveCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 2;
 	private final static String permissionNode = "reporter.move";
 
-	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(MovePhrases.moveHelp, MovePhrases.moveHelpDetails)}));
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToList(new Usage[]{new Usage(MovePhrases.moveHelp, MovePhrases.moveHelpDetails)}));
 	private static final List<String> aliases = Collections.emptyList();
 
 	/**
@@ -70,7 +69,7 @@ public class MoveCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
+	public void execute(final CommandSender sender, final List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;

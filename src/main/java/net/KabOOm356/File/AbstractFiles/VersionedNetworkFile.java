@@ -2,6 +2,7 @@ package net.KabOOm356.File.AbstractFiles;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * A {@link NetworkFile} that has a String GNU standard version associated with it.
@@ -15,7 +16,7 @@ public class VersionedNetworkFile extends NetworkFile {
 	/**
 	 * The versions split into indexes.
 	 */
-	private ArrayList<String> versions;
+	private List<String> versions;
 
 	/**
 	 * The level of this release.
@@ -142,8 +143,8 @@ public class VersionedNetworkFile extends NetworkFile {
 	 *
 	 * @return An ArrayList of Strings with each version number in an index.
 	 */
-	private static ArrayList<String> separateVersion(final String version) {
-		final ArrayList<String> list = new ArrayList<>();
+	private static List<String> separateVersion(final String version) {
+		final List<String> list = new ArrayList<>();
 		final String[] array = version.split("[\\.]|[-]|[_]|[ ]");
 
 		for (final String str : array) {
@@ -195,7 +196,7 @@ public class VersionedNetworkFile extends NetworkFile {
 	public void setVersion(final String version) {
 		this.version = version;
 
-		final ArrayList<String> separatedVersions = separateVersion();
+		final List<String> separatedVersions = separateVersion();
 
 		final int index;
 		final int lastIndex = separatedVersions.size() - 1;
@@ -308,7 +309,7 @@ public class VersionedNetworkFile extends NetworkFile {
 	/**
 	 * @return The separated version numbers in each index.
 	 */
-	public ArrayList<String> getVersions() {
+	public List<String> getVersions() {
 		return versions;
 	}
 
@@ -322,7 +323,7 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @return An ArrayList of Strings with each version number in an index.
 	 * @see #separateVersion(String)
 	 */
-	private ArrayList<String> separateVersion() {
+	private List<String> separateVersion() {
 		return separateVersion(version);
 	}
 

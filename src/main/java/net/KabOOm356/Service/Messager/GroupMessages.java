@@ -4,6 +4,7 @@ import net.KabOOm356.Service.Messager.Messages.Message;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * A {@link HashMap} that uses a {@link Group} as a key that points to a {@link PendingMessages} object.
@@ -39,7 +40,7 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	 * @param group    Initial group.
 	 * @param messages Initial messages.
 	 */
-	public GroupMessages(final Group group, final ArrayList<Message> messages) {
+	public GroupMessages(final Group group, final List<Message> messages) {
 		super();
 
 		put(group, messages);
@@ -65,7 +66,7 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	 * @param group    The group to add the messages to.
 	 * @param messages The messages to add to the group.
 	 */
-	public void put(final Group group, final ArrayList<Message> messages) {
+	public void put(final Group group, final List<Message> messages) {
 		for (final Message message : messages) {
 			put(group, message);
 		}
@@ -76,7 +77,7 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	 *
 	 * @param remainingIndexes The remaining indexes after a batch deletion.
 	 */
-	public void reindexMessages(final ArrayList<Integer> remainingIndexes) {
+	public void reindexMessages(final List<Integer> remainingIndexes) {
 		for (final Entry<Group, PendingMessages> messages : entrySet()) {
 			final PendingMessages pendingMessage = messages.getValue();
 
@@ -125,7 +126,7 @@ public class GroupMessages extends HashMap<Group, PendingMessages> {
 	 * Removes the empty items from this structure.
 	 */
 	private void removeEmpty() {
-		final ArrayList<Group> removalKeys = new ArrayList<>();
+		final List<Group> removalKeys = new ArrayList<>();
 
 		for (final Entry<Group, PendingMessages> messages : entrySet()) {
 			if (messages.getValue().isEmpty()) {

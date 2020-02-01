@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -108,9 +109,9 @@ public class ReporterPlayerListener implements Listener {
 		// No point to send the message if the player can't view any reports.
 		if (canView) {
 			// Get the messages for the player using their UUID.
-			final ArrayList<String> messages = playerMessageService.getMessages(player.getUniqueId().toString());
+			final List<String> messages = playerMessageService.getMessages(player.getUniqueId().toString());
 			// Get the messages for the player using their player name.
-			final ArrayList<String> playerNameMessages = playerMessageService.getMessages(player.getName());
+			final List<String> playerNameMessages = playerMessageService.getMessages(player.getName());
 
 			// Append the message pools.
 			messages.addAll(playerNameMessages);
@@ -182,8 +183,8 @@ public class ReporterPlayerListener implements Listener {
 
 		final boolean displayAlertToPlayers = plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.toPlayer", true);
 
-		final ArrayList<Integer> consoleIndexes = new ArrayList<>();
-		final ArrayList<Integer> indexes = new ArrayList<>();
+		final List<Integer> consoleIndexes = new ArrayList<>();
+		final List<Integer> indexes = new ArrayList<>();
 
 		for (final ResultRow row : result) {
 			consoleIndexes.add(row.getInt("ID"));
@@ -225,7 +226,7 @@ public class ReporterPlayerListener implements Listener {
 		}
 	}
 
-	private void alertOnlinePlayersReportedPlayerLogin(final String reportedPlayerName, final ArrayList<Integer> indexes) {
+	private void alertOnlinePlayersReportedPlayerLogin(final String reportedPlayerName, final List<Integer> indexes) {
 		String message = ChatColor.BLUE + Reporter.getLogPrefix() +
 				ChatColor.WHITE + plugin.getLocale().getString(AlertPhrases.alertUnclaimedPlayerLogin);
 

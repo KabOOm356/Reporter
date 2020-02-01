@@ -35,8 +35,8 @@ public class CompleteCommand extends ReporterCommand {
 	private static final String name = "Complete";
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.complete";
-	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(CompletePhrases.completeHelp, CompletePhrases.completeHelpDetails)}));
-	private static final List<String> aliases = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new String[]{"Finish"}));
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToList(new Usage[]{new Usage(CompletePhrases.completeHelp, CompletePhrases.completeHelpDetails)}));
+	private static final List<String> aliases = Collections.unmodifiableList(ArrayUtil.arrayToList(new String[]{"Finish"}));
 	private final boolean sendMessage;
 
 	/**
@@ -70,7 +70,7 @@ public class CompleteCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
+	public void execute(final CommandSender sender, final List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;
@@ -116,7 +116,7 @@ public class CompleteCommand extends ReporterCommand {
 	}
 
 	private void completeReport(final CommandSender sender, final int index, final String summary) throws ClassNotFoundException, SQLException, InterruptedException {
-		final ArrayList<String> params = new ArrayList<>(5);
+		final List<String> params = new ArrayList<>(5);
 		params.add(0, "1");
 		params.add(BukkitUtil.getUUIDString(sender));
 		params.add(2, sender.getName());

@@ -45,14 +45,14 @@ public class DeleteCommand extends ReporterCommand {
 	private static final String permissionNode = "reporter.delete";
 	private static final ModeratorStat statistic = ModeratorStat.DELETED;
 
-	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToList(new Usage[]{
 			new Usage(DeletePhrases.deleteHelp, DeletePhrases.deleteHelpDetails),
 			new Usage("/report delete/remove all", DeletePhrases.deleteHelpAllDetails),
 			new Usage("/report delete/remove completed|finished", DeletePhrases.deleteHelpCompletedDetails),
 			new Usage("/report delete/remove incomplete|unfinished", DeletePhrases.deleteHelpIncompleteDetails),
 			new Usage(DeletePhrases.deleteHelpPlayer, DeletePhrases.deleteHelpPlayerDetails)
 	}));
-	private static final List<String> aliases = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new String[]{"Remove"}));
+	private static final List<String> aliases = Collections.unmodifiableList(ArrayUtil.arrayToList(new String[]{"Remove"}));
 
 	/**
 	 * Constructor.
@@ -82,7 +82,7 @@ public class DeleteCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
+	public void execute(final CommandSender sender, final List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;
@@ -184,7 +184,7 @@ public class DeleteCommand extends ReporterCommand {
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			final ArrayList<Integer> remainingIndexes = new ArrayList<>();
+			final List<Integer> remainingIndexes = new ArrayList<>();
 			final SQLResultSet result = database.sqlQuery(connectionId, query);
 
 			for (final ResultRow row : result) {
@@ -345,7 +345,7 @@ public class DeleteCommand extends ReporterCommand {
 	private int deleteReportBatch(final CommandSender sender, final BatchDeletionType deletion) throws Exception {
 		try {
 			final int beforeDeletion = getServiceModule().getReportCountService().getCount();
-			final ArrayList<Integer> remainingIndexes = getRemainingIndexes(sender, deletion);
+			final List<Integer> remainingIndexes = getRemainingIndexes(sender, deletion);
 			final int afterDeletion = remainingIndexes.size();
 			final int totalDeleted = beforeDeletion - afterDeletion;
 
@@ -509,8 +509,8 @@ public class DeleteCommand extends ReporterCommand {
 		return query.toString();
 	}
 
-	private ArrayList<Integer> getRemainingIndexes(final CommandSender sender, final BatchDeletionType deletion) throws ClassNotFoundException, SQLException, InterruptedException {
-		final ArrayList<Integer> remainingIDs = new ArrayList<>();
+	private List<Integer> getRemainingIndexes(final CommandSender sender, final BatchDeletionType deletion) throws ClassNotFoundException, SQLException, InterruptedException {
+		final List<Integer> remainingIDs = new ArrayList<>();
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
@@ -531,11 +531,11 @@ public class DeleteCommand extends ReporterCommand {
 		getServiceModule().getLastViewedReportService().deleteIndex(removedIndex);
 	}
 
-	private void updateLastViewed(final ArrayList<Integer> remainingIndexes) {
+	private void updateLastViewed(final List<Integer> remainingIndexes) {
 		getServiceModule().getLastViewedReportService().deleteBatch(remainingIndexes);
 	}
 
-	private void reformatTables(final CommandSender sender, final ArrayList<Integer> remainingIndexes) throws Exception {
+	private void reformatTables(final CommandSender sender, final List<Integer> remainingIndexes) throws Exception {
 		StringBuilder query;
 		Statement stmt = null;
 

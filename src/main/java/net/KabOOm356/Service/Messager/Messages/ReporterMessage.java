@@ -5,6 +5,7 @@ import net.KabOOm356.Util.FormattingUtil;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A {@link Message} that has indexes associated with it.
@@ -13,7 +14,7 @@ public class ReporterMessage extends Message {
 	/**
 	 * The indexes associated with this message.
 	 */
-	private final ArrayList<Integer> indexes;
+	private final List<Integer> indexes;
 
 	/**
 	 * Constructor.
@@ -78,7 +79,7 @@ public class ReporterMessage extends Message {
 	 *
 	 * @return The indexes currently associated with this message.
 	 */
-	public ArrayList<Integer> getIndexes() {
+	public List<Integer> getIndexes() {
 		return indexes;
 	}
 
@@ -109,7 +110,7 @@ public class ReporterMessage extends Message {
 	 *
 	 * @param indexes The indexes to add.
 	 */
-	public void addIndexes(final ArrayList<Integer> indexes) {
+	public void addIndexes(final List<Integer> indexes) {
 		for (final int index : indexes) {
 			addIndex(index);
 		}
@@ -140,7 +141,7 @@ public class ReporterMessage extends Message {
 	 *
 	 * @param remainingIndexes The remaining indexes after a batch deletion.
 	 */
-	public void reindex(final ArrayList<Integer> remainingIndexes) {
+	public void reindex(final List<Integer> remainingIndexes) {
 		int LCV = 0;
 
 		while (LCV < indexes.size()) {

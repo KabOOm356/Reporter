@@ -20,20 +20,20 @@ public final class ArrayUtil {
 	}
 
 	/**
-	 * Converts a Java array to an {@link ArrayList}.
+	 * Converts a Java array to an {@link List}.
 	 *
-	 * @param array The array to convert to an {@link ArrayList}.
-	 * @return An {@link ArrayList} containing all elements of the given array.
+	 * @param array The array to convert to an {@link List}.
+	 * @return An {@link List} containing all elements of the given array.
 	 */
-	public static <T> ArrayList<T> arrayToArrayList(final T[] array) {
+	public static <T> List<T> arrayToList(final T[] array) {
 		if (array == null) {
 			throw new IllegalArgumentException("Parameter 'array' cannot be null!");
 		}
 
-		final ArrayList<T> arrayList = new ArrayList<>();
-		Collections.addAll(arrayList, array);
+		final List<T> list = new ArrayList<>();
+		Collections.addAll(list, array);
 
-		return arrayList;
+		return list;
 	}
 
 	/**
@@ -148,7 +148,7 @@ public final class ArrayUtil {
 		Validate.notNull(indexColor);
 		Validate.notNull(separatorColor);
 
-		final ArrayList<String> array = new ArrayList<>();
+		final List<String> array = new ArrayList<>();
 		for (final ResultRow row : resultSet) {
 			array.add(row.getString(columnName));
 		}

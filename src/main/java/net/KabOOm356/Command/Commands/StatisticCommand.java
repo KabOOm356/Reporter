@@ -15,7 +15,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,19 +23,19 @@ public class StatisticCommand extends ReporterCommand {
 	private final static int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.statistic.*";
 
-	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToList(new Usage[]{
 			new Usage(StatisticPhrases.statisticHelp, StatisticPhrases.statisticHelpDetails),
 			new Usage("/report statistic/stat list", StatisticPhrases.statisticListHelpDetails),
 			new Usage("/report statistic/stat <Player Name> all", StatisticPhrases.statisticAllHelpDetails),
 			new Usage("/report statistic/stat <Player Name> all mod|player", StatisticPhrases.statisticAllModPlayerHelpDetails)
 	}));
-	private static final List<String> aliases = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new String[]{"Stat"}));
+	private static final List<String> aliases = Collections.unmodifiableList(ArrayUtil.arrayToList(new String[]{"Stat"}));
 
 	public StatisticCommand(final ReporterCommandManager manager) {
 		super(manager, name, permissionNode, minimumNumberOfArguments);
 	}
 
-	private static String getStatisticNameString(final ArrayList<SQLStat> stats) {
+	private static String getStatisticNameString(final List<SQLStat> stats) {
 		final StringBuilder stb = new StringBuilder();
 
 		for (int LCV = 0; LCV < stats.size(); LCV++) {
@@ -65,7 +64,7 @@ public class StatisticCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) {
+	public void execute(final CommandSender sender, final List<String> args) {
 		if (args.get(0).equalsIgnoreCase("list")) {
 			if (getServiceModule().getPermissionService().hasPermission(sender, "reporter.statistic.list")) {
 				listStatistics(sender);
@@ -175,7 +174,7 @@ public class StatisticCommand extends ReporterCommand {
 			return;
 		}
 
-		final ArrayList<SQLStat> stats = SQLStat.getAll(ModeratorStat.class);
+		final List<SQLStat> stats = SQLStat.getAll(ModeratorStat.class);
 
 		for (final SQLStat stat : stats) {
 			displayStatistic(sender, player, stat);
@@ -187,7 +186,7 @@ public class StatisticCommand extends ReporterCommand {
 			return;
 		}
 
-		final ArrayList<SQLStat> stats = SQLStat.getAll(PlayerStat.class);
+		final List<SQLStat> stats = SQLStat.getAll(PlayerStat.class);
 
 		for (final SQLStat stat : stats) {
 			displayStatistic(sender, player, stat);
@@ -198,7 +197,7 @@ public class StatisticCommand extends ReporterCommand {
 		String playerStatsList = ChatColor.WHITE + getManager().getLocale().getString(StatisticPhrases.availablePlayerStatistics);
 		String modStatsList = ChatColor.WHITE + getManager().getLocale().getString(StatisticPhrases.availableModeratorStatistics);
 
-		ArrayList<SQLStat> stats = SQLStat.getAll(PlayerStat.class);
+		List<SQLStat> stats = SQLStat.getAll(PlayerStat.class);
 
 		playerStatsList = playerStatsList.replaceAll("%s", getStatisticNameString(stats));
 

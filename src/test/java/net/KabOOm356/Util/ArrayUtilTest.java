@@ -13,23 +13,23 @@ import static org.junit.Assert.*;
 public class ArrayUtilTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testArrayToArrayListNull() {
-		ArrayUtil.arrayToArrayList(null);
+		ArrayUtil.arrayToList(null);
 	}
 
 	@Test
-	public void testArrayToArrayList() {
+	public void testArrayToList() {
 		final Integer[] emptyIntArray = new Integer[0];
-		final ArrayList<Integer> intList = new ArrayList<>();
+		final List<Integer> intList = new ArrayList<>();
 
-		assertEquals(intList, ArrayUtil.arrayToArrayList(emptyIntArray));
+		assertEquals(intList, ArrayUtil.arrayToList(emptyIntArray));
 
 		final Integer[] oneIntArray = {2};
 		intList.add(2);
-		assertEquals(intList, ArrayUtil.arrayToArrayList(oneIntArray));
+		assertEquals(intList, ArrayUtil.arrayToList(oneIntArray));
 
 		intList.clear();
 		intList.add(5);
-		assertNotEquals(intList, ArrayUtil.arrayToArrayList(oneIntArray));
+		assertNotEquals(intList, ArrayUtil.arrayToList(oneIntArray));
 
 		final Integer[] intArray = {1, 2, 3, 4, 5};
 		intList.clear();
@@ -38,7 +38,7 @@ public class ArrayUtilTest {
 		intList.add(3);
 		intList.add(4);
 		intList.add(5);
-		assertEquals(intList, ArrayUtil.arrayToArrayList(intArray));
+		assertEquals(intList, ArrayUtil.arrayToList(intArray));
 
 		intList.clear();
 		intList.add(3);
@@ -46,7 +46,7 @@ public class ArrayUtilTest {
 		intList.add(1);
 		intList.add(5);
 		intList.add(4);
-		assertNotEquals(intList, ArrayUtil.arrayToArrayList(intArray));
+		assertNotEquals(intList, ArrayUtil.arrayToList(intArray));
 
 		intArray[3] = 2;
 		intList.clear();
@@ -55,7 +55,7 @@ public class ArrayUtilTest {
 		intList.add(3);
 		intList.add(2);
 		intList.add(5);
-		assertEquals(intList, ArrayUtil.arrayToArrayList(intArray));
+		assertEquals(intList, ArrayUtil.arrayToList(intArray));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -122,7 +122,7 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testIndexesToString() {
-		final ArrayList<Integer> list = new ArrayList<>();
+		final List<Integer> list = new ArrayList<>();
 
 		String value = ArrayUtil.indexesToString(list);
 		assertEquals("", value);
@@ -191,7 +191,7 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testIndexToStringChatColor() {
-		final ArrayList<String> testArray = new ArrayList<>();
+		final List<String> testArray = new ArrayList<>();
 		testArray.add("FirstElement");
 		testArray.add("SecondElement");
 		testArray.add("LastElement");

@@ -15,6 +15,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A class to manage setting statistics held in an SQL database.
@@ -92,7 +93,7 @@ public class SQLStatService extends Service {
 		query.append("SET ").append(statColumn).append(" = ").append(statColumn).append(" + ").append(increment).append(' ');
 		query.append("WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 
-		final ArrayList<String> params = new ArrayList<>();
+		final List<String> params = new ArrayList<>();
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 
@@ -145,7 +146,7 @@ public class SQLStatService extends Service {
 		query.append("SET ").append(statColumn).append(" = ").append(statColumn).append(" - ").append(decrement).append(' ');
 		query.append("WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 
-		final ArrayList<String> params = new ArrayList<>();
+		final List<String> params = new ArrayList<>();
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 
@@ -185,7 +186,7 @@ public class SQLStatService extends Service {
 		query.append("SET ").append(statColumn).append(" = ? ");
 		query.append("WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 
-		final ArrayList<String> params = new ArrayList<>();
+		final List<String> params = new ArrayList<>();
 		params.add(value);
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
@@ -226,7 +227,7 @@ public class SQLStatService extends Service {
 		query.append(" FROM ").append(tableName);
 		query.append(" WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 
-		final ArrayList<String> params = new ArrayList<>();
+		final List<String> params = new ArrayList<>();
 		params.add(player.getUniqueId().toString());
 		params.add(player.getName());
 
@@ -298,7 +299,7 @@ public class SQLStatService extends Service {
 						'(' + indexColumn + ',' + secondaryIndexColumn + ')' +
 						"VALUES (?,?)";
 
-				final ArrayList<String> params = new ArrayList<>();
+				final List<String> params = new ArrayList<>();
 
 				if (BukkitUtil.isPlayerValid(player)) {
 					params.add(player.getUniqueId().toString());
@@ -341,7 +342,7 @@ public class SQLStatService extends Service {
 			query.append("FROM ").append(tableName).append(' ');
 			query.append("WHERE ").append(indexColumn).append(" = ? OR ").append(secondaryIndexColumn).append(" = ?");
 
-			final ArrayList<String> params = new ArrayList<>();
+			final List<String> params = new ArrayList<>();
 
 			params.add(player.getUniqueId().toString());
 			params.add(player.getName());
@@ -406,7 +407,7 @@ public class SQLStatService extends Service {
 			if (name.equalsIgnoreCase("all")) {
 				return SQLStat.ALL;
 			} else {
-				final ArrayList<SQLStat> stats = SQLStat.getAll(ModeratorStat.class);
+				final List<SQLStat> stats = SQLStat.getAll(ModeratorStat.class);
 				stats.addAll(SQLStat.getAll(PlayerStat.class));
 
 				for (final SQLStat stat : stats) {
@@ -425,8 +426,8 @@ public class SQLStatService extends Service {
 		 * @param clazz The Class to get the static {@link SQLStat} fields from.
 		 * @return An {@link ArrayList} containing all the {@link SQLStat}s from the given class.
 		 */
-		public static <T extends SQLStat> ArrayList<SQLStat> getAll(final Class<T> clazz) {
-			final ArrayList<SQLStat> stats = new ArrayList<>();
+		public static <T extends SQLStat> List<SQLStat> getAll(final Class<T> clazz) {
+			final List<SQLStat> stats = new ArrayList<>();
 
 			for (final Field f : clazz.getDeclaredFields()) {
 				try {

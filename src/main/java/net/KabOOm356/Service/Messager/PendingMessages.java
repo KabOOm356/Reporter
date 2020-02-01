@@ -5,6 +5,7 @@ import net.KabOOm356.Service.Messager.Messages.ReporterMessage;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class PendingMessages extends ArrayList<Message> {
 	/**
@@ -35,7 +36,7 @@ public class PendingMessages extends ArrayList<Message> {
 	 *
 	 * @param messages Initial messages.
 	 */
-	public PendingMessages(final ArrayList<Message> messages) {
+	public PendingMessages(final List<Message> messages) {
 		super();
 
 		addAll(messages);
@@ -73,7 +74,7 @@ public class PendingMessages extends ArrayList<Message> {
 	 *
 	 * @param remainingIndexes The remaining indexes after a batch deletion.
 	 */
-	public void reindexMessages(final ArrayList<Integer> remainingIndexes) {
+	public void reindexMessages(final List<Integer> remainingIndexes) {
 		for (final Message message : this) {
 			if (message instanceof ReporterMessage) {
 				final ReporterMessage reporterMessage = (ReporterMessage) message;
@@ -118,7 +119,7 @@ public class PendingMessages extends ArrayList<Message> {
 	 * Cleans up this structure, removing messages with no indexes.
 	 */
 	private void removeEmpty() {
-		final ArrayList<Message> deletion = new ArrayList<>();
+		final List<Message> deletion = new ArrayList<>();
 
 		for (final Message message : this) {
 			if (message.isEmpty()) {

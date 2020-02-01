@@ -36,7 +36,7 @@ public class ReportCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 2;
 	private final static String permissionNode = "reporter.report";
 
-	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(ReportPhrases.reportHelp, ReportPhrases.reportHelpDetails)}));
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToList(new Usage[]{new Usage(ReportPhrases.reportHelp, ReportPhrases.reportHelpDetails)}));
 	private static final List<String> aliases = Collections.emptyList();
 
 	/**
@@ -67,7 +67,7 @@ public class ReportCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) {
+	public void execute(final CommandSender sender, final List<String> args) {
 		if (!hasRequiredPermission(sender)) {
 			return;
 		}
@@ -115,7 +115,7 @@ public class ReportCommand extends ReporterCommand {
 	}
 
 	private void reportCommand(final CommandSender sender, final OfflinePlayer reported, final String details) throws ClassNotFoundException, SQLException, InterruptedException {
-		final ArrayList<String> params = new ArrayList<>();
+		final List<String> params = new ArrayList<>();
 		final int count = getServiceModule().getReportCountService().getCount();
 		Location reportedLoc = null;
 
@@ -282,7 +282,7 @@ public class ReportCommand extends ReporterCommand {
 		return FormattingUtil.formatTimeRemaining(timeRemaining, seconds);
 	}
 
-	private String getDetails(final ArrayList<String> args) {
+	private String getDetails(final List<String> args) {
 		final StringBuilder details = new StringBuilder();
 		for (int LCV = 1; LCV < args.size(); LCV++) {
 			details.append(args.get(LCV)).append(' ');

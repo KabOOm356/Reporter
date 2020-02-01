@@ -21,7 +21,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +35,7 @@ public class UnassignCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 1;
 	private static final String permissionNode = "reporter.unassign";
 
-	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(UnassignPhrases.unassignHelp, UnassignPhrases.unassignHelpDetails)}));
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToList(new Usage[]{new Usage(UnassignPhrases.unassignHelp, UnassignPhrases.unassignHelpDetails)}));
 	private static final List<String> aliases = Collections.emptyList();
 
 	/**
@@ -67,7 +66,7 @@ public class UnassignCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
+	public void execute(final CommandSender sender, final List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;

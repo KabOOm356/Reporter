@@ -17,7 +17,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class DowngradeCommand extends ReporterCommand {
 	private final static String permissionNode = "reporter.move";
 	private static final int minimumNumberOfArguments = 1;
 
-	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(DowngradePhrases.downgradeHelp, DowngradePhrases.downgradeHelpDetails)}));
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToList(new Usage[]{new Usage(DowngradePhrases.downgradeHelp, DowngradePhrases.downgradeHelpDetails)}));
 	private static final List<String> aliases = Collections.emptyList();
 
 	/**
@@ -62,7 +61,7 @@ public class DowngradeCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
+	public void execute(final CommandSender sender, final List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;

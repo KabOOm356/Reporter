@@ -28,7 +28,7 @@ public class ReportInformationService extends Service {
 	 */
 	public List<Integer> getViewableReports(final CommandSender sender) throws InterruptedException, SQLException, ClassNotFoundException {
 		final String query;
-		final ArrayList<String> params = new ArrayList<>();
+		final List<String> params = new ArrayList<>();
 
 		if (BukkitUtil.isPlayer(sender)) {
 			final OfflinePlayer player = OfflinePlayer.class.cast(sender);
@@ -119,7 +119,7 @@ public class ReportInformationService extends Service {
 	 * @throws InterruptedException
 	 */
 	public List<Integer> getIndexesOfPriority(final ModLevel level) throws ClassNotFoundException, SQLException, InterruptedException {
-		final ArrayList<Integer> indexes = new ArrayList<>();
+		final List<Integer> indexes = new ArrayList<>();
 		final String query = "SELECT ID FROM Reports WHERE Priority = " + level.getLevel();
 
 		final ExtendedDatabaseHandler database = getDatabase();

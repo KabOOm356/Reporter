@@ -18,7 +18,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class ListCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 0;
 	private final static String permissionNode = "reporter.list";
 
-	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToList(new Usage[]{
 			new Usage("/report list [indexes]", ListPhrases.listHelpDetails),
 			new Usage("/report list priority [indexes]", ListPhrases.listHelpPriorityDetails),
 			new Usage("/report list claimed [indexes]", ListPhrases.listHelpClaimedDetails),
@@ -68,7 +67,7 @@ public class ListCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) {
+	public void execute(final CommandSender sender, final List<String> args) {
 		if (hasPermission(sender)) {
 			try {
 				if (args == null || args.isEmpty()) {

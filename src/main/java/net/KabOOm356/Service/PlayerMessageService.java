@@ -11,6 +11,7 @@ import net.KabOOm356.Util.FormattingUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 /**
@@ -63,7 +64,7 @@ public class PlayerMessageService extends Service {
 	 *
 	 * @param remainingIndexes The remaining indexes in the database.
 	 */
-	public void reindexMessages(final ArrayList<Integer> remainingIndexes) {
+	public void reindexMessages(final List<Integer> remainingIndexes) {
 		getMessages().reindexMessages(remainingIndexes);
 	}
 
@@ -114,8 +115,8 @@ public class PlayerMessageService extends Service {
 	 * @return An {@link ArrayList} of messages that contains all the messages
 	 * <br/ >sent since the player has been offline.
 	 */
-	public ArrayList<String> getMessages(final String player) {
-		final ArrayList<String> playerMessages = new ArrayList<>();
+	public List<String> getMessages(final String player) {
+		final List<String> playerMessages = new ArrayList<>();
 
 		if (getMessages().containsKey(player)) {
 			for (final Entry<Group, PendingMessages> e : getMessages().get(player).entrySet()) {
@@ -136,8 +137,8 @@ public class PlayerMessageService extends Service {
 	 * @return An {@link ArrayList} of messages that contains all the messages
 	 * <br/ >sent since the player has been offline.
 	 */
-	public ArrayList<String> getMessages(final String player, final Group group) {
-		final ArrayList<String> playerMessages = new ArrayList<>();
+	public List<String> getMessages(final String player, final Group group) {
+		final List<String> playerMessages = new ArrayList<>();
 
 		if (getMessages().containsKey(player)) {
 			final HashMap<Group, PendingMessages> groupedMessages = getMessages().get(player);
@@ -159,7 +160,7 @@ public class PlayerMessageService extends Service {
 	 * @return The number of pending messages there are for the player.
 	 */
 	public int getNumberOfMessages(final String player) {
-		final ArrayList<String> messages = getMessages(player);
+		final List<String> messages = getMessages(player);
 
 		return messages.size();
 	}
@@ -172,7 +173,7 @@ public class PlayerMessageService extends Service {
 	 * @return The number of pending messages in the given group for the player.
 	 */
 	public int getNumberOfMessages(final String player, final Group group) {
-		final ArrayList<String> messages = getMessages(player, group);
+		final List<String> messages = getMessages(player, group);
 
 		return messages.size();
 	}

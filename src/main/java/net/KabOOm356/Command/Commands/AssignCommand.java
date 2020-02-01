@@ -38,7 +38,7 @@ public class AssignCommand extends ReporterCommand {
 	private final static int minimumNumberOfArguments = 2;
 	private final static String permissionNode = "reporter.assign";
 
-	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(AssignPhrases.assignHelp, AssignPhrases.assignHelpDetails)}));
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToList(new Usage[]{new Usage(AssignPhrases.assignHelp, AssignPhrases.assignHelpDetails)}));
 	private static final List<String> aliases = Collections.emptyList();
 
 	/**
@@ -69,7 +69,7 @@ public class AssignCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
+	public void execute(final CommandSender sender, final List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;
@@ -98,7 +98,7 @@ public class AssignCommand extends ReporterCommand {
 
 	private void assignReport(final CommandSender sender, final int index, final Player player) throws ClassNotFoundException, SQLException, InterruptedException {
 		final String query = "UPDATE Reports SET ClaimStatus=?, ClaimDate=?, ClaimedBy=?, ClaimedByUUID=?, ClaimPriority=? WHERE ID=?";
-		final ArrayList<String> params = new ArrayList<>();
+		final List<String> params = new ArrayList<>();
 
 		params.add(0, "1");
 		params.add(1, Reporter.getDateformat().format(new Date()));

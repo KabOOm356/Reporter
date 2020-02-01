@@ -5,7 +5,7 @@ import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Service.SQLStatServices.PlayerStatService.PlayerStat;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -49,7 +49,7 @@ public class SQLStatTest {
 
 	@Test
 	public void testGetAll() {
-		ArrayList<SQLStat> stats = SQLStat.getAll(SQLStat.class);
+		List<SQLStat> stats = SQLStat.getAll(SQLStat.class);
 
 		assertEquals(1, stats.size());
 		assertTrue(stats.contains(SQLStat.ALL));

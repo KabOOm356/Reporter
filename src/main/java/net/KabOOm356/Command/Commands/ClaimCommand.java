@@ -35,7 +35,7 @@ public class ClaimCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.claim";
 
-	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{new Usage(ClaimPhrases.claimHelp, ClaimPhrases.claimHelpDetails)}));
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToList(new Usage[]{new Usage(ClaimPhrases.claimHelp, ClaimPhrases.claimHelpDetails)}));
 	private static final List<String> aliases = Collections.emptyList();
 
 	/**
@@ -66,7 +66,7 @@ public class ClaimCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
+	public void execute(final CommandSender sender, final List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (!hasRequiredPermission(sender)) {
 				return;
@@ -100,7 +100,7 @@ public class ClaimCommand extends ReporterCommand {
 	}
 
 	private void claimReport(final CommandSender sender, final int index) throws ClassNotFoundException, SQLException, InterruptedException {
-		final ArrayList<String> params = new ArrayList<>();
+		final List<String> params = new ArrayList<>();
 
 		params.add("1");
 		params.add(BukkitUtil.getUUIDString(sender));

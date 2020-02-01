@@ -23,9 +23,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * A Command Service and Command Executor for all the Reporter Commands.
@@ -147,7 +147,7 @@ public class ReporterCommandManager implements CommandExecutor {
 			return true;
 		}
 
-		final ArrayList<String> arguments = ArrayUtil.arrayToArrayList(args);
+		final List<String> arguments = ArrayUtil.arrayToList(args);
 		net.KabOOm356.Command.Command command;
 
 		// Begin Respond Command

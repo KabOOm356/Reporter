@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * A command that will display how to use the other commands.
@@ -18,7 +19,7 @@ public final class HelpCommand {
 	private static final float commandsPerPage = 5f;
 	private static final String format = ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.RED + "%usage" + ChatColor.WHITE + " - %description";
 	private final Locale locale;
-	private final ArrayList<ArrayList<Usage>> pages = new ArrayList<>();
+	private final List<List<Usage>> pages = new ArrayList<>();
 	private final HelpCommandDisplay display;
 
 	public HelpCommand(final Locale locale, final Collection<ReporterCommand> commands, final HelpCommandDisplay display) {
@@ -30,8 +31,8 @@ public final class HelpCommand {
 		createPages(commands);
 	}
 
-	private static ArrayList<Usage> createPage(final ArrayList<Usage> help, final int pageNumber) {
-		final ArrayList<Usage> page = new ArrayList<>();
+	private static List<Usage> createPage(final List<Usage> help, final int pageNumber) {
+		final List<Usage> page = new ArrayList<>();
 		final int startIndex = getPageStartIndex(pageNumber);
 		final int endIndex = getPageEndIndex(pageNumber, help.size());
 		for (int index = startIndex; index < endIndex; index++) {
@@ -79,15 +80,15 @@ public final class HelpCommand {
 	}
 
 	private void createPages(final Collection<ReporterCommand> commands) {
-		final ArrayList<Usage> help = getHelp(commands);
+		final List<Usage> help = getHelp(commands);
 		final int pageCount = calculateNumberOfPages(help.size());
 		for (int page = 0; page < pageCount; page++) {
 			pages.add(createPage(help, page));
 		}
 	}
 
-	private ArrayList<Usage> getHelp(final Collection<ReporterCommand> commands) {
-		final ArrayList<Usage> help = new ArrayList<>();
+	private List<Usage> getHelp(final Collection<ReporterCommand> commands) {
+		final List<Usage> help = new ArrayList<>();
 		for (final ReporterCommand command : commands) {
 			help.addAll(command.getUsages());
 		}
@@ -107,7 +108,7 @@ public final class HelpCommand {
 
 	private void printPage(final CommandSender sender, final int page) {
 		final int pageIndex = getPageIndex(page);
-		final ArrayList<Usage> currentPage = pages.get(pageIndex);
+		final List<Usage> currentPage = pages.get(pageIndex);
 		for (final Usage usage : currentPage) {
 			final String usageString = getLocale().getString(usage.getKey());
 			final String description = getLocale().getString(usage.getValue());

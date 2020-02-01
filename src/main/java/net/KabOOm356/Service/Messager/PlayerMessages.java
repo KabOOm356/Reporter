@@ -4,6 +4,7 @@ import net.KabOOm356.Service.Messager.Messages.Message;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * A {@link HashMap} that uses a player name for the key and points to a {@link GroupMessages} object.
@@ -106,7 +107,7 @@ public class PlayerMessages extends HashMap<String, GroupMessages> {
 	 *
 	 * @param remainingIndexes The remaining indexes after a batch deletion.
 	 */
-	public void reindexMessages(final ArrayList<Integer> remainingIndexes) {
+	public void reindexMessages(final List<Integer> remainingIndexes) {
 		for (final Entry<String, GroupMessages> messages : this.entrySet()) {
 			final GroupMessages groupMessages = messages.getValue();
 
@@ -130,7 +131,7 @@ public class PlayerMessages extends HashMap<String, GroupMessages> {
 	}
 
 	private void removeEmpty() {
-		final ArrayList<String> removalKeys = new ArrayList<>();
+		final List<String> removalKeys = new ArrayList<>();
 
 		for (final Entry<String, GroupMessages> messages : entrySet()) {
 			if (messages.getValue().isEmpty()) {

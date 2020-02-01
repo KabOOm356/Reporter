@@ -24,7 +24,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +38,7 @@ public class ViewCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 1;
 	private static final String permissionNode = "reporter.view";
 
-	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToList(new Usage[]{
 			new Usage(ViewPhrases.viewHelp, ViewPhrases.viewHelpDetails),
 			new Usage("/report view all [name]", ViewPhrases.viewHelpAllDetails),
 			new Usage("/report view completed|finished [name]", ViewPhrases.viewHelpCompletedDetails),
@@ -105,7 +104,7 @@ public class ViewCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
+	public void execute(final CommandSender sender, final List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
 		try {
 			if (hasPermission(sender)) {
 				if (args.get(0).equalsIgnoreCase("all")) {
@@ -358,7 +357,7 @@ public class ViewCommand extends ReporterCommand {
 		}
 	}
 
-	private boolean displayRealName(final ArrayList<String> args, final int index) {
+	private boolean displayRealName(final List<String> args, final int index) {
 		boolean displayRealName = getManager().getConfig().getBoolean("general.viewing.displayRealName", false);
 
 		if (args.size() >= (index + 1)) {

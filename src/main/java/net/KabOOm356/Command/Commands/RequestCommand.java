@@ -35,7 +35,7 @@ public class RequestCommand extends ReporterCommand {
 	private static final int minimumNumberOfArguments = 1;
 	private final static String permissionNode = "reporter.request";
 
-	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToArrayList(new Usage[]{
+	private static final List<Usage> usages = Collections.unmodifiableList(ArrayUtil.arrayToList(new Usage[]{
 			new Usage(RequestPhrases.requestHelp, RequestPhrases.requestHelpDetails),
 			new Usage("/report request most", RequestPhrases.requestMostHelpDetails)
 	}));
@@ -69,7 +69,7 @@ public class RequestCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final ArrayList<String> args) {
+	public void execute(final CommandSender sender, final List<String> args) {
 		try {
 			if (hasRequiredPermission(sender)) {
 				if (args.get(0).equalsIgnoreCase("most")) {
@@ -110,7 +110,7 @@ public class RequestCommand extends ReporterCommand {
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			final ArrayList<String> players = new ArrayList<>();
+			final List<String> players = new ArrayList<>();
 			final SQLResultSet result;
 			int numberOfReports = -1;
 
@@ -166,7 +166,7 @@ public class RequestCommand extends ReporterCommand {
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
 		try {
-			final ArrayList<String> params = new ArrayList<>();
+			final List<String> params = new ArrayList<>();
 			String query = "SELECT ID FROM Reports WHERE ReportedUUID=?";
 
 			if (!player.getName().equalsIgnoreCase("* (Anonymous)")) {

@@ -18,6 +18,7 @@ import test.test.PowerMockitoTest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
@@ -46,7 +47,7 @@ public class HelpCommandTest extends PowerMockitoTest {
 		final LinkedHashMap<String, ReporterCommand> commands = new LinkedHashMap<>(16, 0.75F, false);
 		for (int commandNumber = 0; commandNumber < numberOfCommands; commandNumber++) {
 			final ReporterCommand command = mock(ReporterCommand.class);
-			final ArrayList<Usage> usages = new ArrayList<>();
+			final List<Usage> usages = new ArrayList<>();
 			final int startNumber = commandNumber * numberOfUsagesPerCommand;
 			for (int usageNumber = startNumber + 1; usageNumber <= startNumber + numberOfUsagesPerCommand; usageNumber++) {
 				final Usage usage = new Usage("key:" + usageNumber, "value:" + usageNumber);
