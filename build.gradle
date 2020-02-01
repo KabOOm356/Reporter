@@ -4,7 +4,7 @@ buildscript {
         pluginVersion = '3.3.2'
         
         // Java compile
-        javaTargetVersion = JavaVersion.VERSION_1_6
+        javaTargetVersion = JavaVersion.VERSION_1_7
         
         // Dependency
         bukkitVersion = '1.15.2-R0.1-SNAPSHOT'
