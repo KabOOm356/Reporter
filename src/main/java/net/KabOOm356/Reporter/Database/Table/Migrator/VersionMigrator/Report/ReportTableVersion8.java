@@ -183,17 +183,11 @@ public class ReportTableVersion8 extends DatabaseTableVersionMigrator {
 
 	private SQLResultSet getConversionData() throws SQLException {
 		final SQLResultSet sqlResultSet = new SQLResultSet();
-		ResultSet resultSet = null;
-		try {
-			resultSet = getDatabase().query(getConnectionId(), "SELECT ID, SenderRaw, ReportedRaw, ClaimedByRaw, CompletedByRaw FROM Reports");
+		try (ResultSet resultSet = getDatabase().query(getConnectionId(), "SELECT ID, SenderRaw, ReportedRaw, ClaimedByRaw, CompletedByRaw FROM Reports")) {
 			sqlResultSet.set(resultSet);
 		} catch (final SQLException e) {
 			log.warn("Failed to execute query to get conversion data!");
 			throw e;
-		} finally {
-			if (resultSet != null) {
-				resultSet.close();
-			}
 		}
 		return sqlResultSet;
 	}
