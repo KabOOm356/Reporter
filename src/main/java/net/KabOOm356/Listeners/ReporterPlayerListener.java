@@ -1,8 +1,8 @@
 package net.KabOOm356.Listeners;
 
-import net.KabOOm356.Command.Command;
 import net.KabOOm356.Command.Commands.ListCommand;
 import net.KabOOm356.Command.Commands.ViewCommand;
+import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.AlertPhrases;
@@ -86,7 +86,7 @@ public class ReporterPlayerListener implements Listener {
 	}
 
 	private void listOnLogin(final Player player) {
-		final Command listCommand = plugin.getCommandManager().getCommand(ListCommand.getCommandName());
+		final ReporterCommand listCommand = plugin.getCommandManager().getCommand(ListCommand.getCommandName());
 		if (listCommand.hasPermission(player)) {
 			listCommand.setSender(player);
 			listCommand.setArguments(new ArrayList<String>());

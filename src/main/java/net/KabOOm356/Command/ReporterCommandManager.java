@@ -132,8 +132,9 @@ public class ReporterCommandManager implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(final CommandSender sender, final Command cmd, final String label, final String[] args) {
+		final boolean isRespondCommand = label.equalsIgnoreCase("respond") || label.equalsIgnoreCase("resp") || label.equalsIgnoreCase("rrespond");
 		if (args == null || args.length == 0) {
-			if (label.equalsIgnoreCase("respond") || label.equalsIgnoreCase("resp") || label.equalsIgnoreCase("rrespond")) {
+			if (isRespondCommand) {
 				sender.sendMessage(ChatColor.RED + getLocale().getString(GeneralPhrases.tryRespondHelp));
 			} else {
 				sender.sendMessage(ChatColor.RED + getLocale().getString(GeneralPhrases.tryReportHelp));
@@ -149,10 +150,10 @@ public class ReporterCommandManager implements CommandExecutor {
 		}
 
 		final List<String> arguments = ArrayUtil.arrayToList(args);
-		net.KabOOm356.Command.Command command;
+		ReporterCommand command;
 
 		// Begin Respond Command
-		if (label.equalsIgnoreCase("respond") || label.equalsIgnoreCase("resp") || label.equalsIgnoreCase("rrespond")) {
+		if (isRespondCommand) {
 			command = getCommand(RespondCommand.getCommandName());
 
 			// Respond help command
@@ -173,7 +174,7 @@ public class ReporterCommandManager implements CommandExecutor {
 			// Respond to report
 			if (arguments.size() >= command.getMinimumNumberOfArguments()) {
 				try {
-					final net.KabOOm356.Command.Command commandToRun = command.getRunnableClone(sender, arguments);
+					final ReporterCommand commandToRun = command.getRunnableClone(sender, arguments);
 					Bukkit.getScheduler().runTaskAsynchronously(plugin, commandToRun);
 					return true;
 				} catch (final Exception e) {
@@ -211,7 +212,7 @@ public class ReporterCommandManager implements CommandExecutor {
 			if (command != null) {
 				if (arguments.size() >= command.getMinimumNumberOfArguments()) {
 					try {
-						final net.KabOOm356.Command.Command commandToRun = command.getRunnableClone(sender, arguments);
+						final ReporterCommand commandToRun = command.getRunnableClone(sender, arguments);
 						Bukkit.getScheduler().runTaskAsynchronously(plugin, commandToRun);
 						return true;
 					} catch (final Exception e) {
@@ -229,7 +230,7 @@ public class ReporterCommandManager implements CommandExecutor {
 
 				if (arguments.size() >= command.getMinimumNumberOfArguments()) {
 					try {
-						final net.KabOOm356.Command.Command commandToRun = command.getRunnableClone(sender, arguments);
+						final ReporterCommand commandToRun = command.getRunnableClone(sender, arguments);
 						Bukkit.getScheduler().runTaskAsynchronously(plugin, commandToRun);
 						return true;
 					} catch (final Exception e) {
