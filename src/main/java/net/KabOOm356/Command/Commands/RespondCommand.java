@@ -12,6 +12,7 @@ import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
+import net.KabOOm356.Throwable.RequiredPermissionException;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import org.apache.logging.log4j.Level;
@@ -70,12 +71,10 @@ public class RespondCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
-		try {
-			if (!hasRequiredPermission(sender)) {
-				return;
-			}
+	public void execute(final CommandSender sender, final List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException, RequiredPermissionException {
+		hasRequiredPermission(sender);
 
+		try {
 			// Cast the sender to type Player or tell the sender they must be a player
 			Player player = null;
 			if (BukkitUtil.isPlayer(sender)) {

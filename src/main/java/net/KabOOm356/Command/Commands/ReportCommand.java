@@ -10,6 +10,7 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.ReportPhrases;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Service.SQLStatServices.PlayerStatService;
 import net.KabOOm356.Service.SQLStatServices.PlayerStatService.PlayerStat;
+import net.KabOOm356.Throwable.RequiredPermissionException;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.FormattingUtil;
@@ -67,10 +68,8 @@ public class ReportCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final List<String> args) {
-		if (!hasRequiredPermission(sender)) {
-			return;
-		}
+	public void execute(final CommandSender sender, final List<String> args) throws RequiredPermissionException {
+		hasRequiredPermission(sender);
 
 		final OfflinePlayer reported = getManager().getPlayer(args.get(0));
 

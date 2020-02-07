@@ -9,6 +9,7 @@ import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.RequestPhrases;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Throwable.RequiredPermissionException;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import org.apache.logging.log4j.Level;
@@ -69,14 +70,14 @@ public class RequestCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final List<String> args) {
+	public void execute(final CommandSender sender, final List<String> args) throws RequiredPermissionException {
+		hasRequiredPermission(sender);
+
 		try {
-			if (hasRequiredPermission(sender)) {
-				if (args.get(0).equalsIgnoreCase("most")) {
-					requestMostReported(sender);
-				} else {
-					requestPlayer(sender, args.get(0));
-				}
+			if (args.get(0).equalsIgnoreCase("most")) {
+				requestMostReported(sender);
+			} else {
+				requestPlayer(sender, args.get(0));
 			}
 		} catch (final Exception e) {
 			log.log(Level.ERROR, "Failed to request!", e);

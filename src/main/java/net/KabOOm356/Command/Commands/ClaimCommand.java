@@ -10,6 +10,7 @@ import net.KabOOm356.Service.SQLStatServices.ModeratorStatService.ModeratorStat;
 import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
+import net.KabOOm356.Throwable.RequiredPermissionException;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import org.apache.logging.log4j.Level;
@@ -66,12 +67,10 @@ public class ClaimCommand extends ReporterCommand {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, final List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException {
-		try {
-			if (!hasRequiredPermission(sender)) {
-				return;
-			}
+	public void execute(final CommandSender sender, final List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException, RequiredPermissionException {
+		hasRequiredPermission(sender);
 
+		try {
 			final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
 			if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {

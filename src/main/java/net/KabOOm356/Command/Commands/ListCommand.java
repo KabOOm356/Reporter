@@ -72,15 +72,15 @@ public class ListCommand extends ReporterCommand {
 			try {
 				if (args == null || args.isEmpty()) {
 					listCommand(sender);
-				} else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("indexes")) {
+				} else if (args.get(0).equalsIgnoreCase("indexes")) {
 					listIndexes(sender);
-				} else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("priority")) {
+				} else if (args.get(0).equalsIgnoreCase("priority")) {
 					if (args.size() >= 2 && args.get(1).equalsIgnoreCase("indexes")) {
 						listPriorityIndexes(sender);
 					} else {
 						listPriority(sender);
 					}
-				} else if (args.size() >= 1 && args.get(0).equalsIgnoreCase("claimed")) {
+				} else if (args.get(0).equalsIgnoreCase("claimed")) {
 					if (args.size() >= 3 && args.get(1).equalsIgnoreCase("priority") && args.get(2).equalsIgnoreCase("indexes")) {
 						listClaimedPriorityIndexes(sender);
 					} else if (args.size() >= 2 && args.get(1).equalsIgnoreCase("indexes")) {

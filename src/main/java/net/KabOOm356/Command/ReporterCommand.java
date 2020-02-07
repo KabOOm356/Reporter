@@ -9,6 +9,7 @@ import net.KabOOm356.Service.ServiceModule;
 import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.IndexOutOfRangeException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
+import net.KabOOm356.Throwable.RequiredPermissionException;
 import net.KabOOm356.Util.BukkitUtil;
 import org.apache.commons.lang.Validate;
 import org.apache.logging.log4j.LogManager;
@@ -63,7 +64,7 @@ public abstract class ReporterCommand extends TimedRunnable implements RunnableW
 	 * @param sender The {@link CommandSender} whom is executing this command.
 	 * @param args   The given arguments from the {@link CommandSender}.
 	 */
-	public abstract void execute(CommandSender sender, List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException;
+	public abstract void execute(CommandSender sender, List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException, RequiredPermissionException;
 
 	/**
 	 * Checks if the given {@link Player} has permission to run this command, or is OP.
@@ -101,17 +102,15 @@ public abstract class ReporterCommand extends TimedRunnable implements RunnableW
 	}
 
 	/**
-	 * Checks if the given {@link CommandSender} has permission to run this command and alerts them if they do not.
+	 * Checks if the given {@link CommandSender} has permission to run this command.
 	 *
 	 * @param sender The {@link CommandSender} to check.
-	 * @return True if the {@link CommandSender} has permission or is OP, otherwise false.
+	 * @throws RequiredPermissionException If the sender does not have the required permission.
 	 */
-	public boolean hasRequiredPermission(final CommandSender sender) {
+	public void hasRequiredPermission(final CommandSender sender) throws RequiredPermissionException {
 		if (!hasPermission(sender)) {
-			sender.sendMessage(getFailedPermissionsMessage());
-			return false;
+			throw new RequiredPermissionException(String.format("Sender [%s] does not have the required permission [%s]!", BukkitUtil.formatPlayerName(sender), permissionNode));
 		}
-		return true;
 	}
 
 	protected ReporterCommandManager getManager() {
@@ -211,6 +210,9 @@ public abstract class ReporterCommand extends TimedRunnable implements RunnableW
 			sender.sendMessage(message);
 		} catch (final IndexOutOfRangeException e) {
 			final String message = getManager().getLocale().getString(GeneralPhrases.indexRange);
+			sender.sendMessage(message);
+		} catch (final RequiredPermissionException e) {
+			final String message = getFailedPermissionsMessage();
 			sender.sendMessage(message);
 		} finally {
 			isRunning = false;
