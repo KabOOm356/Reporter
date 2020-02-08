@@ -8,6 +8,7 @@ buildscript {
         
         // Dependency
         bukkitVersion = '1.15.2-R0.1-SNAPSHOT'
+        spigotPluginAnnotationVersion = '1.2.2-SNAPSHOT'
         log4jVersion = '2.0-beta9'
     }
     repositories {
@@ -56,6 +57,7 @@ dependencies {
     implementation group: 'org.bstats', name: 'bstats-bukkit', version: '1.5'
     
     compileOnly group: 'org.bukkit', name: 'bukkit', version: bukkitVersion
+    compileOnly group: 'org.spigotmc', name: 'plugin-annotations', version: spigotPluginAnnotationVersion
     compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
     compileOnly group: 'net.milkbowl.vault', name: 'VaultAPI', version: '1.7'
     
@@ -63,5 +65,8 @@ dependencies {
     testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '1.6.2'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito', version: '1.6.2'
     testImplementation group: 'org.bukkit', name: 'bukkit', version: bukkitVersion
+    testImplementation group: 'org.spigotmc', name: 'plugin-annotations', version: spigotPluginAnnotationVersion
     testImplementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
+
+    annotationProcessor group: 'org.spigotmc', name: 'plugin-annotations', version: spigotPluginAnnotationVersion
 }

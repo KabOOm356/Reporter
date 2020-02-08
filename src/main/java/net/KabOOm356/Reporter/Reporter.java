@@ -29,6 +29,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.annotation.command.Command;
+import org.bukkit.plugin.java.annotation.command.Commands;
+import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
+import org.bukkit.plugin.java.annotation.plugin.Plugin;
+import org.bukkit.plugin.java.annotation.plugin.Website;
+import org.bukkit.plugin.java.annotation.plugin.author.Author;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -44,6 +50,23 @@ import java.util.concurrent.Callable;
  * <br /><br />
  * Homepage on BukkitDev: <a href="http://dev.bukkit.org/server-mods/reporter/">http://dev.bukkit.org/server-mods/reporter/</a>
  */
+@Plugin(
+		name = "Reporter",
+		version = "3.3.3 BETA"
+)
+@Author("KabOOm 356")
+@Website("https://dev.bukkit.org/projects/reporter")
+@SoftDependency("Vault")
+@Commands({
+		@Command(
+				name = "report",
+				aliases = {"rreport", "rep"}
+		),
+		@Command(
+				name = "respond",
+				aliases = {"rrespond", "resp"}
+		)
+})
 public class Reporter extends JavaPlugin {
 	public static final String localeVersion = "11";
 	public static final String configVersion = "16";
