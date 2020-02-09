@@ -396,3 +396,7 @@ Changelog:
     3.3.2   7/16/2019
                 Updated Bukkit API to 1.14.3-R0.1-SNAPSHOT
                 Fixed issue with initializing metrics on a separate thread.
+    3.3.3
+                Updated Bukkit API to 1.15.2-R0.1-SNAPSHOT.
+                Updated supported Java version to 1.7.
+                Set Spigot api-version to stop getting flagged as a legacy plugin.
