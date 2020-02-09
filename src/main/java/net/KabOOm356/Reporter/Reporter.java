@@ -32,6 +32,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
 import org.bukkit.plugin.java.annotation.command.Commands;
 import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
+import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.Website;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
@@ -54,6 +55,7 @@ import java.util.concurrent.Callable;
 		name = "Reporter",
 		version = "3.3.3 BETA"
 )
+@ApiVersion(ApiVersion.Target.v1_13)
 @Author("KabOOm 356")
 @Website("https://dev.bukkit.org/projects/reporter")
 @SoftDependency("Vault")
