@@ -1,5 +1,6 @@
 package net.KabOOm356.Service;
 
+import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.Util;
@@ -15,10 +16,6 @@ public class LastViewedReportService extends Service {
 
 	protected LastViewedReportService(final ServiceModule module) {
 		super(module);
-	}
-
-	private static int getIndex(final String index) {
-		return Util.parseInt(index);
 	}
 
 	/**
@@ -53,15 +50,20 @@ public class LastViewedReportService extends Service {
 	 * @param index  The index the sender specified.
 	 * @return An int that is either the last report the sender viewed or the parsed value from the given index.
 	 * @throws NoLastViewedReportException Thrown if the index equals {@link #lastViewedIndex} but the {@link CommandSender} has not viewed a report yet.
+	 * @throws IndexNotANumberException Thrown if the index is not parsable to an integer.
 	 */
-	public int getIndexOrLastViewedReport(final CommandSender sender, final String index) throws NoLastViewedReportException {
+	public int getIndexOrLastViewedReport(final CommandSender sender, final String index) throws NoLastViewedReportException, IndexNotANumberException {
 		Validate.notNull(sender);
 		Validate.notNull(index);
 		Validate.notEmpty(index);
 		if (lastViewedIndex.equalsIgnoreCase(index)) {
 			return getLastViewed(sender);
 		} else {
-			return getIndex(index);
+			final Integer parsedIndex = Util.parseInt(index);
+			if (parsedIndex == null) {
+				throw new IndexNotANumberException(String.format("Could not parse index number from [%s]", index));
+			}
+			return parsedIndex;
 		}
 	}
 

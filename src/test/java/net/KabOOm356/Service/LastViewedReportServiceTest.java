@@ -1,5 +1,6 @@
 package net.KabOOm356.Service;
 
+import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
 import net.KabOOm356.Util.BukkitUtil;
 import org.bukkit.Bukkit;
@@ -71,37 +72,43 @@ public class LastViewedReportServiceTest extends ServiceTest {
 	}
 
 	@Test
-	public void getIndexOrLastViewedReportLast() throws NoLastViewedReportException {
+	public void getIndexOrLastViewedReportLast() throws NoLastViewedReportException, IndexNotANumberException {
 		final CommandSender sender = mock(CommandSender.class);
 		lastViewed.put(sender, 5);
 		assertEquals(5, manager.getIndexOrLastViewedReport(sender, lastViewedIndex));
 	}
 
 	@Test
-	public void getIndexOrLastViewedReportIndex() throws NoLastViewedReportException {
+	public void getIndexOrLastViewedReportIndex() throws NoLastViewedReportException, IndexNotANumberException {
 		final CommandSender sender = mock(CommandSender.class);
 		lastViewed.put(sender, 5);
 		assertEquals(8, manager.getIndexOrLastViewedReport(sender, "8"));
 	}
 
 	@Test(expected = NoLastViewedReportException.class)
-	public void getIndexOrLastViewedReportNoLastReport() throws NoLastViewedReportException {
+	public void getIndexOrLastViewedReportNoLastReport() throws NoLastViewedReportException, IndexNotANumberException {
 		final CommandSender sender = mock(CommandSender.class);
 		manager.getIndexOrLastViewedReport(sender, lastViewedIndex);
 	}
 
+	@Test(expected = IndexNotANumberException.class)
+	public void getIndexOrLastViewedReportIndexNotANumber() throws NoLastViewedReportException, IndexNotANumberException {
+		final CommandSender sender = mock(CommandSender.class);
+		manager.getIndexOrLastViewedReport(sender, "123fdsa987");
+	}
+
 	@Test(expected = IllegalArgumentException.class)
-	public void getIndexOrLastViewedReportNullSender() throws NoLastViewedReportException {
+	public void getIndexOrLastViewedReportNullSender() throws NoLastViewedReportException, IndexNotANumberException {
 		manager.getIndexOrLastViewedReport(null, "1");
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void getIndexOrLastViewedReportNullIndex() throws NoLastViewedReportException {
+	public void getIndexOrLastViewedReportNullIndex() throws NoLastViewedReportException, IndexNotANumberException {
 		manager.getIndexOrLastViewedReport(mock(CommandSender.class), null);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void getIndexOrLastViewedReportEmptyIndex() throws NoLastViewedReportException {
+	public void getIndexOrLastViewedReportEmptyIndex() throws NoLastViewedReportException, IndexNotANumberException {
 		manager.getIndexOrLastViewedReport(mock(CommandSender.class), "");
 	}
 
