@@ -53,7 +53,7 @@ import java.util.concurrent.Callable;
  */
 @Plugin(
 		name = "Reporter",
-		version = "3.3.3 BETA"
+		version = "3.3.3"
 )
 @ApiVersion(ApiVersion.Target.v1_13)
 @Author("KabOOm 356")
