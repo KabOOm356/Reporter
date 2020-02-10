@@ -98,9 +98,7 @@ public class DeleteCommand extends ReporterCommand {
 				if (Util.isInteger(args.get(0)) || args.get(0).equalsIgnoreCase("last")) {
 					final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
-					if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
-						return;
-					}
+					getServiceModule().getReportValidatorService().requireReportIndexValid(index);
 
 					if (!getServiceModule().getReportPermissionService().canAlterReport(sender, index)) {
 						return;

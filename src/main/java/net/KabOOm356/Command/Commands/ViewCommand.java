@@ -133,9 +133,7 @@ public class ViewCommand extends ReporterCommand {
 					}
 				} else {
 					final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
-					if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
-						return;
-					}
+					getServiceModule().getReportValidatorService().requireReportIndexValid(index);
 					viewReport(sender, index, displayRealName(args, 1));
 				}
 			} else if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true)) {
@@ -149,9 +147,7 @@ public class ViewCommand extends ReporterCommand {
 
 				final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
-				if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
-					return;
-				}
+				getServiceModule().getReportValidatorService().requireReportIndexValid(index);
 
 				if (indexes.contains(index)) {
 					viewReport(sender, index, false);

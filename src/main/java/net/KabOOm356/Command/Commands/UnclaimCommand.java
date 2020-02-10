@@ -75,9 +75,7 @@ public class UnclaimCommand extends ReporterCommand {
 		try {
 			final int index = getServiceModule().getLastViewedReportService().getIndexOrLastViewedReport(sender, args.get(0));
 
-			if (!getServiceModule().getReportValidatorService().isReportIndexValid(index)) {
-				return;
-			}
+			getServiceModule().getReportValidatorService().requireReportIndexValid(index);
 
 			if (canUnclaimReport(sender, index)) {
 				unclaimReport(sender, index);
