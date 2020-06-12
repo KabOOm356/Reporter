@@ -6,8 +6,17 @@ import net.KabOOm356.Locale.Entry.LocalePhrase;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.HelpPhrases;
 import net.KabOOm356.Locale.Locale;
+import net.KabOOm356.Service.PermissionService;
+import net.KabOOm356.Service.ServiceModule;
+import net.KabOOm356.Throwable.IndexNotANumberException;
+import net.KabOOm356.Throwable.IndexOutOfRangeException;
+import net.KabOOm356.Throwable.NoLastViewedReportException;
+import net.KabOOm356.Throwable.RequiredPermissionException;
+import net.KabOOm356.Util.BukkitUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -17,13 +26,12 @@ import test.test.PowerMockitoTest;
 
 import java.util.*;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-@PrepareForTest(HelpCommand.class)
+@PrepareForTest({HelpCommand.class, Bukkit.class, BukkitUtil.class})
 public class HelpCommandTest extends PowerMockitoTest {
 	private static final int numberOfCommands = 6;
 	private static final int numberOfUsagesPerCommand = 4;
@@ -31,16 +39,27 @@ public class HelpCommandTest extends PowerMockitoTest {
 	private HelpCommand help;
 
 	@Mock
-	private CommandSender sender;
+	private Player sender;
 
 	@Mock
 	private ReporterCommandManager commandManager;
+
+	@Mock
+	private ServiceModule serviceModule;
+
+	@Mock
+	private PermissionService permissionService;
 
 	@Mock
 	private Locale locale;
 
 	@Before
 	public void setupMocks() {
+		mockStatic(Bukkit.class);
+		when(Bukkit.getOfflinePlayer(anyString())).thenReturn(null);
+		mockStatic(BukkitUtil.class);
+		when(BukkitUtil.isPlayer(any(CommandSender.class))).thenReturn(false);
+
 		final Map<String, ReporterCommand> commands = new LinkedHashMap<>(16, 0.75F, false);
 		for (int commandNumber = 0; commandNumber < numberOfCommands; commandNumber++) {
 			final ReporterCommand command = mock(ReporterCommand.class);
@@ -56,6 +75,9 @@ public class HelpCommandTest extends PowerMockitoTest {
 		final Collection<ReporterCommand> commandCollection = commands.values();
 		when(commandManager.getReportCommands()).thenReturn(commands);
 		when(commandManager.getLocale()).thenReturn(locale);
+		when(commandManager.getServiceModule()).thenReturn(serviceModule);
+		when(serviceModule.getPermissionService()).thenReturn(permissionService);
+		when(permissionService.hasPermission(any(CommandSender.class), anyString())).thenReturn(true);
 		when(locale.getString(any(LocalePhrase.class))).thenAnswer(LocaleEntryAnswer.instance);
 
 		final HelpCommandDisplay.Builder builder = new HelpCommandDisplay.Builder();
@@ -64,13 +86,20 @@ public class HelpCommandTest extends PowerMockitoTest {
 				.setNext(HelpPhrases.nextReportHelpPage)
 				.setHint(GeneralPhrases.tryReportHelp);
 		final HelpCommandDisplay helpCommandDisplay = builder.build();
-		help = new HelpCommand(locale, commandCollection, helpCommandDisplay);
+		help = new HelpCommand(commandManager, locale, commandCollection, helpCommandDisplay);
+	}
+
+	@Test(expected = RequiredPermissionException.class)
+	public void testPrintHelpRequiredPermission() throws RequiredPermissionException, NoLastViewedReportException, IndexNotANumberException, IndexOutOfRangeException {
+		when(BukkitUtil.isPlayer(sender)).thenReturn(true);
+		when(permissionService.hasPermission(eq(sender), anyString())).thenReturn(false);
+		help.execute(sender, Collections.<String>emptyList());
 	}
 
 	@Test
-	public void testPrintHelpValidPages() {
+	public void testPrintHelpValidPages() throws RequiredPermissionException, NoLastViewedReportException, IndexNotANumberException, IndexOutOfRangeException {
 		for (int page = 1; page <= help.getNumberOfHelpPages(); page++) {
-			help.printHelp(sender, page);
+			help.execute(sender, Collections.singletonList(Integer.toString(page)));
 		}
 		// Verify that there was not an error phrase displayed
 		verify(locale, never()).getString(HelpPhrases.pageNumberOutOfRange);
@@ -78,16 +107,16 @@ public class HelpCommandTest extends PowerMockitoTest {
 	}
 
 	@Test
-	public void testPrintHelpPageBelowRange() {
-		help.printHelp(sender, 0);
+	public void testPrintHelpPageBelowRange() throws RequiredPermissionException, NoLastViewedReportException, IndexNotANumberException, IndexOutOfRangeException {
+		help.execute(sender, Collections.singletonList(Integer.toString(0)));
 		verify(sender).sendMessage(ChatColor.RED + locale.getString(HelpPhrases.pageNumberOutOfRange));
 		verify(sender).sendMessage(ChatColor.RED + locale.getString(GeneralPhrases.tryReportHelp));
 	}
 
 	@Test
-	public void testPrintHelpPageAboveRange() {
+	public void testPrintHelpPageAboveRange() throws RequiredPermissionException, NoLastViewedReportException, IndexNotANumberException, IndexOutOfRangeException {
 		final int numberOfHelpPages = help.getNumberOfHelpPages();
-		help.printHelp(sender, numberOfHelpPages + 1);
+		help.execute(sender, Collections.singletonList(Integer.toString(numberOfHelpPages + 1)));
 		verify(sender).sendMessage(ChatColor.RED + locale.getString(HelpPhrases.numberOfHelpPages)
 				.replaceAll("%p", Integer.toString(help.getNumberOfHelpPages())));
 	}

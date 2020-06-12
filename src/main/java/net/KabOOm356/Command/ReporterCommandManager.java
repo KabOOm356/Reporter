@@ -9,10 +9,10 @@ import net.KabOOm356.Locale.Entry.LocalePhrases.HelpPhrases;
 import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Reporter.Reporter;
 import net.KabOOm356.Service.ServiceModule;
+import net.KabOOm356.Throwable.RequiredPermissionException;
 import net.KabOOm356.Util.ArrayUtil;
 import net.KabOOm356.Util.BukkitUtil;
 import net.KabOOm356.Util.FormattingUtil;
-import net.KabOOm356.Util.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -35,7 +35,6 @@ public class ReporterCommandManager implements CommandExecutor {
 	private static final Logger log = LogManager.getLogger(ReporterCommandManager.class);
 
 	private final Reporter plugin;
-	private final HelpCommand reportHelp;
 	private final HelpCommand respondHelp;
 	private Map<String, ReporterCommand> reportCommands;
 	private Map<String, String> aliasReportCommands;
@@ -52,20 +51,13 @@ public class ReporterCommandManager implements CommandExecutor {
 
 		initCommands();
 
-		final HelpCommandDisplay.Builder reportHelpDisplayBuilder = new HelpCommandDisplay.Builder();
-		reportHelpDisplayBuilder.setHeader(HelpPhrases.reportHelpHeader)
-				.setAlias(HelpPhrases.reportHelpAliases)
-				.setNext(HelpPhrases.nextReportHelpPage)
-				.setHint(GeneralPhrases.tryReportHelp);
-		final HelpCommandDisplay reportHelpDisplay = reportHelpDisplayBuilder.build();
-		reportHelp = new HelpCommand(getLocale(), getReportCommands().values(), reportHelpDisplay);
 		final HelpCommandDisplay.Builder respondHelpDisplayBuilder = new HelpCommandDisplay.Builder();
 		respondHelpDisplayBuilder.setHeader(HelpPhrases.respondHelpHeader)
 				.setAlias(HelpPhrases.respondHelpAliases)
 				.setNext(HelpPhrases.nextRespondHelpPage)
 				.setHint(GeneralPhrases.tryRespondHelp);
 		final HelpCommandDisplay respondHelpDisplay = respondHelpDisplayBuilder.build();
-		respondHelp = new HelpCommand(getLocale(), getRespondCommands().values(), respondHelpDisplay);
+		respondHelp = new HelpCommand(this, getLocale(), getRespondCommands().values(), respondHelpDisplay);
 	}
 
 	private void initCommands() {
@@ -96,6 +88,13 @@ public class ReporterCommandManager implements CommandExecutor {
 		initReportCommand(new UnclaimCommand(this));
 		initReportCommand(new UpgradeCommand(this));
 		initReportCommand(new ViewCommand(this));
+		final HelpCommandDisplay.Builder reportHelpDisplayBuilder = new HelpCommandDisplay.Builder();
+		reportHelpDisplayBuilder.setHeader(HelpPhrases.reportHelpHeader)
+				.setAlias(HelpPhrases.reportHelpAliases)
+				.setNext(HelpPhrases.nextReportHelpPage)
+				.setHint(GeneralPhrases.tryReportHelp);
+		final HelpCommandDisplay reportHelpDisplay = reportHelpDisplayBuilder.build();
+		initReportCommand(new HelpCommand(this, getLocale(), getReportCommands().values(), reportHelpDisplay));
 
 		initRespondCommand(new RespondCommand(this));
 	}
@@ -158,15 +157,14 @@ public class ReporterCommandManager implements CommandExecutor {
 
 			// Respond help command
 			if (arguments.size() >= 1 && arguments.get(0).equalsIgnoreCase("help")) {
-				int page = 1;
-
-				if (arguments.size() >= 2) {
-					if (Util.isInteger(arguments.get(1))) {
-						page = Util.parseInt(arguments.get(1));
-					}
+				arguments.remove(0);
+				try {
+					respondHelp.execute(sender, arguments);
+				} catch (final RequiredPermissionException e) {
+					sender.sendMessage(command.getFailedPermissionsMessage());
+				} catch (final Throwable e) {
+					log.error("Failed to run Respond help command!", e);
 				}
-
-				respondHelp.printHelp(sender, page);
 
 				return true;
 			}
@@ -194,22 +192,20 @@ public class ReporterCommandManager implements CommandExecutor {
 
 			command = getCommand(FormattingUtil.capitalizeFirstCharacter(subcommand));
 
-			// Report help command
-			if (subcommand.equalsIgnoreCase("help")) {
-				int page = 1;
-
-				if (arguments.size() >= 1) {
-					if (Util.isInteger(arguments.get(0))) {
-						page = Util.parseInt(arguments.get(0));
+			if (command != null) {
+				// Report help command
+				if (command.getName().toLowerCase().equals("help")) {
+					try {
+						command.execute(sender, arguments);
+					} catch (final RequiredPermissionException e) {
+						sender.sendMessage(command.getFailedPermissionsMessage());
+					} catch (final Throwable e) {
+						log.error("Failed to run Report help command!", e);
 					}
+
+					return true;
 				}
 
-				reportHelp.printHelp(sender, page);
-
-				return true;
-			}
-
-			if (command != null) {
 				if (arguments.size() >= command.getMinimumNumberOfArguments()) {
 					try {
 						final ReporterCommand commandToRun = command.getRunnableClone(sender, arguments);

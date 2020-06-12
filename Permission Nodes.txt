@@ -1,4 +1,6 @@
 Permission Nodes:
+    reporter.help
+        - Ability to view reporting and responding help dialog.
 	reporter.report
 		- Ability to submit reports.
 	reporter.report.nolimit

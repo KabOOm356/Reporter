@@ -1,28 +1,44 @@
 package net.KabOOm356.Command.Help;
 
 import net.KabOOm356.Command.ReporterCommand;
+import net.KabOOm356.Command.ReporterCommandManager;
 import net.KabOOm356.Locale.Entry.LocalePhrases.HelpPhrases;
 import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Reporter.Reporter;
+import net.KabOOm356.Throwable.IndexNotANumberException;
+import net.KabOOm356.Throwable.IndexOutOfRangeException;
+import net.KabOOm356.Throwable.NoLastViewedReportException;
+import net.KabOOm356.Throwable.RequiredPermissionException;
+import net.KabOOm356.Util.Util;
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * A command that will display how to use the other commands.
  */
-public final class HelpCommand {
+public final class HelpCommand extends ReporterCommand {
 	private static final float commandsPerPage = 5f;
 	private static final String format = ChatColor.BLUE + Reporter.getLogPrefix() + ChatColor.RED + "%usage" + ChatColor.WHITE + " - %description";
+
+	private final static String name = "Help";
+	private final static int minimumNumberOfArguments = 0;
+	private final static String permissionNode = "reporter.help";
+
+	private static final List<Usage> usages = Collections.emptyList();
+	private static final List<String> aliases = Collections.emptyList();
+
 	private final Locale locale;
 	private final List<List<Usage>> pages = new ArrayList<>();
 	private final HelpCommandDisplay display;
 
-	public HelpCommand(final Locale locale, final Collection<ReporterCommand> commands, final HelpCommandDisplay display) {
+	public HelpCommand(final ReporterCommandManager manager, final Locale locale, final Collection<ReporterCommand> commands, final HelpCommandDisplay display) {
+		super(manager, name, permissionNode, minimumNumberOfArguments);
 		Validate.notNull(locale);
 		Validate.notNull(commands);
 		Validate.notNull(display);
@@ -67,7 +83,32 @@ public final class HelpCommand {
 		return roundedNumberOfPages.intValue();
 	}
 
-	public void printHelp(final CommandSender sender, final int page) {
+	@Override
+	public void execute(final CommandSender sender, final List<String> args) throws NoLastViewedReportException, IndexOutOfRangeException, IndexNotANumberException, RequiredPermissionException {
+		hasRequiredPermission(sender);
+
+		int page = 1;
+
+		if (args.size() >= 1) {
+			if (Util.isInteger(args.get(0))) {
+				page = Util.parseInt(args.get(0));
+			}
+		}
+
+		printHelp(sender, page);
+	}
+
+	@Override
+	public List<Usage> getUsages() {
+		return usages;
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return aliases;
+	}
+
+	private void printHelp(final CommandSender sender, final int page) {
 		if (requireValidHelpPage(sender, page)) {
 			printHeader(sender, page);
 			printPage(sender, page);
