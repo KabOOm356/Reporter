@@ -26,6 +26,7 @@ public class ReportTableUpdater extends DatabaseTableUpdater {
 		versionUpdaters.add(new ReportTableVersion6(database, getTableName()));
 		versionUpdaters.add(new ReportTableVersion7(database, getTableName()));
 		versionUpdaters.add(new ReportTableVersion8(database, getTableName()));
+		versionUpdaters.add(new ReportTableVersion11(database, getTableName()));
 	}
 
 	@Override

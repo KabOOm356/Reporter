@@ -30,6 +30,22 @@ public final class DatabaseUtil {
 		return (database.getDatabaseType() == DatabaseType.MYSQL) ? " AUTO_INCREMENT" : "";
 	}
 
+	public static String getTableCreationMetadata(final Database database) {
+		return getTableCreationStorageEngine(database) + getTableCreationCharacterSet(database) + getTableCreationCollation(database);
+	}
+
+	public static String getTableCreationStorageEngine(final Database database) {
+		return (database.getDatabaseType() == DatabaseType.MYSQL) ? " ENGINE = INNODB" : "";
+	}
+
+	public static String getTableCreationCharacterSet(final Database database) {
+		return (database.getDatabaseType() == DatabaseType.MYSQL) ? " CHARACTER SET utf8mb4" : "";
+	}
+
+	public static String getTableCreationCollation(final Database database) {
+		return (database.getDatabaseType() == DatabaseType.MYSQL) ? " COLLATE utf8mb4_bin" : "";
+	}
+
 	public static String getColumnsSizeName(final Database database) {
 		return (database.getDatabaseType() == DatabaseType.SQLITE) ? "TYPE_NAME" : "COLUMN_SIZE";
 	}

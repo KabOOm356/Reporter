@@ -4,6 +4,7 @@ import net.KabOOm356.Database.Database;
 import net.KabOOm356.Database.Table.DatabaseTableUpdater;
 import net.KabOOm356.Database.Table.Version.DatabaseTableVersionUpdater;
 import net.KabOOm356.Reporter.Database.Table.Updater.VersionUpdater.PlayerStats.PlayerStatsTableVersion10;
+import net.KabOOm356.Reporter.Database.Table.Updater.VersionUpdater.PlayerStats.PlayerStatsTableVersion11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ public class PlayerStatsTableUpdater extends DatabaseTableUpdater {
 		super(database, updateVersion, tableName);
 
 		versionUpdaters.add(new PlayerStatsTableVersion10(getDatabase(), getTableName()));
+		versionUpdaters.add(new PlayerStatsTableVersion11(getDatabase(), getTableName()));
 	}
 
 	@Override

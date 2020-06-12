@@ -31,7 +31,7 @@ public class MySQL extends Database {
 	 * @param connectionPoolConfig The configuration for the connection pool.
 	 */
 	public MySQL(final String host, final String database, final String username, final String password, final ConnectionPoolConfig connectionPoolConfig) {
-		super(DatabaseType.MYSQL, "com.mysql.jdbc.Driver", "jdbc:mysql://" + host + '/' + database, connectionPoolConfig);
+		super(DatabaseType.MYSQL, "com.mysql.jdbc.Driver", "jdbc:mysql://" + host + '/' + database + "?characterEncoding=utf8&useUnicode=true&character_set_server=utf8mb4", connectionPoolConfig);
 
 		this.username = username;
 		this.password = password;

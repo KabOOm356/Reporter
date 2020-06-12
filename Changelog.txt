@@ -404,3 +404,4 @@ Changelog:
                 Fixed sending an error instead of a usage hint if the report index is not parsable into an integer.
     3.3.4
                 Added a permission node for allowing players to view the help dialog.
+                Fixed issue with some UTF-8 languages not being stored in the database correctly.

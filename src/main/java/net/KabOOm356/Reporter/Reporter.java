@@ -72,7 +72,7 @@ import java.util.concurrent.Callable;
 public class Reporter extends JavaPlugin {
 	public static final String localeVersion = "11";
 	public static final String configVersion = "16";
-	public static final String databaseVersion = "10";
+	public static final String databaseVersion = "11";
 	public static final String anonymousPlayerName = "* (Anonymous)";
 	public static final String console = "CONSOLE";
 	private static final Logger log = LogManager.getLogger(Reporter.class);

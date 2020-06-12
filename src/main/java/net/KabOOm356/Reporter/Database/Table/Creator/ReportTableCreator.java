@@ -1,7 +1,9 @@
 package net.KabOOm356.Reporter.Database.Table.Creator;
 
 import net.KabOOm356.Database.Database;
+import net.KabOOm356.Database.DatabaseType;
 import net.KabOOm356.Database.Table.DatabaseTableCreator;
+import net.KabOOm356.Util.DatabaseUtil;
 
 public class ReportTableCreator extends DatabaseTableCreator {
 	public ReportTableCreator(final Database database, final String databaseVersion, final String tableName) {
@@ -10,32 +12,38 @@ public class ReportTableCreator extends DatabaseTableCreator {
 
 	@Override
 	protected String getTableCreationQuery() {
-		return "CREATE TABLE IF NOT EXISTS Reports (" +
-				"ID INTEGER PRIMARY KEY, " +
-				"Date CHAR(19) NOT NULL DEFAULT 'N/A', " +
-				"SenderUUID CHAR(36) DEFAULT '', " +
-				"Sender VARCHAR(32), " +
-				"ReportedUUID CHAR(36) DEFAULT '', " +
-				"Reported VARCHAR(32) NOT NULL DEFAULT '* (Anonymous)', " +
-				"Details VARCHAR(200) NOT NULL, " +
-				"Priority TINYINT NOT NULL DEFAULT '0', " +
-				"SenderWorld VARCHAR(100) DEFAULT '', " +
-				"SenderX DOUBLE NOT NULL DEFAULT '0.0', " +
-				"SenderY DOUBLE NOT NULL DEFAULT '0.0', " +
-				"SenderZ DOUBLE NOT NULL DEFAULT '0.0', " +
-				"ReportedWorld VARCHAR(100) DEFAULT '', " +
-				"ReportedX DOUBLE DEFAULT '0.0', " +
-				"ReportedY DOUBLE DEFAULT '0.0', " +
-				"ReportedZ DOUBLE DEFAULT '0.0', " +
-				"CompletionStatus BOOLEAN NOT NULL DEFAULT '0', " +
-				"CompletedByUUID CHAR(36) DEFAULT '', " +
-				"CompletedBy VARCHAR(32) DEFAULT '', " +
-				"CompletionDate CHAR(19) DEFAULT '', " +
-				"CompletionSummary VARCHAR(200) DEFAULT '', " +
-				"ClaimStatus BOOLEAN NOT NULL DEFAULT '0', " +
-				"ClaimDate CHAR(19) DEFAULT '', " +
-				"ClaimedByUUID CHAR(36) DEFAULT '', " +
-				"ClaimedBy VARCHAR(32) DEFAULT '', " +
-				"ClaimPriority TINYINT DEFAULT '0');";
+		final StringBuilder createQuery = new StringBuilder();
+		createQuery.append("CREATE TABLE IF NOT EXISTS Reports (")
+				.append("ID INTEGER PRIMARY KEY, ")
+				.append("Date CHAR(19) NOT NULL DEFAULT 'N/A', ")
+				.append("SenderUUID CHAR(36) DEFAULT '', ")
+				.append("Sender VARCHAR(32), ")
+				.append("ReportedUUID CHAR(36) DEFAULT '', ")
+				.append("Reported VARCHAR(32) NOT NULL DEFAULT '* (Anonymous)', ")
+				.append("Details VARCHAR(200) NOT NULL, ")
+				.append("Priority TINYINT NOT NULL DEFAULT '0', ")
+				.append("SenderWorld VARCHAR(100) DEFAULT '', ")
+				.append("SenderX DOUBLE NOT NULL DEFAULT '0.0', ")
+				.append("SenderY DOUBLE NOT NULL DEFAULT '0.0', ")
+				.append("SenderZ DOUBLE NOT NULL DEFAULT '0.0', ")
+				.append("ReportedWorld VARCHAR(100) DEFAULT '', ")
+				.append("ReportedX DOUBLE DEFAULT '0.0', ")
+				.append("ReportedY DOUBLE DEFAULT '0.0', ")
+				.append("ReportedZ DOUBLE DEFAULT '0.0', ")
+				.append("CompletionStatus BOOLEAN NOT NULL DEFAULT '0', ")
+				.append("CompletedByUUID CHAR(36) DEFAULT '', ")
+				.append("CompletedBy VARCHAR(32) DEFAULT '', ")
+				.append("CompletionDate CHAR(19) DEFAULT '', ")
+				.append("CompletionSummary VARCHAR(200) DEFAULT '', ")
+				.append("ClaimStatus BOOLEAN NOT NULL DEFAULT '0', ")
+				.append("ClaimDate CHAR(19) DEFAULT '', ")
+				.append("ClaimedByUUID CHAR(36) DEFAULT '', ")
+				.append("ClaimedBy VARCHAR(32) DEFAULT '', ")
+				.append("ClaimPriority TINYINT DEFAULT '0')");
+		if (getDatabase().getDatabaseType() == DatabaseType.MYSQL) {
+			createQuery.append(DatabaseUtil.getTableCreationMetadata(getDatabase()));
+		}
+		createQuery.append(';');
+		return createQuery.toString();
 	}
 }
