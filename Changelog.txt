@@ -402,7 +402,7 @@ Changelog:
                 Set Spigot api-version to stop getting flagged as a legacy plugin.
                 Fixed no message being sent to the command sender if the report index is out of range.
                 Fixed sending an error instead of a usage hint if the report index is not parsable into an integer.
-    3.3.4
+    3.3.4   6/13/2020
                 Added a permission node for allowing players to view the help dialog.
                 Fixed issue with some UTF-8 languages not being stored in the database correctly.
                 Fixed respond command failing due to being called on separate thread.
