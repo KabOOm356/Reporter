@@ -405,3 +405,4 @@ Changelog:
     3.3.4
                 Added a permission node for allowing players to view the help dialog.
                 Fixed issue with some UTF-8 languages not being stored in the database correctly.
+                Fixed respond command failing due to being called on separate thread.

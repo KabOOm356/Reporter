@@ -172,10 +172,11 @@ public class ReporterCommandManager implements CommandExecutor {
 			// Respond to report
 			if (arguments.size() >= command.getMinimumNumberOfArguments()) {
 				try {
-					final ReporterCommand commandToRun = command.getRunnableClone(sender, arguments);
-					Bukkit.getScheduler().runTaskAsynchronously(plugin, commandToRun);
+					command.setSender(sender);
+					command.setArguments(arguments);
+					command.run();
 					return true;
-				} catch (final Exception e) {
+				} catch (final Throwable e) {
 					log.error("Failed to run Respond command!", e);
 				}
 			} else {
