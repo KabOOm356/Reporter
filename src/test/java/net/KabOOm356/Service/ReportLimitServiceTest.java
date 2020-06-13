@@ -90,7 +90,7 @@ public class ReportLimitServiceTest extends ServiceTest {
 		when(reportedPlayer.getName()).thenReturn(reportedPlayerName);
 		when(reportedPlayer.getUniqueId()).thenReturn(reportedPlayerUUID);
 
-		when(configurationService.get(any(Entry.class))).thenAnswer(ConfigurationAnswer.instance);
+		when(configurationService.get((Entry<?>)any(Entry.class))).thenAnswer(ConfigurationAnswer.instance);
 		when(configurationService.get(ConfigurationEntries.limitReportsAgainstPlayers)).thenReturn(true);
 		when(configurationService.get(ConfigurationEntries.alertConsoleWhenLimitReached)).thenReturn(true);
 		when(configurationService.get(ConfigurationEntries.alertConsoleWhenLimitAgainstPlayerReached)).thenReturn(true);

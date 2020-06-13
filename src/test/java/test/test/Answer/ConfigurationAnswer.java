@@ -19,7 +19,7 @@ public class ConfigurationAnswer implements Answer<Object> {
 		Validate.notEmpty(invocationOnMock.getArguments());
 		Object answer = null;
 		if (invocationOnMock.getArguments()[0] instanceof Entry) {
-			final Entry entry = Entry.class.cast(invocationOnMock.getArguments()[0]);
+			final Entry<?> entry = (Entry<?>) invocationOnMock.getArguments()[0];
 			answer = entry.getDefault();
 		} else if (invocationOnMock.getArguments().length >= 2) {
 			answer = invocationOnMock.getArguments()[1];
