@@ -56,7 +56,7 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.bstats', name: 'bstats-bukkit', version: '1.5'
+    implementation group: 'org.bstats', name: 'bstats-bukkit', version: '1.7'
     
     compileOnly group: 'org.bukkit', name: 'bukkit', version: bukkitVersion
     compileOnly group: 'org.spigotmc', name: 'plugin-annotations', version: spigotPluginAnnotationVersion
