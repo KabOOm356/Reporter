@@ -5,11 +5,6 @@ buildscript {
         
         // Java compile
         javaTargetVersion = JavaVersion.VERSION_1_7
-        
-        // Dependency
-        bukkitVersion = '1.15.2-R0.1-SNAPSHOT'
-        spigotPluginAnnotationVersion = '1.2.2-SNAPSHOT'
-        log4jVersion = '2.0-beta9'
     }
     repositories {
         jcenter()
@@ -58,17 +53,17 @@ repositories {
 dependencies {
     implementation group: 'org.bstats', name: 'bstats-bukkit', version: '1.7'
     
-    compileOnly group: 'org.bukkit', name: 'bukkit', version: bukkitVersion
-    compileOnly group: 'org.spigotmc', name: 'plugin-annotations', version: spigotPluginAnnotationVersion
-    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
+    compileOnly group: 'org.bukkit', name: 'bukkit', version: '1.15.2-R0.1-SNAPSHOT'
+    compileOnly group: 'org.spigotmc', name: 'plugin-annotations', version: '1.2.2-SNAPSHOT'
+    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.0-beta9'
     compileOnly group: 'net.milkbowl.vault', name: 'VaultAPI', version: '1.7'
     
     testImplementation group: 'junit', name: 'junit', version: '4.13'
     testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.7'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
-    testImplementation group: 'org.bukkit', name: 'bukkit', version: bukkitVersion
-    testImplementation group: 'org.spigotmc', name: 'plugin-annotations', version: spigotPluginAnnotationVersion
-    testImplementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
+    testImplementation group: 'org.bukkit', name: 'bukkit', version: '1.15.2-R0.1-SNAPSHOT'
+    testImplementation group: 'org.spigotmc', name: 'plugin-annotations', version: '1.2.2-SNAPSHOT'
+    testImplementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.0-beta9'
 
-    annotationProcessor group: 'org.spigotmc', name: 'plugin-annotations', version: spigotPluginAnnotationVersion
+    annotationProcessor group: 'org.spigotmc', name: 'plugin-annotations', version: '1.2.2-SNAPSHOT'
 }
