@@ -29,7 +29,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.*;
 
-@PrepareForTest({ReportLimitService.class, PlayerReport.class, PlayerReportQueue.class, Player.class, Bukkit.class, BukkitUtil.class})
+@PrepareForTest({ReportLimitService.class, PlayerReport.class, PlayerReportQueue.class, Player.class, Bukkit.class, BukkitUtil.class, OfflinePlayer.class})
 public class ReportLimitServiceTest extends ServiceTest {
 	private final String playerName = "testPlayer";
 	private final String reportedPlayerName = "reportedPlayer";
