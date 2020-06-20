@@ -30,6 +30,9 @@ public class DatabaseTableCreatorTest extends PowerMockitoTest {
 		doCallRealMethod().when(databaseTableCreator, "createTable");
 		doCallRealMethod().when(databaseTableCreator, "needsToCreateTable");
 		when(databaseTableCreator, "getDatabase").thenReturn(database);
+		when(databaseTableCreator, "getTableCreationQuery").thenReturn("Table Creation Query");
+		when(databaseTableCreator, "getConnectionId").thenReturn(1);
+		when(databaseTableCreator, "getTableName").thenReturn("Test Table Name");
 		when(database.checkTable(anyInt(), anyString())).thenReturn(false);
 		when(database.getDatabaseType()).thenReturn(DatabaseType.MYSQL);
 	}
