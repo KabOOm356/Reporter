@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import test.test.PowerMockitoTest;
@@ -16,16 +16,15 @@ import test.test.PowerMockitoTest;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.*;
 
-@SuppressWarnings("deprecation")
 @PrepareForTest({BukkitUtil.class, OfflinePlayer.class, Bukkit.class})
 public class BukkitUtilTest extends PowerMockitoTest {
-	@BeforeClass
-	public static void mockBukkit() {
+	@Before
+	public void setupMocks() {
 		mockStatic(Bukkit.class);
 	}
 
@@ -91,8 +90,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 
 		returned = BukkitUtil.formatPlayerName(sender);
 		assertEquals(playerName, returned);
-
-		verifyStatic();
 	}
 
 	@Test
@@ -336,7 +333,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		when(BukkitUtil.getUUIDString(offlinePlayer)).thenReturn(testUUIDString);
 
 		assertEquals(testUUIDString, BukkitUtil.getUUIDString(commandSender));
-		verifyStatic();
 	}
 
 	@Test
@@ -392,7 +388,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		mockStatic(Bukkit.class);
 		when(Bukkit.getOfflinePlayer(testUUID)).thenReturn(offlinePlayer);
 		assertEquals(offlinePlayer, BukkitUtil.getOfflinePlayer(testUUID, null));
-		verifyStatic();
 	}
 
 	@Test
@@ -402,7 +397,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		mockStatic(Bukkit.class);
 		when(Bukkit.getOfflinePlayer(name)).thenReturn(offlinePlayer);
 		assertEquals(offlinePlayer, BukkitUtil.getOfflinePlayer(null, name));
-		verifyStatic();
 	}
 
 	@Test
@@ -445,7 +439,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		when(BukkitUtil.isUsernameValid(anyString())).thenReturn(true);
 
 		assertEquals(null, BukkitUtil.getPlayer("player", false));
-		verifyStatic();
 	}
 
 	@Test
@@ -462,7 +455,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		when(BukkitUtil.isUsernameValid(anyString())).thenReturn(true);
 
 		assertEquals(matchedOfflinePlayer, BukkitUtil.getPlayer("player", true));
-		verifyStatic();
 	}
 
 	@Test
@@ -540,7 +532,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		assertEquals(testPlugin, BukkitUtil.getPlugin(pluginName));
 		verify(pluginManager).isPluginEnabled(pluginName);
 		verify(pluginManager).getPlugin(pluginName);
-		verifyStatic();
 	}
 
 	@Test(expected = IllegalPluginAccessException.class)
@@ -555,7 +546,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 			BukkitUtil.getPlugin(pluginName);
 		} finally {
 			verify(pluginManager).isPluginEnabled(pluginName);
-			verifyStatic();
 		}
 	}
 

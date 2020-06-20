@@ -11,8 +11,8 @@ import test.test.PowerMockitoTest;
 
 import java.sql.SQLException;
 
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.powermock.api.mockito.PowerMockito.*;
 
@@ -30,6 +30,9 @@ public class DatabaseTableCreatorTest extends PowerMockitoTest {
 		doCallRealMethod().when(databaseTableCreator, "createTable");
 		doCallRealMethod().when(databaseTableCreator, "needsToCreateTable");
 		when(databaseTableCreator, "getDatabase").thenReturn(database);
+		when(databaseTableCreator, "getTableCreationQuery").thenReturn("Table Creation Query");
+		when(databaseTableCreator, "getConnectionId").thenReturn(1);
+		when(databaseTableCreator, "getTableName").thenReturn("Test Table Name");
 		when(database.checkTable(anyInt(), anyString())).thenReturn(false);
 		when(database.getDatabaseType()).thenReturn(DatabaseType.MYSQL);
 	}

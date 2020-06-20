@@ -13,7 +13,7 @@ import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.*;
@@ -55,6 +55,8 @@ public class FileIOTest extends PowerMockitoTest {
 		whenNew(BufferedReader.class).withAnyArguments().thenReturn(bufferedReader);
 		whenNew(InputStreamReader.class).withAnyArguments().thenReturn(inputStreamReader);
 		when(file.toURI()).thenReturn(uri);
+		when(file.getParent()).thenReturn("Test Parent");
+		when(file.getName()).thenReturn("Test Name");
 		when(uri.toURL()).thenReturn(url);
 		when(url.openStream()).thenReturn(inputStream);
 
