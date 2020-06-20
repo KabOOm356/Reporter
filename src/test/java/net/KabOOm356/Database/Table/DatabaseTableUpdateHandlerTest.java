@@ -121,7 +121,7 @@ public class DatabaseTableUpdateHandlerTest extends PowerMockitoTest {
 		startTransaction.invoke(databaseTableUpdateHandler);
 		commitTransaction.invoke(databaseTableUpdateHandler);
 		verify(statement).executeBatch();
-		verifyPrivate(databaseTableUpdateHandler).invoke(endTransaction);
+		verifyPrivate(databaseTableUpdateHandler).invoke(endTransaction).withNoArguments();
 	}
 
 	@Test(expected = SQLException.class)

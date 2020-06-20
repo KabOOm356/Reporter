@@ -80,6 +80,7 @@ public class UrlIOTest extends PowerMockitoTest {
 		whenNew(URL.class).withAnyArguments().thenReturn(url);
 		when(url.openConnection()).thenReturn(httpURLConnection);
 		when(httpURLConnection.getResponseCode()).thenReturn(HttpURLConnection.HTTP_NOT_FOUND);
+		when(networkFile.getURL()).thenReturn("Test URL");
 		UrlIO.downloadFile(networkFile, file);
 	}
 
@@ -98,6 +99,8 @@ public class UrlIOTest extends PowerMockitoTest {
 		whenNew(FileOutputStream.class).withAnyArguments().thenReturn(mock(FileOutputStream.class));
 
 		when(bufferedReader.readLine()).thenReturn("Test", "String", null);
+
+		when(networkFile.getURL()).thenReturn("Test URL");
 
 		UrlIO.downloadFile(networkFile, file);
 		verify(bufferedWriter, times(2)).write(anyString());

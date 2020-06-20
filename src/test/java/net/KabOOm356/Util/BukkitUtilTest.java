@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import test.test.PowerMockitoTest;
@@ -21,11 +21,10 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.*;
 
-@SuppressWarnings("deprecation")
 @PrepareForTest({BukkitUtil.class, OfflinePlayer.class, Bukkit.class})
 public class BukkitUtilTest extends PowerMockitoTest {
-	@BeforeClass
-	public static void mockBukkit() {
+	@Before
+	public void setupMocks() {
 		mockStatic(Bukkit.class);
 	}
 

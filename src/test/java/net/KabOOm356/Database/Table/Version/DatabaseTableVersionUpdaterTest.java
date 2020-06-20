@@ -37,7 +37,7 @@ public class DatabaseTableVersionUpdaterTest extends PowerMockitoTest {
 
 	@After
 	public void verifyMocks() throws Exception {
-		verifyPrivate(databaseTableVersionUpdater).invoke(commitTransaction);
+		verifyPrivate(databaseTableVersionUpdater).invoke(commitTransaction).withNoArguments();
 	}
 
 	@Test

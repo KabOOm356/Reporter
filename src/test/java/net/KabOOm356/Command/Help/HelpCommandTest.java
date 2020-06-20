@@ -2,7 +2,7 @@ package net.KabOOm356.Command.Help;
 
 import net.KabOOm356.Command.ReporterCommand;
 import net.KabOOm356.Command.ReporterCommandManager;
-import net.KabOOm356.Locale.Entry.LocalePhrase;
+import net.KabOOm356.Configuration.Entry;
 import net.KabOOm356.Locale.Entry.LocalePhrases.GeneralPhrases;
 import net.KabOOm356.Locale.Entry.LocalePhrases.HelpPhrases;
 import net.KabOOm356.Locale.Locale;
@@ -26,7 +26,6 @@ import test.test.PowerMockitoTest;
 
 import java.util.*;
 
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -78,7 +77,7 @@ public class HelpCommandTest extends PowerMockitoTest {
 		when(commandManager.getServiceModule()).thenReturn(serviceModule);
 		when(serviceModule.getPermissionService()).thenReturn(permissionService);
 		when(permissionService.hasPermission(any(CommandSender.class), anyString())).thenReturn(true);
-		when(locale.getString(any(LocalePhrase.class))).thenAnswer(LocaleEntryAnswer.instance);
+		when(locale.getString(any(Entry.class))).thenAnswer(LocaleEntryAnswer.instance);
 
 		final HelpCommandDisplay.Builder builder = new HelpCommandDisplay.Builder();
 		builder.setHeader(HelpPhrases.reportHelpHeader)
