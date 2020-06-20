@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import test.test.service.ServiceTest;
 
@@ -18,7 +19,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.*;
@@ -73,11 +75,11 @@ public class ReportInformationServiceTest extends ServiceTest {
 	public void getViewableReportsNameLookup() throws InterruptedException, SQLException, ClassNotFoundException {
 		final CommandSender commandSender = mock(CommandSender.class);
 		when(BukkitUtil.isPlayer(commandSender)).thenReturn(false);
-		when(getDatabaseHandler().preparedSQLQuery(eq(connectionId), anyString(), anyListOf(String.class))).thenReturn(sqlResultSet);
+		when(getDatabaseHandler().preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.<String>anyList())).thenReturn(sqlResultSet);
 		final List<Integer> returned = manager.getViewableReports(commandSender);
 		verifyReturned(returned);
 		verify(commandSender).getName();
-		verify(getDatabaseHandler()).preparedSQLQuery(eq(connectionId), anyString(), anyListOf(String.class));
+		verify(getDatabaseHandler()).preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.<String>anyList());
 	}
 
 	@Test
@@ -87,11 +89,11 @@ public class ReportInformationServiceTest extends ServiceTest {
 		when(BukkitUtil.isPlayer(commandSender)).thenReturn(true);
 		when(OfflinePlayer.class.cast(commandSender)).thenReturn(player);
 		when(player.getUniqueId()).thenReturn(UUID.randomUUID());
-		when(getDatabaseHandler().preparedSQLQuery(eq(connectionId), anyString(), anyListOf(String.class))).thenReturn(sqlResultSet);
+		when(getDatabaseHandler().preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.<String>anyList())).thenReturn(sqlResultSet);
 		final List<Integer> returned = manager.getViewableReports(commandSender);
 		verifyReturned(returned);
 		verify(player).getUniqueId();
-		verify(getDatabaseHandler()).preparedSQLQuery(eq(connectionId), anyString(), anyListOf(String.class));
+		verify(getDatabaseHandler()).preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.<String>anyList());
 	}
 
 	@Test

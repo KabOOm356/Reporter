@@ -19,6 +19,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import test.test.Answer.LocaleEntryAnswer;
@@ -77,7 +78,7 @@ public class HelpCommandTest extends PowerMockitoTest {
 		when(commandManager.getServiceModule()).thenReturn(serviceModule);
 		when(serviceModule.getPermissionService()).thenReturn(permissionService);
 		when(permissionService.hasPermission(any(CommandSender.class), anyString())).thenReturn(true);
-		when(locale.getString(any(Entry.class))).thenAnswer(LocaleEntryAnswer.instance);
+		when(locale.getString(ArgumentMatchers.<Entry<String>>any())).thenAnswer(LocaleEntryAnswer.instance);
 
 		final HelpCommandDisplay.Builder builder = new HelpCommandDisplay.Builder();
 		builder.setHeader(HelpPhrases.reportHelpHeader)
