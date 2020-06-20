@@ -80,6 +80,7 @@ public class Reporter extends JavaPlugin {
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static final UpdateSite localeXMLUpdateSite = new UpdateSite("https://www.dropbox.com/s/m75q8xsvc1swys0/latest.xml?dl=1", UpdateSite.Type.XML);
 	private static final String pluginUpdateAPI = "https://api.curseforge.com/servermods/files?projectIds=31347";
+	private static final int metricsPluginId = 3509;
 	private static String version;
 	private static String defaultConsolePrefix;
 	private static String versionString;
@@ -291,7 +292,7 @@ public class Reporter extends JavaPlugin {
 	}
 
 	private void initializeStatistics() {
-		this.metrics = new Metrics(this);
+		this.metrics = new Metrics(this, metricsPluginId);
 	}
 
 	private void initializePermissions() {
