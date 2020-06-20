@@ -63,7 +63,7 @@ dependencies {
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
     testImplementation group: 'org.bukkit', name: 'bukkit', version: '1.15.2-R0.1-SNAPSHOT'
     testImplementation group: 'org.spigotmc', name: 'plugin-annotations', version: '1.2.2-SNAPSHOT'
-    testImplementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.0-beta9'
+    testImplementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.3'
 
     annotationProcessor group: 'org.spigotmc', name: 'plugin-annotations', version: '1.2.2-SNAPSHOT'
 }
