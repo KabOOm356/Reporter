@@ -53,9 +53,7 @@ public class PlayerReportTest extends PowerMockitoTest {
 	public void put() throws Exception {
 		mockNewPlayerReportQueue();
 		playerReport.put(player, reportedPlayer, timer);
-		verifyNew(PlayerReportQueue.class).withNoArguments();
-		verify(playerReportQueue).put(reportedPlayer, timer);
-		verify(playerReport).put(senderUUID, playerReportQueue);
+		assertEquals(timer, playerReport.get(player).get(reportedPlayer).peek());
 	}
 
 	@Test

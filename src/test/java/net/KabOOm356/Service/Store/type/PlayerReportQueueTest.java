@@ -31,7 +31,7 @@ public class PlayerReportQueueTest extends PowerMockitoTest {
 	private ReportTimer timer;
 
 	@Before
-	public void setupMocks() throws Exception {
+	public void setupMocks() {
 		mockStatic(Bukkit.class);
 		mockStatic(BukkitUtil.class);
 		mockStatic(Player.class);
@@ -41,22 +41,18 @@ public class PlayerReportQueueTest extends PowerMockitoTest {
 	}
 
 	@Test
-	public void testPut() throws Exception {
-		final PriorityQueue<ReportTimer> priorityQueue = spy(new PriorityQueue<ReportTimer>());
-		whenNew(PriorityQueue.class).withNoArguments().thenReturn(priorityQueue);
-
+	public void testPut() {
 		playerReportQueue.put(player, timer);
-		verify(priorityQueue).add(timer);
+		assertEquals(timer, playerReportQueue.get(player).peek());
 	}
 
 	@Test
-	public void testPutNotValidPlayer() throws Exception {
+	public void testPutNotValidPlayer() {
 		when(BukkitUtil.isPlayerValid(player)).thenReturn(false);
-		final PriorityQueue<ReportTimer> priorityQueue = spy(new PriorityQueue<ReportTimer>());
-		whenNew(PriorityQueue.class).withNoArguments().thenReturn(priorityQueue);
 
 		playerReportQueue.put(player, timer);
-		verify(priorityQueue).add(timer);
+
+		assertEquals(timer, playerReportQueue.get(player).peek());
 	}
 
 	@Test

@@ -90,8 +90,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 
 		returned = BukkitUtil.formatPlayerName(sender);
 		assertEquals(playerName, returned);
-
-		verifyStatic(BukkitUtil.class);
 	}
 
 	@Test
@@ -335,7 +333,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		when(BukkitUtil.getUUIDString(offlinePlayer)).thenReturn(testUUIDString);
 
 		assertEquals(testUUIDString, BukkitUtil.getUUIDString(commandSender));
-		verifyStatic(BukkitUtil.class);
 	}
 
 	@Test
@@ -391,7 +388,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		mockStatic(Bukkit.class);
 		when(Bukkit.getOfflinePlayer(testUUID)).thenReturn(offlinePlayer);
 		assertEquals(offlinePlayer, BukkitUtil.getOfflinePlayer(testUUID, null));
-		verifyStatic(Bukkit.class);
 	}
 
 	@Test
@@ -401,7 +397,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		mockStatic(Bukkit.class);
 		when(Bukkit.getOfflinePlayer(name)).thenReturn(offlinePlayer);
 		assertEquals(offlinePlayer, BukkitUtil.getOfflinePlayer(null, name));
-		verifyStatic(Bukkit.class);
 	}
 
 	@Test
@@ -444,7 +439,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		when(BukkitUtil.isUsernameValid(anyString())).thenReturn(true);
 
 		assertEquals(null, BukkitUtil.getPlayer("player", false));
-		verifyStatic(Bukkit.class);
 	}
 
 	@Test
@@ -461,7 +455,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		when(BukkitUtil.isUsernameValid(anyString())).thenReturn(true);
 
 		assertEquals(matchedOfflinePlayer, BukkitUtil.getPlayer("player", true));
-		verifyStatic(Bukkit.class);
 	}
 
 	@Test
@@ -539,7 +532,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		assertEquals(testPlugin, BukkitUtil.getPlugin(pluginName));
 		verify(pluginManager).isPluginEnabled(pluginName);
 		verify(pluginManager).getPlugin(pluginName);
-		verifyStatic(Bukkit.class);
 	}
 
 	@Test(expected = IllegalPluginAccessException.class)
@@ -554,7 +546,6 @@ public class BukkitUtilTest extends PowerMockitoTest {
 			BukkitUtil.getPlugin(pluginName);
 		} finally {
 			verify(pluginManager).isPluginEnabled(pluginName);
-			verifyStatic(Bukkit.class);
 		}
 	}
 
