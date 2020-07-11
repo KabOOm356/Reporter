@@ -27,7 +27,7 @@ sourceCompatibility = javaTargetVersion
 targetCompatibility = javaTargetVersion
 
 wrapper {
-    gradleVersion = '6.1.1'
+    gradleVersion = '6.5.1'
     distributionType = Wrapper.DistributionType.ALL
 }
 
