@@ -390,6 +390,7 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		assertEquals(offlinePlayer, BukkitUtil.getOfflinePlayer(testUUID, null));
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetOfflinePlayerValidName() {
 		final String name = "TestName";
@@ -399,6 +400,7 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		assertEquals(offlinePlayer, BukkitUtil.getOfflinePlayer(null, name));
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetPlayerOnline() {
 		final Player player = mock(Player.class);
@@ -412,6 +414,7 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		assertEquals(player, BukkitUtil.getPlayer("player", true));
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetPlayerNotOnlineHasPlayedBefore() {
 		final OfflinePlayer offlinePlayer = mock(OfflinePlayer.class);
@@ -427,6 +430,7 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		assertEquals(offlinePlayer, BukkitUtil.getPlayer("player", true));
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetPlayerNotOnlineHasNotPlayedBeforeNoMatchingAllowed() {
 		final OfflinePlayer offlinePlayer = mock(OfflinePlayer.class);
@@ -438,9 +442,10 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		when(BukkitUtil.getPlayer(anyString(), anyBoolean())).thenCallRealMethod();
 		when(BukkitUtil.isUsernameValid(anyString())).thenReturn(true);
 
-		assertEquals(null, BukkitUtil.getPlayer("player", false));
+		assertNull(BukkitUtil.getPlayer("player", false));
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetPlayerNotOnlineHasNotPlayedBeforeMatchingAllowed() {
 		final OfflinePlayer offlinePlayer = mock(OfflinePlayer.class);
@@ -457,6 +462,7 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		assertEquals(matchedOfflinePlayer, BukkitUtil.getPlayer("player", true));
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetPlayerAnonymous() {
 		mockStatic(BukkitUtil.class);
@@ -469,6 +475,7 @@ public class BukkitUtilTest extends PowerMockitoTest {
 		assertEquals(BukkitUtil.anonymousPlayer, BukkitUtil.getPlayer("*", true));
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetPlayerInvalidUsername() {
 		mockStatic(BukkitUtil.class);
