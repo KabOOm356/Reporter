@@ -406,3 +406,5 @@ Changelog:
                 Added a permission node for allowing players to view the help dialog.
                 Fixed issue with some UTF-8 languages not being stored in the database correctly.
                 Fixed respond command failing due to being called on separate thread.
+    4.0.0
+                Upgrade compile target to Java 8.
