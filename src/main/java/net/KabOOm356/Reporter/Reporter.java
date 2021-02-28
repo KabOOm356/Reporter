@@ -44,7 +44,6 @@ import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * The main Reporter class.
@@ -282,12 +281,7 @@ public class Reporter extends JavaPlugin {
 		} else {
 			// Create a chart to track the database engine being used.
 			final DatabaseType databaseType = databaseHandler.getDatabaseType();
-			metrics.addCustomChart(new Metrics.SimplePie("database_engine", new Callable<String>() {
-				@Override
-				public String call() {
-					return databaseType.toString();
-				}
-			}));
+			metrics.addCustomChart(new Metrics.SimplePie("database_engine", databaseType::toString));
 		}
 	}
 
@@ -300,12 +294,7 @@ public class Reporter extends JavaPlugin {
 
 		// Create a chart to track the permissions manager being used.
 		final PermissionType permissionType = permissionHandler.getPermissionType();
-		metrics.addCustomChart(new Metrics.SimplePie("permission_manager", new Callable<String>() {
-			@Override
-			public String call() {
-				return permissionType.toString();
-			}
-		}));
+		metrics.addCustomChart(new Metrics.SimplePie("permission_manager", permissionType::toString));
 	}
 
 	public void loadLocale() {
@@ -314,12 +303,7 @@ public class Reporter extends JavaPlugin {
 		}
 
 		// Create a chart to track the locale language and locale version being used.
-		metrics.addCustomChart(new Metrics.SimplePie("locale", new Callable<String>() {
-			@Override
-			public String call() {
-				return FormattingUtil.capitalizeFirstCharacter(locale.getString(LocaleInfo.language));
-			}
-		}));
+		metrics.addCustomChart(new Metrics.SimplePie("locale", () -> FormattingUtil.capitalizeFirstCharacter(locale.getString(LocaleInfo.language))));
 
 		log.info(Reporter.getDefaultConsolePrefix() + "Language: " + locale.getString(LocaleInfo.language)
 				+ " v" + locale.getString(LocaleInfo.version)

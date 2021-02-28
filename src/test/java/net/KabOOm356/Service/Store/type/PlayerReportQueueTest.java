@@ -57,7 +57,7 @@ public class PlayerReportQueueTest extends PowerMockitoTest {
 
 	@Test
 	public void testPutExisting() {
-		final PriorityQueue<ReportTimer> priorityQueue = spy(new PriorityQueue<ReportTimer>());
+		final PriorityQueue<ReportTimer> priorityQueue = spy(new PriorityQueue<>());
 		playerReportQueue.put(playerUUID, priorityQueue);
 
 		playerReportQueue.put(player, timer);

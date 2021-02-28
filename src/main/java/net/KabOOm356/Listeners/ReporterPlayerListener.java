@@ -89,7 +89,7 @@ public class ReporterPlayerListener implements Listener {
 		final ReporterCommand listCommand = plugin.getCommandManager().getCommand(ListCommand.getCommandName());
 		if (listCommand.hasPermission(player)) {
 			listCommand.setSender(player);
-			listCommand.setArguments(new ArrayList<String>());
+			listCommand.setArguments(new ArrayList<>());
 			if (plugin.getConfig().getBoolean("general.messaging.listOnLogin.useDelay", true)) {
 				final int delay = plugin.getConfig().getInt("general.messaging.listOnLogin.delay", 5);
 				Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, listCommand, BukkitUtil.convertSecondsToServerTicks(delay));
