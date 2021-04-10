@@ -58,13 +58,13 @@ public final class HelpCommand extends ReporterCommand {
 	}
 
 	private static int getPageStartIndex(final int page) {
-		final Float pageStartIndex = page * commandsPerPage;
-		return pageStartIndex.intValue();
+		final float pageStartIndex = page * commandsPerPage;
+		return (int) pageStartIndex;
 	}
 
 	private static int getPageEndIndex(final int page, final int total) {
-		final Float endIndex = getPageStartIndex(page) + commandsPerPage;
-		return (endIndex > total) ? total : endIndex.intValue();
+		final float endIndex = getPageStartIndex(page) + commandsPerPage;
+		return (endIndex > total) ? total : (int) endIndex;
 	}
 
 	private static int getPageIndex(final int page) {
@@ -79,8 +79,8 @@ public final class HelpCommand extends ReporterCommand {
 	 */
 	private static int calculateNumberOfPages(final int numberOfHelpMessages) {
 		final double numberOfPages = numberOfHelpMessages / commandsPerPage;
-		final Double roundedNumberOfPages = Math.ceil(numberOfPages);
-		return roundedNumberOfPages.intValue();
+		final double roundedNumberOfPages = Math.ceil(numberOfPages);
+		return (int) roundedNumberOfPages;
 	}
 
 	@Override

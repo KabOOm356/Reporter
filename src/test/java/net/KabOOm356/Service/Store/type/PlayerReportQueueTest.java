@@ -79,7 +79,7 @@ public class PlayerReportQueueTest extends PowerMockitoTest {
 
 		final PriorityQueue<ReportTimer> returned = playerReportQueue.get(player);
 		assertFalse(returned.isEmpty());
-		assertTrue(returned.size() == 1);
+        assertEquals(1, returned.size());
 		assertTrue(returned.contains(timer));
 	}
 }

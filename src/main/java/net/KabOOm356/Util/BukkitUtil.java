@@ -246,13 +246,13 @@ public final class BukkitUtil {
 			final OfflinePlayer player2 = OfflinePlayer.class.cast(commandSender2);
 			final UUID senderUUID = player.getUniqueId();
 			final UUID senderUUID2 = player2.getUniqueId();
-			if (senderUUID != null && senderUUID2 != null && senderUUID.equals(senderUUID2)) {
+			if (senderUUID != null && senderUUID.equals(senderUUID2)) {
 				return true;
 			}
 		}
 		final String senderName = commandSender.getName();
 		final String senderName2 = commandSender2.getName();
-		return senderName != null && senderName2 != null && senderName.equals(senderName2);
+		return senderName != null && senderName.equals(senderName2);
 	}
 
 	/**

@@ -343,7 +343,7 @@ public class VersionedNetworkFile extends NetworkFile {
 		int difference = 0;
 
 		// Get the length of the longest version number sequence.
-		final int length = (this.versions.size() > comp.getVersions().size()) ? this.versions.size() : comp.getVersions().size();
+		final int length = Math.max(this.versions.size(), comp.getVersions().size());
 
 		// Calculate the difference between the two versions.
 		for (int LCV = length - 1; LCV >= 0; LCV--) {

@@ -181,7 +181,7 @@ public class CompleteCommand extends ReporterCommand {
 			try {
 				connectionId = database.openPooledConnection();
 
-				final String query = "SELECT SenderUUID, Sender FROM Reports WHERE ID=" + Integer.toString(index);
+				final String query = "SELECT SenderUUID, Sender FROM Reports WHERE ID=" + index;
 
 				final SQLResultSet result = database.sqlQuery(connectionId, query);
 

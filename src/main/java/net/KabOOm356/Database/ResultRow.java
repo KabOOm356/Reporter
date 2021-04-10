@@ -86,7 +86,7 @@ public class ResultRow extends HashMap<String, Object> {
 		}
 
 		// Try to parse for the Boolean, only returns true if the string value is "true".
-		Boolean value = Boolean.parseBoolean(getString(colName));
+		boolean value = Boolean.parseBoolean(getString(colName));
 		// Tries to parse for the Boolean by Integer value, true if the string value is "1".
 		value = value || getString(colName).equals("1");
 

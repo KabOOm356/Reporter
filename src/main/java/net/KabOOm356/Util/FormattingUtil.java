@@ -150,7 +150,7 @@ public final class FormattingUtil {
 
 		str = str.toLowerCase();
 
-		return String.valueOf(Character.toUpperCase(str.charAt(0))) +
+		return Character.toUpperCase(str.charAt(0)) +
 				str.substring(1);
 	}
 

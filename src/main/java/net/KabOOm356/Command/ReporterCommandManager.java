@@ -195,7 +195,7 @@ public class ReporterCommandManager implements CommandExecutor {
 
 			if (command != null) {
 				// Report help command
-				if (command.getName().toLowerCase().equals("help")) {
+				if (command.getName().equalsIgnoreCase("help")) {
 					try {
 						command.execute(sender, arguments);
 					} catch (final RequiredPermissionException e) {

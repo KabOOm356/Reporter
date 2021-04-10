@@ -113,9 +113,9 @@ public class RevisionFile extends ExtendedFile {
 			final int index = name.indexOf('.');
 
 			if (index != -1) {
-				this.setName(name.substring(0, index) + Integer.toString(revision) + name.substring(index));
+				this.setName(name.substring(0, index) + revision + name.substring(index));
 			} else {
-				this.setName(name + Integer.toString(revision));
+				this.setName(name + revision);
 			}
 		} else {
 			this.setName(name);

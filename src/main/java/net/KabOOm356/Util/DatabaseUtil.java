@@ -65,7 +65,7 @@ public final class DatabaseUtil {
 			final String exceptionMessage = "Required number of parameters: " +
 					parameters.size() +
 					" got: " +
-					Integer.toString(numberOfOccurrences);
+                    numberOfOccurrences;
 			throw new WrongNumberOfSQLParametersException(exceptionMessage);
 		}
 	}

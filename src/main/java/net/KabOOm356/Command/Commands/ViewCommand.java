@@ -233,7 +233,7 @@ public class ViewCommand extends ReporterCommand {
 
 			query = "SELECT COUNT(*) AS Count " +
 					"FROM Reports " +
-					"WHERE ClaimStatus = 1 AND ClaimedByUUID = '" + uuid.toString() + "' AND Priority = " + level.getLevel();
+					"WHERE ClaimStatus = 1 AND ClaimedByUUID = '" + uuid + "' AND Priority = " + level.getLevel();
 		}
 
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();

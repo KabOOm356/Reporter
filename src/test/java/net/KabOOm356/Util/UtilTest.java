@@ -32,7 +32,7 @@ public class UtilTest {
 		for (Integer LCV = -1000; LCV <= 1000; LCV++) {
 			stringValue = LCV.toString();
 
-			assertTrue(LCV.equals(Util.parseInt(stringValue)));
+			assertEquals(LCV, Util.parseInt(stringValue));
 		}
 	}
 
@@ -41,8 +41,8 @@ public class UtilTest {
 		String stringValue;
 
 		// Test values between -1000 and 1000.
-		for (Integer LCV = -1000; LCV <= 1000; LCV++) {
-			stringValue = LCV.toString();
+		for (int LCV = -1000; LCV <= 1000; LCV++) {
+			stringValue = Integer.toString(LCV);
 
 			assertTrue(Util.isInteger(stringValue));
 		}
