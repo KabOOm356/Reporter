@@ -73,28 +73,28 @@ public class ReportInformationServiceTest extends ServiceTest {
 
 	@Test
 	public void getViewableReportsNameLookup() throws InterruptedException, SQLException, ClassNotFoundException {
-		final CommandSender commandSender = mock(CommandSender.class);
-		when(BukkitUtil.isPlayer(commandSender)).thenReturn(false);
-		when(getDatabaseHandler().preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.<String>anyList())).thenReturn(sqlResultSet);
-		final List<Integer> returned = manager.getViewableReports(commandSender);
-		verifyReturned(returned);
-		verify(commandSender).getName();
-		verify(getDatabaseHandler()).preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.<String>anyList());
-	}
+        final CommandSender commandSender = mock(CommandSender.class);
+        when(BukkitUtil.isPlayer(commandSender)).thenReturn(false);
+        when(getDatabaseHandler().preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.anyList())).thenReturn(sqlResultSet);
+        final List<Integer> returned = manager.getViewableReports(commandSender);
+        verifyReturned(returned);
+        verify(commandSender).getName();
+        verify(getDatabaseHandler()).preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.anyList());
+    }
 
 	@Test
 	public void getViewableReportsUUIDLookup() throws InterruptedException, SQLException, ClassNotFoundException {
-		final CommandSender commandSender = mock(CommandSender.class);
-		final OfflinePlayer player = mock(OfflinePlayer.class);
-		when(BukkitUtil.isPlayer(commandSender)).thenReturn(true);
-		when(OfflinePlayer.class.cast(commandSender)).thenReturn(player);
-		when(player.getUniqueId()).thenReturn(UUID.randomUUID());
-		when(getDatabaseHandler().preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.<String>anyList())).thenReturn(sqlResultSet);
-		final List<Integer> returned = manager.getViewableReports(commandSender);
-		verifyReturned(returned);
-		verify(player).getUniqueId();
-		verify(getDatabaseHandler()).preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.<String>anyList());
-	}
+        final CommandSender commandSender = mock(CommandSender.class);
+        final OfflinePlayer player = mock(OfflinePlayer.class);
+        when(BukkitUtil.isPlayer(commandSender)).thenReturn(true);
+        when(OfflinePlayer.class.cast(commandSender)).thenReturn(player);
+        when(player.getUniqueId()).thenReturn(UUID.randomUUID());
+        when(getDatabaseHandler().preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.anyList())).thenReturn(sqlResultSet);
+        final List<Integer> returned = manager.getViewableReports(commandSender);
+        verifyReturned(returned);
+        verify(player).getUniqueId();
+        verify(getDatabaseHandler()).preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.anyList());
+    }
 
 	@Test
 	public void getCompletedReportIndexes() throws SQLException, InterruptedException, ClassNotFoundException {

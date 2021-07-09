@@ -93,7 +93,7 @@ public class HelpCommandTest extends PowerMockitoTest {
 	public void testPrintHelpRequiredPermission() throws RequiredPermissionException, NoLastViewedReportException, IndexNotANumberException, IndexOutOfRangeException {
 		when(BukkitUtil.isPlayer(sender)).thenReturn(true);
 		when(permissionService.hasPermission(eq(sender), anyString())).thenReturn(false);
-		help.execute(sender, Collections.<String>emptyList());
+		help.execute(sender, Collections.emptyList());
 	}
 
 	@Test

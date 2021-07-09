@@ -54,11 +54,10 @@ public final class ReporterConfigurationUtil {
 						out.write(line);
 						out.newLine();
 						out.write("# " + Reporter.getDateformat().format(new Date()));
-						out.newLine();
 					} else {
 						out.write(line);
-						out.newLine();
 					}
+					out.newLine();
 				}
 
 				out.flush();

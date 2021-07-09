@@ -44,7 +44,6 @@ import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * The main Reporter class.
@@ -52,8 +51,8 @@ import java.util.concurrent.Callable;
  * Homepage on BukkitDev: <a href="http://dev.bukkit.org/server-mods/reporter/">http://dev.bukkit.org/server-mods/reporter/</a>
  */
 @Plugin(
-		name = "Reporter",
-		version = "3.3.4"
+        name = "Reporter",
+        version = "4.0.0 BETA"
 )
 @ApiVersion(ApiVersion.Target.v1_13)
 @Author("KabOOm 356")
@@ -280,15 +279,10 @@ public class Reporter extends JavaPlugin {
 			log.fatal(Reporter.getDefaultConsolePrefix() + "Disabling plugin!");
 			getServer().getPluginManager().disablePlugin(this);
 		} else {
-			// Create a chart to track the database engine being used.
-			final DatabaseType databaseType = databaseHandler.getDatabaseType();
-			metrics.addCustomChart(new Metrics.SimplePie("database_engine", new Callable<String>() {
-				@Override
-				public String call() {
-					return databaseType.toString();
-				}
-			}));
-		}
+            // Create a chart to track the database engine being used.
+            final DatabaseType databaseType = databaseHandler.getDatabaseType();
+            metrics.addCustomChart(new Metrics.SimplePie("database_engine", databaseType::toString));
+        }
 	}
 
 	private void initializeStatistics() {
@@ -296,35 +290,25 @@ public class Reporter extends JavaPlugin {
 	}
 
 	private void initializePermissions() {
-		permissionHandler = new PermissionHandler();
+        permissionHandler = new PermissionHandler();
 
-		// Create a chart to track the permissions manager being used.
-		final PermissionType permissionType = permissionHandler.getPermissionType();
-		metrics.addCustomChart(new Metrics.SimplePie("permission_manager", new Callable<String>() {
-			@Override
-			public String call() {
-				return permissionType.toString();
-			}
-		}));
-	}
+        // Create a chart to track the permissions manager being used.
+        final PermissionType permissionType = permissionHandler.getPermissionType();
+        metrics.addCustomChart(new Metrics.SimplePie("permission_manager", permissionType::toString));
+    }
 
 	public void loadLocale() {
-		if (!setLocaleDefaults(locale)) {
-			log.warn(Reporter.getDefaultConsolePrefix() + "Unable to set defaults for the locale!");
-		}
+        if (!setLocaleDefaults(locale)) {
+            log.warn(Reporter.getDefaultConsolePrefix() + "Unable to set defaults for the locale!");
+        }
 
-		// Create a chart to track the locale language and locale version being used.
-		metrics.addCustomChart(new Metrics.SimplePie("locale", new Callable<String>() {
-			@Override
-			public String call() {
-				return FormattingUtil.capitalizeFirstCharacter(locale.getString(LocaleInfo.language));
-			}
-		}));
+        // Create a chart to track the locale language and locale version being used.
+        metrics.addCustomChart(new Metrics.SimplePie("locale", () -> FormattingUtil.capitalizeFirstCharacter(locale.getString(LocaleInfo.language))));
 
-		log.info(Reporter.getDefaultConsolePrefix() + "Language: " + locale.getString(LocaleInfo.language)
-				+ " v" + locale.getString(LocaleInfo.version)
-				+ " By " + locale.getString(LocaleInfo.author));
-	}
+        log.info(Reporter.getDefaultConsolePrefix() + "Language: " + locale.getString(LocaleInfo.language)
+                + " v" + locale.getString(LocaleInfo.version)
+                + " By " + locale.getString(LocaleInfo.author));
+    }
 
 	private boolean setLocaleDefaults(final Locale locale) {
 		final Reader defaultLocaleReader = getTextResource("en_US.yml");

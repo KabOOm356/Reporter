@@ -46,8 +46,8 @@ public class PlayerReportQueue extends HashMap<UUID, PriorityQueue<ReportTimer>>
 	}
 
 	private void add(final UUID key, final ReportTimer timer) {
-		final PriorityQueue<ReportTimer> queue = (containsKey(key)) ? get(key) : new PriorityQueue<ReportTimer>();
-		queue.add(timer);
-		put(key, queue);
-	}
+        final PriorityQueue<ReportTimer> queue = (containsKey(key)) ? get(key) : new PriorityQueue<>();
+        queue.add(timer);
+        put(key, queue);
+    }
 }

@@ -194,18 +194,18 @@ public class ReporterCommandManager implements CommandExecutor {
 			command = getCommand(FormattingUtil.capitalizeFirstCharacter(subcommand));
 
 			if (command != null) {
-				// Report help command
-				if (command.getName().toLowerCase().equals("help")) {
-					try {
-						command.execute(sender, arguments);
-					} catch (final RequiredPermissionException e) {
-						sender.sendMessage(command.getFailedPermissionsMessage());
-					} catch (final Throwable e) {
-						log.error("Failed to run Report help command!", e);
-					}
+                // Report help command
+                if (command.getName().equalsIgnoreCase("help")) {
+                    try {
+                        command.execute(sender, arguments);
+                    } catch (final RequiredPermissionException e) {
+                        sender.sendMessage(command.getFailedPermissionsMessage());
+                    } catch (final Throwable e) {
+                        log.error("Failed to run Report help command!", e);
+                    }
 
-					return true;
-				}
+                    return true;
+                }
 
 				if (arguments.size() >= command.getMinimumNumberOfArguments()) {
 					try {

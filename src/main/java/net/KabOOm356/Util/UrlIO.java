@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -18,15 +19,15 @@ import java.util.Locale;
  * A class to help with {@link URL} based input/output operations.
  */
 public final class UrlIO {
-	/**
-	 * The Date format to use.
-	 */
-	public static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
-	/**
-	 * The encoding to use when writing files.
-	 */
-	public static final Charset outputCharset = Charset.forName("UTF-8");
-	public static final String ALPHA = "alpha";
+    /**
+     * The Date format to use.
+     */
+    public static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
+    /**
+     * The encoding to use when writing files.
+     */
+    public static final Charset outputCharset = StandardCharsets.UTF_8;
+    public static final String ALPHA = "alpha";
 	public static final String BETA = "beta";
 	public static final String RELEASE_CANDIDATE = "rc";
 	private static final Logger log = LogManager.getLogger(UrlIO.class);

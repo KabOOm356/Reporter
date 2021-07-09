@@ -30,29 +30,29 @@ public class UtilTest {
 
 		// Test to parse values between -1000 and 1000.
 		for (Integer LCV = -1000; LCV <= 1000; LCV++) {
-			stringValue = LCV.toString();
+            stringValue = LCV.toString();
 
-			assertTrue(LCV.equals(Util.parseInt(stringValue)));
-		}
+            assertEquals(LCV, Util.parseInt(stringValue));
+        }
 	}
 
 	@Test
 	public void testIsInteger() {
-		String stringValue;
+        String stringValue;
 
-		// Test values between -1000 and 1000.
-		for (Integer LCV = -1000; LCV <= 1000; LCV++) {
-			stringValue = LCV.toString();
+        // Test values between -1000 and 1000.
+        for (int LCV = -1000; LCV <= 1000; LCV++) {
+            stringValue = Integer.toString(LCV);
 
-			assertTrue(Util.isInteger(stringValue));
-		}
+            assertTrue(Util.isInteger(stringValue));
+        }
 
-		// Test ASCII characters.
-		for (int LCV = 32; LCV <= 126; LCV++) // Loop through the ASCII characters. Space(' ') to tilde('~').
-		{
-			stringValue = Character.toString((char) LCV);
+        // Test ASCII characters.
+        for (int LCV = 32; LCV <= 126; LCV++) // Loop through the ASCII characters. Space(' ') to tilde('~').
+        {
+            stringValue = Character.toString((char) LCV);
 
-			if (LCV < 48 || LCV > 57) // If the ASCII value is outside of the numeric characters.
+            if (LCV < 48 || LCV > 57) // If the ASCII value is outside of the numeric characters.
 			{
 				assertFalse(Util.isInteger(stringValue));
 			} else // If the ASCII value is a numeric (0-9).

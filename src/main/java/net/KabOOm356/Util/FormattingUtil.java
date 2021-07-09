@@ -140,19 +140,19 @@ public final class FormattingUtil {
 	 * @return The given String in lower case with the first character capitalized.
 	 */
 	public static String capitalizeFirstCharacter(String str) {
-		if (str == null) {
-			throw new IllegalArgumentException("Parameter 'str' cannot be null!");
-		}
+        if (str == null) {
+            throw new IllegalArgumentException("Parameter 'str' cannot be null!");
+        }
 
-		if (str.length() <= 0) {
-			return "";
-		}
+        if (str.length() <= 0) {
+            return "";
+        }
 
-		str = str.toLowerCase();
+        str = str.toLowerCase();
 
-		return String.valueOf(Character.toUpperCase(str.charAt(0))) +
-				str.substring(1);
-	}
+        return Character.toUpperCase(str.charAt(0)) +
+                str.substring(1);
+    }
 
 	/**
 	 * Formats the given line with the amount of time given in seconds.

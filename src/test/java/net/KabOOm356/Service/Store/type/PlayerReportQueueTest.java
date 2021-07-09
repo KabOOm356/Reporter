@@ -57,12 +57,12 @@ public class PlayerReportQueueTest extends PowerMockitoTest {
 
 	@Test
 	public void testPutExisting() {
-		final PriorityQueue<ReportTimer> priorityQueue = spy(new PriorityQueue<ReportTimer>());
-		playerReportQueue.put(playerUUID, priorityQueue);
+        final PriorityQueue<ReportTimer> priorityQueue = spy(new PriorityQueue<>());
+        playerReportQueue.put(playerUUID, priorityQueue);
 
-		playerReportQueue.put(player, timer);
-		verify(priorityQueue).add(timer);
-	}
+        playerReportQueue.put(player, timer);
+        verify(priorityQueue).add(timer);
+    }
 
 	@Test
 	public void testGetEmpty() {
@@ -78,8 +78,8 @@ public class PlayerReportQueueTest extends PowerMockitoTest {
 		playerReportQueue.put(playerUUID, priorityQueue);
 
 		final PriorityQueue<ReportTimer> returned = playerReportQueue.get(player);
-		assertFalse(returned.isEmpty());
-		assertTrue(returned.size() == 1);
-		assertTrue(returned.contains(timer));
+        assertFalse(returned.isEmpty());
+        assertEquals(1, returned.size());
+        assertTrue(returned.contains(timer));
 	}
 }

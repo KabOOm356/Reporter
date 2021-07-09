@@ -62,10 +62,10 @@ public final class DatabaseUtil {
 			}
 		} else {
 			final int numberOfOccurrences = Util.countOccurrences(query, queryParameter);
-			final String exceptionMessage = "Required number of parameters: " +
-					parameters.size() +
-					" got: " +
-					Integer.toString(numberOfOccurrences);
+            final String exceptionMessage = "Required number of parameters: " +
+                    parameters.size() +
+                    " got: " +
+                    numberOfOccurrences;
 			throw new WrongNumberOfSQLParametersException(exceptionMessage);
 		}
 	}

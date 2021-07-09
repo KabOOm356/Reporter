@@ -146,7 +146,7 @@ public abstract class AbstractFile {
 	private static String getExtension(final String fileName) {
 		final int index = fileName.lastIndexOf('.');
 		if (index != -1 && index + 1 < fileName.length()) {
-			return fileName.substring(index + 1, fileName.length());
+			return fileName.substring(index + 1);
 		}
 		return "";
 	}

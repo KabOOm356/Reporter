@@ -1,10 +1,10 @@
 buildscript {
     ext {
         // Plugin API
-        pluginVersion = '3.3.4'
-
+        pluginVersion = '4.0.0-SNAPSHOT'
+        
         // Java compile
-        javaTargetVersion = JavaVersion.VERSION_1_7
+        javaTargetVersion = JavaVersion.VERSION_1_8
     }
     repositories {
         maven {

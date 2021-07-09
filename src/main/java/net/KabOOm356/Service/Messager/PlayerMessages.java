@@ -68,9 +68,7 @@ public class PlayerMessages extends HashMap<String, GroupMessages> {
 		if (this.containsKey(player)) {
 			final GroupMessages messages = get(player);
 
-			if (messages.containsKey(group)) {
-				messages.remove(group);
-			}
+            messages.remove(group);
 		}
 
 		removeEmpty();

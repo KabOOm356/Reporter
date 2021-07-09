@@ -81,17 +81,17 @@ public class ResultRow extends HashMap<String, Object> {
 	 * @return The column cast to a Boolean if the column exists, otherwise null.
 	 */
 	public Boolean getBoolean(final String colName) {
-		if (get(colName) == null) {
-			return null;
-		}
+        if (get(colName) == null) {
+            return null;
+        }
 
-		// Try to parse for the Boolean, only returns true if the string value is "true".
-		Boolean value = Boolean.parseBoolean(getString(colName));
-		// Tries to parse for the Boolean by Integer value, true if the string value is "1".
-		value = value || getString(colName).equals("1");
+        // Try to parse for the Boolean, only returns true if the string value is "true".
+        boolean value = Boolean.parseBoolean(getString(colName));
+        // Tries to parse for the Boolean by Integer value, true if the string value is "1".
+        value = value || getString(colName).equals("1");
 
-		return value;
-	}
+        return value;
+    }
 
 	/**
 	 * Attempts to cast the contents of the given column to an Integer.

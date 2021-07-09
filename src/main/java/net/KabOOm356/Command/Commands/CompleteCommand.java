@@ -179,19 +179,19 @@ public class CompleteCommand extends ReporterCommand {
 			final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 			Integer connectionId = null;
 			try {
-				connectionId = database.openPooledConnection();
+                connectionId = database.openPooledConnection();
 
-				final String query = "SELECT SenderUUID, Sender FROM Reports WHERE ID=" + Integer.toString(index);
+                final String query = "SELECT SenderUUID, Sender FROM Reports WHERE ID=" + index;
 
-				final SQLResultSet result = database.sqlQuery(connectionId, query);
+                final SQLResultSet result = database.sqlQuery(connectionId, query);
 
-				final String uuidString = result.getString("SenderUUID");
+                final String uuidString = result.getString("SenderUUID");
 
-				if (!uuidString.isEmpty()) {
-					final UUID uuid = UUID.fromString(uuidString);
-					sender = Bukkit.getOfflinePlayer(uuid);
-					playerName = sender.getName();
-				} else {
+                if (!uuidString.isEmpty()) {
+                    final UUID uuid = UUID.fromString(uuidString);
+                    sender = Bukkit.getOfflinePlayer(uuid);
+                    playerName = sender.getName();
+                } else {
 					playerName = result.getString("Sender");
 				}
 			} catch (final Exception e) {

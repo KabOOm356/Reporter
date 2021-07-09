@@ -232,8 +232,8 @@ public class ViewCommand extends ReporterCommand {
 			final UUID uuid = senderPlayer.getUniqueId();
 
 			query = "SELECT COUNT(*) AS Count " +
-					"FROM Reports " +
-					"WHERE ClaimStatus = 1 AND ClaimedByUUID = '" + uuid.toString() + "' AND Priority = " + level.getLevel();
+                    "FROM Reports " +
+                    "WHERE ClaimStatus = 1 AND ClaimedByUUID = '" + uuid + "' AND Priority = " + level.getLevel();
 		}
 
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();

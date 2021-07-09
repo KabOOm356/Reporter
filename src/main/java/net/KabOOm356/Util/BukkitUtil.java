@@ -242,18 +242,18 @@ public final class BukkitUtil {
 			return false;
 		}
 		if (isOfflinePlayer(commandSender) && isOfflinePlayer(commandSender2)) {
-			final OfflinePlayer player = OfflinePlayer.class.cast(commandSender);
-			final OfflinePlayer player2 = OfflinePlayer.class.cast(commandSender2);
-			final UUID senderUUID = player.getUniqueId();
-			final UUID senderUUID2 = player2.getUniqueId();
-			if (senderUUID != null && senderUUID2 != null && senderUUID.equals(senderUUID2)) {
-				return true;
-			}
-		}
-		final String senderName = commandSender.getName();
-		final String senderName2 = commandSender2.getName();
-		return senderName != null && senderName2 != null && senderName.equals(senderName2);
-	}
+            final OfflinePlayer player = OfflinePlayer.class.cast(commandSender);
+            final OfflinePlayer player2 = OfflinePlayer.class.cast(commandSender2);
+            final UUID senderUUID = player.getUniqueId();
+            final UUID senderUUID2 = player2.getUniqueId();
+            if (senderUUID != null && senderUUID.equals(senderUUID2)) {
+                return true;
+            }
+        }
+        final String senderName = commandSender.getName();
+        final String senderName2 = commandSender2.getName();
+        return senderName != null && senderName.equals(senderName2);
+    }
 
 	/**
 	 * Checks if the {@link OfflinePlayer} has the given {@link UUID}.

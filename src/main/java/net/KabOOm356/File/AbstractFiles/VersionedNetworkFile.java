@@ -336,24 +336,24 @@ public class VersionedNetworkFile extends NetworkFile {
 	 * @return The difference between version of the two objects.
 	 */
 	public int compareVersionTo(final VersionedNetworkFile comp) {
-		if (comp == null) {
-			throw new IllegalArgumentException("Object to compare to cannot be null!");
-		}
+        if (comp == null) {
+            throw new IllegalArgumentException("Object to compare to cannot be null!");
+        }
 
-		int difference = 0;
+        int difference = 0;
 
-		// Get the length of the longest version number sequence.
-		final int length = (this.versions.size() > comp.getVersions().size()) ? this.versions.size() : comp.getVersions().size();
+        // Get the length of the longest version number sequence.
+        final int length = Math.max(this.versions.size(), comp.getVersions().size());
 
-		// Calculate the difference between the two versions.
-		for (int LCV = length - 1; LCV >= 0; LCV--) {
-			difference += ((length - LCV) + Math.abs(difference)) * (this.getVersion(LCV) - comp.getVersion(LCV));
-		}
+        // Calculate the difference between the two versions.
+        for (int LCV = length - 1; LCV >= 0; LCV--) {
+            difference += ((length - LCV) + Math.abs(difference)) * (this.getVersion(LCV) - comp.getVersion(LCV));
+        }
 
-		// Take release level into account if the two versions are the same.
-		if (difference == 0) {
-			difference = this.getReleaseLevel().value - comp.getReleaseLevel().value;
-		}
+        // Take release level into account if the two versions are the same.
+        if (difference == 0) {
+            difference = this.getReleaseLevel().value - comp.getReleaseLevel().value;
+        }
 
 		// Take the release level version into account if the two versions are the same.
 		if (difference == 0) {
