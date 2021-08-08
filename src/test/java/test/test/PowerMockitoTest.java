@@ -6,6 +6,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @SuppressWarnings("EmptyClass")
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore("javax.management.*")
+@PowerMockIgnore({"javax.management.*", "com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*"})
 public abstract class PowerMockitoTest {
 }
