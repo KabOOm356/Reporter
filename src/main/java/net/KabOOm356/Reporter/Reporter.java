@@ -24,6 +24,7 @@ import net.KabOOm356.Util.FormattingUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -281,7 +282,7 @@ public class Reporter extends JavaPlugin {
 		} else {
             // Create a chart to track the database engine being used.
             final DatabaseType databaseType = databaseHandler.getDatabaseType();
-            metrics.addCustomChart(new Metrics.SimplePie("database_engine", databaseType::toString));
+			metrics.addCustomChart(new SimplePie("database_engine", databaseType::toString));
         }
 	}
 
@@ -294,7 +295,7 @@ public class Reporter extends JavaPlugin {
 
         // Create a chart to track the permissions manager being used.
         final PermissionType permissionType = permissionHandler.getPermissionType();
-        metrics.addCustomChart(new Metrics.SimplePie("permission_manager", permissionType::toString));
+		metrics.addCustomChart(new SimplePie("permission_manager", permissionType::toString));
     }
 
 	public void loadLocale() {
@@ -303,7 +304,7 @@ public class Reporter extends JavaPlugin {
         }
 
         // Create a chart to track the locale language and locale version being used.
-        metrics.addCustomChart(new Metrics.SimplePie("locale", () -> FormattingUtil.capitalizeFirstCharacter(locale.getString(LocaleInfo.language))));
+		metrics.addCustomChart(new SimplePie("locale", () -> FormattingUtil.capitalizeFirstCharacter(locale.getString(LocaleInfo.language))));
 
         log.info(Reporter.getDefaultConsolePrefix() + "Language: " + locale.getString(LocaleInfo.language)
                 + " v" + locale.getString(LocaleInfo.version)
