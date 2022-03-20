@@ -29,17 +29,10 @@ public class ReportLimitService extends Service {
 	private static final Logger log = LogManager.getLogger(ReportLimitService.class);
 
 	/**
-	 * An instance of the main class.
-	 */
-	private final Plugin plugin;
-
-	/**
 	 * Constructor
 	 */
 	protected ReportLimitService(final ServiceModule module) {
 		super(module);
-
-		this.plugin = BukkitUtil.getPlugin(Reporter.class.getSimpleName());
 	}
 
 	/**
@@ -102,7 +95,7 @@ public class ReportLimitService extends Service {
 		final boolean canReportPlayer = canReport(sender, reportedPlayer);
 
 		if (isPlayer && canReport && canReportPlayer) {
-			final Player player = Player.class.cast(sender);
+      final Player player = (Player) sender;
 			final boolean noLimit = hasPermission(player, "reporter.report.nolimit");
 
 			if (!noLimit) {
@@ -116,6 +109,7 @@ public class ReportLimitService extends Service {
 				// Convert from seconds to bukkit ticks
 				final long bukkitTicks = BukkitUtil.convertSecondsToServerTicks(getConfigurationService().get(ConfigurationEntries.limitTime));
 
+				final Plugin plugin = BukkitUtil.getPlugin(Reporter.class.getSimpleName());
 				Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, timer, bukkitTicks);
 
 				getPlayerReports().put(sender, reportedPlayer, timer);
@@ -232,7 +226,7 @@ public class ReportLimitService extends Service {
 
 	private boolean canReport(final CommandSender sender, final int limit, final int numberOfReports) {
 		if (isPlayerAndHasReported(sender)) {
-			final Player player = Player.class.cast(sender);
+			final Player player = (Player) sender;
 			if (!hasLimitOverride(player)) {
 				return numberOfReports < limit;
 			}

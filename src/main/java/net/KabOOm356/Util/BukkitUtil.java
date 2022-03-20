@@ -49,7 +49,7 @@ public final class BukkitUtil {
 	 */
 	public static String formatPlayerName(final CommandSender player) {
 		if (isOfflinePlayer(player)) {
-			return formatPlayerName(OfflinePlayer.class.cast(player));
+			return formatPlayerName((OfflinePlayer) player);
 		}
 		return player.getName();
 	}
@@ -67,7 +67,7 @@ public final class BukkitUtil {
 	 */
 	public static String formatPlayerName(final CommandSender player, final boolean displayRealName) {
 		if (isOfflinePlayer(player)) {
-			return formatPlayerName(OfflinePlayer.class.cast(player), displayRealName);
+			return formatPlayerName((OfflinePlayer) player, displayRealName);
 		}
 		return player.getName();
 	}
@@ -83,7 +83,7 @@ public final class BukkitUtil {
 	 * @return The given player's name in a custom display format.
 	 */
 	public static String formatPlayerName(final OfflinePlayer player) {
-		if (player.isOnline()) {
+		if (player.isOnline() && player.getPlayer() != null) {
 			return formatPlayerName(player.getPlayer());
 		}
 		return player.getName();
@@ -101,7 +101,7 @@ public final class BukkitUtil {
 	 * @return The given player's name in a custom display format.
 	 */
 	public static String formatPlayerName(final OfflinePlayer player, final boolean displayRealName) {
-		if (player.isOnline()) {
+		if (player.isOnline() && player.getPlayer() != null) {
 			return formatPlayerName(player.getPlayer(), displayRealName);
 		}
 		return player.getName();
@@ -192,7 +192,7 @@ public final class BukkitUtil {
 	 * @param uuid The UUID.
 	 * @return True if the UUID is a valid player, otherwise false.
 	 */
-	public static boolean isPlayerValid(final UUID uuid) {
+	public static boolean isPlayerIdValid(final UUID uuid) {
 		return !invalidUserUUID.equals(uuid);
 	}
 
@@ -242,28 +242,17 @@ public final class BukkitUtil {
 			return false;
 		}
 		if (isOfflinePlayer(commandSender) && isOfflinePlayer(commandSender2)) {
-            final OfflinePlayer player = OfflinePlayer.class.cast(commandSender);
-            final OfflinePlayer player2 = OfflinePlayer.class.cast(commandSender2);
-            final UUID senderUUID = player.getUniqueId();
-            final UUID senderUUID2 = player2.getUniqueId();
-            if (senderUUID != null && senderUUID.equals(senderUUID2)) {
-                return true;
-            }
-        }
-        final String senderName = commandSender.getName();
-        final String senderName2 = commandSender2.getName();
-        return senderName != null && senderName.equals(senderName2);
-    }
-
-	/**
-	 * Checks if the {@link OfflinePlayer} has the given {@link UUID}.
-	 *
-	 * @param player The {@link OfflinePlayer}.
-	 * @param uuid   The {@link UUID}.
-	 * @return True if the {@link OfflinePlayer} has the given {@link UUID}.
-	 */
-	public static boolean playersEqual(final OfflinePlayer player, final UUID uuid) {
-		return player.getUniqueId().equals(uuid);
+			final OfflinePlayer player = (OfflinePlayer) commandSender;
+			final OfflinePlayer player2 = (OfflinePlayer) commandSender2;
+			final UUID senderUUID = player.getUniqueId();
+			final UUID senderUUID2 = player2.getUniqueId();
+			if (senderUUID != null && senderUUID.equals(senderUUID2)) {
+				return true;
+			}
+		}
+		final String senderName = commandSender.getName();
+		final String senderName2 = commandSender2.getName();
+		return senderName != null && senderName.equals(senderName2);
 	}
 
 	/**
@@ -285,7 +274,7 @@ public final class BukkitUtil {
 	 */
 	public static String getUUIDString(final CommandSender sender) {
 		if (isOfflinePlayer(sender)) {
-			final OfflinePlayer player = OfflinePlayer.class.cast(sender);
+			final OfflinePlayer player = (OfflinePlayer) sender;
 			return getUUIDString(player);
 		}
 		return "";
@@ -306,20 +295,6 @@ public final class BukkitUtil {
 	}
 
 	/**
-	 * Returns the UUID of the given {@link CommandSender}.
-	 *
-	 * @param sender The {@link CommandSender} to get the UUID of.
-	 * @return The UUID of the sender if the sender has a UUID, otherwise null.
-	 */
-	public static UUID getUUID(final CommandSender sender) {
-		if (isOfflinePlayer(sender)) {
-			final OfflinePlayer player = OfflinePlayer.class.cast(sender);
-			return player.getUniqueId();
-		}
-		return null;
-	}
-
-	/**
 	 * Gets an offline player by UUID or name if the UUID is not valid or null.
 	 *
 	 * @param uuid The UUID.
@@ -327,7 +302,7 @@ public final class BukkitUtil {
 	 * @return An {@link OfflinePlayer} by UUID or by name if the UUID is not valid or null.  If the UUID is not valid and the name is null or empty, null is returned.
 	 */
 	public static OfflinePlayer getOfflinePlayer(final UUID uuid, final String name) {
-		if (uuid != null && isPlayerValid(uuid)) {
+		if (uuid != null && isPlayerIdValid(uuid)) {
 			return Bukkit.getOfflinePlayer(uuid);
 		}
 		// Getting the player by UUID failed, try getting by name

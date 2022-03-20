@@ -5,7 +5,7 @@ import net.KabOOm356.Database.DatabaseType;
 import net.KabOOm356.Throwable.WrongNumberOfSQLParametersException;
 import org.junit.Test;
 import org.mockito.Mock;
-import test.test.PowerMockitoTest;
+import test.test.MockitoTest;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -13,10 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
-public class DatabaseUtilTest extends PowerMockitoTest {
+public class DatabaseUtilTest extends MockitoTest {
 	private static final char queryParameter = DatabaseUtil.queryParameter;
 	private static final String query = "SELECT * FROM table WHERE x=" + queryParameter + " AND y=" + queryParameter;
 
@@ -113,6 +112,7 @@ public class DatabaseUtilTest extends PowerMockitoTest {
 		final List<String> parameters = new ArrayList<>();
 		parameters.add("param1");
 		parameters.add("param2");
+		doNothing().when(preparedStatement).setString(1, parameters.get(0));
 		doThrow(new SQLException("Test Exception")).when(preparedStatement).setString(2, parameters.get(1));
 		try {
 			DatabaseUtil.bindParametersToPreparedStatement(preparedStatement, query, parameters);
@@ -122,7 +122,5 @@ public class DatabaseUtilTest extends PowerMockitoTest {
 				throw e;
 			}
 		}
-		verify(preparedStatement).setString(1, parameters.get(0));
-		verify(preparedStatement).setString(2, parameters.get(1));
 	}
 }

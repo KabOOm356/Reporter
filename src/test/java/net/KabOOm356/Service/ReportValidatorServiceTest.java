@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
 public class ReportValidatorServiceTest extends ServiceTest {
 	@Mock

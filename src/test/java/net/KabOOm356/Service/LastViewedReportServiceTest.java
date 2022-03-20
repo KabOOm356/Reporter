@@ -2,12 +2,11 @@ package net.KabOOm356.Service;
 
 import net.KabOOm356.Throwable.IndexNotANumberException;
 import net.KabOOm356.Throwable.NoLastViewedReportException;
-import net.KabOOm356.Util.BukkitUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.junit.Before;
 import org.junit.Test;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedStatic;
 import test.test.service.ServiceTest;
 
 import java.util.ArrayList;
@@ -15,9 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
-@PrepareForTest({LastViewedReportService.class, BukkitUtil.class, Bukkit.class})
 public class LastViewedReportServiceTest extends ServiceTest {
 	private static final int noLastViewedIndex = LastViewedReportService.noLastViewedIndex;
 	private static final String lastViewedIndex = LastViewedReportService.lastViewedIndex;
@@ -29,8 +27,6 @@ public class LastViewedReportServiceTest extends ServiceTest {
 	public void setupMocks() throws Exception {
 		super.setupMocks();
 
-		mockStatic(Bukkit.class);
-		mockStatic(BukkitUtil.class);
 		lastViewed = super.getLastViewedHandler();
 		manager = spy(new LastViewedReportService(getModule()));
 	}
@@ -68,6 +64,7 @@ public class LastViewedReportServiceTest extends ServiceTest {
 	@Test(expected = NoLastViewedReportException.class)
 	public void getLastViewedNoLastReport() throws NoLastViewedReportException {
 		final CommandSender sender = mock(CommandSender.class);
+		when(sender.getName()).thenReturn("testPlayer");
 		manager.getLastViewed(sender);
 	}
 
@@ -88,7 +85,10 @@ public class LastViewedReportServiceTest extends ServiceTest {
 	@Test(expected = NoLastViewedReportException.class)
 	public void getIndexOrLastViewedReportNoLastReport() throws NoLastViewedReportException, IndexNotANumberException {
 		final CommandSender sender = mock(CommandSender.class);
-		manager.getIndexOrLastViewedReport(sender, lastViewedIndex);
+		when(sender.getName()).thenReturn("testPlayer");
+		try (MockedStatic<Bukkit> bukkit = mockStatic(Bukkit.class)) {
+			manager.getIndexOrLastViewedReport(sender, lastViewedIndex);
+		}
 	}
 
 	@Test(expected = IndexNotANumberException.class)

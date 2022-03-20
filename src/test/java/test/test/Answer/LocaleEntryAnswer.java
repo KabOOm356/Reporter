@@ -19,7 +19,7 @@ public class LocaleEntryAnswer implements Answer<String> {
 		Validate.notEmpty(invocationOnMock.getArguments());
 		String answer = "";
 		if (invocationOnMock.getArguments()[0] instanceof Entry) {
-			final Entry entry = Entry.class.cast(invocationOnMock.getArguments()[0]);
+			final Entry entry = (Entry) invocationOnMock.getArguments()[0];
 			answer = entry.getDefault().toString();
 		} else {
 			log.warn("First parameter was not an Entry! Returning an empty string!", invocationOnMock.getArguments());

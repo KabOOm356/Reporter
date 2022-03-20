@@ -1,7 +1,6 @@
 package test.test.service;
 
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
-import net.KabOOm356.Locale.Entry.LocalePhrase;
 import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Permission.PermissionHandler;
 import net.KabOOm356.Service.Messager.PlayerMessages;
@@ -13,28 +12,18 @@ import org.bukkit.configuration.Configuration;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import test.test.Answer.ConfigurationAnswer;
-import test.test.Answer.LocaleEntryAnswer;
-import test.test.PowerMockitoTest;
+import test.test.MockitoTest;
 
-import java.lang.reflect.Method;
+import static org.mockito.Mockito.*;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.when;
-import static org.powermock.api.support.membermodification.MemberMatcher.method;
-
-public abstract class ServiceTest extends PowerMockitoTest {
-	private static final Method getStore = method(ServiceModule.class, "getStore");
+public abstract class ServiceTest extends MockitoTest {
+	private ServiceModule module;
 	@Spy
 	private final LastViewed lastViewed = new LastViewed();
 	@Spy
 	private final PlayerMessages playerMessages = new PlayerMessages();
-	@Spy
-	private final PlayerReport playerReport = new PlayerReport();
 	@Mock
-	private ServiceModule module;
+	private PlayerReport playerReports;
 	@Mock
 	private Configuration configuration;
 	@Mock
@@ -46,10 +35,19 @@ public abstract class ServiceTest extends PowerMockitoTest {
 
 	@Before
 	public void setupMocks() throws Exception {
-		final StoreModule store = new StoreModule(configuration, databaseHandler, locale, permissionHandler, lastViewed, playerMessages, playerReport);
-		doReturn(store).when(module, getStore).withNoArguments();
-		when(configuration.get(anyString(), any())).thenAnswer(ConfigurationAnswer.instance);
-		when(locale.getString(any(LocalePhrase.class))).thenAnswer(LocaleEntryAnswer.instance);
+		final StoreModule store =
+				new StoreModule(
+						configuration,
+						databaseHandler,
+						locale,
+						permissionHandler,
+						lastViewed,
+						playerMessages,
+						playerReports);
+		module =
+				mock(
+						ServiceModule.class,
+						withSettings().useConstructor(store).defaultAnswer(CALLS_REAL_METHODS));
 	}
 
 	public ServiceModule getModule() {
@@ -72,12 +70,8 @@ public abstract class ServiceTest extends PowerMockitoTest {
 		return lastViewed;
 	}
 
-	public PlayerMessages getPlayerMessages() {
-		return playerMessages;
-	}
-
-	public PlayerReport getPlayerReport() {
-		return playerReport;
+	public PlayerReport getPlayerReports() {
+		return playerReports;
 	}
 
 	public Locale getLocale() {

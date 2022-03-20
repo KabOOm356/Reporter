@@ -63,11 +63,11 @@ dependencies {
     compileOnly group: 'net.milkbowl.vault', name: 'VaultAPI', version: '1.7'
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.9'
-    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
+    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.4.0'
     testImplementation group: 'org.bukkit', name: 'bukkit', version: '1.15.2-R0.1-SNAPSHOT'
     testImplementation group: 'org.spigotmc', name: 'plugin-annotations', version: '1.2.3-SNAPSHOT'
     testImplementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
+    testImplementation group: 'net.milkbowl.vault', name: 'VaultAPI', version: '1.7'
 
     annotationProcessor group: 'org.spigotmc', name: 'plugin-annotations', version: '1.2.3-SNAPSHOT'
 }

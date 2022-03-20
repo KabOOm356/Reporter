@@ -30,8 +30,8 @@ public class ReportInformationService extends Service {
 		final String query;
 		final List<String> params = new ArrayList<>();
 
-		if (BukkitUtil.isPlayer(sender)) {
-			final OfflinePlayer player = OfflinePlayer.class.cast(sender);
+		if (BukkitUtil.isOfflinePlayer(sender)) {
+			final OfflinePlayer player = (OfflinePlayer) sender;
 			query = "SELECT ID FROM Reports WHERE SenderUUID=?";
 			params.add(player.getUniqueId().toString());
 		} else {

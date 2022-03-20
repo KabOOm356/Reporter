@@ -21,18 +21,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedStatic;
 import test.test.Answer.LocaleEntryAnswer;
-import test.test.PowerMockitoTest;
+import test.test.MockitoTest;
 
 import java.util.*;
 
 import static org.mockito.Mockito.*;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-@PrepareForTest({HelpCommand.class, Bukkit.class, BukkitUtil.class})
-public class HelpCommandTest extends PowerMockitoTest {
+public class HelpCommandTest extends MockitoTest {
 	private static final int numberOfCommands = 6;
 	private static final int numberOfUsagesPerCommand = 4;
 
@@ -55,10 +52,11 @@ public class HelpCommandTest extends PowerMockitoTest {
 
 	@Before
 	public void setupMocks() {
-		mockStatic(Bukkit.class);
-		when(Bukkit.getOfflinePlayer(anyString())).thenReturn(null);
-		mockStatic(BukkitUtil.class);
-		when(BukkitUtil.isPlayer(any(CommandSender.class))).thenReturn(false);
+		try (MockedStatic<Bukkit> bukkit = mockStatic(Bukkit.class);
+			 MockedStatic<BukkitUtil> bukkitUtil = mockStatic(BukkitUtil.class)) {
+			bukkit.when(() -> Bukkit.getOfflinePlayer(anyString())).thenReturn(null);
+			bukkitUtil.when(() -> BukkitUtil.isPlayer(any(CommandSender.class))).thenReturn(false);
+		}
 
 		final Map<String, ReporterCommand> commands = new LinkedHashMap<>(16, 0.75F, false);
 		for (int commandNumber = 0; commandNumber < numberOfCommands; commandNumber++) {
@@ -73,11 +71,8 @@ public class HelpCommandTest extends PowerMockitoTest {
 			commands.put("command:" + commandNumber, command);
 		}
 		final Collection<ReporterCommand> commandCollection = commands.values();
-		when(commandManager.getReportCommands()).thenReturn(commands);
-		when(commandManager.getLocale()).thenReturn(locale);
 		when(commandManager.getServiceModule()).thenReturn(serviceModule);
 		when(serviceModule.getPermissionService()).thenReturn(permissionService);
-		when(permissionService.hasPermission(any(CommandSender.class), anyString())).thenReturn(true);
 		when(locale.getString(ArgumentMatchers.<Entry<String>>any())).thenAnswer(LocaleEntryAnswer.instance);
 
 		final HelpCommandDisplay.Builder builder = new HelpCommandDisplay.Builder();
@@ -91,33 +86,52 @@ public class HelpCommandTest extends PowerMockitoTest {
 
 	@Test(expected = RequiredPermissionException.class)
 	public void testPrintHelpRequiredPermission() throws RequiredPermissionException, NoLastViewedReportException, IndexNotANumberException, IndexOutOfRangeException {
-		when(BukkitUtil.isPlayer(sender)).thenReturn(true);
-		when(permissionService.hasPermission(eq(sender), anyString())).thenReturn(false);
-		help.execute(sender, Collections.emptyList());
+		try (MockedStatic<BukkitUtil> bukkitUtil = mockStatic(BukkitUtil.class)) {
+			bukkitUtil.when(() -> BukkitUtil.isPlayer(sender)).thenReturn(true);
+			when(permissionService.hasPermission(eq(sender), anyString())).thenReturn(false);
+			help.execute(sender, Collections.emptyList());
+		}
 	}
 
 	@Test
 	public void testPrintHelpValidPages() throws RequiredPermissionException, NoLastViewedReportException, IndexNotANumberException, IndexOutOfRangeException {
-		for (int page = 1; page <= help.getNumberOfHelpPages(); page++) {
-			help.execute(sender, Collections.singletonList(Integer.toString(page)));
+		try (MockedStatic<BukkitUtil> bukkitUtil = mockStatic(BukkitUtil.class)) {
+			bukkitUtil.when(() -> BukkitUtil.isPlayer(any(CommandSender.class))).thenReturn(false);
+
+			for (int page = 1; page <= help.getNumberOfHelpPages(); page++) {
+				help.execute(sender, Collections.singletonList(Integer.toString(page)));
+			}
+			// Verify that there was not an error phrase displayed
+			verify(locale, never()).getString(HelpPhrases.pageNumberOutOfRange);
+			verify(locale, never()).getString(HelpPhrases.numberOfHelpPages);
 		}
-		// Verify that there was not an error phrase displayed
-		verify(locale, never()).getString(HelpPhrases.pageNumberOutOfRange);
-		verify(locale, never()).getString(HelpPhrases.numberOfHelpPages);
 	}
 
 	@Test
 	public void testPrintHelpPageBelowRange() throws RequiredPermissionException, NoLastViewedReportException, IndexNotANumberException, IndexOutOfRangeException {
-		help.execute(sender, Collections.singletonList(Integer.toString(0)));
-		verify(sender).sendMessage(ChatColor.RED + locale.getString(HelpPhrases.pageNumberOutOfRange));
-		verify(sender).sendMessage(ChatColor.RED + locale.getString(GeneralPhrases.tryReportHelp));
+		try (MockedStatic<BukkitUtil> bukkitUtil = mockStatic(BukkitUtil.class)) {
+			bukkitUtil.when(() -> BukkitUtil.isPlayer(any(CommandSender.class))).thenReturn(false);
+
+			help.execute(sender, Collections.singletonList(Integer.toString(0)));
+			verify(sender)
+					.sendMessage(ChatColor.RED + locale.getString(HelpPhrases.pageNumberOutOfRange));
+			verify(sender).sendMessage(ChatColor.RED + locale.getString(GeneralPhrases.tryReportHelp));
+		}
 	}
 
 	@Test
 	public void testPrintHelpPageAboveRange() throws RequiredPermissionException, NoLastViewedReportException, IndexNotANumberException, IndexOutOfRangeException {
-		final int numberOfHelpPages = help.getNumberOfHelpPages();
-		help.execute(sender, Collections.singletonList(Integer.toString(numberOfHelpPages + 1)));
-		verify(sender).sendMessage(ChatColor.RED + locale.getString(HelpPhrases.numberOfHelpPages)
-				.replaceAll("%p", Integer.toString(help.getNumberOfHelpPages())));
+		try (MockedStatic<BukkitUtil> bukkitUtil = mockStatic(BukkitUtil.class)) {
+			bukkitUtil.when(() -> BukkitUtil.isPlayer(any(CommandSender.class))).thenReturn(false);
+
+			final int numberOfHelpPages = help.getNumberOfHelpPages();
+			help.execute(sender, Collections.singletonList(Integer.toString(numberOfHelpPages + 1)));
+			verify(sender)
+					.sendMessage(
+							ChatColor.RED
+									+ locale
+									.getString(HelpPhrases.numberOfHelpPages)
+									.replaceAll("%p", Integer.toString(help.getNumberOfHelpPages())));
+		}
 	}
 }

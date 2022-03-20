@@ -4,11 +4,14 @@ import net.KabOOm356.Configuration.ConstantEntry;
 import net.KabOOm356.Configuration.Entry;
 import org.junit.Before;
 import org.junit.Test;
+import test.test.Answer.ConfigurationAnswer;
 import test.test.service.ServiceTest;
 
-import static org.junit.Assert.*;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public class ConfigurationServiceTest extends ServiceTest {
 	private ConfigurationService service;
@@ -18,11 +21,13 @@ public class ConfigurationServiceTest extends ServiceTest {
 	public void setupMocks() throws Exception {
 		super.setupMocks();
 		service = spy(new ConfigurationService(getModule()));
-		when(getConfiguration().get("test", "default")).thenReturn("return");
+		when(getConfiguration().get(anyString(), anyString())).thenAnswer(ConfigurationAnswer.instance);
+		when(getConfiguration().get(anyString(), anyInt())).thenAnswer(ConfigurationAnswer.instance);
 	}
 
 	@Test
 	public void get() {
+		when(getConfiguration().get("test", "default")).thenReturn("return");
 		final Entry<String> entry = new Entry<>("test", "default");
 		assertEquals("return", service.get(entry));
 	}

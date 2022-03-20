@@ -30,7 +30,7 @@ public class PermissionService extends Service {
 	 */
 	public boolean hasPermission(final CommandSender sender, final String permission) {
 		if (BukkitUtil.isPlayer(sender)) {
-			final Player player = Player.class.cast(sender);
+      final Player player = (Player) sender;
 			return hasPermission(player, permission);
 		}
 		return true;

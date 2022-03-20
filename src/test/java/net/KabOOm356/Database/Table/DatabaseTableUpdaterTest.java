@@ -1,27 +1,21 @@
 package net.KabOOm356.Database.Table;
 
-import net.KabOOm356.Database.Database;
 import net.KabOOm356.Database.Table.Version.DatabaseTableVersionUpdater;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.test.PowerMockitoTest;
+import test.test.MockitoTest;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
-@PrepareForTest({DatabaseTableUpdater.class})
-public class DatabaseTableUpdaterTest extends PowerMockitoTest {
-	@Mock
+public class DatabaseTableUpdaterTest extends MockitoTest {
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private DatabaseTableUpdater databaseTableUpdater;
-
-	@Mock
-	private Database database;
 
 	@Mock
 	private DatabaseTableVersionUpdater databaseTableVersionUpdater;
@@ -36,8 +30,6 @@ public class DatabaseTableUpdaterTest extends PowerMockitoTest {
 		databaseTableVersionUpdaterList.add(databaseTableVersionUpdater2);
 		when(databaseTableUpdater.getDatabaseTableVersionUpdaters()).thenReturn(databaseTableVersionUpdaterList);
 		when(databaseTableUpdater.getTableName()).thenReturn("TestTable");
-		doCallRealMethod().when(databaseTableUpdater, "updateTable");
-		doCallRealMethod().when(databaseTableUpdater).update();
 	}
 
 	@Test
@@ -67,13 +59,15 @@ public class DatabaseTableUpdaterTest extends PowerMockitoTest {
 
 	@Test(expected = IllegalStateException.class)
 	public void testUpdateCommitIllegalStateException() throws Exception {
-		doThrow(new IllegalStateException("Test Exception")).when(databaseTableUpdater, "commitTransaction");
+		doThrow(new IllegalStateException("Test Exception"))
+				.when(databaseTableUpdater)
+				.commitTransaction();
 		databaseTableUpdater.update();
 	}
 
 	@Test(expected = SQLException.class)
 	public void testUpdateCommitSQLException() throws Exception {
-		doThrow(new SQLException("Test Exception")).when(databaseTableUpdater, "commitTransaction");
+		doThrow(new SQLException("Test Exception")).when(databaseTableUpdater).commitTransaction();
 		databaseTableUpdater.update();
 	}
 }

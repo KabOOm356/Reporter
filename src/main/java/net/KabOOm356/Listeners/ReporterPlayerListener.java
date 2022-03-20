@@ -183,12 +183,9 @@ public class ReporterPlayerListener implements Listener {
 
 		final boolean displayAlertToPlayers = plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.toPlayer", true);
 
-		final List<Integer> consoleIndexes = new ArrayList<>();
 		final List<Integer> indexes = new ArrayList<>();
 
 		for (final ResultRow row : result) {
-			consoleIndexes.add(row.getInt("ID"));
-
 			// If a report is claimed send a message to the claimer, if they are online.
 			if (row.getBoolean("ClaimStatus") && displayAlertToPlayers) {
 				final String uuidString = row.getString("ClaimedByUUID");

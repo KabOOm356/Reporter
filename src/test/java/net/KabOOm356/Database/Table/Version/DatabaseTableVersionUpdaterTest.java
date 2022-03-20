@@ -5,103 +5,124 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.test.PowerMockitoTest;
+import test.test.MockitoTest;
 
-import java.lang.reflect.Method;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.sql.Statement;
 
-import static org.mockito.Mockito.never;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
-@PrepareForTest(DatabaseTableVersionUpdater.class)
-public class DatabaseTableVersionUpdaterTest extends PowerMockitoTest {
-	private static final Method needsToUpdate = method(DatabaseTableVersionUpdater.class, "needsToUpdate");
-	private static final Method startTransaction = method(DatabaseTableVersionUpdater.class, "startTransaction");
-	private static final Method apply = method(DatabaseTableVersionUpdater.class, "apply");
-	private static final Method commitTransaction = method(DatabaseTableVersionUpdater.class, "commitTransaction");
-	@Mock
+public class DatabaseTableVersionUpdaterTest extends MockitoTest {
 	private DatabaseTableVersionUpdater databaseTableVersionUpdater;
+
 	@Mock
 	private Database database;
+	@Mock
+	private Statement statement;
 
 	@Before
 	public void setupMocks() throws Exception {
-		doCallRealMethod().when(databaseTableVersionUpdater).update();
-		doNothing().when(databaseTableVersionUpdater, startTransaction).withNoArguments();
-		when(databaseTableVersionUpdater, needsToUpdate).withNoArguments().thenReturn(true);
-		when(databaseTableVersionUpdater, "getDatabase").thenReturn(database);
-		when(databaseTableVersionUpdater, "getColumns").thenReturn(new ArrayList<String>());
+		databaseTableVersionUpdater =
+				mock(
+						DatabaseTableVersionUpdater.class,
+						withSettings()
+								.defaultAnswer(CALLS_REAL_METHODS)
+								.useConstructor(database, "version", "table name"));
+		when(database.createStatement(anyInt())).thenReturn(statement);
 	}
 
 	@After
 	public void verifyMocks() throws Exception {
-		verifyPrivate(databaseTableVersionUpdater).invoke(commitTransaction).withNoArguments();
+		verify(statement).close();
 	}
 
 	@Test
 	public void testUpdate() throws Exception {
+		when(databaseTableVersionUpdater.needsToUpdate()).thenReturn(true);
+
 		databaseTableVersionUpdater.update();
-		verifyPrivate(databaseTableVersionUpdater).invoke(startTransaction).withNoArguments();
-		verifyPrivate(databaseTableVersionUpdater).invoke(needsToUpdate).withNoArguments();
-		verifyPrivate(databaseTableVersionUpdater).invoke(apply).withNoArguments();
+		verify(databaseTableVersionUpdater).startTransaction();
+		verify(databaseTableVersionUpdater).apply();
 	}
 
 	@Test
 	public void testUpdateNotNeeded() throws Exception {
-		when(databaseTableVersionUpdater, needsToUpdate).withNoArguments().thenReturn(false);
+		final DatabaseTableVersionUpdater databaseTableVersionUpdater =
+				mock(
+						DatabaseTableVersionUpdater.class,
+						withSettings()
+								.defaultAnswer(CALLS_REAL_METHODS)
+								.useConstructor(database, "version", "table name"));
+		when(databaseTableVersionUpdater.needsToUpdate()).thenReturn(false);
 		databaseTableVersionUpdater.update();
-		verifyPrivate(databaseTableVersionUpdater, never()).invoke(apply).withNoArguments();
+		verify(databaseTableVersionUpdater, never()).apply();
 	}
 
 	@Test(expected = InterruptedException.class)
 	public void testUpdateInterruptedException() throws Exception {
-		when(databaseTableVersionUpdater, apply).withNoArguments().thenThrow(new InterruptedException("Test Exception"));
-		try {
-			databaseTableVersionUpdater.update();
-		} finally {
-			verifyPrivate(databaseTableVersionUpdater).invoke(commitTransaction).withNoArguments();
-		}
+		final DatabaseTableVersionUpdater databaseTableVersionUpdater =
+				mock(
+						DatabaseTableVersionUpdater.class,
+						withSettings()
+								.defaultAnswer(CALLS_REAL_METHODS)
+								.useConstructor(database, "version", "table name"));
+		when(databaseTableVersionUpdater.needsToUpdate()).thenReturn(true);
+		doThrow(new InterruptedException("Test Exception")).when(databaseTableVersionUpdater).apply();
+		databaseTableVersionUpdater.update();
 	}
 
 	@Test(expected = SQLException.class)
 	public void testUpdateSQLException() throws Exception {
-		when(databaseTableVersionUpdater, apply).withNoArguments().thenThrow(new SQLException("Test Exception"));
-		try {
-			databaseTableVersionUpdater.update();
-		} finally {
-			verifyPrivate(databaseTableVersionUpdater).invoke(commitTransaction).withNoArguments();
-		}
+		final DatabaseTableVersionUpdater databaseTableVersionUpdater =
+				mock(
+						DatabaseTableVersionUpdater.class,
+						withSettings()
+								.defaultAnswer(CALLS_REAL_METHODS)
+								.useConstructor(database, "version", "table name"));
+		when(databaseTableVersionUpdater.needsToUpdate()).thenReturn(true);
+		doThrow(new SQLException("Test Exception")).when(databaseTableVersionUpdater).apply();
+		databaseTableVersionUpdater.update();
 	}
 
 	@Test(expected = ClassNotFoundException.class)
 	public void testUpdateClassNotFoundException() throws Exception {
-		when(databaseTableVersionUpdater, apply).withNoArguments().thenThrow(new ClassNotFoundException("Test Exception"));
-		try {
-			databaseTableVersionUpdater.update();
-		} finally {
-			verifyPrivate(databaseTableVersionUpdater).invoke(commitTransaction).withNoArguments();
-		}
+		final DatabaseTableVersionUpdater databaseTableVersionUpdater =
+				mock(
+						DatabaseTableVersionUpdater.class,
+						withSettings()
+								.defaultAnswer(CALLS_REAL_METHODS)
+								.useConstructor(database, "version", "table name"));
+		when(databaseTableVersionUpdater.needsToUpdate()).thenReturn(true);
+
+		doThrow(new ClassNotFoundException("Test Exception")).when(databaseTableVersionUpdater).apply();
+		databaseTableVersionUpdater.update();
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testUpdateCommitIllegalStateException() throws Exception {
-		when(databaseTableVersionUpdater, commitTransaction).withNoArguments().thenThrow(new IllegalStateException("Test Exception"));
-		try {
-			databaseTableVersionUpdater.update();
-		} finally {
-			verifyPrivate(databaseTableVersionUpdater).invoke(commitTransaction).withNoArguments();
-		}
+		final DatabaseTableVersionUpdater databaseTableVersionUpdater =
+				mock(
+						DatabaseTableVersionUpdater.class,
+						withSettings()
+								.defaultAnswer(CALLS_REAL_METHODS)
+								.useConstructor(database, "version", "table name"));
+		when(databaseTableVersionUpdater.needsToUpdate()).thenReturn(true);
+
+		doThrow(new IllegalStateException("Test Exception")).when(statement).executeBatch();
+		databaseTableVersionUpdater.update();
 	}
 
 	@Test(expected = SQLException.class)
 	public void testUpdateCommitSQLException() throws Exception {
-		when(databaseTableVersionUpdater, commitTransaction).withNoArguments().thenThrow(new SQLException("Test Exception"));
-		try {
-			databaseTableVersionUpdater.update();
-		} finally {
-			verifyPrivate(databaseTableVersionUpdater).invoke(commitTransaction).withNoArguments();
-		}
+		final DatabaseTableVersionUpdater databaseTableVersionUpdater =
+				mock(
+						DatabaseTableVersionUpdater.class,
+						withSettings()
+								.defaultAnswer(CALLS_REAL_METHODS)
+								.useConstructor(database, "version", "table name"));
+		when(databaseTableVersionUpdater.needsToUpdate()).thenReturn(true);
+
+		doThrow(new SQLException("Test Exception")).when(statement).executeBatch();
+		databaseTableVersionUpdater.update();
 	}
 }

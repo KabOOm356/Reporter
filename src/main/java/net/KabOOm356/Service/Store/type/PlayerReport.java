@@ -32,7 +32,7 @@ public class PlayerReport extends HashMap<UUID, PlayerReportQueue> {
 	 */
 	public PlayerReportQueue get(final CommandSender sender) {
 		if (BukkitUtil.isOfflinePlayer(sender)) {
-			final OfflinePlayer player = OfflinePlayer.class.cast(sender);
+      final OfflinePlayer player = (OfflinePlayer) sender;
 			return get(player);
 		}
 		return null;
@@ -47,7 +47,7 @@ public class PlayerReport extends HashMap<UUID, PlayerReportQueue> {
 	 */
 	public void put(final CommandSender sender, final OfflinePlayer reported, final ReportTimer timer) {
 		if (BukkitUtil.isPlayer(sender)) {
-			final Player player = Player.class.cast(sender);
+			final Player player = (Player) sender;
 			final UUID key = player.getUniqueId();
 			add(key, reported, timer);
 		}

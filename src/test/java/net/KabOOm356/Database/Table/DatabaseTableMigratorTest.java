@@ -1,27 +1,21 @@
 package net.KabOOm356.Database.Table;
 
-import net.KabOOm356.Database.Database;
 import net.KabOOm356.Database.Table.Version.DatabaseTableVersionMigrator;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.test.PowerMockitoTest;
+import test.test.MockitoTest;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
-@PrepareForTest(DatabaseTableMigrator.class)
-public class DatabaseTableMigratorTest extends PowerMockitoTest {
-	@Mock
+public class DatabaseTableMigratorTest extends MockitoTest {
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private DatabaseTableMigrator databaseTableMigrator;
-
-	@Mock
-	private Database database;
 
 	@Mock
 	private DatabaseTableVersionMigrator databaseTableVersionMigrator;
@@ -31,8 +25,6 @@ public class DatabaseTableMigratorTest extends PowerMockitoTest {
 
 	@Before
 	public void setupMocks() throws Exception {
-		doCallRealMethod().when(databaseTableMigrator).migrate();
-		doCallRealMethod().when(databaseTableMigrator, "migrateTable");
 		final List<DatabaseTableVersionMigrator> databaseTableVersionMigratorList = new ArrayList<>();
 		databaseTableVersionMigratorList.add(databaseTableVersionMigrator);
 		databaseTableVersionMigratorList.add(databaseTableVersionMigrator2);

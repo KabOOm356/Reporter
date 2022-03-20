@@ -1,14 +1,10 @@
 package net.KabOOm356.Util;
 
-import org.bukkit.ChatColor;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class UtilTest {
-	public static final ChatColor indexColor = ChatColor.RED;
-	public static final ChatColor separatorColor = ChatColor.WHITE;
-
 	@Test
 	public void testCountOccurrences() {
 		final String str = "This is a string.\nThis is a new line!";

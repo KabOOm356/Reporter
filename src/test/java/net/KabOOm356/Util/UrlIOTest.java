@@ -3,24 +3,16 @@ package net.KabOOm356.Util;
 import net.KabOOm356.File.AbstractFiles.NetworkFile;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.test.PowerMockitoTest;
+import test.test.MockitoTest;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
 
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.when;
 
-@PrepareForTest({UrlIO.class})
-public class UrlIOTest extends PowerMockitoTest {
-	@Mock
-	public URL url;
-
+public class UrlIOTest extends MockitoTest {
 	@Mock
 	public HttpURLConnection httpURLConnection;
 
@@ -29,12 +21,6 @@ public class UrlIOTest extends PowerMockitoTest {
 
 	@Mock
 	public File file;
-
-	@Mock
-	public BufferedReader bufferedReader;
-
-	@Mock
-	public BufferedWriter bufferedWriter;
 
 	@Test
 	public void testGetResponse() throws IOException {
@@ -73,38 +59,6 @@ public class UrlIOTest extends PowerMockitoTest {
 		} catch (final IllegalArgumentException e) {
 			// Expected exception
 		}
-	}
-
-	@Test(expected = IOException.class)
-	public void testDownloadFileBadResponse() throws Exception {
-		whenNew(URL.class).withAnyArguments().thenReturn(url);
-		when(url.openConnection()).thenReturn(httpURLConnection);
-		when(httpURLConnection.getResponseCode()).thenReturn(HttpURLConnection.HTTP_NOT_FOUND);
-		when(networkFile.getURL()).thenReturn("Test URL");
-		UrlIO.downloadFile(networkFile, file);
-	}
-
-	@Test
-	public void testDownloadFile() throws Exception {
-		whenNew(URL.class).withAnyArguments().thenReturn(url);
-		when(url.openConnection()).thenReturn(httpURLConnection);
-		when(httpURLConnection.getResponseCode()).thenReturn(HttpURLConnection.HTTP_OK);
-		when(httpURLConnection.getInputStream()).thenReturn(mock(InputStream.class));
-
-		whenNew(BufferedReader.class).withAnyArguments().thenReturn(bufferedReader);
-		whenNew(InputStreamReader.class).withAnyArguments().thenReturn(mock(InputStreamReader.class));
-
-		whenNew(BufferedWriter.class).withAnyArguments().thenReturn(bufferedWriter);
-		whenNew(OutputStreamWriter.class).withAnyArguments().thenReturn(mock(OutputStreamWriter.class));
-		whenNew(FileOutputStream.class).withAnyArguments().thenReturn(mock(FileOutputStream.class));
-
-		when(bufferedReader.readLine()).thenReturn("Test", "String", null);
-
-		when(networkFile.getURL()).thenReturn("Test URL");
-
-		UrlIO.downloadFile(networkFile, file);
-		verify(bufferedWriter, times(2)).write(anyString());
-		verify(httpURLConnection).disconnect();
 	}
 
 	@Test

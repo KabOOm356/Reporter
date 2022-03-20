@@ -1,88 +1,78 @@
 package net.KabOOm356.Database.Table;
 
 import net.KabOOm356.Database.Database;
-import net.KabOOm356.Database.DatabaseType;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.test.PowerMockitoTest;
+import test.test.MockitoTest;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
-@PrepareForTest(DatabaseTableCreator.class)
-public class DatabaseTableCreatorTest extends PowerMockitoTest {
-	@Mock
+public class DatabaseTableCreatorTest extends MockitoTest {
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private DatabaseTableCreator databaseTableCreator;
 
 	@Mock
 	private Database database;
+	@Mock
+	private Statement statement;
 
 	@Before
 	public void setupMocks() throws Exception {
-		doCallRealMethod().when(databaseTableCreator).create();
-		doCallRealMethod().when(databaseTableCreator, "createTable");
-		doCallRealMethod().when(databaseTableCreator, "needsToCreateTable");
-		when(databaseTableCreator, "getDatabase").thenReturn(database);
-		when(databaseTableCreator, "getTableCreationQuery").thenReturn("Table Creation Query");
-		when(databaseTableCreator, "getConnectionId").thenReturn(1);
-		when(databaseTableCreator, "getTableName").thenReturn("Test Table Name");
+		when(databaseTableCreator.getDatabase()).thenReturn(database);
+		when(databaseTableCreator.getTableCreationQuery()).thenReturn("Table Creation Query");
+		when(databaseTableCreator.getConnectionId()).thenReturn(1);
+		when(databaseTableCreator.getTableName()).thenReturn("Test Table");
 		when(database.checkTable(anyInt(), anyString())).thenReturn(false);
-		when(database.getDatabaseType()).thenReturn(DatabaseType.MYSQL);
-	}
 
-	@After
-	public void verifyMocks() throws Exception {
-		verifyPrivate(databaseTableCreator).invoke("startTransaction");
-		verifyPrivate(databaseTableCreator).invoke("commitTransaction");
+		when(database.createStatement(anyInt())).thenReturn(statement);
+		when(database.checkTable(anyInt(), anyString())).thenReturn(false);
 	}
 
 	@Test
 	public void testCreate() throws Exception {
 		databaseTableCreator.create();
-		verifyPrivate(databaseTableCreator).invoke("addQueryToTransaction", anyString());
+		verify(databaseTableCreator).addQueryToTransaction(anyString());
+		verify(statement).executeBatch();
+		verify(statement).close();
+		verify(database).closeConnection(anyInt());
 	}
 
 	@Test
 	public void testCreateNotNeeded() throws Exception {
 		when(database.checkTable(anyInt(), anyString())).thenReturn(true);
 		databaseTableCreator.create();
-		verifyPrivate(databaseTableCreator, never()).invoke("addQueryToTransaction", anyString());
-	}
-
-	@Test(expected = InterruptedException.class)
-	public void testCreateInterruptedException() throws Exception {
-		doThrow(new InterruptedException("Test Exception")).when(databaseTableCreator, "startTransaction");
-		databaseTableCreator.create();
+		verify(databaseTableCreator, never()).addQueryToTransaction(anyString());
+		verify(statement).close();
+		verify(database).closeConnection(anyInt());
 	}
 
 	@Test(expected = SQLException.class)
-	public void testCreateSQLException() throws Exception {
-		doThrow(new SQLException("Test Exception")).when(databaseTableCreator, "needsToCreateTable");
+	public void testCreateSQLExceptionOnOpenConnection() throws Exception {
+		doThrow(new SQLException("Test Exception")).when(database).openPooledConnection();
 		databaseTableCreator.create();
-	}
-
-	@Test(expected = ClassNotFoundException.class)
-	public void testCreateClassNotFoundException() throws Exception {
-		doThrow(new ClassNotFoundException("Test Exception")).when(databaseTableCreator, "startTransaction");
-		databaseTableCreator.create();
+		verify(statement, never()).executeBatch();
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testCreateCommitIllegalStateException() throws Exception {
-		doThrow(new IllegalStateException("Test Exception")).when(databaseTableCreator, "commitTransaction");
+		doThrow(new IllegalStateException("Test Exception")).when(statement).executeBatch();
 		databaseTableCreator.create();
+		verify(statement).close();
+		verify(database).closeConnection(anyInt());
 	}
 
 	@Test(expected = SQLException.class)
 	public void testCreateCommitSQLException() throws Exception {
-		doThrow(new SQLException("Test Exception")).when(databaseTableCreator, "commitTransaction");
+		doThrow(new SQLException("Test Exception")).when(statement).executeBatch();
 		databaseTableCreator.create();
+		verify(statement).close();
+		verify(database).closeConnection(anyInt());
 	}
 }

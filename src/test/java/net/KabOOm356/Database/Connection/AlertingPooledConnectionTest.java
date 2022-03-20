@@ -2,15 +2,13 @@ package net.KabOOm356.Database.Connection;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.test.PowerMockitoTest;
+import test.test.MockitoTest;
 
 import java.sql.Connection;
 
-import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.mockito.Mockito.mock;
 
-@PrepareForTest(AlertingPooledConnection.class)
-public class AlertingPooledConnectionTest extends PowerMockitoTest {
+public class AlertingPooledConnectionTest extends MockitoTest {
 
 	@Test
 	public void test() throws Exception {
@@ -22,5 +20,4 @@ public class AlertingPooledConnectionTest extends PowerMockitoTest {
 		apc.close();
 		Mockito.verify(connectionPoolManager).connectionClosed(1);
 	}
-
 }

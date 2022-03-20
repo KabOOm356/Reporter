@@ -1,24 +1,19 @@
 package net.KabOOm356.Service;
 
-import net.KabOOm356.Reporter.Reporter;
-import net.KabOOm356.Util.BukkitUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.junit.Before;
 import org.junit.Test;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedStatic;
 import test.test.service.ServiceTest;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
-@PrepareForTest({PermissionService.class, Reporter.class, Player.class, BukkitUtil.class, Bukkit.class})
 public class PermissionServiceTest extends ServiceTest {
 	private static final String permission = "permission";
 
@@ -29,30 +24,23 @@ public class PermissionServiceTest extends ServiceTest {
 	public void setupMocks() throws Exception {
 		super.setupMocks();
 
-		mockStatic(Reporter.class);
-		mockStatic(Player.class);
-		mockStatic(Bukkit.class);
-		mockStatic(BukkitUtil.class);
-
-		manager = spy(new PermissionService(getModule()));
+		manager = new PermissionService(getModule());
 	}
 
 	@Test
-	public void hasPermissionCommandSender() {
-		final CommandSender sender = mock(CommandSender.class);
-		final Player player = mock(Player.class);
-		when(BukkitUtil.isPlayer(sender)).thenReturn(true);
-		when(Player.class.cast(sender)).thenReturn(player);
-		doReturn(true).when(manager).hasPermission(player, permission);
-		manager.hasPermission(sender, permission);
-		verify(manager).hasPermission(player, permission);
+	public void hasPermissionCommandSenderIsPlayer() {
+		final CommandSender sender =
+				mock(CommandSender.class, withSettings().extraInterfaces(Player.class));
+		when(getPermissionHandler().hasPermission((Player) sender, permission)).thenReturn(true);
+		assertTrue(manager.hasPermission(sender, permission));
 	}
 
 	@Test
 	public void hasPermissionCommandSenderNotAPlayer() {
 		final CommandSender sender = mock(CommandSender.class);
-		when(BukkitUtil.isPlayer(sender)).thenReturn(false);
-		assertTrue(manager.hasPermission(sender, permission));
+		try (MockedStatic<Bukkit> bukkit = mockStatic(Bukkit.class)) {
+			assertTrue(manager.hasPermission(sender, permission));
+		}
 	}
 
 	@Test
@@ -64,7 +52,6 @@ public class PermissionServiceTest extends ServiceTest {
 	@Test
 	public void hasPermissionPlayerIsOpNotConfigured() {
 		final Player player = mock(Player.class);
-		when(player.isOp()).thenReturn(true);
 		assertFalse(manager.hasPermission(player, permission));
 	}
 

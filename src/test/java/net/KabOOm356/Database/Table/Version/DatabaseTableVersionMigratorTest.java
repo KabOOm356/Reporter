@@ -1,79 +1,63 @@
 package net.KabOOm356.Database.Table.Version;
 
-import net.KabOOm356.Database.Table.DatabaseTableCreator;
-import org.junit.After;
+import net.KabOOm356.Database.Database;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.test.PowerMockitoTest;
+import test.test.MockitoTest;
 
-import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.sql.Statement;
 
-import static org.mockito.Mockito.atLeastOnce;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
-@PrepareForTest(DatabaseTableVersionMigrator.class)
-public class DatabaseTableVersionMigratorTest extends PowerMockitoTest {
-	private static final Method needsMigration = method(DatabaseTableVersionMigrator.class, "needsMigration");
-	private static final Method commitTransaction = method(DatabaseTableVersionMigrator.class, "commitTransaction");
-	@Mock
+public class DatabaseTableVersionMigratorTest extends MockitoTest {
 	private DatabaseTableVersionMigrator databaseTableVersionMigrator;
+
 	@Mock
-	private DatabaseTableCreator databaseTableCreator;
+	private Database database;
+	@Mock
+	private Statement statement;
 
 	@Before
 	public void setupMocks() throws Exception {
-		doCallRealMethod().when(databaseTableVersionMigrator).migrate();
-		when(databaseTableVersionMigrator, "getCreator").thenReturn(databaseTableCreator);
-		when(databaseTableVersionMigrator, needsMigration).withNoArguments().thenReturn(true);
-
-		when(databaseTableVersionMigrator, "dropTemporaryTable").thenCallRealMethod();
-		when(databaseTableVersionMigrator, "migrateTable").thenCallRealMethod();
-		when(databaseTableVersionMigrator, "dropTable").thenCallRealMethod();
-		when(databaseTableVersionMigrator, "createTemporaryTable").thenCallRealMethod();
-		when(databaseTableVersionMigrator, "populateTemporaryTable").thenCallRealMethod();
-	}
-
-	@After
-	public void verifyMocks() throws Exception {
-		verifyPrivate(databaseTableVersionMigrator, atLeastOnce()).invoke("startTransaction");
-		verifyPrivate(databaseTableVersionMigrator).invoke(commitTransaction).withNoArguments();
-	}
-
-	@Test
-	public void testMigrate() throws InterruptedException, SQLException, ClassNotFoundException {
-		databaseTableVersionMigrator.migrate();
+		databaseTableVersionMigrator =
+				mock(
+						DatabaseTableVersionMigrator.class,
+						withSettings()
+								.defaultAnswer(CALLS_REAL_METHODS)
+								.useConstructor(database, "version", "table name"));
+		when(database.createStatement(anyInt())).thenReturn(statement);
 	}
 
 	@Test(expected = InterruptedException.class)
 	public void testMigrateInterruptedException() throws Exception {
-		doThrow(new InterruptedException("Test Exception")).when(databaseTableVersionMigrator, needsMigration).withNoArguments();
+		when(database.openPooledConnection()).thenThrow(new InterruptedException("Test Exception"));
 		databaseTableVersionMigrator.migrate();
 	}
 
 	@Test(expected = SQLException.class)
 	public void testMigrateSQLException() throws Exception {
-		doThrow(new SQLException("Test Exception")).when(databaseTableVersionMigrator, needsMigration).withNoArguments();
+		when(database.openPooledConnection()).thenThrow(new SQLException("Test Exception"));
 		databaseTableVersionMigrator.migrate();
 	}
 
 	@Test(expected = ClassNotFoundException.class)
 	public void testMigrateClassNotFoundException() throws Exception {
-		doThrow(new ClassNotFoundException("Test Exception")).when(databaseTableVersionMigrator, needsMigration).withNoArguments();
+		when(database.openPooledConnection()).thenThrow(new ClassNotFoundException("Test Exception"));
 		databaseTableVersionMigrator.migrate();
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testMigrateCommitIllegalStateException() throws Exception {
-		doThrow(new IllegalStateException("Test Exception")).when(databaseTableVersionMigrator, commitTransaction).withNoArguments();
+		when(database.openPooledConnection()).thenThrow(new IllegalStateException("Test Exception"));
 		databaseTableVersionMigrator.migrate();
 	}
 
 	@Test(expected = SQLException.class)
 	public void testMigrateCommitSQLException() throws Exception {
-		doThrow(new SQLException("Test Exception")).when(databaseTableVersionMigrator, commitTransaction).withNoArguments();
+		when(statement.executeBatch()).thenThrow(new SQLException("Test Exception"));
 		databaseTableVersionMigrator.migrate();
+		verify(statement).close();
 	}
 }

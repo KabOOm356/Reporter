@@ -2,7 +2,9 @@ package net.KabOOm356.Locale;
 
 import net.KabOOm356.Configuration.ConstantEntry;
 import net.KabOOm356.Configuration.Entry;
-import net.KabOOm356.Locale.Entry.*;
+import net.KabOOm356.Locale.Entry.LocaleEntry;
+import net.KabOOm356.Locale.Entry.LocaleInfo;
+import net.KabOOm356.Locale.Entry.LocalePhrase;
 import net.KabOOm356.Util.Initializable;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -20,7 +22,7 @@ public class Locale extends YamlConfiguration implements Initializable {
 	 */
 	public String getString(final Entry<String> entry) {
 		if (entry instanceof ConstantEntry) {
-			final ConstantEntry<String> constantEntry = ConstantEntry.class.cast(entry);
+			final ConstantEntry<String> constantEntry = (ConstantEntry<String>) entry;
 			return getString(constantEntry);
 		}
 		return getString(entry.getPath(), entry.getDefault());

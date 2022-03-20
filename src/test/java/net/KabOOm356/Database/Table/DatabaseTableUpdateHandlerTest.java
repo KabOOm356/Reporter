@@ -3,32 +3,24 @@ package net.KabOOm356.Database.Table;
 import net.KabOOm356.Database.Database;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.test.PowerMockitoTest;
+import test.test.MockitoTest;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
-@PrepareForTest(DatabaseTableUpdateHandlerTest.class)
-public class DatabaseTableUpdateHandlerTest extends PowerMockitoTest {
+public class DatabaseTableUpdateHandlerTest extends MockitoTest {
 	private static final int connectionId = 123456;
 	private static final String query = "Test Query";
-	private static final Method startTransaction = method(DatabaseTableUpdateHandler.class, "startTransaction");
-	private static final Method addQueryToTransaction = method(DatabaseTableUpdateHandler.class, "addQueryToTransaction");
-	private static final Method commitTransaction = method(DatabaseTableUpdateHandler.class, "commitTransaction");
-	private static final Method terminateTransaction = method(DatabaseTableUpdateHandler.class, "terminateTransaction");
-	private static final Method endTransaction = method(DatabaseTableUpdateHandler.class, "endTransaction");
-	@Mock
+
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private DatabaseTableUpdateHandler databaseTableUpdateHandler;
+
 	@Mock
 	private Database database;
 	@Mock
@@ -36,21 +28,15 @@ public class DatabaseTableUpdateHandlerTest extends PowerMockitoTest {
 
 	@Before
 	public void setupMocks() throws Exception {
-		doCallRealMethod().when(databaseTableUpdateHandler, startTransaction).withNoArguments();
-		doCallRealMethod().when(databaseTableUpdateHandler, addQueryToTransaction).withArguments(query);
-		doCallRealMethod().when(databaseTableUpdateHandler, commitTransaction).withNoArguments();
-		doCallRealMethod().when(databaseTableUpdateHandler, terminateTransaction).withNoArguments();
-		doCallRealMethod().when(databaseTableUpdateHandler, endTransaction).withNoArguments();
-		when(databaseTableUpdateHandler.isTransactionInProgress()).thenCallRealMethod();
-		when(databaseTableUpdateHandler, "getStatement").thenCallRealMethod();
-		when(databaseTableUpdateHandler, "getDatabase").thenReturn(database);
+		when(databaseTableUpdateHandler.getDatabase()).thenReturn(database);
 		when(database.openPooledConnection()).thenReturn(connectionId);
 		when(database.createStatement(anyInt())).thenReturn(statement);
 	}
 
 	@Test
-	public void testStartTransaction() throws InvocationTargetException, IllegalAccessException, InterruptedException, SQLException, ClassNotFoundException {
-		startTransaction.invoke(databaseTableUpdateHandler);
+	public void testStartTransaction()
+			throws InterruptedException, SQLException, ClassNotFoundException {
+		databaseTableUpdateHandler.startTransaction();
 		verify(database).openPooledConnection();
 		verify(database).createStatement(connectionId);
 	}
@@ -59,10 +45,10 @@ public class DatabaseTableUpdateHandlerTest extends PowerMockitoTest {
 	public void testStartTransactionInterruptedException() throws Exception {
 		when(database.openPooledConnection()).thenThrow(new InterruptedException("Test Exception"));
 		try {
-			startTransaction.invoke(databaseTableUpdateHandler);
+			databaseTableUpdateHandler.startTransaction();
 		} finally {
-			verifyPrivate(databaseTableUpdateHandler).invoke(terminateTransaction).withNoArguments();
-			verifyPrivate(databaseTableUpdateHandler).invoke(endTransaction).withNoArguments();
+			verify(databaseTableUpdateHandler).terminateTransaction();
+			verify(databaseTableUpdateHandler).endTransaction();
 		}
 	}
 
@@ -70,10 +56,10 @@ public class DatabaseTableUpdateHandlerTest extends PowerMockitoTest {
 	public void testStartTransactionSQLException() throws Exception {
 		when(database.openPooledConnection()).thenThrow(new SQLException("Test Exception"));
 		try {
-			startTransaction.invoke(databaseTableUpdateHandler);
+			databaseTableUpdateHandler.startTransaction();
 		} finally {
-			verifyPrivate(databaseTableUpdateHandler).invoke(terminateTransaction).withNoArguments();
-			verifyPrivate(databaseTableUpdateHandler).invoke(endTransaction).withNoArguments();
+			verify(databaseTableUpdateHandler).terminateTransaction();
+			verify(databaseTableUpdateHandler).endTransaction();
 		}
 	}
 
@@ -81,36 +67,38 @@ public class DatabaseTableUpdateHandlerTest extends PowerMockitoTest {
 	public void testStartTransactionClassNotFoundException() throws Exception {
 		when(database.openPooledConnection()).thenThrow(new ClassNotFoundException("Test Exception"));
 		try {
-			startTransaction.invoke(databaseTableUpdateHandler);
+			databaseTableUpdateHandler.startTransaction();
 		} finally {
-			verifyPrivate(databaseTableUpdateHandler).invoke(terminateTransaction).withNoArguments();
-			verifyPrivate(databaseTableUpdateHandler).invoke(endTransaction).withNoArguments();
+			verify(databaseTableUpdateHandler).terminateTransaction();
+			verify(databaseTableUpdateHandler).endTransaction();
 		}
 	}
 
 	@Test
-	public void testAddQueryToTransaction() throws InvocationTargetException, IllegalAccessException, SQLException {
+	public void testAddQueryToTransaction()
+			throws SQLException, InterruptedException, ClassNotFoundException {
 		// Start the transaction
-		startTransaction.invoke(databaseTableUpdateHandler);
-		addQueryToTransaction.invoke(databaseTableUpdateHandler, query);
+		databaseTableUpdateHandler.startTransaction();
+		databaseTableUpdateHandler.addQueryToTransaction(query);
 		verify(statement).addBatch(query);
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void testAddQueryToTransactionNoTransaction() throws InvocationTargetException, IllegalAccessException {
+	public void testAddQueryToTransactionNoTransaction() throws SQLException {
 		try {
-			addQueryToTransaction.invoke(databaseTableUpdateHandler, query);
+			databaseTableUpdateHandler.addQueryToTransaction(query);
 		} finally {
 			verify(databaseTableUpdateHandler).isTransactionInProgress();
 		}
 	}
 
 	@Test(expected = SQLException.class)
-	public void testAddQueryToTransactionSQLException() throws SQLException, InvocationTargetException, IllegalAccessException {
+	public void testAddQueryToTransactionSQLException()
+			throws SQLException, InterruptedException, ClassNotFoundException {
 		doThrow(new SQLException("Test Exception")).when(statement).addBatch(anyString());
-		startTransaction.invoke(databaseTableUpdateHandler);
+		databaseTableUpdateHandler.startTransaction();
 		try {
-			addQueryToTransaction.invoke(databaseTableUpdateHandler, query);
+			databaseTableUpdateHandler.addQueryToTransaction(query);
 		} finally {
 			verify(databaseTableUpdateHandler, times(2)).isTransactionInProgress();
 		}
@@ -118,30 +106,31 @@ public class DatabaseTableUpdateHandlerTest extends PowerMockitoTest {
 
 	@Test
 	public void testCommitTransaction() throws Exception {
-		startTransaction.invoke(databaseTableUpdateHandler);
-		commitTransaction.invoke(databaseTableUpdateHandler);
+		databaseTableUpdateHandler.startTransaction();
+		databaseTableUpdateHandler.commitTransaction();
 		verify(statement).executeBatch();
-		verifyPrivate(databaseTableUpdateHandler).invoke(endTransaction).withNoArguments();
+		verify(databaseTableUpdateHandler).endTransaction();
 	}
 
 	@Test(expected = SQLException.class)
 	public void testCommitTransactionSQLException() throws Exception {
-		startTransaction.invoke(databaseTableUpdateHandler);
+		databaseTableUpdateHandler.startTransaction();
 		doThrow(new SQLException("Test Exception")).when(statement).executeBatch();
 		try {
-			commitTransaction.invoke(databaseTableUpdateHandler);
+			databaseTableUpdateHandler.commitTransaction();
 		} finally {
 			verify(statement).executeBatch();
-			verifyPrivate(databaseTableUpdateHandler).invoke(terminateTransaction).withNoArguments();
-			verifyPrivate(databaseTableUpdateHandler).invoke(endTransaction).withNoArguments();
+			verify(databaseTableUpdateHandler).terminateTransaction();
+			verify(databaseTableUpdateHandler).endTransaction();
 		}
 	}
 
 	@Test
-	public void testEndTransactionStatementSQLException() throws InvocationTargetException, IllegalAccessException, SQLException {
-		startTransaction.invoke(databaseTableUpdateHandler);
+	public void testEndTransactionStatementSQLException()
+			throws SQLException, InterruptedException, ClassNotFoundException {
+		databaseTableUpdateHandler.startTransaction();
 		doThrow(new SQLException("Test Exception")).when(statement).close();
-		commitTransaction.invoke(databaseTableUpdateHandler);
+		databaseTableUpdateHandler.commitTransaction();
 		verify(statement).close();
 		verify(database).closeConnection(connectionId);
 	}

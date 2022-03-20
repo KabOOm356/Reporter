@@ -11,23 +11,17 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * A class to help with {@link URL} based input/output operations.
  */
 public final class UrlIO {
-    /**
-     * The Date format to use.
-     */
-    public static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
-    /**
-     * The encoding to use when writing files.
-     */
-    public static final Charset outputCharset = StandardCharsets.UTF_8;
-    public static final String ALPHA = "alpha";
+	/**
+	 * The encoding to use when writing files.
+	 */
+	public static final Charset outputCharset = StandardCharsets.UTF_8;
+	public static final String ALPHA = "alpha";
 	public static final String BETA = "beta";
 	public static final String RELEASE_CANDIDATE = "rc";
 	private static final Logger log = LogManager.getLogger(UrlIO.class);
@@ -141,7 +135,7 @@ public final class UrlIO {
 			final int lastIndex = fileName.lastIndexOf(' ');
 			String version = fileName.substring(lastIndex + 1);
 			fileName = fileName.substring(0, lastIndex);
-			
+
 			/*
 			 * If the release level is appended behind the version separated with a space
 			 * append it to the numeral version and re-parse for a space.
@@ -153,20 +147,6 @@ public final class UrlIO {
 			return version;
 		}
 		return "";
-	}
-
-	/**
-	 * Returns the node value from the given {@link Element} with the given tag name.
-	 * <br/>
-	 * If the given tag name cannot be found the given default value will be returned.
-	 *
-	 * @param element      The {@link Element} to get the given node value from.
-	 * @param tagName      The tag name to get from the given {@link Element}.
-	 * @param defaultValue The default value to return if the given tag name is not set in the given {@link Element}.
-	 * @return The node value for the given tag name if it is set, otherwise the default value is returned.
-	 */
-	public static String getNodeValue(final Element element, final String tagName, final String defaultValue) {
-		return (getNodeValue(element, tagName) != null) ? getNodeValue(element, tagName) : defaultValue;
 	}
 
 	/**

@@ -103,7 +103,7 @@ public class ReportPermissionService extends Service {
 				claimedByUUID = UUID.fromString(claimedByUUIDString);
 			}
 			final OfflinePlayer claimedByOfflinePlayer = BukkitUtil.getOfflinePlayer(claimedByUUID, claimedByName);
-			final CommandSender claimedBy = CommandSender.class.cast(claimedByOfflinePlayer);
+			final CommandSender claimedBy = (CommandSender) claimedByOfflinePlayer;
 
 			// Check if the sender is the player claiming the report.
 			// UUID based check.

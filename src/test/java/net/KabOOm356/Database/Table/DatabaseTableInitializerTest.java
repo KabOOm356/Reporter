@@ -2,19 +2,16 @@ package net.KabOOm356.Database.Table;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import test.test.PowerMockitoTest;
+import test.test.MockitoTest;
 
 import java.sql.SQLException;
 
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
-@PrepareForTest(DatabaseTableInitializer.class)
-public class DatabaseTableInitializerTest extends PowerMockitoTest {
-	@Mock
+public class DatabaseTableInitializerTest extends MockitoTest {
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private DatabaseTableInitializer databaseTableInitializer;
 
 	@Mock
@@ -28,14 +25,9 @@ public class DatabaseTableInitializerTest extends PowerMockitoTest {
 
 	@Before
 	public void setupMocks() throws Exception {
-		doReturn(databaseTableCreator).when(databaseTableInitializer, "getCreator");
-		doReturn(databaseTableMigrator).when(databaseTableInitializer, "getMigrator");
-		doReturn(databaseTableUpdater).when(databaseTableInitializer, "getUpdater");
-
-		doCallRealMethod().when(databaseTableInitializer).initialize();
-		doCallRealMethod().when(databaseTableInitializer, "create");
-		doCallRealMethod().when(databaseTableInitializer, "migrate");
-		doCallRealMethod().when(databaseTableInitializer, "update");
+		when(databaseTableInitializer.getCreator()).thenReturn(databaseTableCreator);
+		when(databaseTableInitializer.getMigrator()).thenReturn(databaseTableMigrator);
+		when(databaseTableInitializer.getUpdater()).thenReturn(databaseTableUpdater);
 	}
 
 	@Test
@@ -48,7 +40,7 @@ public class DatabaseTableInitializerTest extends PowerMockitoTest {
 
 	@Test
 	public void testInitializeNoCreate() throws Exception {
-		doReturn(null).when(databaseTableInitializer, "getCreator");
+		when(databaseTableInitializer.getCreator()).thenReturn(null);
 		databaseTableInitializer.initialize();
 		verify(databaseTableCreator, never()).create();
 		verify(databaseTableMigrator).migrate();
@@ -57,7 +49,7 @@ public class DatabaseTableInitializerTest extends PowerMockitoTest {
 
 	@Test
 	public void testInitializeNoMigrate() throws Exception {
-		doReturn(null).when(databaseTableInitializer, "getMigrator");
+		when(databaseTableInitializer.getMigrator()).thenReturn(null);
 		databaseTableInitializer.initialize();
 		verify(databaseTableCreator).create();
 		verify(databaseTableMigrator, never()).migrate();
@@ -66,7 +58,7 @@ public class DatabaseTableInitializerTest extends PowerMockitoTest {
 
 	@Test
 	public void testInitializeNoUpdate() throws Exception {
-		doReturn(null).when(databaseTableInitializer, "getUpdater");
+		when(databaseTableInitializer.getUpdater()).thenReturn(null);
 		databaseTableInitializer.initialize();
 		verify(databaseTableCreator).create();
 		verify(databaseTableMigrator).migrate();

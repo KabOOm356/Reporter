@@ -2,16 +2,17 @@ package net.KabOOm356.Service;
 
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
+import net.KabOOm356.Locale.Entry.LocalePhrase;
 import net.KabOOm356.Permission.ModLevel;
 import net.KabOOm356.Util.BukkitUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedStatic;
+import test.test.Answer.LocaleEntryAnswer;
 import test.test.service.ServiceTest;
 
 import java.sql.SQLException;
@@ -21,16 +22,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
-@PrepareForTest({ReportPermissionService.class, Bukkit.class, BukkitUtil.class, CommandSender.class})
 public class ReportPermissionServiceTest extends ServiceTest {
 	@Mock
 	private CommandSender sender;
 
-	@Mock
+	@Mock(extraInterfaces = {CommandSender.class})
 	private OfflinePlayer claimingPlayer;
 
 	@Mock
@@ -47,14 +45,21 @@ public class ReportPermissionServiceTest extends ServiceTest {
 
 	private ReportPermissionService manager;
 
+	private static MockedStatic<Bukkit> bukkit;
+	private static MockedStatic<BukkitUtil> bukkitUtil;
+
+	@BeforeClass
+	public static void staticMock() {
+		bukkit = mockStatic(Bukkit.class);
+		bukkitUtil = mockStatic(BukkitUtil.class);
+	}
+
 	@Override
 	@Before
 	public void setupMocks() throws Exception {
 		super.setupMocks();
-		mockStatic(Bukkit.class);
-		mockStatic(BukkitUtil.class);
-		mockStatic(CommandSender.class);
-		when(BukkitUtil.formatPlayerName(sender)).thenReturn("sender");
+
+		bukkitUtil.when(() -> BukkitUtil.formatPlayerName(sender)).thenReturn("sender");
 		final int connectionId = 999;
 		final String claimedBy = "player";
 		final UUID claimedByUUID = UUID.randomUUID();
@@ -67,11 +72,24 @@ public class ReportPermissionServiceTest extends ServiceTest {
 		resultSet.add(resultRow);
 		when(getDatabaseHandler().openPooledConnection()).thenReturn(connectionId);
 		when(getDatabaseHandler().sqlQuery(eq(connectionId), anyString())).thenReturn(resultSet);
-		when(BukkitUtil.getOfflinePlayer(claimedByUUID, claimedBy)).thenReturn(claimingPlayer);
-		when(CommandSender.class.cast(claimingPlayer)).thenReturn(claimingPlayerSender);
+		bukkitUtil
+				.when(() -> BukkitUtil.getOfflinePlayer(claimedByUUID, claimedBy))
+				.thenReturn(claimingPlayer);
 		when(getModule().getReportInformationService()).thenReturn(informationManager);
 		when(getModule().getPlayerService()).thenReturn(playerService);
 		manager = spy(new ReportPermissionService(getModule()));
+	}
+
+	@After
+	public void resetMocks() {
+		bukkit.reset();
+		bukkitUtil.reset();
+	}
+
+	@AfterClass
+	public static void cleanupMocks() {
+		bukkit.close();
+		bukkitUtil.close();
 	}
 
 	@Test
@@ -142,6 +160,7 @@ public class ReportPermissionServiceTest extends ServiceTest {
 
 	@Test
 	public void requireUnclaimedOrPriorityClaimedWithHigherPriority() throws InterruptedException, SQLException, ClassNotFoundException {
+		when(getLocale().getString(any(LocalePhrase.class))).thenAnswer(LocaleEntryAnswer.instance);
 		resultRow.put("ClaimStatus", true);
 		final CommandSender player = mock(CommandSender.class);
 		when(playerService.getModLevel(player)).thenReturn(ModLevel.LOW);
@@ -160,7 +179,8 @@ public class ReportPermissionServiceTest extends ServiceTest {
 	public void requireUnclaimedOrPriorityClaimedBySender() throws InterruptedException, SQLException, ClassNotFoundException {
 		final CommandSender player = mock(CommandSender.class);
 		resultRow.put("ClaimStatus", true);
-		when(BukkitUtil.playersEqual(sender, claimingPlayerSender)).thenReturn(true);
+		when(playerService.getModLevel(player)).thenReturn(ModLevel.HIGH);
+		bukkitUtil.when(() -> BukkitUtil.playersEqual(sender, claimingPlayerSender)).thenReturn(true);
 		assertTrue(manager.requireUnclaimedOrPriority(sender, 1, player));
 	}
 
@@ -168,7 +188,8 @@ public class ReportPermissionServiceTest extends ServiceTest {
 	public void requireUnclaimedOrPriorityClaimedByPlayer() throws InterruptedException, SQLException, ClassNotFoundException {
 		final CommandSender player = mock(CommandSender.class);
 		resultRow.put("ClaimStatus", true);
-		when(BukkitUtil.playersEqual(player, claimingPlayerSender)).thenReturn(true);
+		when(playerService.getModLevel(player)).thenReturn(ModLevel.HIGH);
+		bukkitUtil.when(() -> BukkitUtil.playersEqual(player, claimingPlayerSender)).thenReturn(true);
 		assertTrue(manager.requireUnclaimedOrPriority(sender, 1, player));
 	}
 
@@ -241,19 +262,21 @@ public class ReportPermissionServiceTest extends ServiceTest {
 
 	@Test
 	public void requirePriorityFailSameSender() throws InterruptedException, SQLException, ClassNotFoundException {
+		when(getLocale().getString(any(LocalePhrase.class))).thenAnswer(LocaleEntryAnswer.instance);
 		doReturn(false).when(manager).checkPriority(sender, 1);
 		when(informationManager.getReportPriority(1)).thenReturn(ModLevel.NORMAL);
-		when(BukkitUtil.playersEqual(sender, sender)).thenReturn(true);
+		bukkitUtil.when(() -> BukkitUtil.playersEqual(sender, sender)).thenReturn(true);
 		assertFalse(manager.requirePriority(sender, 1, sender));
 		verify(playerService).displayModLevel(sender);
 	}
 
 	@Test
 	public void requirePriorityFailDifferentSender() throws InterruptedException, SQLException, ClassNotFoundException {
+		when(getLocale().getString(any(LocalePhrase.class))).thenAnswer(LocaleEntryAnswer.instance);
 		final CommandSender player = mock(CommandSender.class);
 		doReturn(false).when(manager).checkPriority(player, 1);
 		when(informationManager.getReportPriority(1)).thenReturn(ModLevel.NORMAL);
-		when(BukkitUtil.playersEqual(sender, player)).thenReturn(false);
+		bukkitUtil.when(() -> BukkitUtil.playersEqual(sender, player)).thenReturn(false);
 		assertFalse(manager.requirePriority(sender, 1, player));
 		verify(playerService).displayModLevel(sender, player);
 	}

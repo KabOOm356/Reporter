@@ -3,7 +3,6 @@ package net.KabOOm356.Service;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
 import net.KabOOm356.Permission.ModLevel;
-import net.KabOOm356.Util.BukkitUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -11,7 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedStatic;
 import test.test.service.ServiceTest;
 
 import java.sql.SQLException;
@@ -21,11 +20,8 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
-@PrepareForTest({ReportInformationService.class, Bukkit.class, BukkitUtil.class, OfflinePlayer.class, ModLevel.class})
 public class ReportInformationServiceTest extends ServiceTest {
 	private static final int connectionId = 999;
 
@@ -40,10 +36,7 @@ public class ReportInformationServiceTest extends ServiceTest {
 	@Before
 	public void setupMocks() throws Exception {
 		super.setupMocks();
-		mockStatic(Bukkit.class);
-		mockStatic(BukkitUtil.class);
-		mockStatic(OfflinePlayer.class);
-		mockStatic(ModLevel.class);
+
 		sqlResultSet = new SQLResultSet();
 		resultRow = new ResultRow();
 		resultRow1 = new ResultRow();
@@ -55,7 +48,7 @@ public class ReportInformationServiceTest extends ServiceTest {
 		sqlResultSet.add(resultRow1);
 		sqlResultSet.add(resultRow2);
 		when(getDatabaseHandler().openPooledConnection()).thenReturn(connectionId);
-		manager = spy(new ReportInformationService(getModule()));
+		manager = new ReportInformationService(getModule());
 	}
 
 	@After
@@ -73,28 +66,31 @@ public class ReportInformationServiceTest extends ServiceTest {
 
 	@Test
 	public void getViewableReportsNameLookup() throws InterruptedException, SQLException, ClassNotFoundException {
-        final CommandSender commandSender = mock(CommandSender.class);
-        when(BukkitUtil.isPlayer(commandSender)).thenReturn(false);
-        when(getDatabaseHandler().preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.anyList())).thenReturn(sqlResultSet);
-        final List<Integer> returned = manager.getViewableReports(commandSender);
-        verifyReturned(returned);
-        verify(commandSender).getName();
-        verify(getDatabaseHandler()).preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.anyList());
-    }
+		final CommandSender commandSender = mock(CommandSender.class);
+		when(getDatabaseHandler().preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.anyList())).thenReturn(sqlResultSet);
+		try (final MockedStatic<Bukkit> bukkit = mockStatic(Bukkit.class)) {
+			final List<Integer> returned = manager.getViewableReports(commandSender);
+			verifyReturned(returned);
+			verify(commandSender).getName();
+			verify(getDatabaseHandler())
+					.preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.anyList());
+		}
+	}
 
 	@Test
 	public void getViewableReportsUUIDLookup() throws InterruptedException, SQLException, ClassNotFoundException {
-        final CommandSender commandSender = mock(CommandSender.class);
-        final OfflinePlayer player = mock(OfflinePlayer.class);
-        when(BukkitUtil.isPlayer(commandSender)).thenReturn(true);
-        when(OfflinePlayer.class.cast(commandSender)).thenReturn(player);
-        when(player.getUniqueId()).thenReturn(UUID.randomUUID());
-        when(getDatabaseHandler().preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.anyList())).thenReturn(sqlResultSet);
-        final List<Integer> returned = manager.getViewableReports(commandSender);
-        verifyReturned(returned);
-        verify(player).getUniqueId();
-        verify(getDatabaseHandler()).preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.anyList());
-    }
+		final CommandSender commandSender =
+				mock(CommandSender.class, withSettings().extraInterfaces(OfflinePlayer.class));
+		when(((OfflinePlayer) commandSender).getUniqueId()).thenReturn(UUID.randomUUID());
+		when(getDatabaseHandler().preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.anyList())).thenReturn(sqlResultSet);
+		try (final MockedStatic<Bukkit> bukkit = mockStatic(Bukkit.class)) {
+			final List<Integer> returned = manager.getViewableReports(commandSender);
+			verifyReturned(returned);
+			verify((OfflinePlayer) commandSender).getUniqueId();
+			verify(getDatabaseHandler())
+					.preparedSQLQuery(eq(connectionId), anyString(), ArgumentMatchers.anyList());
+		}
+	}
 
 	@Test
 	public void getCompletedReportIndexes() throws SQLException, InterruptedException, ClassNotFoundException {
@@ -128,8 +124,10 @@ public class ReportInformationServiceTest extends ServiceTest {
 		resultRow.put("Priority", priority);
 		sqlResultSet.add(resultRow);
 		when(getDatabaseHandler().sqlQuery(eq(connectionId), anyString())).thenReturn(sqlResultSet);
-		when(ModLevel.getByLevel(priority)).thenReturn(ModLevel.NORMAL);
-		assertEquals(ModLevel.NORMAL, manager.getReportPriority(5));
-		verify(getDatabaseHandler()).sqlQuery(eq(connectionId), anyString());
+		try (final MockedStatic<ModLevel> modLevel = mockStatic(ModLevel.class)) {
+			modLevel.when(() -> ModLevel.getByLevel(priority)).thenReturn(ModLevel.NORMAL);
+			assertEquals(ModLevel.NORMAL, manager.getReportPriority(5));
+			verify(getDatabaseHandler()).sqlQuery(eq(connectionId), anyString());
+		}
 	}
 }

@@ -31,7 +31,7 @@ public class PlayerService extends Service {
 			return ModLevel.HIGH;
 		} else {
 			if (BukkitUtil.isPlayer(sender)) {
-				final Player player = Player.class.cast(sender);
+        final Player player = (Player) sender;
 				if (hasPermission(player, highModLevelPermission)) {
 					return ModLevel.HIGH;
 				} else if (hasPermission(player, normalModLevelPermission)) {
@@ -87,5 +87,17 @@ public class PlayerService extends Service {
 
 	private Locale getLocale() {
 		return getStore().getLocaleStore().get();
+	}
+
+	public static String getHighModLevelPermission() {
+		return highModLevelPermission;
+	}
+
+	public static String getNormalModLevelPermission() {
+		return normalModLevelPermission;
+	}
+
+	public static String getLowModLevelPermission() {
+		return lowModLevelPermission;
 	}
 }
