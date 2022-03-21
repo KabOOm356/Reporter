@@ -2,7 +2,7 @@ buildscript {
     ext {
         // Plugin API
         pluginVersion = '4.0.0-SNAPSHOT'
-        
+
         // Java compile
         javaTargetVersion = JavaVersion.VERSION_1_8
     }
@@ -59,14 +59,14 @@ dependencies {
 
     compileOnly group: 'org.spigotmc', name: 'spigot-api', version: '1.18-pre5-R0.1-SNAPSHOT'
     compileOnly group: 'org.spigotmc', name: 'plugin-annotations', version: '1.2.3-SNAPSHOT'
-    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
+    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.2'
     compileOnly group: 'net.milkbowl.vault', name: 'VaultAPI', version: '1.7'
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.4.0'
     testImplementation group: 'org.bukkit', name: 'bukkit', version: '1.15.2-R0.1-SNAPSHOT'
     testImplementation group: 'org.spigotmc', name: 'plugin-annotations', version: '1.2.3-SNAPSHOT'
-    testImplementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
+    testImplementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.2'
     testImplementation group: 'net.milkbowl.vault', name: 'VaultAPI', version: '1.7'
 
     annotationProcessor group: 'org.spigotmc', name: 'plugin-annotations', version: '1.2.3-SNAPSHOT'
