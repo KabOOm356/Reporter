@@ -410,3 +410,4 @@ Changelog:
                 Updated Bukkit API to 1.18-pre5-R0.1-SNAPSHOT.
                 Upgrade compile target to Java 8.
                 Upgrade bstats-bukkit from 1.8 to 2.2.1.
+                Migrate from powermock to mockito 4 for mocking API
