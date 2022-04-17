@@ -166,15 +166,6 @@ public abstract class AbstractFile {
 	}
 
 	/**
-	 * Sets the time this file was last modified.
-	 *
-	 * @param modificationDate The date this file was last modified.
-	 */
-	public void setModificationDate(final Date modificationDate) {
-		this.modificationDate = modificationDate;
-	}
-
-	/**
 	 * @return The extension of the file.
 	 */
 	public String getExtension() {

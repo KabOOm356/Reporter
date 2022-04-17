@@ -10,8 +10,6 @@ import test.test.MockitoTest;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class DatabaseTableUpdateHandlerTest extends MockitoTest {

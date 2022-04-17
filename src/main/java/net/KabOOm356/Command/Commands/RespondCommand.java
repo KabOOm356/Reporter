@@ -76,7 +76,7 @@ public class RespondCommand extends ReporterCommand {
 
 		try {
 			// Cast the sender to type Player or tell the sender they must be a player
-			Player player = null;
+			Player player;
 			if (BukkitUtil.isPlayer(sender)) {
 				player = (Player) sender;
 			} else {
@@ -116,9 +116,9 @@ public class RespondCommand extends ReporterCommand {
 			final boolean requestedToReported = playerLoc.equalsIgnoreCase("reported");
 			boolean sendToReported = requestedToReported;
 
-			int id = -1;
+			int id;
 			double X = 0.0, Y = 0.0, Z = 0.0;
-			String World = null, reported = null, sender = null, details = null;
+			String World = null, reported, sender, details;
 
 			final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 			final int connectionId = database.openPooledConnection();

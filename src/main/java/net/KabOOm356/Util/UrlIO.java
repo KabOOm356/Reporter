@@ -11,6 +11,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Date;
 
 /**
@@ -85,7 +86,7 @@ public final class UrlIO {
 
 		try {
 			in = new BufferedReader(new InputStreamReader(connection.getInputStream(), abstractFile.getEncoding()));
-			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destination), outputCharset.name()));
+			out = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(destination.toPath()), outputCharset.name()));
 
 			String line;
 

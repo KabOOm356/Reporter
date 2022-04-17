@@ -162,7 +162,7 @@ public class RequestCommand extends ReporterCommand {
 			return;
 		}
 
-		String indexes = "";
+		String indexes;
 
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
@@ -191,7 +191,7 @@ public class RequestCommand extends ReporterCommand {
 			database.closeConnection(connectionId);
 		}
 
-		String out = null;
+		String out;
 		if (indexes.isEmpty()) {
 			out = BukkitUtil.colorCodeReplaceAll(
 					getManager().getLocale().getString(RequestPhrases.reqNF));

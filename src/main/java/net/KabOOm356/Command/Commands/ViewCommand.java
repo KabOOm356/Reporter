@@ -137,7 +137,7 @@ public class ViewCommand extends ReporterCommand {
 					viewReport(sender, index, displayRealName(args, 1));
 				}
 			} else if (getManager().getConfig().getBoolean("general.canViewSubmittedReports", true)) {
-				List<Integer> indexes = null;
+				List<Integer> indexes;
 				try {
 					indexes = getServiceModule().getReportInformationService().getViewableReports(sender);
 				} catch (final Exception e) {
@@ -383,8 +383,8 @@ public class ViewCommand extends ReporterCommand {
 	private void viewAll(final CommandSender sender, final boolean displayRealName) throws Exception {
 		final String query = "SELECT ID, SenderUUID, Sender, ReportedUUID, Reported, Details, CompletionStatus FROM Reports";
 
-		String[][] notCompleted = null;
-		String[][] completed = null;
+		String[][] notCompleted;
+		String[][] completed;
 		try {
 			notCompleted = new String[getServiceModule().getReportCountService().getIncompleteReports()][4];
 			completed = new String[getServiceModule().getReportCountService().getCompletedReports()][4];
@@ -430,7 +430,7 @@ public class ViewCommand extends ReporterCommand {
 				"FROM Reports " +
 				"WHERE CompletionStatus = 1";
 
-		String[][] reports = null;
+		String[][] reports;
 		try {
 			reports = new String[getServiceModule().getReportCountService().getCompletedReports()][4];
 		} catch (final Exception e) {
@@ -468,7 +468,7 @@ public class ViewCommand extends ReporterCommand {
 				"FROM Reports " +
 				"WHERE CompletionStatus = 0";
 
-		String[][] reports = null;
+		String[][] reports;
 		try {
 			reports = new String[getServiceModule().getReportCountService().getIncompleteReports()][4];
 		} catch (final Exception e) {
@@ -504,18 +504,18 @@ public class ViewCommand extends ReporterCommand {
 	private void viewReport(final CommandSender sender, final int index, final boolean displayRealName) throws Exception {
 		final String query = "SELECT * FROM Reports WHERE ID = " + index;
 
-		String reporter = null, reportedPlayer = null, reportDetails = null, dateReport = null, priority = null;
+		String reporter, reportedPlayer, reportDetails, dateReport, priority;
 
-		String senderWorld = null, reportedWorld = null;
-		int senderX = 0, senderY = 0, senderZ = 0, reportedX = 0, reportedY = 0, reportedZ = 0;
+		String senderWorld, reportedWorld;
+		int senderX, senderY, senderZ, reportedX, reportedY, reportedZ;
 
-		boolean claimStatus = false;
-		String claimedBy = null, claimDate = null;
+		boolean claimStatus;
+		String claimedBy, claimDate;
 
-		boolean completionStatus = false;
-		String completedBy = null, completionDate = null, summaryDetails = null;
+		boolean completionStatus;
+		String completedBy, completionDate, summaryDetails;
 
-		OfflinePlayer player = null;
+		OfflinePlayer player;
 
 		final ExtendedDatabaseHandler database = getManager().getDatabaseHandler();
 		final int connectionId = database.openPooledConnection();
@@ -564,7 +564,6 @@ public class ViewCommand extends ReporterCommand {
 			}
 
 			claimDate = result.getString("ClaimDate");
-			completionStatus = result.getBoolean("CompletionStatus");
 			completedBy = result.getString("CompletedBy");
 
 			if (!result.getString("CompletedByUUID").isEmpty()) {

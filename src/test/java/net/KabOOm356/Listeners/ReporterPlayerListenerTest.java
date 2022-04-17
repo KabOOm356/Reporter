@@ -32,8 +32,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class ReporterPlayerListenerTest extends MockitoTest {

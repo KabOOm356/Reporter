@@ -189,7 +189,7 @@ public class Reporter extends JavaPlugin {
 	private void setupCommands() {
 		final String[] cmds = {"report", "rreport", "rep", "respond", "rrespond", "resp"};
 
-		PluginCommand cmd = null;
+		PluginCommand cmd;
 
 		boolean error = false;
 
@@ -214,8 +214,8 @@ public class Reporter extends JavaPlugin {
 		if (getConfig().getBoolean("plugin.updates.checkForUpdates", true)) {
 			final ReleaseLevel pluginLevel = ReleaseLevel.getByName(getConfig().getString("plugin.updates.updateLevel", "RELEASE"));
 
-			URL url = null;
-			URLConnection connection = null;
+			URL url;
+			URLConnection connection;
 
 			try {
 				url = new URL(pluginUpdateAPI);

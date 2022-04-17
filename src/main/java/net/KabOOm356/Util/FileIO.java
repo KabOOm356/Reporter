@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.nio.file.Files;
 
 /**
  * A class to help with file input and output.
@@ -69,7 +70,7 @@ public final class FileIO {
 
 		try {
 			input = new BufferedReader(new InputStreamReader(in.toURI().toURL().openStream(), inEncoding));
-			output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(out), outEncoding));
+			output = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(out.toPath()), outEncoding));
 
 			while ((line = input.readLine()) != null) {
 				output.write(line);

@@ -67,7 +67,7 @@ public class PluginUpdater extends Updater {
 		}
 
 		BufferedReader in = null;
-		String list = null;
+		String list;
 
 		try {
 			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
