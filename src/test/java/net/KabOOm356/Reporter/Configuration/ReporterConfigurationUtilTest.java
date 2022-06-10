@@ -1,18 +1,17 @@
 package net.KabOOm356.Reporter.Configuration;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
+
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.file.YamlConfigurationOptions;
 import org.junit.Test;
 import org.mockito.Mock;
 import test.test.MockitoTest;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
-
 public class ReporterConfigurationUtilTest extends MockitoTest {
-  @Mock
-  private YamlConfiguration configuration;
+  @Mock private YamlConfiguration configuration;
 
   @Test
   public void testUpdateConfigurationNoUpdate() {

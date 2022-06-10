@@ -1,5 +1,7 @@
 package test.test.service;
 
+import static org.mockito.Mockito.*;
+
 import net.KabOOm356.Database.ExtendedDatabaseHandler;
 import net.KabOOm356.Locale.Locale;
 import net.KabOOm356.Permission.PermissionHandler;
@@ -14,67 +16,58 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import test.test.MockitoTest;
 
-import static org.mockito.Mockito.*;
-
 public abstract class ServiceTest extends MockitoTest {
-	private ServiceModule module;
-	@Spy
-	private final LastViewed lastViewed = new LastViewed();
-	@Spy
-	private final PlayerMessages playerMessages = new PlayerMessages();
-	@Mock
-	private PlayerReport playerReports;
-	@Mock
-	private Configuration configuration;
-	@Mock
-	private ExtendedDatabaseHandler databaseHandler;
-	@Mock
-	private PermissionHandler permissionHandler;
-	@Mock
-	private Locale locale;
+  private ServiceModule module;
+  @Spy private final LastViewed lastViewed = new LastViewed();
+  @Spy private final PlayerMessages playerMessages = new PlayerMessages();
+  @Mock private PlayerReport playerReports;
+  @Mock private Configuration configuration;
+  @Mock private ExtendedDatabaseHandler databaseHandler;
+  @Mock private PermissionHandler permissionHandler;
+  @Mock private Locale locale;
 
-	@Before
-	public void setupMocks() throws Exception {
-		final StoreModule store =
-				new StoreModule(
-						configuration,
-						databaseHandler,
-						locale,
-						permissionHandler,
-						lastViewed,
-						playerMessages,
-						playerReports);
-		module =
-				mock(
-						ServiceModule.class,
-						withSettings().useConstructor(store).defaultAnswer(CALLS_REAL_METHODS));
-	}
+  @Before
+  public void setupMocks() throws Exception {
+    final StoreModule store =
+        new StoreModule(
+            configuration,
+            databaseHandler,
+            locale,
+            permissionHandler,
+            lastViewed,
+            playerMessages,
+            playerReports);
+    module =
+        mock(
+            ServiceModule.class,
+            withSettings().useConstructor(store).defaultAnswer(CALLS_REAL_METHODS));
+  }
 
-	public ServiceModule getModule() {
-		return module;
-	}
+  public ServiceModule getModule() {
+    return module;
+  }
 
-	public Configuration getConfiguration() {
-		return configuration;
-	}
+  public Configuration getConfiguration() {
+    return configuration;
+  }
 
-	public ExtendedDatabaseHandler getDatabaseHandler() {
-		return databaseHandler;
-	}
+  public ExtendedDatabaseHandler getDatabaseHandler() {
+    return databaseHandler;
+  }
 
-	public PermissionHandler getPermissionHandler() {
-		return permissionHandler;
-	}
+  public PermissionHandler getPermissionHandler() {
+    return permissionHandler;
+  }
 
-	public LastViewed getLastViewedHandler() {
-		return lastViewed;
-	}
+  public LastViewed getLastViewedHandler() {
+    return lastViewed;
+  }
 
-	public PlayerReport getPlayerReports() {
-		return playerReports;
-	}
+  public PlayerReport getPlayerReports() {
+    return playerReports;
+  }
 
-	public Locale getLocale() {
-		return locale;
-	}
+  public Locale getLocale() {
+    return locale;
+  }
 }

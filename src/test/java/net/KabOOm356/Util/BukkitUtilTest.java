@@ -1,5 +1,9 @@
 package net.KabOOm356.Util;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -14,11 +18,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.MockedStatic;
 import test.test.MockitoTest;
-
-import java.util.UUID;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 public class BukkitUtilTest extends MockitoTest {
   private static MockedStatic<Bukkit> bukkit;
@@ -94,7 +93,7 @@ public class BukkitUtilTest extends MockitoTest {
   public void testFormatPlayerNameCommandSenderPlayer() {
     final String playerName = "TestName";
     final OfflinePlayer player =
-            mock(OfflinePlayer.class, withSettings().extraInterfaces(CommandSender.class));
+        mock(OfflinePlayer.class, withSettings().extraInterfaces(CommandSender.class));
     when(player.getName()).thenReturn(playerName);
 
     assertEquals(playerName, BukkitUtil.formatPlayerName((CommandSender) player));
@@ -113,7 +112,7 @@ public class BukkitUtilTest extends MockitoTest {
   public void testFormatPlayerNameCommandSenderPlayerDisplayRealName() {
     final String playerName = "TestName";
     final OfflinePlayer player =
-            mock(OfflinePlayer.class, withSettings().extraInterfaces(CommandSender.class));
+        mock(OfflinePlayer.class, withSettings().extraInterfaces(CommandSender.class));
     when(player.getName()).thenReturn(playerName);
 
     assertEquals(playerName, BukkitUtil.formatPlayerName((CommandSender) player, true));
@@ -163,8 +162,8 @@ public class BukkitUtilTest extends MockitoTest {
     when(offlinePlayer.getPlayer()).thenReturn(player);
 
     assertEquals(
-            "displayName " + ChatColor.GOLD + "(playerName)",
-            BukkitUtil.formatPlayerName(offlinePlayer, true));
+        "displayName " + ChatColor.GOLD + "(playerName)",
+        BukkitUtil.formatPlayerName(offlinePlayer, true));
   }
 
   @Test
@@ -184,8 +183,8 @@ public class BukkitUtilTest extends MockitoTest {
     when(player.getName()).thenReturn("playerName");
 
     assertEquals(
-            "displayName " + ChatColor.GOLD + "(playerName)",
-            BukkitUtil.formatPlayerName(player, true));
+        "displayName " + ChatColor.GOLD + "(playerName)",
+        BukkitUtil.formatPlayerName(player, true));
   }
 
   @Test
@@ -210,8 +209,8 @@ public class BukkitUtilTest extends MockitoTest {
     final String realName = "RealName";
 
     assertEquals(
-            "DisplayName " + ChatColor.GOLD + "(RealName)",
-            BukkitUtil.formatPlayerName(displayName, realName));
+        "DisplayName " + ChatColor.GOLD + "(RealName)",
+        BukkitUtil.formatPlayerName(displayName, realName));
   }
 
   @Test
@@ -220,8 +219,8 @@ public class BukkitUtilTest extends MockitoTest {
     final String realName = "TestName";
 
     assertEquals(
-            "TestName " + ChatColor.GOLD + "(TestName)",
-            BukkitUtil.formatPlayerName(displayName, realName, true));
+        "TestName " + ChatColor.GOLD + "(TestName)",
+        BukkitUtil.formatPlayerName(displayName, realName, true));
   }
 
   @Test
@@ -230,8 +229,8 @@ public class BukkitUtilTest extends MockitoTest {
     final String realName = "Name";
 
     assertEquals(
-            "TestName " + ChatColor.GOLD + "(Name)",
-            BukkitUtil.formatPlayerName(displayName, realName, true));
+        "TestName " + ChatColor.GOLD + "(Name)",
+        BukkitUtil.formatPlayerName(displayName, realName, true));
   }
 
   @Test
@@ -240,8 +239,8 @@ public class BukkitUtilTest extends MockitoTest {
     final String realName = "RealName";
 
     assertEquals(
-            "DisplayName " + ChatColor.GOLD + "(RealName)",
-            BukkitUtil.formatPlayerName(displayName, realName, true));
+        "DisplayName " + ChatColor.GOLD + "(RealName)",
+        BukkitUtil.formatPlayerName(displayName, realName, true));
   }
 
   @Test
@@ -250,8 +249,8 @@ public class BukkitUtilTest extends MockitoTest {
     final String realName = "RealName";
 
     assertEquals(
-            "DisplayName " + ChatColor.GOLD + "(RealName)",
-            BukkitUtil.formatPlayerName(displayName, realName, false));
+        "DisplayName " + ChatColor.GOLD + "(RealName)",
+        BukkitUtil.formatPlayerName(displayName, realName, false));
   }
 
   @Test
@@ -321,13 +320,13 @@ public class BukkitUtilTest extends MockitoTest {
     final UUID matchingUUID = UUID.randomUUID();
     final String matchingName = "MatchingTestName";
     final CommandSender commandSender =
-            mock(CommandSender.class, withSettings().extraInterfaces(OfflinePlayer.class));
+        mock(CommandSender.class, withSettings().extraInterfaces(OfflinePlayer.class));
     final CommandSender commandSender1 =
-            mock(CommandSender.class, withSettings().extraInterfaces(OfflinePlayer.class));
+        mock(CommandSender.class, withSettings().extraInterfaces(OfflinePlayer.class));
 
     when(((OfflinePlayer) commandSender).getUniqueId()).thenReturn(matchingUUID, UUID.randomUUID());
     when(((OfflinePlayer) commandSender1).getUniqueId())
-            .thenReturn(matchingUUID, UUID.randomUUID());
+        .thenReturn(matchingUUID, UUID.randomUUID());
     when(commandSender.getName()).thenReturn(matchingName, "NonMatchingName");
     when(commandSender1.getName()).thenReturn(matchingName, "AnotherName");
     // UUID check => true
@@ -343,7 +342,7 @@ public class BukkitUtilTest extends MockitoTest {
     assertEquals("", BukkitUtil.colorCodeReplaceAll(""));
     assertEquals("This is a string", BukkitUtil.colorCodeReplaceAll("This is a string"));
     assertEquals(
-            "§0This §1is §2a §3string", BukkitUtil.colorCodeReplaceAll("&0This &1is &2a &3string"));
+        "§0This §1is §2a §3string", BukkitUtil.colorCodeReplaceAll("&0This &1is &2a &3string"));
     assertEquals("§a", BukkitUtil.colorCodeReplaceAll("&a"));
   }
 
@@ -351,7 +350,7 @@ public class BukkitUtilTest extends MockitoTest {
   public void testGetUUIDString() {
     final UUID uuid = UUID.randomUUID();
     final OfflinePlayer offlinePlayer =
-            mock(OfflinePlayer.class, withSettings().extraInterfaces(CommandSender.class));
+        mock(OfflinePlayer.class, withSettings().extraInterfaces(CommandSender.class));
     when(offlinePlayer.getUniqueId()).thenReturn(uuid);
     when(offlinePlayer.getName()).thenReturn("testName");
 
@@ -504,8 +503,8 @@ public class BukkitUtilTest extends MockitoTest {
 
     bukkit.when(() -> Bukkit.getOfflinePlayer(playerName)).thenReturn(offlinePlayer);
     bukkit
-            .when(Bukkit::getOfflinePlayers)
-            .thenReturn(new OfflinePlayer[]{otherOfflinePlayer, matchedOfflinePlayer});
+        .when(Bukkit::getOfflinePlayers)
+        .thenReturn(new OfflinePlayer[] {otherOfflinePlayer, matchedOfflinePlayer});
 
     assertEquals(matchedOfflinePlayer, BukkitUtil.getPlayer(playerName, true));
   }
@@ -537,7 +536,7 @@ public class BukkitUtilTest extends MockitoTest {
     final OfflinePlayer offlinePlayer4 = mock(OfflinePlayer.class);
     when(offlinePlayer4.getName()).thenReturn("another player");
     final OfflinePlayer[] offlinePlayers = {
-            offlinePlayer, offlinePlayer2, offlinePlayer3, offlinePlayer4
+      offlinePlayer, offlinePlayer2, offlinePlayer3, offlinePlayer4
     };
     bukkit.when(Bukkit::getOfflinePlayers).thenReturn(offlinePlayers);
     assertEquals(offlinePlayer, BukkitUtil.matchOfflinePlayer("Test"));
@@ -560,7 +559,7 @@ public class BukkitUtilTest extends MockitoTest {
     final OfflinePlayer offlinePlayer4 = mock(OfflinePlayer.class);
     when(offlinePlayer4.getName()).thenReturn("another player");
     final OfflinePlayer[] offlinePlayers = {
-            offlinePlayer, offlinePlayer2, offlinePlayer3, offlinePlayer4
+      offlinePlayer, offlinePlayer2, offlinePlayer3, offlinePlayer4
     };
     bukkit.when(Bukkit::getOfflinePlayers).thenReturn(offlinePlayers);
     assertNull(BukkitUtil.matchOfflinePlayer("Does not exist"));

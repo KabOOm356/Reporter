@@ -1,14 +1,13 @@
 package net.KabOOm356.Util;
 
+import static org.junit.Assert.*;
+
+import java.sql.SQLException;
+import java.util.*;
 import net.KabOOm356.Database.ResultRow;
 import net.KabOOm356.Database.SQLResultSet;
 import org.bukkit.ChatColor;
 import org.junit.Test;
-
-import java.sql.SQLException;
-import java.util.*;
-
-import static org.junit.Assert.*;
 
 public class ArrayUtilTest {
   @Test(expected = IllegalArgumentException.class)
@@ -202,16 +201,16 @@ public class ArrayUtilTest {
 
     returned = ArrayUtil.indexesToString(testArray, ChatColor.RED, ChatColor.WHITE);
     expected =
-            ChatColor.RED
-                    + "FirstElement"
-                    + ChatColor.WHITE
-                    + ", "
-                    + ChatColor.RED
-                    + "SecondElement"
-                    + ChatColor.WHITE
-                    + ", "
-                    + ChatColor.RED
-                    + "LastElement";
+        ChatColor.RED
+            + "FirstElement"
+            + ChatColor.WHITE
+            + ", "
+            + ChatColor.RED
+            + "SecondElement"
+            + ChatColor.WHITE
+            + ", "
+            + ChatColor.RED
+            + "LastElement";
     assertEquals(expected, returned);
   }
 
@@ -229,22 +228,22 @@ public class ArrayUtilTest {
     resultSet.add(resultRow);
 
     String returned =
-            ArrayUtil.indexesToString(new SQLResultSet(), "TestColumn", ChatColor.RED, ChatColor.WHITE);
+        ArrayUtil.indexesToString(new SQLResultSet(), "TestColumn", ChatColor.RED, ChatColor.WHITE);
     String expected = "";
     assertEquals(expected, returned);
 
     returned = ArrayUtil.indexesToString(resultSet, "TestColumn", ChatColor.RED, ChatColor.WHITE);
     expected =
-            ChatColor.RED
-                    + "1"
-                    + ChatColor.WHITE
-                    + ", "
-                    + ChatColor.RED
-                    + '3'
-                    + ChatColor.WHITE
-                    + ", "
-                    + ChatColor.RED
-                    + "LastValue";
+        ChatColor.RED
+            + "1"
+            + ChatColor.WHITE
+            + ", "
+            + ChatColor.RED
+            + '3'
+            + ChatColor.WHITE
+            + ", "
+            + ChatColor.RED
+            + "LastValue";
     assertEquals(expected, returned);
   }
 }

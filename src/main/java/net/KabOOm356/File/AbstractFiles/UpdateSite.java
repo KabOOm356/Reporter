@@ -1,62 +1,55 @@
 package net.KabOOm356.File.AbstractFiles;
 
 /**
- * A {@link NetworkFile} that is a readable index for other files or entries, in either XML or RSS format.
+ * A {@link NetworkFile} that is a readable index for other files or entries, in either XML or RSS
+ * format.
  */
 public class UpdateSite extends NetworkFile {
-	/**
-	 * The type of this UpdateSite.
-	 */
-	private final Type type;
+  /** The type of this UpdateSite. */
+  private final Type type;
 
-	/**
-	 * UpdateSite Constructor.
-	 *
-	 * @param url  The URL location of this file on the network.
-	 * @param type The {@link Type} of this UpdateSite.
-	 */
-	public UpdateSite(final String url, final Type type) {
-		super(url);
+  /**
+   * UpdateSite Constructor.
+   *
+   * @param url The URL location of this file on the network.
+   * @param type The {@link Type} of this UpdateSite.
+   */
+  public UpdateSite(final String url, final Type type) {
+    super(url);
 
-		this.type = type;
-	}
+    this.type = type;
+  }
 
-	/**
-	 * @return The type of this UpdateSite.
-	 */
-	public Type getType() {
-		return type;
-	}
+  /**
+   * @return The type of this UpdateSite.
+   */
+  public Type getType() {
+    return type;
+  }
 
-	@Override
-	public String toString() {
-		String string = super.toString();
-		string += "\nType: " + type;
+  @Override
+  public String toString() {
+    String string = super.toString();
+    string += "\nType: " + type;
 
-		return string;
-	}
+    return string;
+  }
 
-	/**
-	 * Defines the type of UpdateSite.
-	 */
-	public enum Type {
-		/**
-		 * RSS UpdateSite Type.
-		 */
-		RSS("RSS"),
-		/**
-		 * XML UpdateSite Type.
-		 */
-		XML("XML");
+  /** Defines the type of UpdateSite. */
+  public enum Type {
+    /** RSS UpdateSite Type. */
+    RSS("RSS"),
+    /** XML UpdateSite Type. */
+    XML("XML");
 
-		private final String name;
+    private final String name;
 
-		Type(final String name) {
-			this.name = name;
-		}
+    Type(final String name) {
+      this.name = name;
+    }
 
-		public String toString() {
-			return name;
-		}
-	}
+    public String toString() {
+      return name;
+    }
+  }
 }

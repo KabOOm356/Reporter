@@ -9,30 +9,30 @@ import net.KabOOm356.Reporter.Database.Table.Creator.ModStatsTableCreator;
 import net.KabOOm356.Reporter.Database.Table.Updater.ModStatsTableUpdater;
 
 public class ModStatsTableInitializer extends DatabaseTableInitializer {
-	private static final String tableName = "ModStats";
+  private static final String tableName = "ModStats";
 
-	private final ModStatsTableCreator creator;
-	private final ModStatsTableUpdater updater;
+  private final ModStatsTableCreator creator;
+  private final ModStatsTableUpdater updater;
 
-	public ModStatsTableInitializer(final Database database, final String databaseVersion) {
-		super();
+  public ModStatsTableInitializer(final Database database, final String databaseVersion) {
+    super();
 
-		this.creator = new ModStatsTableCreator(database, databaseVersion, tableName);
-		this.updater = new ModStatsTableUpdater(database, databaseVersion, tableName);
-	}
+    this.creator = new ModStatsTableCreator(database, databaseVersion, tableName);
+    this.updater = new ModStatsTableUpdater(database, databaseVersion, tableName);
+  }
 
-	@Override
-	protected DatabaseTableCreator getCreator() {
-		return creator;
-	}
+  @Override
+  protected DatabaseTableCreator getCreator() {
+    return creator;
+  }
 
-	@Override
-	protected DatabaseTableMigrator getMigrator() {
-		return null;
-	}
+  @Override
+  protected DatabaseTableMigrator getMigrator() {
+    return null;
+  }
 
-	@Override
-	protected DatabaseTableUpdater getUpdater() {
-		return updater;
-	}
+  @Override
+  protected DatabaseTableUpdater getUpdater() {
+    return updater;
+  }
 }

@@ -1,5 +1,8 @@
 package net.KabOOm356.Listeners;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import net.KabOOm356.Command.Commands.ListCommand;
 import net.KabOOm356.Command.Commands.ViewCommand;
 import net.KabOOm356.Command.ReporterCommand;
@@ -23,219 +26,273 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-/**
- * A {@link Listener} that listens for player events.
- */
+/** A {@link Listener} that listens for player events. */
 public class ReporterPlayerListener implements Listener {
-	private static final Logger log = LogManager.getLogger(ReporterPlayerListener.class);
+  private static final Logger log = LogManager.getLogger(ReporterPlayerListener.class);
 
-	private final Reporter plugin;
+  private final Reporter plugin;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param instance The running instance of {@link Reporter}.
-	 */
-	public ReporterPlayerListener(final Reporter instance) {
-		plugin = instance;
-	}
+  /**
+   * Constructor.
+   *
+   * @param instance The running instance of {@link Reporter}.
+   */
+  public ReporterPlayerListener(final Reporter instance) {
+    plugin = instance;
+  }
 
-	/**
-	 * Run when a player joins.
-	 *
-	 * @param event The player join event.
-	 */
-	@EventHandler(priority = EventPriority.NORMAL)
-	public void onPlayerJoin(final PlayerJoinEvent event) {
-		final Player player = event.getPlayer();
+  /**
+   * Run when a player joins.
+   *
+   * @param event The player join event.
+   */
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onPlayerJoin(final PlayerJoinEvent event) {
+    final Player player = event.getPlayer();
 
-		final PlayerMessageService playerMessageService = plugin.getCommandManager().getServiceModule().getPlayerMessageService();
+    final PlayerMessageService playerMessageService =
+        plugin.getCommandManager().getServiceModule().getPlayerMessageService();
 
-		if (playerMessageService.hasMessages(player.getUniqueId().toString()) || playerMessageService.hasMessages(player.getName())) {
-			sendMessages(player);
-		}
+    if (playerMessageService.hasMessages(player.getUniqueId().toString())
+        || playerMessageService.hasMessages(player.getName())) {
+      sendMessages(player);
+    }
 
-		if (plugin.getConfig().getBoolean("general.messaging.listOnLogin.listOnLogin", true)) {
-			listOnLogin(player);
-		}
+    if (plugin.getConfig().getBoolean("general.messaging.listOnLogin.listOnLogin", true)) {
+      listOnLogin(player);
+    }
 
-		final boolean alertReportedPlayerLogin = plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.enabled", true);
-		if (alertReportedPlayerLogin) {
-			final boolean alertConsoleReportedPlayerLogin = plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.toConsole", true);
-			final boolean alertPlayersReportedPlayerLogin = plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.toPlayer", true);
-			if (alertConsoleReportedPlayerLogin || alertPlayersReportedPlayerLogin) {
-				if (isPlayerReported(player)) {
-					alertThatReportedPlayerLogin(player);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Runs when a player quits.
-	 *
-	 * @param event The player quit event.
-	 */
-	@EventHandler(priority = EventPriority.NORMAL)
-	public void onPlayerQuit(final PlayerQuitEvent event) {
-		plugin.getCommandManager().getServiceModule().getLastViewedReportService().removeLastViewedReport(event.getPlayer());
-	}
-
-	private void listOnLogin(final Player player) {
-		final ReporterCommand listCommand = plugin.getCommandManager().getCommand(ListCommand.getCommandName());
-		if (listCommand.hasPermission(player)) {
-            listCommand.setSender(player);
-            listCommand.setArguments(new ArrayList<>());
-            if (plugin.getConfig().getBoolean("general.messaging.listOnLogin.useDelay", true)) {
-                final int delay = plugin.getConfig().getInt("general.messaging.listOnLogin.delay", 5);
-                Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, listCommand, BukkitUtil.convertSecondsToServerTicks(delay));
-            } else {
-                Bukkit.getScheduler().runTaskAsynchronously(plugin, listCommand);
-            }
+    final boolean alertReportedPlayerLogin =
+        plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.enabled", true);
+    if (alertReportedPlayerLogin) {
+      final boolean alertConsoleReportedPlayerLogin =
+          plugin
+              .getConfig()
+              .getBoolean("general.messaging.alerts.reportedPlayerLogin.toConsole", true);
+      final boolean alertPlayersReportedPlayerLogin =
+          plugin
+              .getConfig()
+              .getBoolean("general.messaging.alerts.reportedPlayerLogin.toPlayer", true);
+      if (alertConsoleReportedPlayerLogin || alertPlayersReportedPlayerLogin) {
+        if (isPlayerReported(player)) {
+          alertThatReportedPlayerLogin(player);
         }
-	}
+      }
+    }
+  }
 
-	private void sendMessages(final Player player) {
-		// Players can view a message if they have permission to view all reports or their submitted reports.
-		boolean canView = plugin.getCommandManager().getServiceModule().getPermissionService().hasPermission(player, ViewCommand.getCommandPermissionNode());
-		canView = canView || plugin.getConfig().getBoolean("general.canViewSubmittedReports", true);
+  /**
+   * Runs when a player quits.
+   *
+   * @param event The player quit event.
+   */
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onPlayerQuit(final PlayerQuitEvent event) {
+    plugin
+        .getCommandManager()
+        .getServiceModule()
+        .getLastViewedReportService()
+        .removeLastViewedReport(event.getPlayer());
+  }
 
-		final PlayerMessageService playerMessageService = plugin.getCommandManager().getServiceModule().getPlayerMessageService();
+  private void listOnLogin(final Player player) {
+    final ReporterCommand listCommand =
+        plugin.getCommandManager().getCommand(ListCommand.getCommandName());
+    if (listCommand.hasPermission(player)) {
+      listCommand.setSender(player);
+      listCommand.setArguments(new ArrayList<>());
+      if (plugin.getConfig().getBoolean("general.messaging.listOnLogin.useDelay", true)) {
+        final int delay = plugin.getConfig().getInt("general.messaging.listOnLogin.delay", 5);
+        Bukkit.getScheduler()
+            .runTaskLaterAsynchronously(
+                plugin, listCommand, BukkitUtil.convertSecondsToServerTicks(delay));
+      } else {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, listCommand);
+      }
+    }
+  }
 
-		// No point to send the message if the player can't view any reports.
-		if (canView) {
-			// Get the messages for the player using their UUID.
-			final List<String> messages = playerMessageService.getMessages(player.getUniqueId().toString());
-			// Get the messages for the player using their player name.
-			final List<String> playerNameMessages = playerMessageService.getMessages(player.getName());
+  private void sendMessages(final Player player) {
+    // Players can view a message if they have permission to view all reports or their submitted
+    // reports.
+    boolean canView =
+        plugin
+            .getCommandManager()
+            .getServiceModule()
+            .getPermissionService()
+            .hasPermission(player, ViewCommand.getCommandPermissionNode());
+    canView = canView || plugin.getConfig().getBoolean("general.canViewSubmittedReports", true);
 
-			// Append the message pools.
-			messages.addAll(playerNameMessages);
+    final PlayerMessageService playerMessageService =
+        plugin.getCommandManager().getServiceModule().getPlayerMessageService();
 
-			if (plugin.getConfig().getBoolean("general.messaging.completedMessageOnLogin.useDelay", true)) {
-				int messageGroup = 1;
-				int message = 0;
+    // No point to send the message if the player can't view any reports.
+    if (canView) {
+      // Get the messages for the player using their UUID.
+      final List<String> messages =
+          playerMessageService.getMessages(player.getUniqueId().toString());
+      // Get the messages for the player using their player name.
+      final List<String> playerNameMessages = playerMessageService.getMessages(player.getName());
 
-				long delayTime = 0;
-				final int delayTimeInSeconds = plugin.getConfig().getInt("general.messaging.completedMessageOnLogin.delay", 5);
+      // Append the message pools.
+      messages.addAll(playerNameMessages);
 
-				while (!messages.isEmpty()) {
-					// Calculate the delay time in bukkit ticks and the offset for the message group.
-					delayTime = BukkitUtil.convertSecondsToServerTicks(delayTimeInSeconds) * messageGroup;
+      if (plugin
+          .getConfig()
+          .getBoolean("general.messaging.completedMessageOnLogin.useDelay", true)) {
+        int messageGroup = 1;
+        int message = 0;
 
-					final String output = messages.remove(0);
+        long delayTime = 0;
+        final int delayTimeInSeconds =
+            plugin.getConfig().getInt("general.messaging.completedMessageOnLogin.delay", 5);
 
-					Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new DelayedMessage(player, output), delayTime);
+        while (!messages.isEmpty()) {
+          // Calculate the delay time in bukkit ticks and the offset for the message group.
+          delayTime = BukkitUtil.convertSecondsToServerTicks(delayTimeInSeconds) * messageGroup;
 
-					message++;
+          final String output = messages.remove(0);
 
-					if (message % 5 == 0) {
-						messageGroup++;
-					}
-				}
-			} else {
-				for (final String message : messages) {
-					player.sendMessage(message);
-				}
-			}
-		}
+          Bukkit.getScheduler()
+              .runTaskLaterAsynchronously(plugin, new DelayedMessage(player, output), delayTime);
 
-		// Remove the messages for the player.
-		playerMessageService.removePlayerMessages(player.getUniqueId().toString());
-		playerMessageService.removePlayerMessages(player.getName());
-	}
+          message++;
 
-	private boolean isPlayerReported(final Player player) {
-		final StringBuilder query = new StringBuilder();
-		query.append("SELECT ID ")
-				.append("FROM Reports ")
-				.append("WHERE ReportedUUID = '").append(player.getUniqueId()).append("' AND CompletionStatus = 0");
+          if (message % 5 == 0) {
+            messageGroup++;
+          }
+        }
+      } else {
+        for (final String message : messages) {
+          player.sendMessage(message);
+        }
+      }
+    }
 
-		final SQLResultSet result;
+    // Remove the messages for the player.
+    playerMessageService.removePlayerMessages(player.getUniqueId().toString());
+    playerMessageService.removePlayerMessages(player.getName());
+  }
 
-		try {
-			result = plugin.getDatabaseHandler().sqlQuery(query.toString());
-			return !result.isEmpty();
-		} catch (final Exception e) {
-			log.error("Failed to execute sql query!", e);
-		}
-		return false;
-	}
+  private boolean isPlayerReported(final Player player) {
+    final StringBuilder query = new StringBuilder();
+    query
+        .append("SELECT ID ")
+        .append("FROM Reports ")
+        .append("WHERE ReportedUUID = '")
+        .append(player.getUniqueId())
+        .append("' AND CompletionStatus = 0");
 
-	private void alertThatReportedPlayerLogin(final Player reportedPlayer) {
-		final StringBuilder query = new StringBuilder();
-		query.append("SELECT ID, ClaimStatus, ClaimedByUUID ")
-				.append("FROM Reports ")
-				.append("WHERE ReportedUUID = '").append(reportedPlayer.getUniqueId()).append("' AND CompletionStatus = 0");
+    final SQLResultSet result;
 
-		final SQLResultSet result;
+    try {
+      result = plugin.getDatabaseHandler().sqlQuery(query.toString());
+      return !result.isEmpty();
+    } catch (final Exception e) {
+      log.error("Failed to execute sql query!", e);
+    }
+    return false;
+  }
 
-		try {
-			result = plugin.getDatabaseHandler().sqlQuery(query.toString());
-		} catch (final Exception e) {
-			log.error("Failed to execute sql query!", e);
-			return;
-		}
+  private void alertThatReportedPlayerLogin(final Player reportedPlayer) {
+    final StringBuilder query = new StringBuilder();
+    query
+        .append("SELECT ID, ClaimStatus, ClaimedByUUID ")
+        .append("FROM Reports ")
+        .append("WHERE ReportedUUID = '")
+        .append(reportedPlayer.getUniqueId())
+        .append("' AND CompletionStatus = 0");
 
-		final boolean displayAlertToPlayers = plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.toPlayer", true);
+    final SQLResultSet result;
 
-		final List<Integer> indexes = new ArrayList<>();
+    try {
+      result = plugin.getDatabaseHandler().sqlQuery(query.toString());
+    } catch (final Exception e) {
+      log.error("Failed to execute sql query!", e);
+      return;
+    }
 
-		for (final ResultRow row : result) {
-			// If a report is claimed send a message to the claimer, if they are online.
-			if (row.getBoolean("ClaimStatus") && displayAlertToPlayers) {
-				final String uuidString = row.getString("ClaimedByUUID");
-				final UUID uuid = UUID.fromString(uuidString);
-				final OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-				alertClaimingPlayerReportedPlayerLogin(player, reportedPlayer, row.getString("ID"));
-			} else {
-				// Add the ID to the indexes to be sent to all players that can receive the alert.
-				indexes.add(row.getInt("ID"));
-			}
-		}
+    final boolean displayAlertToPlayers =
+        plugin
+            .getConfig()
+            .getBoolean("general.messaging.alerts.reportedPlayerLogin.toPlayer", true);
 
-		final String reportedPlayerName = ChatColor.RED + BukkitUtil.formatPlayerName(reportedPlayer) + ChatColor.WHITE;
+    final List<Integer> indexes = new ArrayList<>();
 
-		if (plugin.getConfig().getBoolean("general.messaging.alerts.reportedPlayerLogin.toConsole", true)) {
-			final String message = plugin.getLocale().getString(AlertPhrases.alertConsoleReportedPlayerLogin)
-					.replaceAll("%r", reportedPlayerName)
-					.replaceAll("%i", ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE));
-			log.info(message);
-		}
+    for (final ResultRow row : result) {
+      // If a report is claimed send a message to the claimer, if they are online.
+      if (row.getBoolean("ClaimStatus") && displayAlertToPlayers) {
+        final String uuidString = row.getString("ClaimedByUUID");
+        final UUID uuid = UUID.fromString(uuidString);
+        final OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+        alertClaimingPlayerReportedPlayerLogin(player, reportedPlayer, row.getString("ID"));
+      } else {
+        // Add the ID to the indexes to be sent to all players that can receive the alert.
+        indexes.add(row.getInt("ID"));
+      }
+    }
 
-		alertOnlinePlayersReportedPlayerLogin(reportedPlayerName, indexes);
-	}
+    final String reportedPlayerName =
+        ChatColor.RED + BukkitUtil.formatPlayerName(reportedPlayer) + ChatColor.WHITE;
 
-	private void alertClaimingPlayerReportedPlayerLogin(final OfflinePlayer player, final OfflinePlayer reportedPlayer, final String id) {
-		if (player.isOnline()) {
-			String message = ChatColor.BLUE + Reporter.getLogPrefix() +
-					ChatColor.WHITE + plugin.getLocale().getString(AlertPhrases.alertClaimedPlayerLogin);
+    if (plugin
+        .getConfig()
+        .getBoolean("general.messaging.alerts.reportedPlayerLogin.toConsole", true)) {
+      final String message =
+          plugin
+              .getLocale()
+              .getString(AlertPhrases.alertConsoleReportedPlayerLogin)
+              .replaceAll("%r", reportedPlayerName)
+              .replaceAll(
+                  "%i", ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE));
+      log.info(message);
+    }
 
-			message = message
-					.replaceAll("%r", ChatColor.RED + BukkitUtil.formatPlayerName(reportedPlayer) + ChatColor.WHITE)
-					.replaceAll("%i", ChatColor.GOLD + id + ChatColor.WHITE);
+    alertOnlinePlayersReportedPlayerLogin(reportedPlayerName, indexes);
+  }
 
-			player.getPlayer().sendMessage(message);
-		}
-	}
+  private void alertClaimingPlayerReportedPlayerLogin(
+      final OfflinePlayer player, final OfflinePlayer reportedPlayer, final String id) {
+    if (player.isOnline()) {
+      String message =
+          ChatColor.BLUE
+              + Reporter.getLogPrefix()
+              + ChatColor.WHITE
+              + plugin.getLocale().getString(AlertPhrases.alertClaimedPlayerLogin);
 
-	private void alertOnlinePlayersReportedPlayerLogin(final String reportedPlayerName, final List<Integer> indexes) {
-		String message = ChatColor.BLUE + Reporter.getLogPrefix() +
-				ChatColor.WHITE + plugin.getLocale().getString(AlertPhrases.alertUnclaimedPlayerLogin);
+      message =
+          message
+              .replaceAll(
+                  "%r",
+                  ChatColor.RED + BukkitUtil.formatPlayerName(reportedPlayer) + ChatColor.WHITE)
+              .replaceAll("%i", ChatColor.GOLD + id + ChatColor.WHITE);
 
-		message = message
-				.replaceAll("%r", reportedPlayerName)
-				.replaceAll("%i", ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE));
+      player.getPlayer().sendMessage(message);
+    }
+  }
 
-		for (final Player player : Bukkit.getOnlinePlayers()) {
-			// Send the message to players with the permission to get it.
-			if (plugin.getCommandManager().getServiceModule().getPermissionService().hasPermission(player, "reporter.alerts.onlogin.reportedPlayerLogin")) {
-				player.sendMessage(message);
-			}
-		}
-	}
+  private void alertOnlinePlayersReportedPlayerLogin(
+      final String reportedPlayerName, final List<Integer> indexes) {
+    String message =
+        ChatColor.BLUE
+            + Reporter.getLogPrefix()
+            + ChatColor.WHITE
+            + plugin.getLocale().getString(AlertPhrases.alertUnclaimedPlayerLogin);
+
+    message =
+        message
+            .replaceAll("%r", reportedPlayerName)
+            .replaceAll("%i", ArrayUtil.indexesToString(indexes, ChatColor.GOLD, ChatColor.WHITE));
+
+    for (final Player player : Bukkit.getOnlinePlayers()) {
+      // Send the message to players with the permission to get it.
+      if (plugin
+          .getCommandManager()
+          .getServiceModule()
+          .getPermissionService()
+          .hasPermission(player, "reporter.alerts.onlogin.reportedPlayerLogin")) {
+        player.sendMessage(message);
+      }
+    }
+  }
 }

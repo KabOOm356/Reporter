@@ -9,43 +9,43 @@ import java.util.Map.Entry;
  * @param <V> The type of the value (the second object of the pair).
  */
 public class ObjectPair<K, V> implements Entry<K, V> {
-	private K key;
-	private V value;
+  private K key;
+  private V value;
 
-	public ObjectPair(final K key, final V value) {
-		this.key = key;
-		this.value = value;
-	}
+  public ObjectPair(final K key, final V value) {
+    this.key = key;
+    this.value = value;
+  }
 
-	@Override
-	public K getKey() {
-		return key;
-	}
+  @Override
+  public K getKey() {
+    return key;
+  }
 
-	@Override
-	public V getValue() {
-		return value;
-	}
+  @Override
+  public V getValue() {
+    return value;
+  }
 
-	public K setKey(final K key) {
-		final K oldKey = this.key;
+  public K setKey(final K key) {
+    final K oldKey = this.key;
 
-		this.key = key;
+    this.key = key;
 
-		return oldKey;
-	}
+    return oldKey;
+  }
 
-	@Override
-	public V setValue(final V value) {
-		final V oldValue = this.value;
+  @Override
+  public V setValue(final V value) {
+    final V oldValue = this.value;
 
-		this.value = value;
+    this.value = value;
 
-		return oldValue;
-	}
+    return oldValue;
+  }
 
-	@Override
-	public String toString() {
-		return "[" + key + '=' + value + ']';
-	}
+  @Override
+  public String toString() {
+    return "[" + key + '=' + value + ']';
+  }
 }
