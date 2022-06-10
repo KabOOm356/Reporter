@@ -406,7 +406,7 @@ Changelog:
                 Added a permission node for allowing players to view the help dialog.
                 Fixed issue with some UTF-8 languages not being stored in the database correctly.
                 Fixed respond command failing due to being called on separate thread.
-    4.0.0
+    4.0.0   6/10/2022
                 Updated Bukkit API to 1.19-R0.1-SNAPSHOT.
                 Upgrade compile target to Java 8.
                 Upgrade bstats-bukkit from 1.8 to 3.0.0.
