@@ -13,11 +13,13 @@ buildscript {
     }
     dependencies {
         classpath "gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0"
+		classpath "com.diffplug.spotless:spotless-plugin-gradle:6.7.0"
     }
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
+apply plugin: 'com.diffplug.spotless'
 
 group = 'net.KabOOm356'
 version = pluginVersion
@@ -43,6 +45,22 @@ shadowJar {
     archiveFileName = 'Reporter.jar'
 }
 build.dependsOn shadowJar
+
+spotless {
+    ratchetFrom 'origin/master'
+
+    format 'misc', {
+        target '*.gradle', '*.md', '.gitignore'
+
+        trimTrailingWhitespace()
+        indentWithTabs()
+        endWithNewline()
+    }
+
+    java {
+        googleJavaFormat()
+    }
+}
 
 repositories {
     mavenCentral()
