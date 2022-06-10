@@ -407,7 +407,7 @@ Changelog:
                 Fixed issue with some UTF-8 languages not being stored in the database correctly.
                 Fixed respond command failing due to being called on separate thread.
     4.0.0
-                Updated Bukkit API to 1.18-pre5-R0.1-SNAPSHOT.
+                Updated Bukkit API to 1.19-R0.1-SNAPSHOT.
                 Upgrade compile target to Java 8.
                 Upgrade bstats-bukkit from 1.8 to 2.2.1.
                 Migrate from powermock to mockito 4 for mocking API
