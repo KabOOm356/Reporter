@@ -75,7 +75,7 @@ repositories {
 dependencies {
 	implementation group: 'org.bstats', name: 'bstats-bukkit', version: '3.0.0'
 
-	compileOnly group: 'org.spigotmc', name: 'spigot-api', version: '1.19-R0.1-SNAPSHOT'
+	compileOnly group: 'org.spigotmc', name: 'spigot-api', version: '1.19.2-R0.1-SNAPSHOT'
 	compileOnly group: 'org.spigotmc', name: 'plugin-annotations', version: '1.2.3-SNAPSHOT'
 	compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.18.0'
 	compileOnly group: 'net.milkbowl.vault', name: 'VaultAPI', version: '1.7'
