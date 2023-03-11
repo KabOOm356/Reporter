@@ -30,7 +30,7 @@ sourceCompatibility = javaTargetVersion
 targetCompatibility = javaTargetVersion
 
 wrapper {
-	gradleVersion = '7.4.1'
+	gradleVersion = '8.0.2'
 	distributionType = Wrapper.DistributionType.ALL
 }
 
