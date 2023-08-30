@@ -8,8 +8,8 @@ import net.KabOOm356.Reporter.Reporter;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 /** A class to help with initializing and updating the Reporter configuration file. */
 public final class ReporterConfigurationUtil {
@@ -107,7 +107,7 @@ public final class ReporterConfigurationUtil {
    * @return True if the configuration was updated, otherwise false.
    */
   public static boolean updateConfiguration(final FileConfiguration configuration) {
-    configuration.setDefaults(new YamlConfiguration());
+    configuration.setDefaults(new MemoryConfiguration());
 
     boolean updated = false;
 
