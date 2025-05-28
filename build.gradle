@@ -53,7 +53,7 @@ spotless {
 		target '*.gradle', '*.md', '.gitignore'
 
 		trimTrailingWhitespace()
-		indentWithTabs()
+		leadingSpacesToTabs()
 		endWithNewline()
 	}
 
