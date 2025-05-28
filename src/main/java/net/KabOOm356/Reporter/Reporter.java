@@ -52,7 +52,7 @@ import org.bukkit.plugin.java.annotation.plugin.author.Author;
  * href="http://dev.bukkit.org/server-mods/reporter/">http://dev.bukkit.org/server-mods/reporter/</a>
  */
 @Plugin(name = "Reporter", version = "4.0.0")
-@ApiVersion(ApiVersion.Target.v1_13)
+@ApiVersion("1.20")
 @Author("KabOOm 356")
 @Website("https://dev.bukkit.org/projects/reporter")
 @SoftDependency("Vault")
