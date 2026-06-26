@@ -24,7 +24,8 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
       - name: Upload a Reporter jar
+        if: matrix.java == 25
         uses: actions/upload-artifact@v7
         with:
-          name: Reporter-jdk${{ matrix.java }}
+          name: Reporter
           path: build/libs/Reporter.jar
