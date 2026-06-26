@@ -12,12 +12,12 @@ buildscript {
 		}
 	}
 	dependencies {
-		classpath "gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0"
+		classpath "com.gradleup.shadow:shadow-gradle-plugin:9.0.0"
 		classpath "com.diffplug.spotless:spotless-plugin-gradle:8.7.0"
 	}
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.gradleup.shadow'
 apply plugin: 'java'
 apply plugin: 'com.diffplug.spotless'
 
@@ -26,11 +26,13 @@ version = pluginVersion
 
 description = """"""
 
-sourceCompatibility = javaTargetVersion
-targetCompatibility = javaTargetVersion
+java {
+	sourceCompatibility = javaTargetVersion
+	targetCompatibility = javaTargetVersion
+}
 
 wrapper {
-	gradleVersion = '8.14.3'
+	gradleVersion = '9.6.0'
 	distributionType = Wrapper.DistributionType.ALL
 }
 
