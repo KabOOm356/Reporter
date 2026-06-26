@@ -26,8 +26,10 @@ version = pluginVersion
 
 description = """"""
 
-sourceCompatibility = javaTargetVersion
-targetCompatibility = javaTargetVersion
+java {
+	sourceCompatibility = javaTargetVersion
+	targetCompatibility = javaTargetVersion
+}
 
 wrapper {
 	gradleVersion = '9.6.0'
